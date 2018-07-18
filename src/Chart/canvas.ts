@@ -144,7 +144,7 @@ class ChartCanvas implements Canvas {
 
     const legend = d3
       .select(legendNode)
-      .attr("class", `${styles.legend} ${styles.legendTopBottom} ${options.float}`)
+      .attr("class", `${styles.legend} ${options.float}`)
       .style("float", options.float)
 
     this.elMap[`legend-${options.position}-${options.float}`] = legend

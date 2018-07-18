@@ -1,53 +1,86 @@
 import { css } from "glamor"
 import theme from "../utils/constants"
 
-const legendStyle = {
+// Canvas
+const drawingContainerStyle = {
   fontSize: "11px",
   position: "relative",
   overflow: "hidden",
 }
 
-const legendTopBottomStyle = {
-  padding: "3px 7px",
-  "& .series-legend, .comparison-legend": {
-    float: "left",
+const chartContainerStyle = {
+  position: "relative",
+  display: "block",
+  backgroundColor: theme.colors.white,
+  "&.hidden": {
+    display: "none",
   },
+}
+
+// Legends
+const legendStyle = {
+  padding: `${theme.space.small}px ${theme.space.default}px`
 }
 
 const seriesLegendStyle = {
-  padding: "1px 4px 0 4px",
-  marginRight: "2px",
-  float: "left",
-  lineHeight: "14px",
+  padding: `2px ${theme.space.small}`,
   "& div.color": {
-    width: "10px",
-    height: "10px",
-    margin: "3px 3px 0 0",
+    width: 10,
+    height: 10,
+    marginRight: theme.space.small,
     float: "left",
-    borderRadius: "2px",
+    borderRadius: 2,
   },
   "& div.name": {
     float: "left",
-    ...theme.font.small,
+    fontSize: theme.font.size.default,
+    fontWeight: theme.font.weight.regular,
+    lineHeight: 1,
   },
 }
 
-const drawingContainerStyle = {
-  position: "relative",
-  overflow: "hidden",
-}
-
-const ruleStyle = {
-  stroke: "#eee",
-  strokeWidth: "1px",
+// Axes
+const rulesStyle = {
+  stroke: theme.colors.axis.rules,
+  strokeWidth: 1,
   shapeRendering: "crispedges",
   "& .zero": {
-    strokeWidth: "2px",
+    strokeWidth: 2,
   },
   "& .now": {
-    stroke: "#71a934",
+    stroke: theme.colors.primary,
     strokeDasharray: "2, 4",
   },
+}
+
+const axisLabelStyle = {
+  fill: theme.colors.axis.label,
+  fontFamily: theme.font.family,
+  "&.weekend": {
+    fill: "#9d261d",
+  },
+  "&.now": {
+    fill: theme.colors.primary,
+  },
+}
+
+const axisBorderStyle = {
+  stroke: theme.colors.axis.border,
+  shapeRendering: "crispedges",
+}
+
+const axisTickStyle = {
+  stroke: theme.colors.axis.border,
+  strokeWidth: 1,
+  shapeRendering: "crispedges",
+  "&.zero": {
+    strokeWidth: 2,
+  },
+}
+
+// Focus
+const componentRectStyle = {
+  opacity: 0,
 }
 
 const componentFocusStyle = {
@@ -59,15 +92,6 @@ const componentFocusStyle = {
   padding: 0,
   cursor: "pointer",
   maxWidth: "initial",
-}
-
-const chartContainerStyle = {
-  position: "relative",
-  display: "block",
-  backgroundColor: "#fff",
-  "&.hidden": {
-    display: "none",
-  },
 }
 
 const focusLegendStyle = {
@@ -176,8 +200,11 @@ export const focusLegendBelow = css(focusLegendBelowStyle).toString()
 export const focusLegendRight = css(focusLegendRightStyle).toString()
 export const focusLegendLeft = css(focusLegendLeftStyle).toString()
 export const legend = css(legendStyle).toString()
-export const legendTopBottom = css(legendTopBottomStyle).toString()
 export const seriesLegend = css(seriesLegendStyle).toString()
 export const drawingContainer = css(drawingContainerStyle).toString()
-export const rule = css(ruleStyle).toString()
+export const rules = css(rulesStyle).toString()
+export const axisLabel = css(axisLabelStyle).toString()
+export const axisBorder = css(axisBorderStyle).toString()
+export const axisTick = css(axisTickStyle).toString()
+export const componentRect = css(componentRectStyle).toString()
 export const componentFocus = css(componentFocusStyle).toString()

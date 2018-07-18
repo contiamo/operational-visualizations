@@ -42,7 +42,7 @@ const moment: any = extendMoment(Moment as any)
 import { scaleTime } from "d3-scale"
 import { timeMonday } from "d3-time"
 import { timeFormat } from "d3-time-format"
-import * as styles from "./styles"
+import * as styles from "../../shared/styles"
 
 import {
   AxisAttributes,
@@ -181,9 +181,9 @@ class TimeAxis implements AxisClass<Date> {
     const variableBarWidth =
       variableWidthStacks.length > 0
         ? Math.min(
-            Math.max(config.minBarWidth, (defaultTickWidth - requiredTickWidth) / variableWidthStacks.length),
-            config.maxBarWidthRatio * drawingDims[this.isXAxis ? "width" : "height"],
-          )
+          Math.max(config.minBarWidth, (defaultTickWidth - requiredTickWidth) / variableWidthStacks.length),
+          config.maxBarWidthRatio * drawingDims[this.isXAxis ? "width" : "height"],
+        )
         : 0
     requiredTickWidth = requiredTickWidth + variableBarWidth * variableWidthStacks.length
 
@@ -299,7 +299,7 @@ class TimeAxis implements AxisClass<Date> {
 
     const ticks = this.el
       .select("g.axis-elements")
-      .selectAll(`line.${styles.tick}`)
+      .selectAll(`line.${styles.axisTick}`)
       .data(this.options.showTicks ? this.computed.ticks : [], String)
 
     const updateTicks = ticks
@@ -307,7 +307,7 @@ class TimeAxis implements AxisClass<Date> {
       .append("svg:line")
       .call(setLineAttributes, startAttributes)
       .merge(ticks)
-      .attr("class", styles.tick)
+      .attr("class", styles.axisTick)
 
     if (duration) {
       updateTicks.call(setLineAttributes, attributes, duration)
@@ -322,13 +322,13 @@ class TimeAxis implements AxisClass<Date> {
 
     const labels = this.el
       .select("g.axis-elements")
-      .selectAll(`text.${styles.label}`)
+      .selectAll(`text.${styles.axisLabel}`)
       .data(this.computed.ticks, String)
 
     const updateLabels = labels
       .enter()
       .append("svg:text")
-      .attr("class", styles.label)
+      .attr("class", styles.axisLabel)
       .merge(labels)
       .call(setTextAttributes, startAttributes)
       // @TODO
@@ -378,7 +378,7 @@ class TimeAxis implements AxisClass<Date> {
     startAttributes[this.isXAxis ? "x" : "y"] = this.previous.scale
     startAttributes.transform = this.options.rotateLabels
       ? (d: Date) =>
-          `rotate(-45, ${startAttributes.x(d) + startAttributes.dx}, ${startAttributes.y(d) + startAttributes.dy})`
+        `rotate(-45, ${startAttributes.x(d) + startAttributes.dx}, ${startAttributes.y(d) + startAttributes.dy})`
       : ""
     return startAttributes
   }
@@ -409,7 +409,7 @@ class TimeAxis implements AxisClass<Date> {
       y1: this.isXAxis ? 0 : drawingDims.height,
       y2: 0,
     }
-    this.el.select(`line.${styles.border}`).call(setLineAttributes, border, duration)
+    this.el.select(`line.${styles.axisBorder}`).call(setLineAttributes, border, duration)
   }
 
   private onComponentHover(): void {

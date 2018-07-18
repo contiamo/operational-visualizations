@@ -3,7 +3,7 @@
     "rootDir": "src",
     "outDir": "lib",
     "jsx": "react",
-    "target": "es2015",
+    "target": "es5",
     "moduleResolution": "node",
     "declaration": true,
     "allowSyntheticDefaultImports": true,
@@ -12,7 +12,16 @@
     "sourceMap": true,
     "noImplicitAny": true,
     "jsx": "react",
-    "lib": ["dom", "es2016", "dom.iterable", "scripthost", "es2017.object"]
+    "lib": [
+      "dom",
+      "es2016",
+      "dom.iterable",
+      "scripthost",
+      "es2017.object"
+    ]
   },
-  "include": ["src", "types"]
+  "include": [
+    "src",
+    "types"
+  ]
 }

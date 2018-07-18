@@ -1,5 +1,5 @@
 import { AxisPosition, D3Selection, State } from "../typings"
-import * as styles from "./styles"
+import * as styles from "../../shared/styles"
 import { clone, includes } from "lodash/fp"
 
 class Rules {

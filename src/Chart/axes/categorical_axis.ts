@@ -34,8 +34,7 @@ import {
 import { setTextAttributes, setLineAttributes } from "../../utils/d3_utils"
 import Events from "../../shared/event_catalog"
 import { scaleBand } from "d3-scale"
-import * as styles from "./styles"
-
+import * as styles from "../../shared/styles"
 import {
   AxisAttributes,
   AxisClass,
@@ -204,7 +203,7 @@ class CategoricalAxis implements AxisClass<string> {
 
     const ticks = this.el
       .select("g.axis-elements")
-      .selectAll(`line.${styles.tick}`)
+      .selectAll(`line.${styles.axisTick}`)
       .data(this.options.showTicks ? this.computed.ticks : [], String)
 
     const updateTicks = ticks
@@ -212,7 +211,7 @@ class CategoricalAxis implements AxisClass<string> {
       .append("svg:line")
       .call(setLineAttributes, attributes)
       .merge(ticks)
-      .attr("class", (d: any) => `${styles.tick} ${d === 0 ? "zero" : ""}`)
+      .attr("class", (d: any) => `${styles.axisTick} ${d === 0 ? "zero" : ""}`)
 
     if (duration) {
       updateTicks.call(setLineAttributes, attributes, duration)
@@ -227,13 +226,13 @@ class CategoricalAxis implements AxisClass<string> {
 
     const labels = this.el
       .select("g.axis-elements")
-      .selectAll(`text.${styles.label}`)
+      .selectAll(`text.${styles.axisLabel}`)
       .data(this.computed.ticks, String)
 
     const updateLabels = labels
       .enter()
       .append("svg:text")
-      .attr("class", styles.label)
+      .attr("class", styles.axisLabel)
       .merge(labels)
       .call(setTextAttributes, startAttributes)
       .style("font-size", `${this.options.fontSize}px`)
@@ -274,7 +273,7 @@ class CategoricalAxis implements AxisClass<string> {
       this.scaleWithOffset(this.previous)(d) || this.scaleWithOffset(this.computed)(d)
     startAttributes.transform = this.options.rotateLabels
       ? (d: any) =>
-          `rotate(-45, ${startAttributes.x(d) + startAttributes.dx}, ${startAttributes.y(d) + startAttributes.dy})`
+        `rotate(-45, ${startAttributes.x(d) + startAttributes.dx}, ${startAttributes.y(d) + startAttributes.dy})`
       : ""
     return startAttributes
   }
@@ -313,7 +312,7 @@ class CategoricalAxis implements AxisClass<string> {
       y1: this.isXAxis ? 0 : drawingDims.height,
       y2: 0,
     }
-    this.el.select(`line.${styles.border}`).call(setLineAttributes, border, duration)
+    this.el.select(`line.${styles.axisBorder}`).call(setLineAttributes, border, duration)
   }
 
   private onComponentHover(): void {

@@ -55,7 +55,7 @@ class PieChartCanvas implements Canvas {
 
     const legend = d3
       .select(legendNode)
-      .attr("class", `${styles.legend} ${styles.legendTopBottom} left`)
+      .attr("class", `${styles.legend} left`)
       .style("float", "left")
 
     this.elMap.legend = legend
