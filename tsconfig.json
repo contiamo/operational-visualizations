@@ -3,7 +3,7 @@
     "rootDir": "src",
     "outDir": "lib",
     "jsx": "react",
-    "target": "es2015",
+    "target": "es5",
     "moduleResolution": "node",
     "declaration": true,
     "allowSyntheticDefaultImports": true,
