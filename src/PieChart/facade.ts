@@ -137,7 +137,7 @@ class PieChartFacade implements Facade {
     this.events.removeListener(event, handler)
   }
 
-  draw(): Element {
+  draw(): void {
     this.state.captureState()
     this.series.assignData()
     this.components.legend.draw()
@@ -148,8 +148,6 @@ class PieChartFacade implements Facade {
     !isEmpty(focusElement)
       ? this.events.emit(Events.FOCUS.ELEMENT.HIGHLIGHT, focusElement)
       : this.events.emit(Events.FOCUS.ELEMENT.OUT)
-
-    return this.canvas.elementFor("series").node()
   }
 
   close(): void {

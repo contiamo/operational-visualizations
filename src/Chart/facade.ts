@@ -177,7 +177,7 @@ class ChartFacade implements Facade {
     this.events.removeListener(event, handler)
   }
 
-  draw(): Element {
+  draw(): void {
     this.state.captureState()
     this.series.assignData()
     this.components.legends.draw()
@@ -190,7 +190,6 @@ class ChartFacade implements Facade {
     !isEmpty(focus)
       ? this.events.emit(focus.type === "date" ? Events.FOCUS.DATE : Events.FOCUS.ELEMENT.HIGHLIGHT, focus.value)
       : this.events.emit(Events.FOCUS.CLEAR)
-    return this.canvas.elementFor("series").node()
   }
 
   close(): void {

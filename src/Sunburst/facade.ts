@@ -147,11 +147,10 @@ class SunburstFacade implements Facade {
     this.events.removeListener(event, handler)
   }
 
-  draw(): Element {
+  draw(): void {
     this.state.captureState()
     this.canvas.draw()
     this.components.renderer.draw()
-    return this.canvas.elementFor("series").node()
   }
 
   close(): void {

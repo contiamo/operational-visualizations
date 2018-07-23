@@ -157,7 +157,7 @@ class ProcessFlowFacade implements Facade {
     this.events.removeListener(event, handler)
   }
 
-  draw(): Element {
+  draw(): void {
     this.state.captureState()
     this.series.prepareData()
     this.canvas.draw()
@@ -167,8 +167,6 @@ class ProcessFlowFacade implements Facade {
     !isEmpty(focusElement)
       ? this.events.emit(Events.FOCUS.ELEMENT.HIGHLIGHT, focusElement)
       : this.events.emit(Events.FOCUS.ELEMENT.OUT)
-
-    return this.canvas.elementFor("series").node()
   }
 
   close(): void {
