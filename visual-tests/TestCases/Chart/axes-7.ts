@@ -1,4 +1,4 @@
-import { Chart, AxesData } from "@operational/visualizations"
+import { Chart, AxesData } from "../../../src"
 import { MarathonEnvironment } from "../../Marathon"
 
 const LineRenderer = {

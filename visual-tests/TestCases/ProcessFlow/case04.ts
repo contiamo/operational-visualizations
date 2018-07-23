@@ -1,4 +1,4 @@
-import { ProcessFlow, ProcessFlowLoopHandler } from "@operational/visualizations"
+import { ProcessFlow, ProcessFlowLoopHandler } from "../../../src"
 import { uniq, flow, map, flatten } from "lodash/fp"
 import { MarathonEnvironment } from "../../Marathon"
 
