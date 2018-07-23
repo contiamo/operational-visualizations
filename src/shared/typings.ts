@@ -56,7 +56,7 @@ export interface Canvas {
   remove: () => void
 }
 
-export interface Facade<Config, AccessorsObject, Components, Data> {
+export interface Facade<Config, Data> {
   data: (data?: Data) => Data
   config: (config?: Partial<Config>) => Config
   accessors: (type: string, accessors: Accessors<any>) => Accessors<any>
