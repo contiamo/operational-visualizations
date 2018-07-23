@@ -186,6 +186,7 @@ class ChartFacade implements Facade {
     this.components.axes.draw()
     this.series.draw()
 
+    // Focus behaviour is applied through events only - there is no focus.draw() method.
     const focus: FocusElement = this.state.config().focus
     !isEmpty(focus)
       ? this.events.emit(focus.type === "date" ? Events.FOCUS.DATE : Events.FOCUS.ELEMENT.HIGHLIGHT, focus.value)

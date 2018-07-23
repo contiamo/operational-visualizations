@@ -144,6 +144,7 @@ class PieChartFacade implements Facade {
     this.canvas.draw()
     this.series.draw()
 
+    // Focus behaviour is applied through events only - there is no focus.draw() method.
     const focusElement: FocusElement = this.state.config().focusElement
     !isEmpty(focusElement)
       ? this.events.emit(Events.FOCUS.ELEMENT.HIGHLIGHT, focusElement)
