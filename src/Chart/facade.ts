@@ -88,14 +88,18 @@ class ChartFacade implements Facade {
 
   constructor(context: Element) {
     this.context = context
-    this.events = new EventEmitter()
-    this.state = this.insertState()
-    this.canvas = this.insertCanvas()
-    this.components = this.insertComponents()
-    this.series = this.insertSeries()
+    this.events = this.initializeEvents()
+    this.state = this.initializeState()
+    this.canvas = this.initializeCanvas()
+    this.components = this.initializeComponents()
+    this.series = this.initializeSeries()
   }
 
-  private insertState(): StateHandler<ChartConfig, Data> {
+  private initializeEvents(): EventEmitter {
+    return new EventEmitter()
+  }
+
+  private initializeState(): StateHandler<ChartConfig, Data> {
     return new StateHandler({
       data: {},
       config: defaultConfig(),
@@ -104,11 +108,11 @@ class ChartFacade implements Facade {
     })
   }
 
-  private insertCanvas(): ChartCanvas {
+  private initializeCanvas(): ChartCanvas {
     return new ChartCanvas(this.state.readOnly(), this.state.computedWriter(["canvas"]), this.events, this.context)
   }
 
-  private insertComponents(): any {
+  private initializeComponents(): any {
     return {
       axes: new AxesManager(this.state.readOnly(), this.state.computedWriter("axes"), this.events, {
         xAxes: this.canvas.elementFor("xAxes"),
@@ -133,7 +137,7 @@ class ChartFacade implements Facade {
     }
   }
 
-  private insertSeries(): ChartSeriesManager {
+  private initializeSeries(): ChartSeriesManager {
     return new ChartSeriesManager(
       this.state.readOnly(),
       this.state.computedWriter(["series"]),

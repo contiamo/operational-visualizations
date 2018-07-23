@@ -69,14 +69,18 @@ class PieChartFacade implements Facade {
 
   constructor(context: Element) {
     this.context = context
-    this.events = new EventEmitter()
-    this.state = this.insertState()
-    this.canvas = this.insertCanvas()
-    this.components = this.insertComponents()
-    this.series = this.insertSeries()
+    this.events = this.initializeEvents()
+    this.state = this.initializeState()
+    this.canvas = this.initializeCanvas()
+    this.components = this.initializeComponents()
+    this.series = this.initializeSeries()
   }
 
-  private insertState(): StateHandler<PieChartConfig, Data> {
+  private initializeEvents(): EventEmitter {
+    return new EventEmitter()
+  }
+
+  private initializeState(): StateHandler<PieChartConfig, Data> {
     return new StateHandler({
       data: {},
       config: defaultConfig(),
@@ -85,11 +89,11 @@ class PieChartFacade implements Facade {
     })
   }
 
-  private insertCanvas(): PieChartCanvas {
+  private initializeCanvas(): PieChartCanvas {
     return new PieChartCanvas(this.state.readOnly(), this.state.computedWriter(["canvas"]), this.events, this.context)
   }
 
-  private insertComponents(): Components {
+  private initializeComponents(): Components {
     return {
       legend: new PieChartLegend(
         this.state.readOnly(),
@@ -104,7 +108,7 @@ class PieChartFacade implements Facade {
     }
   }
 
-  private insertSeries(): Series {
+  private initializeSeries(): Series {
     return new Series(
       this.state.readOnly(),
       this.state.computedWriter(["series"]),

@@ -66,13 +66,17 @@ class SunburstFacade implements Facade {
 
   constructor(context: Element) {
     this.context = context
-    this.events = new EventEmitter()
-    this.state = this.insertState()
-    this.canvas = this.insertCanvas()
-    this.components = this.insertComponents()
+    this.events = this.initializeEvents()
+    this.state = this.initializeState()
+    this.canvas = this.initializeCanvas()
+    this.components = this.initializeComponents()
   }
 
-  private insertState(): StateHandler<SunburstConfig, RawData> {
+  private initializeEvents(): EventEmitter {
+    return new EventEmitter()
+  }
+
+  private initializeState(): StateHandler<SunburstConfig, RawData> {
     return new StateHandler({
       data: {},
       config: defaultConfig(),
@@ -81,11 +85,11 @@ class SunburstFacade implements Facade {
     })
   }
 
-  private insertCanvas(): SunburstCanvas {
+  private initializeCanvas(): SunburstCanvas {
     return new SunburstCanvas(this.state.readOnly(), this.state.computedWriter(["canvas"]), this.events, this.context)
   }
 
-  private insertComponents(): Components {
+  private initializeComponents(): Components {
     return {
       breadcrumb: new Breadcrumb(
         this.state.readOnly(),
