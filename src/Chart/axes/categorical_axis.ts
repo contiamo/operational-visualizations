@@ -273,7 +273,7 @@ class CategoricalAxis implements AxisClass<string> {
       this.scaleWithOffset(this.previous)(d) || this.scaleWithOffset(this.computed)(d)
     startAttributes.transform = this.options.rotateLabels
       ? (d: any) =>
-        `rotate(-45, ${startAttributes.x(d) + startAttributes.dx}, ${startAttributes.y(d) + startAttributes.dy})`
+          `rotate(-45, ${startAttributes.x(d) + startAttributes.dx}, ${startAttributes.y(d) + startAttributes.dy})`
       : ""
     return startAttributes
   }

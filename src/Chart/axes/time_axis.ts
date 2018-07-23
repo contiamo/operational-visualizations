@@ -181,9 +181,9 @@ class TimeAxis implements AxisClass<Date> {
     const variableBarWidth =
       variableWidthStacks.length > 0
         ? Math.min(
-          Math.max(config.minBarWidth, (defaultTickWidth - requiredTickWidth) / variableWidthStacks.length),
-          config.maxBarWidthRatio * drawingDims[this.isXAxis ? "width" : "height"],
-        )
+            Math.max(config.minBarWidth, (defaultTickWidth - requiredTickWidth) / variableWidthStacks.length),
+            config.maxBarWidthRatio * drawingDims[this.isXAxis ? "width" : "height"],
+          )
         : 0
     requiredTickWidth = requiredTickWidth + variableBarWidth * variableWidthStacks.length
 
@@ -378,7 +378,7 @@ class TimeAxis implements AxisClass<Date> {
     startAttributes[this.isXAxis ? "x" : "y"] = this.previous.scale
     startAttributes.transform = this.options.rotateLabels
       ? (d: Date) =>
-        `rotate(-45, ${startAttributes.x(d) + startAttributes.dx}, ${startAttributes.y(d) + startAttributes.dy})`
+          `rotate(-45, ${startAttributes.x(d) + startAttributes.dx}, ${startAttributes.y(d) + startAttributes.dy})`
       : ""
     return startAttributes
   }

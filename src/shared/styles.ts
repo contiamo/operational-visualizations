@@ -19,7 +19,7 @@ const chartContainerStyle = {
 
 // Legends
 const legendStyle = {
-  padding: `${theme.space.small}px ${theme.space.default}px`
+  padding: `${theme.space.small}px ${theme.space.default}px`,
 }
 
 const seriesLegendStyle = {

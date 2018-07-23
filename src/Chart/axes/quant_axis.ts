@@ -102,9 +102,9 @@ class QuantAxis implements AxisClass<number> {
     return this.isXAxis
       ? [0, computed.canvas.drawingDims.width]
       : [
-        computed.canvas.drawingDims.height,
-        includes("x2")(computed.axes.requiredAxes) ? 0 : this.options.minTopOffsetTopTick,
-      ]
+          computed.canvas.drawingDims.height,
+          includes("x2")(computed.axes.requiredAxes) ? 0 : this.options.minTopOffsetTopTick,
+        ]
   }
 
   // Computes nice steps (for ticks) given a domain [start, stop] and a
