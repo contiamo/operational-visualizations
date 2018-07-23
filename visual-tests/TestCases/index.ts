@@ -7,7 +7,7 @@ import { TestSuiteGroup } from "./types"
 import { MarathonEnvironment } from "../Marathon"
 
 const testGroups: TestSuiteGroup[] = [
-  { folder: "Charts", title: "Charts", slug: "charts", children: chartTestCases },
+  { folder: "Chart", title: "Charts", slug: "charts", children: chartTestCases },
   { folder: "PieChart", title: "Pie Charts", slug: "pie-charts", children: pieChartTestCases },
   { folder: "ProcessFlow", title: "Process Flow", slug: "process-flow-charts", children: processFlowTestCases },
   { folder: "Sunburst", title: "Sunburst charts", slug: "sunburst", children: sunburstTestCases },

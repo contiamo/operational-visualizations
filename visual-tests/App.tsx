@@ -140,7 +140,8 @@ class App extends React.Component<{}, State> {
                     icon="Open"
                     condensed
                     color="ghost"
-                    to={`https://github.com/contiamo/operational-ui/tree/master/packages/visual-tests/src/TestCases/${
+                    target="_blank"
+                    to={`https://github.com/contiamo/operational-visualizations/blob/master/visual-tests/TestCases/${
                       allTestCases[this.state.group].folder
                     }/${allTestCases[this.state.group].children[this.state.test].slug}.ts`}
                   >
@@ -148,7 +149,8 @@ class App extends React.Component<{}, State> {
                   </Button>
                   <Button
                     condensed
-                    color={this.state.isLooping ? "white" : "info"}
+                    color="ghost"
+                    icon={this.state.isLooping ? "Pause" : "Play"}
                     onClick={() => {
                       if (!this.state.isLooping && this.state.isIdle) {
                         this.loop()
@@ -159,7 +161,7 @@ class App extends React.Component<{}, State> {
                       }))
                     }}
                   >
-                    {this.state.isLooping ? "Pause" : "Loop"}
+                    {this.state.isLooping ? "Pause" : "Run all"}
                   </Button>
                 </>
               }

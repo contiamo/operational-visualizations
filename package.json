@@ -16,7 +16,9 @@
     "build:visual-tests": "parcel build visual-tests/index.html --public-url .",
     "package": "rimraf lib && tsc",
     "test": "jest",
-    "prepublish": "npm run package"
+    "prepublish": "npm run package",
+    "prettier": "prettier 'visual-tests/**/*.{ts,tsx}' --write",
+    "precommit": "npm run prettier && git add ."
   },
   "dependencies": {
     "@operational/visualizations": "^5.2.0",
