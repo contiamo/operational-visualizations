@@ -56,13 +56,13 @@ export interface Canvas {
   remove: () => void
 }
 
-export interface Facade<Config, AccessorsObject, Components, Data> {
+export interface Facade<Config, Data> {
   data: (data?: Data) => Data
   config: (config?: Partial<Config>) => Config
   accessors: (type: string, accessors: Accessors<any>) => Accessors<any>
   on: (event: string, handler: any) => void
   off: (event: string, handler: any) => void
-  draw: () => Element
+  draw: () => void
   close: () => void
 }
 

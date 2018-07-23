@@ -318,7 +318,7 @@ export type ClipPath = "drawing_clip" | "yrules_clip" | "xyrules_clip"
 
 export type SeriesElements = [RendererType, ClipPath][]
 
-export type Facade = Facade<ChartConfig, AccessorsObject, Components, Data>
+export type Facade = Facade<ChartConfig, Data>
 
 export interface MousePosition {
   x: number

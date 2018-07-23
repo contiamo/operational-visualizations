@@ -88,14 +88,18 @@ class ProcessFlowFacade implements Facade {
 
   constructor(context: Element) {
     this.context = context
-    this.events = new EventEmitter()
-    this.state = this.insertState()
-    this.canvas = this.insertCanvas()
-    this.components = this.insertComponents()
-    this.series = this.insertSeries()
+    this.events = this.initializeEvents()
+    this.state = this.initializeState()
+    this.canvas = this.initializeCanvas()
+    this.components = this.initializeComponents()
+    this.series = this.initializeSeries()
   }
 
-  private insertState(): StateHandler<ProcessFlowConfig, InputData> {
+  private initializeEvents(): EventEmitter {
+    return new EventEmitter()
+  }
+
+  private initializeState(): StateHandler<ProcessFlowConfig, InputData> {
     return new StateHandler({
       data: {},
       config: defaultConfig(),
@@ -104,7 +108,7 @@ class ProcessFlowFacade implements Facade {
     })
   }
 
-  private insertCanvas(): ProcessFlowCanvas {
+  private initializeCanvas(): ProcessFlowCanvas {
     return new ProcessFlowCanvas(
       this.state.readOnly(),
       this.state.computedWriter(["canvas"]),
@@ -113,7 +117,7 @@ class ProcessFlowFacade implements Facade {
     )
   }
 
-  private insertComponents(): Components {
+  private initializeComponents(): Components {
     return {
       focus: new ProcessFlowFocus(
         this.state.readOnly(),
@@ -124,7 +128,7 @@ class ProcessFlowFacade implements Facade {
     }
   }
 
-  private insertSeries(): Series {
+  private initializeSeries(): Series {
     return new Series(
       this.state.readOnly(),
       this.state.computedWriter(["series"]),
@@ -153,18 +157,17 @@ class ProcessFlowFacade implements Facade {
     this.events.removeListener(event, handler)
   }
 
-  draw(): Element {
+  draw(): void {
     this.state.captureState()
     this.series.prepareData()
     this.canvas.draw()
     this.series.draw()
 
+    // Focus behaviour is applied through events only - there is no focus.draw() method.
     const focusElement: FocusElement = this.state.config().focusElement
     !isEmpty(focusElement)
       ? this.events.emit(Events.FOCUS.ELEMENT.HIGHLIGHT, focusElement)
       : this.events.emit(Events.FOCUS.ELEMENT.OUT)
-
-    return this.canvas.elementFor("series").node()
   }
 
   close(): void {

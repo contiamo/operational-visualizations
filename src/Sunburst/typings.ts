@@ -95,7 +95,7 @@ export interface ClickPayload {
 
 export type Focus = Focus<HoverPayload>
 
-export type Facade = Facade<SunburstConfig, AccessorsObject, Components, RawData>
+export type Facade = Facade<SunburstConfig, RawData>
 
 export interface Components {
   breadcrumb: Breadcrumb
