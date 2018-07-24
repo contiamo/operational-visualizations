@@ -2,7 +2,7 @@ import Events from "../../shared/event_catalog"
 import { cloneDeep, defaults, filter, find, includes, isFinite, last, rangeStep, sortBy } from "lodash/fp"
 import { setTextAttributes, setLineAttributes } from "../../utils/d3_utils"
 import { computeDomain, computeScale, computeTickNumber, computeTicks } from "../../utils/quant_axis_utils"
-import * as styles from "./styles"
+import * as styles from "../../shared/styles"
 
 import {
   computeRequiredMargin,
@@ -198,7 +198,7 @@ class QuantAxis implements AxisClass<number> {
 
     const ticks = this.el
       .select("g.axis-elements")
-      .selectAll(`line.${styles.tick}`)
+      .selectAll(`line.${styles.axisTick}`)
       .data(this.options.showTicks ? this.computed.ticks : [], String)
 
     const updateTicks = ticks
@@ -206,7 +206,7 @@ class QuantAxis implements AxisClass<number> {
       .append("svg:line")
       .call(setLineAttributes, startAttributes)
       .merge(ticks)
-      .attr("class", (d: any) => `${styles.tick} ${d === 0 ? "zero" : ""}`)
+      .attr("class", (d: any) => `${styles.axisTick} ${d === 0 ? "zero" : ""}`)
 
     if (duration) {
       updateTicks.call(setLineAttributes, attributes, duration)
@@ -221,13 +221,13 @@ class QuantAxis implements AxisClass<number> {
 
     const labels = this.el
       .select("g.axis-elements")
-      .selectAll(`text.${styles.label}`)
+      .selectAll(`text.${styles.axisLabel}`)
       .data(this.computed.labelTicks, String)
 
     const updateLabels = labels
       .enter()
       .append("svg:text")
-      .attr("class", styles.label)
+      .attr("class", styles.axisLabel)
       .merge(labels)
       .call(setTextAttributes, startAttributes)
       .style("font-size", `${this.options.fontSize}px`)
@@ -313,7 +313,7 @@ class QuantAxis implements AxisClass<number> {
       y1: this.isXAxis ? 0 : drawingDims.height,
       y2: 0,
     }
-    this.el.select(`line.${styles.border}`).call(setLineAttributes, border, duration)
+    this.el.select(`line.${styles.axisBorder}`).call(setLineAttributes, border, duration)
   }
 
   private onComponentHover(): void {

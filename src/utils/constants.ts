@@ -51,8 +51,22 @@ const colors = {
   lightGrey: "#e8e8e8",
 }
 
+type FontWeight = 400 | 700
+
 const font = {
   color: "#999999",
+  size: {
+    /** 12 */
+    default: 12,
+    /** 11 */
+    small: 11,
+  },
+  weight: {
+    /** 400 */
+    regular: 400,
+    /** 700 */
+    bold: 700,
+  },
   small: {
     lineHeight: "1.5",
     textTransform: "none",

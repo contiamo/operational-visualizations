@@ -15,6 +15,7 @@
     "start:visual-tests": "parcel visual-tests/index.html",
     "build:visual-tests": "parcel build visual-tests/index.html --public-url .",
     "package": "rimraf lib && tsc",
+    "prettify": "prettier 'src/**/*.{ts,tsx}' --write",
     "test": "jest",
     "prepublish": "npm run package"
   },

@@ -1,7 +1,7 @@
 import { setLineAttributes, setRectAttributes, setTextAttributes } from "../../utils/d3_utils"
 import { AxisClass, AxisOptions, AxisPosition, Dimensions, D3Selection, TimeAxisOptions } from "../typings"
 import { flow, forEach, get, keys, last, map, mapValues, times, uniqBy, values } from "lodash/fp"
-import * as styles from "./styles"
+import * as styles from "../../shared/styles"
 import * as moment from "moment"
 
 export const axisPosition = (position: AxisPosition, drawingDims: Dimensions): [number, number] => {
@@ -36,7 +36,7 @@ export const insertElements = (
   // Border
   elementGroup
     .append("svg:line")
-    .attr("class", styles.border)
+    .attr("class", styles.axisBorder)
     .call(setLineAttributes, { x1: 0, x2: 0, y1: 0, y2: 0 })
 
   return axisGroup

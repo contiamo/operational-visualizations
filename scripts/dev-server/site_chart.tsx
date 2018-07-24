@@ -27,13 +27,6 @@ const BarsRenderer: any = {
   type: "bars",
 }
 
-const FixedBarsRenderer: any = {
-  accessors: {
-    barWidth: () => 20,
-  },
-  type: "bars",
-}
-
 const SymbolRenderer: any = {
   accessors: {
     symbol: (series: any, d: any) => (d.y >= 1000 ? "cross" : "diamond"),
@@ -135,8 +128,10 @@ const createData: any = () => {
             ],
             name: "Metric 1",
             key: "series3",
-            xAttribute: "y",
-            yAttribute: "x",
+            datumAccessors: {
+              x: (d: any) => d.y,
+              y: (d: any) => d.x,
+            },
             yAxis: "y2",
           },
           {
@@ -152,8 +147,10 @@ const createData: any = () => {
             ],
             name: "Metric 2",
             key: "series4",
-            xAttribute: "y",
-            yAttribute: "x",
+            datumAccessors: {
+              x: (d: any) => d.y,
+              y: (d: any) => d.x,
+            },
             yAxis: "y2",
           },
         ],
