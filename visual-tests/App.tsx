@@ -121,7 +121,7 @@ class App extends React.Component<{}, State> {
                       active={groupIndex === this.state.group && testIndex === this.state.test}
                       onClick={() => {
                         this.setState(() => ({
-                          group: this.state.group,
+                          group: groupIndex,
                           test: testIndex,
                         }))
                       }}
