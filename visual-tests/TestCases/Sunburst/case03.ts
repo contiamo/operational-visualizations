@@ -1,4 +1,4 @@
-import { Sunburst } from "@operational/visualizations"
+import { Sunburst } from "../../../src"
 import { MarathonEnvironment } from "../../Marathon"
 
 export const marathon = ({ test, afterAll, container }: MarathonEnvironment): void => {

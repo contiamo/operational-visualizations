@@ -1,4 +1,4 @@
-import { ProcessFlow } from "@operational/visualizations"
+import { ProcessFlow } from "../../../src"
 import { MarathonEnvironment } from "../../Marathon"
 
 const data1 = {

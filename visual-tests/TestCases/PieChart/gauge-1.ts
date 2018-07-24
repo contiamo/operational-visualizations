@@ -1,4 +1,4 @@
-import { PieChart } from "@operational/visualizations"
+import { PieChart } from "../../../src"
 import { MarathonEnvironment } from "../../Marathon"
 
 const GaugeRenderer = {

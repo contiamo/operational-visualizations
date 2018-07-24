@@ -1,4 +1,4 @@
-import { Chart } from "@operational/visualizations"
+import { Chart } from "../../../src"
 import { MarathonEnvironment } from "../../Marathon"
 import { format } from "d3-format"
 
