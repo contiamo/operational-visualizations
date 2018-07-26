@@ -27,7 +27,11 @@ export default class State<T> {
   }
 
   readOnly(): ReadOnlyState<T> {
-    return { get: this.get }
+    return {
+      get: (path: Path): any => {
+        return get([].concat((Array.isArray(path) && path) || [path]))(cloneDeep(this.state))
+      }
+    }
   }
 
   clone(): State<T> {
