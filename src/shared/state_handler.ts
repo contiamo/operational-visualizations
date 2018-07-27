@@ -44,7 +44,7 @@ export default class StateHandler<Config, Data> {
   }
 
   // Config
-  config(config?: Partial<Config>): Config {
+  config(config?: Partial<Config>) {
     if (!arguments.length) return this.state.current.get("config")
 
     const invalidOptions: string[] = reduce.convert({ cap: false })(

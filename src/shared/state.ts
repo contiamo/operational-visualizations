@@ -1,10 +1,9 @@
-import { cloneDeep } from "lodash"
-import { defaults, get, set } from "lodash/fp"
+import { cloneDeep, defaults, get, set } from "lodash/fp"
 
 export type Path = string | string[]
 
 export interface ReadOnlyState<T> {
-  get(path: Path): any
+  get(path: Path): Readonly<any>
 }
 
 export default class State<T> {
@@ -14,12 +13,13 @@ export default class State<T> {
     this.state = cloneDeep(obj)
   }
 
-  get = (path: Path): any => {
+  get = (path: Path): Readonly<any> => {
     return get([].concat((Array.isArray(path) && path) || [path]))(this.state)
   }
 
   set(path: Path, value: any) {
     this.state = set(path)(value)(this.state)
+    return value
   }
 
   merge(path: Path, value: { [key: string]: any } = {}) {
@@ -27,11 +27,7 @@ export default class State<T> {
   }
 
   readOnly(): ReadOnlyState<T> {
-    return {
-      get: (path: Path): any => {
-        return get([].concat((Array.isArray(path) && path) || [path]))(cloneDeep(this.state))
-      }
-    }
+    return { get: this.get }
   }
 
   clone(): State<T> {

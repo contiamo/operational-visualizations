@@ -1,4 +1,5 @@
 import {
+  cloneDeep,
   filter,
   find,
   flow,
@@ -121,13 +122,13 @@ class ChartSeriesManager implements SeriesManager {
         return includes(type)(rendererTypes).toString()
       })(data)
 
-      // Find all groups of specified type
-      const groups = splitData.true
-
-      // If there are no groups, no further data processing is necessary
-      if (!groups) {
+      // If there are no series groups of this type, no further data processing is necessary
+      if (!splitData.true) {
         return data
       }
+
+      // Find all groups of specified type
+      const groups = cloneDeep(splitData.true)
 
       // Call provided `compute` method on each group
       forEach.convert({ cap: false })(compute)(groups)
