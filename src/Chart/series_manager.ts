@@ -5,7 +5,6 @@ import {
   flow,
   forEach,
   get,
-  groupBy,
   includes,
   indexOf,
   invoke,
@@ -36,6 +35,10 @@ import {
   StateWriter,
   Datum,
 } from "./typings"
+
+type GroupedRendererType = "stacked" | "range"
+
+type GroupCalculation = (group: { [key: string]: any }, index: number) => void
 
 class ChartSeriesManager implements SeriesManager {
   el: D3Selection
@@ -115,39 +118,29 @@ class ChartSeriesManager implements SeriesManager {
     return data
   }
 
-  private handleGroupedSeries(type: "stacked" | "range", compute: any) {
+  private handleGroupedSeries(type: GroupedRendererType, compute: GroupCalculation) {
     return (data: SeriesData) => {
-      const splitData: any = groupBy(options => {
-        const rendererTypes = map(get("type"))(this.renderAs(options))
-        return includes(type)(rendererTypes).toString()
+      const newData: any[] = []
+      let groupIndex: number = 0
+      forEach((series: any) => {
+        const rendererTypes = map(get("type"))(this.renderAs(series))
+        if (includes(type)(rendererTypes)) {
+          const computedSeries = cloneDeep(series)
+          // Perform group calculation
+          compute(computedSeries, groupIndex)
+          // Append each series in the group individually to the new data array
+          forEach((options: any) => {
+            options.renderAs = this.renderAs(this.renderAs(computedSeries)[0])
+            newData.push(options)
+          })(computedSeries.series)
+          // Add one to the group index
+          groupIndex = groupIndex + 1
+        } else {
+          newData.push(series)
+        }
       })(data)
 
-      // If there are no series groups of this type, no further data processing is necessary
-      if (!splitData.true) {
-        return data
-      }
-
-      // Find all groups of specified type
-      const groups = cloneDeep(splitData.true)
-
-      // Call provided `compute` method on each group
-      forEach.convert({ cap: false })(compute)(groups)
-
-      // Flatten data structure by appending each processed individual series of each group to the list of ungrouped series
-      let ungroupedSeries = splitData.false || []
-
-      forEach(
-        (group: { [key: string]: any }): void => {
-          forEach(
-            (series: { [key: string]: any }): void => {
-              series.renderAs = this.renderAs(this.renderAs(group)[0])
-              ungroupedSeries = ungroupedSeries.concat(series)
-            },
-          )(group.series)
-        },
-      )(groups)
-
-      return ungroupedSeries
+      return newData
     }
   }
 
