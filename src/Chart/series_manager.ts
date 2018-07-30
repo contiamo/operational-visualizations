@@ -68,6 +68,12 @@ class ChartSeriesManager implements SeriesManager {
     this.stateWriter("dataForFocus", this.dataForFocus.bind(this))
   }
 
+  /**
+   * Prepare the data for rendering.
+   * - Remove hidden series from the data
+   * - Assign bar indices to enable correct placement on the axis
+   * - Transform grouped series into individual series which can be rendered independently
+   */
   private prepareData(): void {
     const data = flow(
       omitBy(this.state.current.get("accessors").series.hide),
@@ -85,9 +91,11 @@ class ChartSeriesManager implements SeriesManager {
     series ? series.update(options) : this.create(options)
   }
 
-  // Assign bar index to each series
-  // Grouped series will have the same bar index, while individual series will have unique indices
-  // The bar indices are used to determine where bars are rendered respective to each tick.
+  /**
+   * Assign bar index to each series
+   * Grouped series will have the same bar index, while individual series will have unique indices
+   * The bar indices are used to determine where bars are rendered respective to each tick.
+   */
   private assignBarIndices(data: SeriesData): SeriesData {
     let index = 0
     const barIndices: { [key: string]: number } = {}
@@ -118,6 +126,14 @@ class ChartSeriesManager implements SeriesManager {
     return data
   }
 
+  /**
+   * There are 2 types of grouped series: ranges and stacks.
+   * This method does the following:
+   * - identifies the grouped series
+   * - applies the appropriate calculations (provided as the `compute` argument) to each group of series
+   * - returns each series of the group as as individual series object with its own rendering options,
+   * so it can be rendered independently from the other series in the group.
+   */
   private handleGroupedSeries(type: GroupedRendererType, compute: GroupCalculation) {
     return (data: SeriesData) => {
       const newData: any[] = []
@@ -144,6 +160,7 @@ class ChartSeriesManager implements SeriesManager {
     }
   }
 
+  // Add clip data and stack index to grouped range series
   private computeRange(range: { [key: string]: any }, index: number): void {
     if (range.series.length !== 2) {
       throw new Error("Range renderer must have exactly 2 series.")
@@ -156,6 +173,7 @@ class ChartSeriesManager implements SeriesManager {
     })(range.series)
   }
 
+  // Compute stack values and add stack index to grouped stack series
   private computeStack(stack: { [key: string]: any }, index: number): void {
     // By default, stacks are vertical
     const stackAxis: "x" | "y" = (this.renderAs(stack)[0] as GroupedRendererOptions).stackAxis || "y"
