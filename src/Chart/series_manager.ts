@@ -5,7 +5,6 @@ import {
   flow,
   forEach,
   get,
-  groupBy,
   includes,
   indexOf,
   invoke,
@@ -37,6 +36,10 @@ import {
   Datum,
 } from "./typings"
 
+type GroupedRendererType = "stacked" | "range"
+
+type GroupCalculation = (group: { [key: string]: any }, index: number) => void
+
 class ChartSeriesManager implements SeriesManager {
   el: D3Selection
   events: EventBus
@@ -65,13 +68,19 @@ class ChartSeriesManager implements SeriesManager {
     this.stateWriter("dataForFocus", this.dataForFocus.bind(this))
   }
 
+  /**
+   * Prepare the data for rendering.
+   * - Remove hidden series from the data
+   * - Assign bar indices to enable correct placement on the axis
+   * - Transform grouped series into individual series which can be rendered independently
+   */
   private prepareData(): void {
     const data = flow(
       omitBy(this.state.current.get("accessors").series.hide),
       this.assignBarIndices.bind(this),
       this.handleGroupedSeries("stacked", this.computeStack.bind(this)),
       this.handleGroupedSeries("range", this.computeRange.bind(this)),
-    )(cloneDeep(this.state.current.get("accessors").data.series(this.state.current.get("data"))))
+    )(this.state.current.get("accessors").data.series(this.state.current.get("data")))
 
     this.removeAllExcept(map(this.key)(data))
     forEach(this.updateOrCreate.bind(this))(data)
@@ -82,9 +91,11 @@ class ChartSeriesManager implements SeriesManager {
     series ? series.update(options) : this.create(options)
   }
 
-  // Assign bar index to each series
-  // Grouped series will have the same bar index, while individual series will have unique indices
-  // The bar indices are used to determine where bars are rendered respective to each tick.
+  /**
+   * Assign bar index to each series
+   * Grouped series will have the same bar index, while individual series will have unique indices
+   * The bar indices are used to determine where bars are rendered respective to each tick.
+   */
   private assignBarIndices(data: SeriesData): SeriesData {
     let index = 0
     const barIndices: { [key: string]: number } = {}
@@ -115,42 +126,41 @@ class ChartSeriesManager implements SeriesManager {
     return data
   }
 
-  private handleGroupedSeries(type: "stacked" | "range", compute: any) {
+  /**
+   * There are 2 types of grouped series: ranges and stacks.
+   * This method does the following:
+   * - identifies the grouped series
+   * - applies the appropriate calculations (provided as the `compute` argument) to each group of series
+   * - returns each series of the group as as individual series object with its own rendering options,
+   * so it can be rendered independently from the other series in the group.
+   */
+  private handleGroupedSeries(type: GroupedRendererType, compute: GroupCalculation) {
     return (data: SeriesData) => {
-      const splitData: any = groupBy(options => {
-        const rendererTypes = map(get("type"))(this.renderAs(options))
-        return includes(type)(rendererTypes).toString()
+      const newData: any[] = []
+      let groupIndex: number = 0
+      forEach((series: any) => {
+        const rendererTypes = map(get("type"))(this.renderAs(series))
+        if (includes(type)(rendererTypes)) {
+          const computedSeries = cloneDeep(series)
+          // Perform group calculation
+          compute(computedSeries, groupIndex)
+          // Append each series in the group individually to the new data array
+          forEach((options: any) => {
+            options.renderAs = this.renderAs(this.renderAs(computedSeries)[0])
+            newData.push(options)
+          })(computedSeries.series)
+          // Add one to the group index
+          groupIndex = groupIndex + 1
+        } else {
+          newData.push(series)
+        }
       })(data)
 
-      // Find all groups of specified type
-      const groups = splitData.true
-
-      // If there are no groups, no further data processing is necessary
-      if (!groups) {
-        return data
-      }
-
-      // Call provided `compute` method on each group
-      forEach.convert({ cap: false })(compute)(groups)
-
-      // Flatten data structure by appending each processed individual series of each group to the list of ungrouped series
-      let ungroupedSeries = splitData.false || []
-
-      forEach(
-        (group: { [key: string]: any }): void => {
-          forEach(
-            (series: { [key: string]: any }): void => {
-              series.renderAs = this.renderAs(this.renderAs(group)[0])
-              ungroupedSeries = ungroupedSeries.concat(series)
-            },
-          )(group.series)
-        },
-      )(groups)
-
-      return ungroupedSeries
+      return newData
     }
   }
 
+  // Add clip data and stack index to grouped range series
   private computeRange(range: { [key: string]: any }, index: number): void {
     if (range.series.length !== 2) {
       throw new Error("Range renderer must have exactly 2 series.")
@@ -163,6 +173,7 @@ class ChartSeriesManager implements SeriesManager {
     })(range.series)
   }
 
+  // Compute stack values and add stack index to grouped stack series
   private computeStack(stack: { [key: string]: any }, index: number): void {
     // By default, stacks are vertical
     const stackAxis: "x" | "y" = (this.renderAs(stack)[0] as GroupedRendererOptions).stackAxis || "y"
