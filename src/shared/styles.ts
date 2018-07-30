@@ -23,7 +23,7 @@ const legendStyle = {
 }
 
 const seriesLegendStyle = {
-  padding: `2px ${theme.space.small}`,
+  padding: `2px ${theme.space.small}px`,
   "& div.color": {
     width: 10,
     height: 10,
