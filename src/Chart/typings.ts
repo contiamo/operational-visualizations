@@ -1,4 +1,4 @@
-import { Accessor, BaseConfig, Facade, Focus, Legend, ChartStateReadOnly, Dimensions } from "../shared/typings"
+import { Accessor, BaseConfig, Facade, Focus, Legend, ChartStateReadOnly } from "../shared/typings"
 import { DateRange } from "moment-range"
 
 export {
@@ -137,14 +137,14 @@ export interface SingleRendererOptions<RendererAccessors> {
 
 export interface GroupedRendererOptions {
   type: "range" | "stacked"
-  stackAxis?: "x" | "y"
+  stackAxis?: AxisOrientation
   renderAs: SingleRendererOptions<any>[]
 }
 
 export type RendererOptions = SingleRendererOptions<any> | GroupedRendererOptions
 
 export interface RendererClass<RendererAccessors> {
-  dataForAxis: (axis: "x" | "y") => any[]
+  dataForAxis: (axis: AxisOrientation) => any[]
   draw: () => void
   type: RendererType
   update: (data: Datum[], options: SingleRendererOptions<RendererAccessors>) => void

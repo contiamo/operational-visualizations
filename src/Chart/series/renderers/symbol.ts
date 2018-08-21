@@ -25,6 +25,7 @@ import {
   RendererType,
   SingleRendererOptions,
   State,
+  AxisOrientation,
 } from "../../typings"
 
 const defaultAccessors: Partial<SymbolRendererAccessors> = {
@@ -114,7 +115,7 @@ class Symbol implements RendererClass<SymbolRendererAccessors> {
           d3Symbol()
             .type(this.symbol(d).symbol)
             .size(1)(),
-      )
+    )
       .attr("transform", this.startTransform.bind(this))
       .merge(symbols)
       .on("mouseenter", withD3Element(this.onMouseOver.bind(this)))
@@ -131,7 +132,7 @@ class Symbol implements RendererClass<SymbolRendererAccessors> {
           d3Symbol()
             .type(this.symbol(d).symbol)
             .size(this.size(d))(),
-      )
+    )
       .attr("transform", this.transform.bind(this))
 
     symbols
@@ -144,7 +145,7 @@ class Symbol implements RendererClass<SymbolRendererAccessors> {
           d3Symbol()
             .type(this.symbol(d).symbol)
             .size(1)(),
-      )
+    )
       .remove()
   }
 
@@ -152,7 +153,7 @@ class Symbol implements RendererClass<SymbolRendererAccessors> {
     this.el.remove()
   }
 
-  dataForAxis(axis: "x" | "y") {
+  dataForAxis(axis: AxisOrientation) {
     const data = map((this as any)[axis])(this.data)
       .concat(map(get(`${axis}0`))(this.data))
       .concat(map(get(`${axis}1`))(this.data))

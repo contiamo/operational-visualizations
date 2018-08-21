@@ -17,6 +17,7 @@ import {
   RendererType,
   SingleRendererOptions,
   State,
+  AxisOrientation,
 } from "../../typings"
 
 const defaultAccessors: Partial<FlagRendererAccessors> = {
@@ -34,7 +35,7 @@ class Flag implements RendererClass<FlagRendererAccessors> {
   el: D3Selection
   events: EventBus
   options: Options
-  position: "x" | "y"
+  position: AxisOrientation
   scale: any
   series: Series
   state: State
@@ -67,7 +68,7 @@ class Flag implements RendererClass<FlagRendererAccessors> {
     this.options = options
     this.assignAccessors(options.accessors)
     this.assignConfig(options.config)
-    this.position = this.axis[0] as "x" | "y"
+    this.position = this.axis[0] as AxisOrientation
     this.data = filter((d: Datum) => this.validate(this.position === "x" ? this.x(d) : this.y(d)))(data)
   }
 
@@ -148,7 +149,7 @@ class Flag implements RendererClass<FlagRendererAccessors> {
     this.el.remove()
   }
 
-  dataForAxis(axis: "x" | "y") {
+  dataForAxis(axis: AxisOrientation) {
     return this.position === axis ? compact(map(this[axis])(this.data)) : []
   }
 
@@ -178,7 +179,7 @@ class Flag implements RendererClass<FlagRendererAccessors> {
 
   private assignConfig(customConfig: Partial<FlagRendererConfig>): void {
     forEach.convert({ cap: false })((value: any, key: string) => {
-      ;(this as any)[key] = value
+      ; (this as any)[key] = value
     })(customConfig)
   }
 

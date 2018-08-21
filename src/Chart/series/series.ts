@@ -11,6 +11,7 @@ import {
   RendererType,
   SeriesAccessor,
   State,
+  AxisOrientation,
 } from "../typings"
 
 const hasValue = (d: any): boolean => {
@@ -59,7 +60,7 @@ class ChartSeries {
   assignAccessors(datumAccessors: any): void {
     // Assign series accessors
     forEach.convert({ cap: false })((accessor: SeriesAccessor<any>, key: string) => {
-      ;(this as any)[key] = () => accessor(this.options)
+      ; (this as any)[key] = () => accessor(this.options)
     })(this.state.current.getAccessors().series)
     // Assign series-specific datum accessors
     this.x = (datumAccessors && datumAccessors.x) || defaultDatumAccessors.x
@@ -110,7 +111,7 @@ class ChartSeries {
     }
   }
 
-  dataForAxis(axis: "x" | "y") {
+  dataForAxis(axis: AxisOrientation) {
     const data = map((renderer: RendererClass<any>) => renderer.dataForAxis(axis))(this.renderers)
     return uniqBy(String)(compact(flatten(data)))
   }

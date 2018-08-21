@@ -2,7 +2,7 @@ import Axis from "./axes/axis"
 import Rules from "../Chart/axes/rules"
 import { any, assign, defaults, difference, find, forEach, get, includes, invoke, keys, omitBy, pickBy } from "lodash/fp"
 import { alignAxes } from "./axes/axis_utils"
-import { AxisClass, AxisConfig, AxisOptions, AxisPosition, D3Selection, EventBus, State, StateWriter } from "./typings"
+import { AxisClass, AxisConfig, AxisOptions, AxisPosition, D3Selection, EventBus, State, StateWriter, AxisOrientation } from "./typings"
 
 const generalAxisConfig = {
   fontSize: 11,
@@ -35,7 +35,7 @@ const axisConfig: { [key: string]: AxisConfig } = {
 
 class AxesManager {
   axes: { [key: string]: AxisClass<any> } = {}
-  axesDrawn: ("x" | "y")[]
+  axesDrawn: AxisOrientation[]
   els: { [key: string]: D3Selection }
   events: EventBus
   oldAxes: { [key: string]: AxisClass<any> } = {}
@@ -120,7 +120,7 @@ class AxesManager {
   private setBaselines(): void {
     const xType = (this.axes.x1 || this.axes.x2).type
     const yType = (this.axes.y1 || this.axes.y2).type
-    const baseline: "x" | "y" = xType === "quant" && yType !== "quant" ? "y" : "x"
+    const baseline: AxisOrientation = xType === "quant" && yType !== "quant" ? "y" : "x"
     this.stateWriter("baseline", baseline)
   }
 
@@ -130,7 +130,7 @@ class AxesManager {
     )
   }
 
-  private drawAxes(orientation: "x" | "y"): void {
+  private drawAxes(orientation: AxisOrientation): void {
     const axes: { [key: string]: AxisClass<any> } = pickBy(
       (axis: AxisClass<any>): boolean => {
         return orientation === "x" ? axis.isXAxis : !axis.isXAxis
@@ -153,13 +153,13 @@ class AxesManager {
     }
   }
 
-  updateRules(orientation: "x" | "y"): void {
+  updateRules(orientation: AxisOrientation): void {
     const rules = this.rules[orientation] || new Rules(this.state, this.els[`${orientation}Rules`], orientation)
     this.rules[orientation] = rules
     rules.draw()
   }
 
-  private removeRules(orientation: "x" | "y"): void {
+  private removeRules(orientation: AxisOrientation): void {
     const rules = this.rules[orientation]
     if (!rules) {
       return
