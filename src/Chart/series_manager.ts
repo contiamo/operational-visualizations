@@ -35,6 +35,8 @@ import {
   StateWriter,
   Datum,
   AxisOrientation,
+  LegendPosition,
+  LegendFloat,
 } from "./typings"
 
 type GroupedRendererType = "stacked" | "range"
@@ -243,8 +245,8 @@ class ChartSeriesManager implements SeriesManager {
       if (series.hideInLegend()) {
         return memo
       }
-      const position: "top" | "bottom" = series.legendPosition()
-      const float: "left" | "right" = series.legendFloat()
+      const position: LegendPosition = series.legendPosition()
+      const float: LegendFloat = series.legendFloat()
       return set([position, float])((get([position, float])(memo) || []).concat(series.dataForLegend()))(memo)
     }, {})(this.series)
   }

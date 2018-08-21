@@ -12,6 +12,8 @@ import {
   SeriesAccessor,
   State,
   AxisOrientation,
+  LegendPosition,
+  LegendFloat,
 } from "../typings"
 
 const hasValue = (d: any): boolean => {
@@ -116,11 +118,11 @@ class ChartSeries {
     return uniqBy(String)(compact(flatten(data)))
   }
 
-  legendPosition(): "top" | "bottom" {
+  legendPosition(): LegendPosition {
     return this.xAxis() === "x1" ? "top" : "bottom"
   }
 
-  legendFloat(): "left" | "right" {
+  legendFloat(): LegendFloat {
     return this.legendPosition() === "top" && this.yAxis() === "y2" ? "right" : "left"
   }
 

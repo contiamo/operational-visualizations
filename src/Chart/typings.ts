@@ -283,6 +283,10 @@ export interface Computed {
 }
 
 // Legend
+export type LegendPosition = "top" | "bottom"
+
+export type LegendFloat = "left" | "right"
+
 export interface LegendDatum {
   label: string
   color: string

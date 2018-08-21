@@ -1,11 +1,11 @@
 import ChartLegend from "./legend/legend"
 import * as styles from "../shared/styles"
 import { forEach, get, reduce } from "lodash/fp"
-import { D3Selection, EventBus, LegendDatum, State, StateWriter } from "./typings"
+import { D3Selection, EventBus, LegendDatum, State, StateWriter, LegendPosition, LegendFloat } from "./typings"
 
 interface LegendOption {
-  position: "top" | "bottom"
-  float: "left" | "right"
+  position: LegendPosition
+  float: LegendFloat
 }
 
 const legendOptions: LegendOption[] = [
@@ -85,9 +85,9 @@ class LegendManager {
 
     shorter.setWidth(
       drawingWidth -
-        maxLongerWidth -
-        parseInt(shorter.el.style(`padding-left`), 10) -
-        parseInt(shorter.el.style(`padding-right`), 10),
+      maxLongerWidth -
+      parseInt(shorter.el.style(`padding-left`), 10) -
+      parseInt(shorter.el.style(`padding-right`), 10),
     )
     const maxShorterWidth = this.calculateMaxWidth(shorter)
     shorter.setWidth(maxShorterWidth)
