@@ -12,8 +12,8 @@ import {
   Accessors,
   AccessorsObject,
   Components,
+  Computed,
   Data,
-  Datum,
   Facade,
   FocusElement,
   PieChartConfig,
@@ -65,7 +65,7 @@ class PieChartFacade implements Facade {
   private context: Element
   private events: EventEmitter
   private series: Series
-  private state: StateHandler<PieChartConfig, Data>
+  private state: StateHandler<Data, PieChartConfig, AccessorsObject, Computed>
 
   constructor(context: Element) {
     this.context = context
@@ -80,9 +80,9 @@ class PieChartFacade implements Facade {
     return new EventEmitter()
   }
 
-  private initializeState(): StateHandler<PieChartConfig, Data> {
+  private initializeState(): StateHandler<Data, PieChartConfig, AccessorsObject, Computed> {
     return new StateHandler({
-      data: {},
+      data: [],
       config: defaultConfig(),
       accessors: defaultAccessors(),
       computed: {},

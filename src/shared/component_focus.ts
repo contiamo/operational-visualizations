@@ -1,13 +1,13 @@
-import { ComponentHoverPayload, Config, D3Selection, EventBus, State, ComponentConfigInfo } from "./typings"
+import { ComponentHoverPayload, BaseConfig, D3Selection, EventBus, ChartStateReadOnly, ComponentConfigInfo } from "./typings"
 import Events from "./event_catalog"
 import * as styles from "./styles"
 
 class ComponentFocus {
   el: D3Selection
   events: EventBus
-  state: State
+  state: ChartStateReadOnly<any, any, any, any> // @TODO
 
-  constructor(state: State, el: D3Selection, events: EventBus) {
+  constructor(state: ChartStateReadOnly<any, any, any, any>, el: D3Selection, events: EventBus) {
     this.state = state
     this.el = el.append("xhtml:div").attr("class", `${styles.focusLegend} ${styles.componentFocus}`)
     this.events = events
@@ -15,7 +15,7 @@ class ComponentFocus {
   }
 
   onComponentHover(payload: ComponentHoverPayload): void {
-    if (!this.state.current.get("config").showComponentFocus) {
+    if (!this.state.current.getConfig().showComponentFocus) {
       return
     }
     this.events.emit(Events.FOCUS.CLEAR)
@@ -25,11 +25,11 @@ class ComponentFocus {
 
   draw(payload: ComponentHoverPayload): void {
     const componentPosition: ClientRect = payload.component.node().getBoundingClientRect()
-    const canvasPosition: ClientRect = this.state.current.get("computed").canvas.containerRect
+    const canvasPosition: ClientRect = this.state.current.getComputed().canvas.containerRect
     const elStyle: { [key: string]: any } = window.getComputedStyle(this.el.node())
     const topBorderWidth: number = parseInt(elStyle["border-top-width"], 10)
     const leftBorderWidth: number = parseInt(elStyle["border-left-width"], 10)
-    const config: Config = this.state.current.get("config")
+    const config = this.state.current.getConfig() as Readonly<BaseConfig>
 
     // Prevent component focus from going out of canvas.
     let top: number = componentPosition.top - canvasPosition.top - topBorderWidth

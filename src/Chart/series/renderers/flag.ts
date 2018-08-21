@@ -76,7 +76,7 @@ class Flag implements RendererClass<FlagRendererAccessors> {
 
     const data = this.data
     const attributes = assign({ color: this.color })(this.getAttributes())
-    const duration = this.state.current.get("config").duration
+    const duration = this.state.current.getConfig().duration
     const groups = this.el.selectAll("g").data(data)
 
     groups.exit().remove()
@@ -162,7 +162,7 @@ class Flag implements RendererClass<FlagRendererAccessors> {
   }
 
   private setAxisScales(): void {
-    this.scale = this.state.current.get(["computed", "axes", "computed", this.axis, "scale"])
+    this.scale = this.state.current.getComputed().axes.computed[this.axis].scale
   }
 
   private assignAccessors(customAccessors: Partial<FlagRendererAccessors>): void {
@@ -186,7 +186,7 @@ class Flag implements RendererClass<FlagRendererAccessors> {
     const isXAxis = this.position === "x"
     const value = isXAxis ? this.x : this.y
     const scale = this.scale
-    const drawingDims = this.state.current.get("computed").canvas.drawingDims
+    const drawingDims = this.state.current.getComputed().canvas.drawingDims
 
     switch (this.axis) {
       case "x1":
@@ -234,7 +234,7 @@ class Flag implements RendererClass<FlagRendererAccessors> {
 
       label
         .transition()
-        .duration(this.state.current.get("config").duration)
+        .duration(this.state.current.getConfig().duration)
         .attr("x", coordinates.x)
         .attr("y", coordinates.y)
 
@@ -294,8 +294,8 @@ class Flag implements RendererClass<FlagRendererAccessors> {
     let bottom: number
     let left: any
     const margin = (axis: AxisPosition) =>
-      this.state.current.get(["computed", "axes", "margins", axis]) ||
-      this.state.current.get(["config", axis, "margin"])
+      this.state.current.getComputed().axes.margins[axis] ||
+      this.state.current.getConfig()[axis].margin
 
     return (d: Datum) => {
       const line = Math.round(attributes[this.position](d))
@@ -331,11 +331,11 @@ class Flag implements RendererClass<FlagRendererAccessors> {
 
       const focusPoint = {
         axis: this.axis,
-        axisType: this.state.current.get("accessors").data.axes(this.state.current.get("data"))[this.axis].type,
+        axisType: this.state.current.getAccessors().data.axes(this.state.current.getData())[this.axis].type,
         direction: this.direction(d),
         color: this.color(d),
         datum: this.axis[0] === "x" ? this.x(d) : this.y(d),
-        formatter: this.state.current.get(["computed", "axes", "computed", this.axis, "tickFormatter"]) || identity,
+        formatter: this.state.current.getComputed().axes.computed[this.axis].tickFormatter || identity,
         label: this.label(d),
         description: this.description(d),
         x: attributes.x ? attributes.x(d) : attributes.x2,

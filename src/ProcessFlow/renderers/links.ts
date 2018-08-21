@@ -3,7 +3,7 @@ import "d3-transition"
 import { easeCubicInOut } from "d3-ease"
 import { withD3Element } from "../../utils/d3_utils"
 import * as styles from "./styles"
-import { every, find, invoke, map } from "lodash/fp"
+import { find } from "lodash/fp"
 import Events from "../../shared/event_catalog"
 import { exitGroups, filterByMatchers, sizeScale } from "./renderer_utils"
 
@@ -122,7 +122,7 @@ class Links implements Renderer {
 
   draw(data: TLink[]): void {
     this.data = data
-    this.config = this.state.current.get("config")
+    this.config = this.state.current.getConfig()
     const groups = this.el
       .select("g.links-group")
       .selectAll("g.link-group")
@@ -188,7 +188,7 @@ class Links implements Renderer {
   // Paths start as a single point at the source node. If the source node has already been rendered,
   // use its position at the start of the transition.
   private startPath(link: TLink): string {
-    const previousData = this.state.previous.get(["computed", "series", "data"])
+    const previousData = this.state.previous.getComputed().series.data
     const previousNodes = previousData ? previousData.nodes : []
     const existingSource = find((node: TNode) => node.id() === link.sourceId())(previousNodes)
     const x = existingSource ? existingSource.x : link.source().x

@@ -21,7 +21,7 @@ class ElementFocus {
   }
 
   private onMouseOver(payload: HoverPayload) {
-    const computedAxes = this.state.current.get("computed").axes
+    const computedAxes = this.state.current.getComputed().axes
     // Only render a date focus if there isn't a time axis
     const timeAxis = computedAxes.priorityTimeAxis
     if (timeAxis) {
@@ -49,7 +49,7 @@ class ElementFocus {
 
     forEach(
       (item: { name: string; value: any }): void => {
-        const formatter = isFinite(item.value) ? this.state.current.get(["config", "numberFormatter"]) : identity
+        const formatter = isFinite(item.value) ? this.state.current.getConfig().numberFormatter : identity
         const listItem = label.append("xhtml:li")
 
         listItem
@@ -66,14 +66,14 @@ class ElementFocus {
 
     // Get label dimensions
     const labelDims = labelDimensions(this.el)
-    const drawingDimensions = this.state.current.get("computed").canvas.drawingDims
-    const offset = this.state.current.get("config").focusOffset + payload.offset
+    const drawingDimensions = this.state.current.getComputed().canvas.drawingDims
+    const offset = this.state.current.getConfig().focusOffset + payload.offset
 
     positionLabel(this.el, payload.focus, labelDims, this.getDrawingPosition(), offset, payload.position, true)
   }
 
   private getDrawingPosition() {
-    const computed = this.state.current.get("computed")
+    const computed = this.state.current.getComputed()
     const margins = computed.axes.margins
     return {
       xMin: margins.y1,

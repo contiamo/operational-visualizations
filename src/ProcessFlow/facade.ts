@@ -11,6 +11,7 @@ import {
   Accessors,
   AccessorsObject,
   Components,
+  Computed,
   Facade,
   FocusElement,
   InputData,
@@ -84,7 +85,7 @@ class ProcessFlowFacade implements Facade {
   private context: Element
   private events: EventEmitter
   private series: Series
-  private state: StateHandler<ProcessFlowConfig, InputData>
+  private state: StateHandler<InputData, ProcessFlowConfig, AccessorsObject, Computed>
 
   constructor(context: Element) {
     this.context = context
@@ -99,7 +100,7 @@ class ProcessFlowFacade implements Facade {
     return new EventEmitter()
   }
 
-  private initializeState(): StateHandler<ProcessFlowConfig, InputData> {
+  private initializeState(): StateHandler<InputData, ProcessFlowConfig, AccessorsObject, Computed> {
     return new StateHandler({
       data: {},
       config: defaultConfig(),

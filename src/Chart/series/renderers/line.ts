@@ -91,7 +91,7 @@ class Line implements RendererClass<LineRendererAccessors> {
     this.addMissingData()
 
     const data = sortBy((d: Datum) => (this.xIsBaseline ? this.x(d) : this.y(d)))(this.data)
-    const duration = this.state.current.get("config").duration
+    const duration = this.state.current.getConfig().duration
 
     const line = this.el.selectAll("path").data([data])
 
@@ -143,9 +143,10 @@ class Line implements RendererClass<LineRendererAccessors> {
   }
 
   private setAxisScales(): void {
-    this.xIsBaseline = this.state.current.get("computed").axes.baseline === "x"
-    this.xScale = this.state.current.get(["computed", "axes", "computed", this.series.xAxis(), "scale"])
-    this.yScale = this.state.current.get(["computed", "axes", "computed", this.series.yAxis(), "scale"])
+    this.xIsBaseline = this.state.current.getComputed().axes.baseline === "x"
+    const computedAxes = this.state.current.getComputed().axes.computed
+    this.xScale = computedAxes[this.series.xAxis()].scale
+    this.yScale = computedAxes[this.series.yAxis()].scale
     this.adjustedX = (d: Datum) => this.xScale(this.xIsBaseline ? this.x(d) : hasValue(d.x1) ? d.x1 : this.x(d))
     this.adjustedY = (d: Datum) => this.yScale(this.xIsBaseline ? (hasValue(d.y1) ? d.y1 : this.y(d)) : this.y(d))
   }
@@ -155,7 +156,7 @@ class Line implements RendererClass<LineRendererAccessors> {
       return
     }
     if (this.xIsBaseline && !this.series.options.stacked) {
-      const ticks = this.state.current.get(["computed", "series", "dataForAxes", this.series.xAxis()])
+      const ticks = this.state.current.getComputed().series.dataForAxes[this.series.xAxis()]
       forEach((tick: any) => {
         if (!find((d: Datum) => this.x(d).toString() === tick.toString())(this.data)) {
           this.data.push({ injectedX: tick, injectedY: undefined })

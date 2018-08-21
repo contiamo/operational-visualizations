@@ -9,7 +9,7 @@ import { has, uniqueId } from "lodash/fp"
 import { colorAssigner } from "../utils/colorAssigner"
 import theme from "../utils/constants"
 import defaultNumberFormatter from "../utils/number_formatter"
-import { Accessors, AccessorsObject, Components, Facade, RawData, SunburstConfig } from "./typings"
+import { Accessors, AccessorsObject, Components, Computed, Facade, RawData, SunburstConfig } from "./typings"
 
 const defaultConfig = (): SunburstConfig => {
   return {
@@ -62,7 +62,7 @@ class SunburstFacade implements Facade {
   private context: Element
   private customColorAccessor: boolean = false
   private events: EventEmitter
-  private state: StateHandler<SunburstConfig, RawData>
+  private state: StateHandler<RawData, SunburstConfig, AccessorsObject, Computed>
 
   constructor(context: Element) {
     this.context = context
@@ -76,7 +76,7 @@ class SunburstFacade implements Facade {
     return new EventEmitter()
   }
 
-  private initializeState(): StateHandler<SunburstConfig, RawData> {
+  private initializeState(): StateHandler<RawData, SunburstConfig, AccessorsObject, Computed> {
     return new StateHandler({
       data: {},
       config: defaultConfig(),

@@ -71,7 +71,7 @@ class Bars implements RendererClass<BarsRendererAccessors> {
     this.updateClipPath()
 
     const data = filter(this.validate.bind(this))(this.data)
-    const duration = this.state.current.get("config").duration
+    const duration = this.state.current.getConfig().duration
     this.el
       .transition()
       .duration(!!this.el.attr("transform") ? duration : 0)
@@ -119,9 +119,10 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   }
 
   private setAxisScales(): void {
-    this.xIsBaseline = this.state.current.get("computed").axes.baseline === "x"
-    this.xScale = this.state.current.get(["computed", "axes", "computed", this.series.xAxis(), "scale"])
-    this.yScale = this.state.current.get(["computed", "axes", "computed", this.series.yAxis(), "scale"])
+    this.xIsBaseline = this.state.current.getComputed().axes.baseline === "x"
+    const computedAxes = this.state.current.getComputed().axes.computed
+    this.xScale = computedAxes[this.series.xAxis()].scale
+    this.yScale = computedAxes[this.series.yAxis()].scale
     this.x0 = (d: Datum) => {
       const baseline = this.isRange ? this.xScale.domain()[0] : 0
       return this.xScale(
@@ -164,9 +165,9 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   }
 
   defaultFocusContent(d: Datum): { name: string; value: any }[] {
-    const xTitle = this.state.current.get("accessors").data.axes(this.state.current.get("data"))[this.series.xAxis()]
+    const xTitle = this.state.current.getAccessors().data.axes(this.state.current.getData())[this.series.xAxis()]
       .title
-    const yTitle = this.state.current.get("accessors").data.axes(this.state.current.get("data"))[this.series.yAxis()]
+    const yTitle = this.state.current.getAccessors().data.axes(this.state.current.getData())[this.series.yAxis()]
       .title
     return [
       {
@@ -181,7 +182,7 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   }
 
   private seriesTranslation(): string {
-    const seriesBars = this.state.current.get(["computed", "axes", "computedBars", this.series.key()])
+    const seriesBars = this.state.current.getComputed().axes.computedBars[this.series.key()]
     return this.xIsBaseline ? `translate(${seriesBars.offset}, 0)` : `translate(0, ${seriesBars.offset})`
   }
 
@@ -196,7 +197,7 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   }
 
   private attributes() {
-    const barWidth = this.state.current.get(["computed", "axes", "computedBars", this.series.key(), "width"])
+    const barWidth = this.state.current.getComputed().axes.computedBars[this.series.key()].width
     return {
       x: this.x0,
       y: this.y1,
@@ -209,7 +210,7 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   private onMouseOver(d: Datum, el: HTMLElement): void {
     const isNegative = this.xIsBaseline ? this.y(d) < 0 : this.x(d) < 0
     const dimensions = el.getBoundingClientRect()
-    const barOffset = this.state.current.get(["computed", "axes", "computedBars", this.series.key(), "offset"])
+    const barOffset = this.state.current.getComputed().axes.computedBars[this.series.key()].offset
 
     const focusPoint = {
       content: this.focusContent(d),
@@ -236,7 +237,7 @@ class Bars implements RendererClass<BarsRendererAccessors> {
     if (!this.isRange) {
       return
     }
-    const duration = this.state.current.get("config").duration
+    const duration = this.state.current.getConfig().duration
     let data = this.series.options.clipData
 
     // The curveStepAfter interpolation does not account for the width of the bars.
@@ -264,8 +265,8 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   }
 
   private clipPath(data: any[]): string {
-    const barWidth = this.state.current.get("computed").axes.computedBars[this.series.key()].width
-    const offset = this.state.current.get("config").outerBarSpacing / 2
+    const barWidth = this.state.current.getComputed().axes.computedBars[this.series.key()].width
+    const offset = this.state.current.getConfig().outerBarSpacing / 2
     const clipPath = this.xIsBaseline ? this.xClipPath.bind(this) : this.yClipPath.bind(this)
     return clipPath(barWidth, offset)(data)
   }

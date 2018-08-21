@@ -24,7 +24,7 @@ class DateFocus {
 
   private onMouseMove(mousePosition: MousePosition) {
     // Identify nearest date tick and snap focus to this
-    const computedAxes = this.state.current.get("computed").axes
+    const computedAxes = this.state.current.getComputed().axes
 
     // Only render a date focus if there is a time axis
     const timeAxis = computedAxes.priorityTimeAxis
@@ -56,7 +56,7 @@ class DateFocus {
   }
 
   private focusDate(date: Date): void {
-    const computedAxes = this.state.current.get("computed").axes
+    const computedAxes = this.state.current.getComputed().axes
 
     const mainAxis = computedAxes.priorityTimeAxis
     const mainAxisComputed = computedAxes.computed[mainAxis]
@@ -91,13 +91,13 @@ class DateFocus {
     // Remove old focus (may also be a different type of focus)
     this.events.emit(Events.FOCUS.CLEAR)
     // Get focus data
-    const focusData = this.state.current.get("computed").series.dataForFocus(dates)
+    const focusData = this.state.current.getComputed().series.dataForFocus(dates)
     // Draw focus line and points
     const isVertical: boolean = dates.main.axis[0] === "x"
     const position: number = Math.round(
-      this.state.current.get(["computed", "axes", "computed", dates.main.axis, "scale"])(dates.main.date),
+      this.state.current.getComputed().axes.computed[dates.main.axis].scale(dates.main.date),
     )
-    const options = this.state.current.get("config").focusDateOptions
+    const options = this.state.current.getConfig().focusDateOptions
 
     if (includes("line")(options)) {
       this.drawLine(isVertical, position)
@@ -111,7 +111,7 @@ class DateFocus {
   }
 
   private drawLine(isVertical: boolean, position: number): void {
-    const drawingDims = this.state.current.get("computed").canvas.drawingDims
+    const drawingDims = this.state.current.getComputed().canvas.drawingDims
     this.elGroup
       .append("svg:line")
       .attr("x1", isVertical ? position : 0)
@@ -159,8 +159,8 @@ class DateFocus {
 
     // Get label dimensions
     const labelDims = labelDimensions(this.el)
-    const drawingDimensions = this.state.current.get("computed").canvas.drawingDims
-    const offset = this.state.current.get("config").focusOffset
+    const drawingDimensions = this.state.current.getComputed().canvas.drawingDims
+    const offset = this.state.current.getConfig().focusOffset
     const labelPosition = isVertical ? "toRight" : "above"
 
     // Positioning of focus elements depends on orientation
@@ -173,7 +173,7 @@ class DateFocus {
   }
 
   private drawItemsForAxis(labels: D3Selection, data: any, date: Date, axis: AxisPosition) {
-    const formatter = this.state.current.get(["computed", "axes", "computed", axis, "tickFormatter"])
+    const formatter = this.state.current.getComputed().axes.computed[axis].tickFormatter
     this.addTitle(labels, formatter(date))
 
     const partitionedStacks = partition(get("stack"))(data)
@@ -193,13 +193,13 @@ class DateFocus {
 
   private margin(axis: AxisPosition): number {
     return (
-      this.state.current.get(["computed", "axes", "margins", axis]) ||
-      this.state.current.get(["config", axis, "margin"])
+      this.state.current.getComputed().axes.margins[axis] ||
+      this.state.current.getConfig()[axis].margin
     )
   }
 
   private getDrawingPosition() {
-    const computed = this.state.current.get("computed")
+    const computed = this.state.current.getComputed()
     const margins = computed.axes.margins
     return {
       xMin: margins.y1,

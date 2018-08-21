@@ -105,7 +105,7 @@ class TimeAxis implements AxisClass<Date> {
     this.events = events
     this.position = position
     this.isXAxis = position[0] === "x"
-    this.el = insertElements(el, this.type, position, this.state.current.get("computed").canvas.drawingDims)
+    this.el = insertElements(el, this.type, position, this.state.current.getComputed().canvas.drawingDims)
     this.el.on("mouseenter", this.onComponentHover.bind(this))
   }
 
@@ -156,13 +156,13 @@ class TimeAxis implements AxisClass<Date> {
   }
 
   private computeTickWidth(ticksInDomain: Date[]): number {
-    const barSeries = this.state.current.get("computed").series.barSeries
+    const barSeries = this.state.current.getComputed().series.barSeries
     if (isEmpty(barSeries)) {
       return 0
     }
 
-    const config = this.state.current.get("config")
-    const drawingDims = this.state.current.get("computed").canvas.drawingDims
+    const config = this.state.current.getConfig()
+    const drawingDims = this.state.current.getComputed().canvas.drawingDims
     const defaultTickWidth = Math.min(drawingDims[this.isXAxis ? "width" : "height"] / ticksInDomain.length)
 
     const stacks = groupBy((s: { [key: string]: any }) => s.stackIndex || uniqueId("stackIndex"))(barSeries)
@@ -192,8 +192,8 @@ class TimeAxis implements AxisClass<Date> {
   }
 
   private computeBars(defaultBarWidth: number, tickWidth: number) {
-    const config = this.state.current.get("config")
-    const computedSeries = this.state.current.get("computed").series
+    const config = this.state.current.getConfig()
+    const computedSeries = this.state.current.getComputed().series
     const indices = sortBy(identity)(uniq(values(computedSeries.barIndices)))
     let offset = -tickWidth / 2 + config.outerBarSpacing / 2
 
@@ -217,14 +217,14 @@ class TimeAxis implements AxisClass<Date> {
   }
 
   private computeXRange(tickWidth: number, numberOfTicks: number): [number, number] {
-    const drawingDims = this.state.current.get("computed").canvas.drawingDims
+    const drawingDims = this.state.current.getComputed().canvas.drawingDims
     const width = tickWidth * numberOfTicks
     const offset = tickWidth / 2
     return [offset, (width || drawingDims.width) - offset]
   }
 
   private computeYRange(tickWidth: number, numberOfTicks: number): [number, number] {
-    const computed = this.state.current.get("computed")
+    const computed = this.state.current.getComputed()
     const margin = (axis: AxisPosition) => {
       const isRequired: boolean = includes(axis)(computed.axes.requiredAxes)
       return isRequired ? (computed.axes.margins || {})[axis] || 0 : 0
@@ -285,11 +285,11 @@ class TimeAxis implements AxisClass<Date> {
 
   // Drawing
   draw(duration?: number): void {
-    translateAxis(this.el, this.position, this.state.current.get("computed").canvas.drawingDims)
+    translateAxis(this.el, this.position, this.state.current.getComputed().canvas.drawingDims)
     this.drawTicks(duration)
     this.drawLabels(duration)
     this.drawBorder(duration)
-    positionBackgroundRect(this.el, this.position, this.state.current.get("config").duration)
+    positionBackgroundRect(this.el, this.position, this.state.current.getConfig().duration)
     drawTitle(this.el, this.options, this.position, this.computed.range)
   }
 
@@ -346,16 +346,16 @@ class TimeAxis implements AxisClass<Date> {
     let requiredMargin = computeRequiredMargin(this.el, this.options.margin, this.options.outerPadding, this.position)
 
     // Add space for flags
-    const flagAxis = this.state.current.get(["computed", "series", "axesWithFlags", this.position])
+    const flagAxis = this.state.current.getComputed().series.axesWithFlags[this.position]
     requiredMargin = requiredMargin + (flagAxis ? flagAxis.axisPadding : 0)
 
-    const computedMargins = this.state.current.get("computed").axes.margins || {}
+    const computedMargins = this.state.current.getComputed().axes.margins || {}
     if (computedMargins[this.position] === requiredMargin) {
       return
     }
     computedMargins[this.position] = requiredMargin
     this.stateWriter("margins", computedMargins)
-    translateAxis(this.el, this.position, this.state.current.get("computed").canvas.drawingDims)
+    translateAxis(this.el, this.position, this.state.current.getComputed().canvas.drawingDims)
   }
 
   private getAttributes(): AxisAttributes {
@@ -402,7 +402,7 @@ class TimeAxis implements AxisClass<Date> {
   }
 
   private drawBorder(duration?: number): void {
-    const drawingDims = this.state.current.get("computed").canvas.drawingDims
+    const drawingDims = this.state.current.getComputed().canvas.drawingDims
     const border = {
       x1: 0,
       x2: this.isXAxis ? drawingDims.width : 0,

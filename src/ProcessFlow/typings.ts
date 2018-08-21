@@ -3,7 +3,7 @@ import * as d3 from "d3-selection"
 import Nodes from "./node"
 import Link from "./link"
 
-import { Accessor, Config, D3Selection, Focus, Facade } from "../shared/typings"
+import { Accessor, BaseConfig, D3Selection, Focus, Facade, ChartStateReadOnly } from "../shared/typings"
 
 export {
   Accessor,
@@ -13,11 +13,12 @@ export {
   Dimensions,
   EventBus,
   Position,
-  State,
   StateWriter,
 } from "../shared/typings"
 
-export interface ProcessFlowConfig extends Config {
+export type State = ChartStateReadOnly<InputData, ProcessFlowConfig, AccessorsObject, Computed>
+
+export interface ProcessFlowConfig extends BaseConfig {
   borderColor: string
   focusElement?: FocusElement
   focusLabelPosition: string
@@ -117,9 +118,9 @@ export interface InputData {
 }
 
 export interface Computed {
-  canvas: { [key: string]: any }
-  focus: { [key: string]: any }
-  series: { [key: string]: any }
+  canvas?: { [key: string]: any }
+  focus?: { [key: string]: any }
+  series?: { [key: string]: any }
 }
 
 export interface Data {

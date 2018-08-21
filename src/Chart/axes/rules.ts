@@ -16,7 +16,7 @@ class Rules {
   }
 
   draw(): void {
-    const computedAxes = this.state.current.get("computed").axes.computed
+    const computedAxes = this.state.current.getComputed().axes.computed
     const axisComputed = computedAxes[`${this.orientation}1`] || computedAxes[`${this.orientation}2`]
     const data = clone(axisComputed.ruleTicks || axisComputed.ticks)
     const startAttributes = this.startAttributes()
@@ -27,7 +27,7 @@ class Rules {
     rules
       .exit()
       .transition()
-      .duration(this.state.current.get("config").duration)
+      .duration(this.state.current.getConfig().duration)
       .attr("x1", attributes.x1)
       .attr("x2", attributes.x2)
       .attr("y1", attributes.y1)
@@ -45,7 +45,7 @@ class Rules {
       .attr("y2", startAttributes.y2)
       .merge(rules)
       .transition()
-      .duration(this.state.current.get("config").duration)
+      .duration(this.state.current.getConfig().duration)
       .attr("x1", attributes.x1)
       .attr("x2", attributes.x2)
       .attr("y1", attributes.y1)
@@ -53,9 +53,9 @@ class Rules {
   }
 
   private startAttributes() {
-    const previousAxes = this.state.current.get("computed").axes.previous
+    const previousAxes = this.state.current.getComputed().axes.previous
     const axisPrevious = previousAxes[`${this.orientation}1`] || previousAxes[`${this.orientation}2`]
-    const drawingDims = this.state.current.get("computed").canvas.drawingDims
+    const drawingDims = this.state.current.getComputed().canvas.drawingDims
     return {
       x1: this.yRules ? 0 : axisPrevious.scale,
       x2: this.yRules ? drawingDims.width : axisPrevious.scale,
@@ -65,9 +65,9 @@ class Rules {
   }
 
   private attributes() {
-    const computedAxes = this.state.current.get("computed").axes.computed
+    const computedAxes = this.state.current.getComputed().axes.computed
     const axisComputed = computedAxes[`${this.orientation}1`] || computedAxes[`${this.orientation}2`]
-    const drawingDims = this.state.current.get("computed").canvas.drawingDims
+    const drawingDims = this.state.current.getComputed().canvas.drawingDims
     const scale: any = (d: any) => axisComputed.scale(d) + (axisComputed.ruleOffset || 0)
 
     return {

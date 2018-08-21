@@ -70,7 +70,7 @@ class Text implements RendererClass<TextRendererAccessors> {
   draw(): void {
     this.setAxisScales()
     const data = filter(this.validate.bind(this))(this.data)
-    const duration = this.state.current.get("config").duration
+    const duration = this.state.current.getConfig().duration
     const startAttributes = this.startAttributes()
     const attributes = this.attributes()
 
@@ -132,9 +132,10 @@ class Text implements RendererClass<TextRendererAccessors> {
   }
 
   private setAxisScales(): void {
-    this.xIsBaseline = this.state.current.get("computed").axes.baseline === "x"
-    this.xScale = this.state.current.get(["computed", "axes", "computed", this.series.xAxis(), "scale"])
-    this.yScale = this.state.current.get(["computed", "axes", "computed", this.series.yAxis(), "scale"])
+    this.xIsBaseline = this.state.current.getComputed().axes.baseline === "x"
+    const computedAxes = this.state.current.getComputed().axes.computed
+    this.xScale = computedAxes[this.series.xAxis()].scale
+    this.yScale = computedAxes[this.series.yAxis()].scale
     if (!isBoolean(this.tilt)) {
       this.tilt = this.xIsBaseline
     }
@@ -145,7 +146,7 @@ class Text implements RendererClass<TextRendererAccessors> {
   }
 
   private startAttributes() {
-    const computedBars = this.state.current.get("computed").axes.computedBars
+    const computedBars = this.state.current.getComputed().axes.computedBars
     const offset = computedBars && computedBars[this.series.key()] ? computedBars[this.series.key()].width / 2 : 0
     const rotate = this.tilt ? (this.xIsBaseline ? verticalTiltAngle : horizontalTiltAngle) : 0
 
@@ -159,7 +160,7 @@ class Text implements RendererClass<TextRendererAccessors> {
   }
 
   private attributes() {
-    const computedBars = this.state.current.get("computed").axes.computedBars
+    const computedBars = this.state.current.getComputed().axes.computedBars
     const barOffset =
       computedBars && computedBars[this.series.key()]
         ? computedBars[this.series.key()].offset + computedBars[this.series.key()].width / 2

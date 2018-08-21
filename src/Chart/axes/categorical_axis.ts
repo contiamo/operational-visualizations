@@ -74,7 +74,7 @@ class CategoricalAxis implements AxisClass<string> {
     this.events = events
     this.position = position
     this.isXAxis = position[0] === "x"
-    this.el = insertElements(el, this.type, position, this.state.current.get("computed").canvas.drawingDims)
+    this.el = insertElements(el, this.type, position, this.state.current.getComputed().canvas.drawingDims)
     this.el.on("mouseenter", this.onComponentHover.bind(this))
   }
 
@@ -94,7 +94,7 @@ class CategoricalAxis implements AxisClass<string> {
   // Computations
   compute(): void {
     this.previous = cloneDeep(this.computed)
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     const tickWidth = this.computeTickWidth()
     const range = this.computeRange(tickWidth)
     this.computed = {
@@ -113,13 +113,13 @@ class CategoricalAxis implements AxisClass<string> {
   }
 
   private computeTickWidth(): number {
-    const barSeries = this.state.current.get("computed").series.barSeries
+    const barSeries = this.state.current.getComputed().series.barSeries
     if (isEmpty(barSeries)) {
       return 0
     }
 
-    const config = this.state.current.get("config")
-    const drawingDims = this.state.current.get("computed").canvas.drawingDims
+    const config = this.state.current.getConfig()
+    const drawingDims = this.state.current.getComputed().canvas.drawingDims
     const defaultTickWidth =
       (this.position[0] === "x"
         ? drawingDims.width / (this.data.length || 1)
@@ -152,8 +152,8 @@ class CategoricalAxis implements AxisClass<string> {
   }
 
   private computeBarPositions(defaultBarWidth: number, tickWidth: number) {
-    const config = this.state.current.get("config")
-    const computedSeries = this.state.current.get("computed").series
+    const config = this.state.current.getConfig()
+    const computedSeries = this.state.current.getComputed().series
     const indices = sortBy(identity)(uniq(values(computedSeries.barIndices)))
     let offset = -tickWidth / 2
 
@@ -173,7 +173,7 @@ class CategoricalAxis implements AxisClass<string> {
   }
 
   private computeRange(tickWidth: number): [number, number] {
-    const computed = this.state.current.get("computed")
+    const computed = this.state.current.getComputed()
     const width = tickWidth * this.data.length
     const offset = tickWidth / 2
     const margin = (axis: AxisPosition) =>
@@ -190,11 +190,11 @@ class CategoricalAxis implements AxisClass<string> {
 
   // Drawing
   draw(duration?: number): void {
-    translateAxis(this.el, this.position, this.state.current.get("computed").canvas.drawingDims)
+    translateAxis(this.el, this.position, this.state.current.getComputed().canvas.drawingDims)
     this.drawTicks(duration)
     this.drawLabels(duration)
     this.drawBorder(duration)
-    positionBackgroundRect(this.el, this.position, this.state.current.get("config").duration)
+    positionBackgroundRect(this.el, this.position, this.state.current.getConfig().duration)
     drawTitle(this.el, this.options, this.position, this.computed.range)
   }
 
@@ -246,7 +246,7 @@ class CategoricalAxis implements AxisClass<string> {
 
   // Padding added only to end of each step in d3 ordinal band scale
   private scaleWithOffset(computed: AxisComputed) {
-    const barPadding = this.state.current.get("config").innerBarSpacingCategorical
+    const barPadding = this.state.current.getConfig().innerBarSpacingCategorical
     const stepWidth = computed.scale.step()
     return (d: string) => computed.scale(d) - (computed.tickWidth ? (stepWidth * barPadding) / 2 : 0)
   }
@@ -292,20 +292,20 @@ class CategoricalAxis implements AxisClass<string> {
     let requiredMargin = computeRequiredMargin(this.el, this.options.margin, this.options.outerPadding, this.position)
 
     // Add space for flags
-    const flagAxis = this.state.current.get(["computed", "series", "axesWithFlags", this.position])
+    const flagAxis = this.state.current.getComputed().series.axesWithFlags[this.position]
     requiredMargin = requiredMargin + (flagAxis ? flagAxis.axisPadding : 0)
 
-    const computedMargins = this.state.current.get("computed").axes.margins || {}
+    const computedMargins = this.state.current.getComputed().axes.margins || {}
     if (computedMargins[this.position] === requiredMargin) {
       return
     }
     computedMargins[this.position] = requiredMargin
     this.stateWriter("margins", computedMargins)
-    translateAxis(this.el, this.position, this.state.current.get("computed").canvas.drawingDims)
+    translateAxis(this.el, this.position, this.state.current.getComputed().canvas.drawingDims)
   }
 
   private drawBorder(duration?: number): void {
-    const drawingDims = this.state.current.get("computed").canvas.drawingDims
+    const drawingDims = this.state.current.getComputed().canvas.drawingDims
     const border = {
       x1: 0,
       x2: this.isXAxis ? drawingDims.width : 0,

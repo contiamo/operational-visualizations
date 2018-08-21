@@ -22,7 +22,7 @@ class FlagFocus {
     // Remove old focus (may also be a different type of focus)
     this.events.emit(Events.FOCUS.CLEAR)
 
-    this.el.classed("flag", true).style("max-width", this.state.current.get("config").maxFocusLabelWidth)
+    this.el.classed("flag", true).style("max-width", this.state.current.getConfig().maxFocusLabelWidth)
 
     drawHidden(this.el, "flag")
 
@@ -49,7 +49,7 @@ class FlagFocus {
     // Get label dimensions
     const labelDims = labelDimensions(this.el)
     const drawingDimensions = this.getDrawingDimensions()
-    const offset = this.state.current.get("config").flagFocusOffset
+    const offset = this.state.current.getConfig().flagFocusOffset
 
     const labelPosition = {
       left: focusData.x + this.margin("y1") + this.focusDX(focusData, labelDims.width, offset),
@@ -61,8 +61,8 @@ class FlagFocus {
 
   private margin(axis: AxisPosition): number {
     return (
-      this.state.current.get(["computed", "axes", "margins", axis]) ||
-      this.state.current.get(["config", axis, "margin"])
+      this.state.current.getComputed().axes.margins[axis] ||
+      this.state.current.getConfig()[axis].margin
     )
   }
 
@@ -89,14 +89,14 @@ class FlagFocus {
   }
 
   private getDrawingDimensions() {
-    const computed = this.state.current.get("computed")
+    const computed = this.state.current.getComputed()
     const margins = computed.axes.margins
     return {
       xMin: margins.y1,
       xMax: margins.y1 + computed.canvas.drawingDims.width,
-      yMin: this.state.current.get("config").height - computed.canvas.drawingContainerDims.height + margins.x2,
+      yMin: this.state.current.getConfig().height - computed.canvas.drawingContainerDims.height + margins.x2,
       yMax:
-        this.state.current.get("config").height -
+        this.state.current.getConfig().height -
         computed.canvas.drawingContainerDims.height +
         margins.x2 +
         computed.canvas.drawingDims.height,

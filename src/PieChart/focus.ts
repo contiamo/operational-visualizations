@@ -46,17 +46,17 @@ class PieChartFocus implements Focus {
       )
 
     const labelDims = labelDimensions(this.el)
-    const drawingContainerDims = this.state.current.get("computed").canvas.drawingContainerDims
+    const drawingContainerDims = this.state.current.getComputed().canvas.drawingContainerDims
 
     const drawingDimensions = {
       xMin: 0,
-      yMin: this.state.current.get("config").height - drawingContainerDims.height,
+      yMin: this.state.current.getConfig().height - drawingContainerDims.height,
       xMax: drawingContainerDims.width,
-      yMax: this.state.current.get("config").height,
+      yMax: this.state.current.getConfig().height,
     }
 
     const focus = { x: payload.focusPoint.centroid[0], y: payload.focusPoint.centroid[1] }
-    positionLabel(this.el, focus, labelDims, drawingDimensions, this.state.current.get("config").focusOffset, "above")
+    positionLabel(this.el, focus, labelDims, drawingDimensions, this.state.current.getConfig().focusOffset, "above")
   }
 
   private onElementOut(): void {

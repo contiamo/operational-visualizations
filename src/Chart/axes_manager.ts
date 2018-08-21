@@ -1,6 +1,6 @@
 import Axis from "./axes/axis"
 import Rules from "../Chart/axes/rules"
-import { any, assign, defaults, difference, find, forEach, includes, invoke, keys, omitBy, pickBy } from "lodash/fp"
+import { any, assign, defaults, difference, find, forEach, get, includes, invoke, keys, omitBy, pickBy } from "lodash/fp"
 import { alignAxes } from "./axes/axis_utils"
 import { AxisClass, AxisConfig, AxisOptions, AxisPosition, D3Selection, EventBus, State, StateWriter } from "./typings"
 
@@ -67,7 +67,7 @@ class AxesManager {
       y2: yAxisConfig.margin,
     }
     const computedMargins: { [key: string]: number } = defaults(defaultMargins)(
-      this.state.current.get(["computed", "axes", "margins"]) || {},
+      get(["axes", "margins"])(this.state.current.getComputed()) || {},
     )
     this.stateWriter("margins", computedMargins)
   }
@@ -78,8 +78,8 @@ class AxesManager {
     this.axesDrawn = []
 
     // Check all required axes have been configured
-    const requiredAxes = keys(this.state.current.get("computed").series.dataForAxes)
-    const axesOptions = this.state.current.get("accessors").data.axes(this.state.current.get("data"))
+    const requiredAxes = keys(this.state.current.getComputed().series.dataForAxes)
+    const axesOptions = this.state.current.getAccessors().data.axes(this.state.current.getData())
     const undefinedAxes = difference(requiredAxes)(keys(axesOptions))
     if (undefinedAxes.length) {
       throw new Error(`The following axes have not been configured: ${undefinedAxes.join(", ")}`)
@@ -101,7 +101,6 @@ class AxesManager {
 
   private createOrUpdate(options: Partial<AxisOptions>, position: AxisPosition): void {
     const fullOptions = defaults(axisConfig[position])(options)
-    const data = this.state.current.get(["computed", "series", "dataForAxes", position])
     const existing = this.axes[position]
     existing ? this.update(position, fullOptions) : this.create(position, fullOptions)
   }
@@ -114,7 +113,7 @@ class AxesManager {
   }
 
   private update(position: AxisPosition, options: AxisOptions): void {
-    const data = this.state.current.get(["computed", "series", "dataForAxes", position])
+    const data = this.state.current.getComputed().series.dataForAxes[position]
     this.axes[position].update(options, data)
   }
 
@@ -127,7 +126,7 @@ class AxesManager {
 
   private priorityTimeAxis(): AxisPosition {
     return find((axis: AxisPosition): boolean => this.axes[axis] && this.axes[axis].type === "time")(
-      this.state.current.get("config").timeAxisPriority,
+      this.state.current.getConfig().timeAxisPriority,
     )
   }
 
@@ -143,9 +142,10 @@ class AxesManager {
     const hasRules = any((axis: AxisClass<any>) => axis.options.showRules)(axes as any)
     hasRules ? this.updateRules(orientation) : this.removeRules(orientation)
 
+    const duration = this.state.current.getConfig().duration
     if (includes(orientation)(this.axesDrawn)) {
       forEach((axis: AxisClass<any>) => {
-        axis.draw(this.state.current.get(["config", "duration"]))
+        axis.draw(duration)
       })(axes)
     } else {
       forEach(invoke("draw"))(axes)

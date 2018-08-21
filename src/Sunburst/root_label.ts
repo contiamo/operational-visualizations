@@ -17,8 +17,8 @@ class RootLabel {
   }
 
   private update(): void {
-    const computed = this.state.current.get("computed")
-    const config = this.state.current.get("config")
+    const computed = this.state.current.getComputed()
+    const config = this.state.current.getConfig()
     const renderer = computed.renderer
     const drawingDims = computed.canvas.drawingDims
     const fixedNode = renderer.zoomNode || renderer.topNode

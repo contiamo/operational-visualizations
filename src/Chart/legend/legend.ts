@@ -35,7 +35,7 @@ class ChartLegend implements Legend {
 
   draw(): void {
     // No legend
-    if (!this.state.current.get("config").legend || !this.data) {
+    if (!this.state.current.getConfig().legend || !this.data) {
       this.remove()
       return
     }

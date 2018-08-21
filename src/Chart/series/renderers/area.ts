@@ -93,7 +93,7 @@ class Area implements RendererClass<AreaRendererAccessors> {
     this.addMissingData()
     this.updateClipPath()
 
-    const duration = this.state.current.get("config").duration
+    const duration = this.state.current.getConfig().duration
     const data = sortBy((d: Datum) => (this.xIsBaseline ? this.x(d) : this.y(d)))(this.data)
     const area = this.el.selectAll("path.main").data([data])
 
@@ -136,9 +136,10 @@ class Area implements RendererClass<AreaRendererAccessors> {
   }
 
   private setAxisScales(): void {
-    this.xIsBaseline = this.state.current.get("computed").axes.baseline === "x"
-    this.xScale = this.state.current.get(["computed", "axes", "computed", this.series.xAxis(), "scale"])
-    this.yScale = this.state.current.get(["computed", "axes", "computed", this.series.yAxis(), "scale"])
+    this.xIsBaseline = this.state.current.getComputed().axes.baseline === "x"
+    const computedAxes = this.state.current.getComputed().axes.computed
+    this.xScale = computedAxes[this.series.xAxis()].scale
+    this.yScale = computedAxes[this.series.yAxis()].scale
     this.x0 = (d: Datum) => {
       const baseline = this.isRange ? this.xScale.domain()[0] : 0
       return this.xScale(this.xIsBaseline ? this.x(d) : hasValue(d.x0) ? d.x0 : baseline)
@@ -165,13 +166,8 @@ class Area implements RendererClass<AreaRendererAccessors> {
     if (this.closeGaps() || this.series.options.stacked) {
       return
     }
-    const ticks = this.state.current.get([
-      "computed",
-      "axes",
-      "computed",
-      this.xIsBaseline ? this.series.xAxis() : this.series.yAxis(),
-      "ticksInDomain",
-    ])
+    const axis = this.xIsBaseline ? this.series.xAxis() : this.series.yAxis()
+    const ticks = this.state.current.getComputed().axes.computed[axis].ticksInDomain
     forEach((tick: Date) => {
       if (!find((d: Datum) => (this.xIsBaseline ? this.x : this.y)(d).toString() === tick.toString())(this.data)) {
         this.data.push({
@@ -182,8 +178,7 @@ class Area implements RendererClass<AreaRendererAccessors> {
   }
 
   private updateClipPath(): void {
-    const duration = this.state.current.get("config").duration
-    const mainData = sortBy((d: Datum) => (this.xIsBaseline ? this.x(d) : this.y(d)))(this.data)
+    const duration = this.state.current.getConfig().duration
     const data = this.isRange ? [this.series.options.clipData] : []
 
     const clip = this.el.selectAll("clipPath path").data(data)

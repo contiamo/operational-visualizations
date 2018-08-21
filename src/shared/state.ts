@@ -1,20 +1,46 @@
 import { cloneDeep, defaults, get, set } from "lodash/fp"
+import { ChartStateObject } from "./typings"
 
 export type Path = string | string[]
 
-export interface ReadOnlyState<T> {
-  get(path: Path): Readonly<any>
+/*
+ ** All visualizations have a common state structure with the following 4 properties:
+ ** data, config, accessors and computed.
+ **/
+export interface ReadOnlyState<Data, Config, AccessorsObject, Computed> {
+  getData: () => Readonly<Data>
+  getConfig: () => Readonly<Config>
+  getAccessors: () => Readonly<AccessorsObject>
+  getComputed: () => Readonly<Computed>
 }
 
-export default class State<T> {
-  state: T
+export default class State<Data, Config, AccessorsObject, Computed> {
+  state: ChartStateObject<Data, Config, AccessorsObject, Computed>
 
-  constructor(obj: T) {
+
+  constructor(obj: ChartStateObject<Data, Config, AccessorsObject, Computed>) {
     this.state = cloneDeep(obj)
   }
 
-  get = (path: Path): Readonly<any> => {
-    return get([].concat((Array.isArray(path) && path) || [path]))(this.state)
+  getData() {
+    return this.state.data
+  }
+
+  getConfig() {
+    return this.state.config
+  }
+
+  getAccessors() {
+    return this.state.accessors
+  }
+
+  /*
+   ** this.state.computed is generally a heavily nested object. TS Readonly<T> does not currently
+   ** support nesting. The deep clone protects against unintended changes to the computed object,
+   ** but a TS error will only be thrown if first-level properties of the computed object are modified.
+   */
+  getComputed() {
+    return cloneDeep(this.state.computed)
   }
 
   set(path: Path, value: any) {
@@ -26,13 +52,18 @@ export default class State<T> {
     return this.mergePath([].concat(path), value)
   }
 
-  readOnly(): ReadOnlyState<T> {
-    return { get: this.get }
+  readOnly(): ReadOnlyState<Data, Config, AccessorsObject, Computed> {
+    return {
+      getData: this.getData.bind(this),
+      getConfig: this.getConfig.bind(this),
+      getAccessors: this.getAccessors.bind(this),
+      getComputed: this.getComputed.bind(this)
+    }
   }
 
-  clone(): State<T> {
+  clone(): State<Data, Config, AccessorsObject, Computed> {
     // State object will be deep-cloned in constructor
-    return new State<T>(this.state)
+    return new State<Data, Config, AccessorsObject, Computed>(this.state)
   }
 
   private mergePath(path: string[], value: { [key: string]: any }) {

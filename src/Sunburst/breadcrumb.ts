@@ -1,6 +1,6 @@
-import { ClickPayload, D3Selection, Datum, EventBus, HoverPayload, State, StateWriter, SunburstConfig } from "./typings"
+import { ClickPayload, D3Selection, Datum, EventBus, HoverPayload, State, StateWriter } from "./typings"
 import Events from "../shared/event_catalog"
-import { clone, defaults, isEmpty, isObject, last } from "lodash/fp"
+import { clone, defaults } from "lodash/fp"
 import * as styles from "./styles"
 import { readableTextColor } from "../utils/color"
 
@@ -25,13 +25,13 @@ class Breadcrumb {
 
   private updateHoverPath(payload: HoverPayload | ClickPayload): void {
     // Only display breadcrumb if drawing area is wide enough.
-    const config: SunburstConfig = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     const maxBreadcrumbWidth: number = config.breadcrumbItemWidth * config.maxBreadcrumbLength + ARROW_WIDTH
-    if (this.state.current.get("config").width < maxBreadcrumbWidth) {
+    if (this.state.current.getConfig().width < maxBreadcrumbWidth) {
       return
     }
 
-    const computed = this.state.current.get("computed").renderer
+    const computed = this.state.current.getComputed().renderer
     const fixedNode = computed.zoomNode || computed.topNode
     if (!fixedNode || (payload.d && payload.d.data.empty)) {
       return
@@ -45,7 +45,7 @@ class Breadcrumb {
   }
 
   private truncateNodeArray(nodeArray: Datum[]): (Datum | string)[] {
-    const maxLength: number = this.state.current.get("config").maxBreadcrumbLength
+    const maxLength: number = this.state.current.getConfig().maxBreadcrumbLength
     if (nodeArray.length <= maxLength) {
       return nodeArray
     }
@@ -73,7 +73,7 @@ class Breadcrumb {
     trail.exit().remove()
 
     // Add breadcrumb and label for entering nodes.
-    const itemWidth = (d: Datum): number => (d.hops ? HOPS_WIDTH : this.state.current.get("config").breadcrumbItemWidth)
+    const itemWidth = (d: Datum): number => (d.hops ? HOPS_WIDTH : this.state.current.getConfig().breadcrumbItemWidth)
 
     const entering: D3Selection = trail
       .enter()

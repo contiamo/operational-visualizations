@@ -42,7 +42,7 @@ class LegendManager {
     forEach(
       (option: LegendOption): void => {
         const data: LegendDatum[] = get([option.position, option.float])(
-          this.state.current.get("computed").series.dataForLegends,
+          this.state.current.getComputed().series.dataForLegends,
         )
         this.legends[option.position][option.float].setData(data)
         this.legends[option.position][option.float].draw()
@@ -53,7 +53,7 @@ class LegendManager {
 
   // Ensure the 2 top legends (left/right) make sensible use of the available space.
   private arrangeTopLegends(): void {
-    const drawingWidth = this.state.current.get("config").width
+    const drawingWidth = this.state.current.getConfig().width
     const left = this.legends.top.left
     const right = this.legends.top.right
 

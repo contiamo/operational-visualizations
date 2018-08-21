@@ -45,7 +45,7 @@ class ProcessFlowFocus implements Focus {
     const focusPoint = payload.focusPoint
     const datum = payload.d
     const isNode = focusPoint.type === "node"
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
 
     if (isNode ? !config.showNodeFocusLabels : !config.showLinkFocusLabels) {
       return
@@ -61,7 +61,7 @@ class ProcessFlowFocus implements Focus {
       .attr("class", styles.title)
       .text(datum.label())
       .append("span")
-      .text(` (${this.state.current.get("config").numberFormatter(datum.size())})`)
+      .text(` (${this.state.current.getConfig().numberFormatter(datum.size())})`)
 
     // @TODO remove? Doesn't seem to be doing anything...
     if (datum.content().length > 0) {
@@ -77,7 +77,7 @@ class ProcessFlowFocus implements Focus {
     const labelDims = labelDimensions(this.el)
     const drawingDimensions = this.getDrawingDimensions()
     const offset = focusPoint.offset + config.nodeBorderWidth
-    const labelPosition = this.state.current.get("config").focusLabelPosition
+    const labelPosition = this.state.current.getConfig().focusLabelPosition
 
     positionLabel(this.el, focusPoint, labelDims, drawingDimensions, offset, labelPosition)
   }
@@ -105,7 +105,7 @@ class ProcessFlowFocus implements Focus {
       endsHerePercentage: number = Math.round((datum.journeyEnds * 100) / inputsTotal),
       startsHereString: string = !isNaN(startsHerePercentage) ? `${startsHerePercentage}% of all outputs` : " ",
       endsHereString: string = !isNaN(endsHerePercentage) ? `${endsHerePercentage}% of all inputs` : " ",
-      numberFormatter: (x: number) => string = this.state.current.get("config").numberFormatter
+      numberFormatter: (x: number) => string = this.state.current.getConfig().numberFormatter
 
     // Add "Starts here" breakdown
     flow(
@@ -149,8 +149,8 @@ class ProcessFlowFocus implements Focus {
   }
 
   private getDrawingDimensions(): { xMax: number; xMin: number; yMax: number; yMin: number } {
-    const drawingContainer = this.state.current.get("computed").canvas.elRect
-    const computedSeries = this.state.current.get("computed").series
+    const drawingContainer = this.state.current.getComputed().canvas.elRect
+    const computedSeries = this.state.current.getComputed().series
 
     return {
       xMax: drawingContainer.left + computedSeries.width,
