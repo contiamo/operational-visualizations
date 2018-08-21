@@ -22,6 +22,7 @@ import {
   Renderer,
   RendererAccessor,
   State,
+  RendererType,
 } from "../typings"
 
 const ANGLE_RANGE: [number, number] = [0, 2 * Math.PI]
@@ -40,7 +41,7 @@ class Polar implements Renderer {
   private previousComputed: Partial<ComputedData>
   key: RendererAccessor<string>
   state: State
-  type: "donut" | "polar" | "gauge" = "polar"
+  type: RendererType = "polar"
   value: RendererAccessor<number>
 
   constructor(state: State, events: EventBus, el: D3Selection, options: { [key: string]: any }) {

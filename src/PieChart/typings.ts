@@ -105,7 +105,7 @@ export interface Components {
 export type Facade = Facade<PieChartConfig, Data>
 
 export interface RendererOptions {
-  type: "donut" | "polar" | "gauge"
+  type: RendererType
   accessors?: { [key: string]: Accessor<Datum, any> }
   extent?: "semi" | "full"
   comparison?: Datum
@@ -134,6 +134,8 @@ export interface ComputedData extends ComputedInitial, ComputedArcs {
   data: ComputedDatum[]
 }
 
+export type RendererType = "donut" | "polar" | "gauge"
+
 export interface Renderer {
   dataForLegend: () => LegendDatum[]
   draw: () => void
@@ -141,7 +143,7 @@ export interface Renderer {
   remove: () => void
   setData: (data: Datum[]) => void
   state: ChartStateReadOnly<Data, PieChartConfig, AccessorsObject, Computed>
-  type: "donut" | "gauge" | "polar"
+  type: RendererType
   updateOptions: (options: { [key: string]: any }) => void
   value: Accessor<Datum | ComputedDatum, number>
 }
