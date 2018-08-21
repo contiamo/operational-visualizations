@@ -32,7 +32,7 @@ export const assignOptions = (ctx: Renderer, options: { [key: string]: any }): v
 }
 
 export const defaultAccessors = (ctx: Renderer): RendererAccessors => {
-  const assignColor = colorAssigner(ctx.state.current.get("config").palette)
+  const assignColor = colorAssigner(ctx.state.current.getConfig().palette)
   return {
     value: (d: Datum) => d.value,
     key: (d: Datum) => d.key,

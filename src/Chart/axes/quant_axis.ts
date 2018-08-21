@@ -56,7 +56,7 @@ class QuantAxis implements AxisClass<number> {
     this.events = events
     this.position = position
     this.isXAxis = position[0] === "x"
-    this.el = insertElements(el, this.type, position, this.state.current.get("computed").canvas.drawingDims)
+    this.el = insertElements(el, this.type, position, this.state.current.getComputed().canvas.drawingDims)
     this.el.on("mouseenter", this.onComponentHover.bind(this))
   }
 
@@ -91,12 +91,12 @@ class QuantAxis implements AxisClass<number> {
     computed.tickSteps = this.computeTickSteps(computed)
     computed.ruleSteps = this.computeRuleSteps(computed)
     computed.labelSteps = this.computeLabelSteps(computed)
-    computed.tickFormatter = this.state.current.get("config").numberFormatter
+    computed.tickFormatter = this.state.current.getConfig().numberFormatter
     return computed
   }
 
   private computeRange(): [number, number] {
-    const computed = this.state.current.get("computed")
+    const computed = this.state.current.getComputed()
     const margin = (axis: AxisPosition) =>
       includes(axis)(computed.axes.requiredAxes) ? computed.axes.margins[axis] || 0 : 0
     return this.isXAxis
@@ -159,7 +159,7 @@ class QuantAxis implements AxisClass<number> {
 
   computeRuleTicks(steps: [number, number, number]): number[] {
     const ruleTicks = computeTicks(steps)
-    const requiredAxes = this.state.current.get("computed").axes.requiredAxes
+    const requiredAxes = this.state.current.getComputed().axes.requiredAxes
     if (includes(this.isXAxis ? "y1" : "x1")(requiredAxes)) {
       ruleTicks.shift()
     }
@@ -184,11 +184,11 @@ class QuantAxis implements AxisClass<number> {
 
   // Drawing
   draw(duration?: number): void {
-    translateAxis(this.el, this.position, this.state.current.get("computed").canvas.drawingDims)
+    translateAxis(this.el, this.position, this.state.current.getComputed().canvas.drawingDims)
     this.drawTicks(duration)
     this.drawLabels(duration)
     this.drawBorder(duration)
-    positionBackgroundRect(this.el, this.position, this.state.current.get("config").duration)
+    positionBackgroundRect(this.el, this.position, this.state.current.getConfig().duration)
     drawTitle(this.el, this.options, this.position, this.computed.range)
   }
 
@@ -243,20 +243,20 @@ class QuantAxis implements AxisClass<number> {
     let requiredMargin = computeRequiredMargin(this.el, this.options.margin, this.options.outerPadding, this.position)
 
     // Add space for flags
-    const flagAxis = this.state.current.get(["computed", "series", "axesWithFlags", this.position])
+    const flagAxis = this.state.current.getComputed().series.axesWithFlags[this.position]
     requiredMargin = requiredMargin + (flagAxis ? flagAxis.axisPadding : 0)
 
-    const computedMargins = this.state.current.get("computed").axes.margins || {}
+    const computedMargins = this.state.current.getComputed().axes.margins || {}
     if (computedMargins[this.position] === requiredMargin) {
       return
     }
     computedMargins[this.position] = requiredMargin
     this.stateWriter("margins", computedMargins)
-    translateAxis(this.el, this.position, this.state.current.get("computed").canvas.drawingDims)
+    translateAxis(this.el, this.position, this.state.current.getComputed().canvas.drawingDims)
   }
 
   private tickFormatter(): (x: number) => string {
-    const numberFormatter = this.state.current.get("config").numberFormatter
+    const numberFormatter = this.state.current.getConfig().numberFormatter
     const unitTick = last(this.computed.ticks)
     return (x: number): string => (x === unitTick && this.options.unit ? this.options.unit : numberFormatter(x))
   }
@@ -306,7 +306,7 @@ class QuantAxis implements AxisClass<number> {
   }
 
   private drawBorder(duration?: number): void {
-    const drawingDims = this.state.current.get("computed").canvas.drawingDims
+    const drawingDims = this.state.current.getComputed().canvas.drawingDims
     const border = {
       x1: 0,
       x2: this.isXAxis ? drawingDims.width : 0,

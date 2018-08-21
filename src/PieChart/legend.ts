@@ -32,7 +32,7 @@ class PieChartLegend implements Legend {
 
   draw(): void {
     // No legend
-    if (!this.state.current.get("config").legend) {
+    if (!this.state.current.getConfig().legend) {
       this.remove()
       return
     }
@@ -75,7 +75,7 @@ class PieChartLegend implements Legend {
   private updateComparisonLegend(): void {
     // Only needed for gauges, if comparison value is given.
     const data: LegendDatum[] = filter((d: LegendDatum): boolean => d.comparison)(
-      this.state.current.get("computed").series.dataForLegend,
+      this.state.current.getComputed().series.dataForLegend,
     )
 
     const legends = this.legend.selectAll(`div.comparison`).data(data)
@@ -99,7 +99,7 @@ class PieChartLegend implements Legend {
   }
 
   private data(): LegendDatum[] {
-    return filter((d: LegendDatum) => !d.comparison)(this.state.current.get("computed").series.dataForLegend)
+    return filter((d: LegendDatum) => !d.comparison)(this.state.current.getComputed().series.dataForLegend)
   }
 
   private onComponentHover(d: LegendDatum, el: HTMLElement): void {
@@ -122,7 +122,7 @@ class PieChartLegend implements Legend {
 
   private updateDimensions(): void {
     const legendNode = this.legend.node()
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     const h = config.height
     const lh = roundedUpHeight(legendNode) + heightMargin(legendNode)
 

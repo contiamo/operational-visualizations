@@ -74,7 +74,7 @@ class ProcessFlowCanvas implements Canvas {
 
   // Lifecycle
   draw(): void {
-    this.chartContainer.classed("hidden", this.state.current.get("config").hidden)
+    this.chartContainer.classed("hidden", this.state.current.getConfig().hidden)
     this.stateWriter(["containerRect"], this.chartContainer.node().getBoundingClientRect())
   }
 

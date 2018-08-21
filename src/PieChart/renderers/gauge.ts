@@ -79,11 +79,11 @@ class Gauge implements Renderer {
   }
 
   private updateDraw(): void {
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     const duration = config.duration
     const maxTotalFontSize = config.maxTotalFontSize
     const minTotalFontSize = config.minTotalFontSize
-    const drawingDims = this.state.current.get("computed").canvas.drawingContainerDims
+    const drawingDims = this.state.current.getComputed().canvas.drawingContainerDims
 
     // Remove focus before updating chart
     this.events.emit(Events.FOCUS.ELEMENT.OUT)
@@ -249,7 +249,7 @@ class Gauge implements Renderer {
     enter
       .merge(comparison)
       .transition()
-      .duration(this.state.current.get("config").duration)
+      .duration(this.state.current.getConfig().duration)
       .select("path")
       .attrTween("d", this.lineTween.bind(this))
   }
@@ -323,8 +323,8 @@ class Gauge implements Renderer {
   }
 
   private computeArcs(computed: ComputedInitial): ComputedArcs {
-    const drawingDims = this.state.current.get("computed").canvas.drawingContainerDims
-    const outerBorderMargin = this.state.current.get("config").outerBorderMargin
+    const drawingDims = this.state.current.getComputed().canvas.drawingContainerDims
+    const outerBorderMargin = this.state.current.getConfig().outerBorderMargin
     const r = this.computeOuterRadius(drawingDims, outerBorderMargin)
     const rInner = this.computeInnerRadius(r)
     const rHover = r + 1
@@ -349,7 +349,7 @@ class Gauge implements Renderer {
   }
 
   private computeInnerRadius(outerRadius: any): number {
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     const width = outerRadius - config.minInnerRadius
     // If there isn't enough space, don't render inner circle
     return width < config.minWidth ? 0 : outerRadius - Math.min(width, config.maxWidth)

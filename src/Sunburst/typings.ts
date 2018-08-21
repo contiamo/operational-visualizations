@@ -3,7 +3,7 @@ import Breadcrumb from "./breadcrumb"
 import Renderer from "./renderer"
 import RootLabel from "./root_label"
 import { HierarchyRectangularNode } from "d3-hierarchy"
-import { Accessor, Config, Focus, Facade } from "../shared/typings"
+import { Accessor, BaseConfig, Focus, Facade, ChartStateReadOnly } from "../shared/typings"
 
 export {
   Accessor,
@@ -14,11 +14,12 @@ export {
   EventBus,
   Point,
   Position,
-  State,
   StateWriter,
 } from "../shared/typings"
 
-export interface SunburstConfig extends Config {
+export type State = ChartStateReadOnly<RawData, SunburstConfig, AccessorsObject, Computed>
+
+export interface SunburstConfig extends BaseConfig {
   arrowOffset: number
   breadcrumbItemWidth: number
   centerCircleRadius: number
@@ -72,9 +73,9 @@ export interface AccessorsObject {
 }
 
 export interface Computed {
-  canvas: { [key: string]: any }
-  focus: { [key: string]: any }
-  renderer: { [key: string]: any }
+  canvas?: { [key: string]: any }
+  focus?: { [key: string]: any }
+  renderer?: { [key: string]: any }
 }
 
 export interface FocusPoint {

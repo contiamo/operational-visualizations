@@ -77,11 +77,11 @@ class Donut implements Renderer {
   }
 
   private updateDraw(): void {
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     const duration = config.duration
     const maxTotalFontSize = config.maxTotalFontSize
     const minTotalFontSize = config.minTotalFontSize
-    const drawingDims = this.state.current.get("computed").canvas.drawingContainerDims
+    const drawingDims = this.state.current.getComputed().canvas.drawingContainerDims
 
     // Remove focus before updating chart
     this.events.emit(Events.FOCUS.ELEMENT.OUT)
@@ -197,7 +197,7 @@ class Donut implements Renderer {
   }
 
   private computeArcs(computed: ComputedInitial): ComputedArcs {
-    const drawingDims = this.state.current.get("computed").canvas.drawingContainerDims
+    const drawingDims = this.state.current.getComputed().canvas.drawingContainerDims
     const r = this.computeOuterRadius(drawingDims)
     const rInner = this.computeInnerRadius(r)
     const rHover = r + 1
@@ -216,12 +216,12 @@ class Donut implements Renderer {
   }
 
   private computeOuterRadius(drawingDims: Dimensions): number {
-    const outerBorderMargin = this.state.current.get("config").outerBorderMargin
+    const outerBorderMargin = this.state.current.getConfig().outerBorderMargin
     return Math.min(drawingDims.width, drawingDims.height) / 2 - outerBorderMargin
   }
 
   private computeInnerRadius(outerRadius: number): number {
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     const width = outerRadius - config.minInnerRadius
     // If there isn't enough space, don't render inner circle
     return width < config.minWidth ? 0 : outerRadius - Math.min(width, config.maxWidth)

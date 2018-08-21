@@ -58,8 +58,8 @@ class ChartSeriesManager implements SeriesManager {
   }
 
   assignData(): void {
-    this.key = this.state.current.get("accessors").series.key
-    this.renderAs = this.state.current.get("accessors").series.renderAs
+    this.key = this.state.current.getAccessors().series.key
+    this.renderAs = this.state.current.getAccessors().series.renderAs
     this.prepareData()
     this.stateWriter("dataForLegends", this.dataForLegends())
     this.stateWriter("dataForAxes", this.dataForAxes())
@@ -76,11 +76,11 @@ class ChartSeriesManager implements SeriesManager {
    */
   private prepareData(): void {
     const data = flow(
-      omitBy(this.state.current.get("accessors").series.hide),
+      omitBy(this.state.current.getAccessors().series.hide),
       this.assignBarIndices.bind(this),
       this.handleGroupedSeries("stacked", this.computeStack.bind(this)),
       this.handleGroupedSeries("range", this.computeRange.bind(this)),
-    )(this.state.current.get("accessors").data.series(this.state.current.get("data")))
+    )(this.state.current.getAccessors().data.series(this.state.current.getData()))
 
     this.removeAllExcept(map(this.key)(data))
     forEach(this.updateOrCreate.bind(this))(data)

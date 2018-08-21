@@ -101,7 +101,7 @@ class Symbol implements RendererClass<SymbolRendererAccessors> {
   draw(): void {
     this.setAxisScales()
     const data = filter(this.validate.bind(this))(this.data)
-    const duration = this.state.current.get("config").duration
+    const duration = this.state.current.getConfig().duration
 
     const symbols = this.el.selectAll("path").data(data)
 
@@ -182,9 +182,9 @@ class Symbol implements RendererClass<SymbolRendererAccessors> {
   }
 
   defaultFocusContent(d: Datum): { name: string; value: any }[] {
-    const xTitle = this.state.current.get("accessors").data.axes(this.state.current.get("data"))[this.series.xAxis()]
+    const xTitle = this.state.current.getAccessors().data.axes(this.state.current.getData())[this.series.xAxis()]
       .title
-    const yTitle = this.state.current.get("accessors").data.axes(this.state.current.get("data"))[this.series.yAxis()]
+    const yTitle = this.state.current.getAccessors().data.axes(this.state.current.getData())[this.series.yAxis()]
       .title
     return [
       {
@@ -199,9 +199,10 @@ class Symbol implements RendererClass<SymbolRendererAccessors> {
   }
 
   private setAxisScales(): void {
-    this.xIsBaseline = this.state.current.get("computed").axes.baseline === "x"
-    this.xScale = this.state.current.get(["computed", "axes", "computed", this.series.xAxis(), "scale"])
-    this.yScale = this.state.current.get(["computed", "axes", "computed", this.series.yAxis(), "scale"])
+    this.xIsBaseline = this.state.current.getComputed().axes.baseline === "x"
+    const computedAxes = this.state.current.getComputed().axes.computed
+    this.xScale = computedAxes[this.series.xAxis()].scale
+    this.yScale = computedAxes[this.series.yAxis()].scale
   }
 
   private transform(d: Datum): string {

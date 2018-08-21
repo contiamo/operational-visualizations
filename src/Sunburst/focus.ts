@@ -29,7 +29,7 @@ class SunburstFocus implements Focus {
       return
     }
 
-    const computed = this.state.current.get("computed")
+    const computed = this.state.current.getComputed()
     const datum = payload.d
     const focusPoint = payload.focusPoint
 
@@ -46,7 +46,7 @@ class SunburstFocus implements Focus {
       .attr("class", "title")
       .text(dataName(datum))
 
-    content.append("span").text(`(${this.state.current.get("config").numberFormatter(dataValue(datum))})`)
+    content.append("span").text(`(${this.state.current.getConfig().numberFormatter(dataValue(datum))})`)
 
     const comparisonNode: Datum = computed.renderer.zoomNode || computed.renderer.topNode
     const percentage: string = ((dataValue(datum) * 100) / dataValue(comparisonNode)).toPrecision(3)
@@ -54,10 +54,10 @@ class SunburstFocus implements Focus {
 
     const focus = { x: focusPoint.centroid[0], y: focusPoint.centroid[1] }
     const labelDims = labelDimensions(this.el)
-    const drawingDims = this.state.current.get("computed").canvas.drawingDims
+    const drawingDims = this.state.current.getComputed().canvas.drawingDims
     const drawingDimensions = {
       xMin: 0,
-      yMin: this.state.current.get("config").height - drawingDims.height,
+      yMin: this.state.current.getConfig().height - drawingDims.height,
       xMax: drawingDims.width,
       yMax: drawingDims.height,
     }
@@ -67,13 +67,13 @@ class SunburstFocus implements Focus {
       focus,
       labelDims,
       drawingDimensions,
-      this.state.current.get("config").focusOffset,
+      this.state.current.getConfig().focusOffset,
       focusPoint.labelPosition,
     )
   }
 
   private percentageString(datum: Datum): string {
-    const computed = this.state.current.get("computed")
+    const computed = this.state.current.getComputed()
     const topNode = computed.renderer.topNode
     const zoomNode = computed.renderer.zoomNode
     return !zoomNode || topNode === zoomNode
@@ -82,7 +82,7 @@ class SunburstFocus implements Focus {
   }
 
   private singlePercentageString(datum: Datum, comparison: Datum): string {
-    const topNode: Datum = this.state.current.get("computed").renderer.topNode
+    const topNode: Datum = this.state.current.getComputed().renderer.topNode
     const percentage: string = ((dataValue(datum) * 100) / dataValue(comparison)).toPrecision(3)
     return `${percentage}% of ${dataName(comparison)}`
   }

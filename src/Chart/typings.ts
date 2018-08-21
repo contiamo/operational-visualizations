@@ -1,4 +1,4 @@
-import { Accessor, Config, Facade, Focus, Legend } from "../shared/typings"
+import { Accessor, BaseConfig, Facade, Focus, Legend, ChartStateReadOnly, Dimensions } from "../shared/typings"
 import { DateRange } from "moment-range"
 
 export {
@@ -9,13 +9,14 @@ export {
   Dimensions,
   EventBus,
   Legend,
-  State,
   Point,
   Position,
   D3Selection,
   StateWriter,
   Canvas,
 } from "../shared/typings"
+
+export type State = ChartStateReadOnly<Data, ChartConfig, AccessorsObject, Computed>
 
 export interface AxisConfig {
   fontSize: number
@@ -34,7 +35,7 @@ export interface AxisConfig {
 
 export type FocusElement = { type: "element" | "date"; value: string | Date }
 
-export interface ChartConfig extends Config {
+export interface ChartConfig extends BaseConfig {
   flagFocusOffset: number
   focus?: FocusElement
   focusDateOptions: string[]
@@ -43,9 +44,11 @@ export interface ChartConfig extends Config {
   innerBarSpacingCategorical: number
   legend: boolean
   maxBarWidthRatio: number
+  maxFocusLabelWidth: number
   minBarWidth: number
   numberFormatter: (x: number) => string
   outerBarSpacing: number
+  palette: string[]
   showComponentFocus: boolean
   timeAxisPriority: string[]
 }
@@ -179,6 +182,8 @@ export interface SeriesAccessors {
 }
 
 // Axes
+export type AxisOrientation = "x" | "y"
+
 export type AxisPosition = "x1" | "x2" | "y1" | "y2"
 
 export type AxisType = "time" | "quant" | "categorical"
@@ -274,7 +279,6 @@ export interface AccessorsObject {
 export interface Computed {
   axes?: { [key: string]: any }
   canvas?: { [key: string]: any }
-  focus?: { [key: string]: any }
   series?: { [key: string]: any }
 }
 

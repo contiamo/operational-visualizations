@@ -21,8 +21,8 @@ class DataHandler {
   }
 
   prepareData(): Data {
-    const data = this.state.current.get("data")
-    const accessors = this.state.current.get("accessors")
+    const data = this.state.current.getData()
+    const accessors = this.state.current.getAccessors()
     this.journeys = accessors.data.journeys(data)
     this.initializeNodes(accessors.data.nodes(data))
     this.initializeLinks()
@@ -61,7 +61,7 @@ class DataHandler {
 
   private addNode(attrs: {}): TNode {
     extend.convert({ immutable: false })(attrs, { size: 0 })
-    return new Node(attrs, this.state.current.get("accessors").node)
+    return new Node(attrs, this.state.current.getAccessors().node)
   }
 
   private calculateNodeSizes(): void {
@@ -100,7 +100,7 @@ class DataHandler {
   }
 
   private addLink(attrs: LinkAttrs): TLink {
-    return new Link(attrs, this.state.current.get("accessors").link)
+    return new Link(attrs, this.state.current.getAccessors().link)
   }
 
   private computeLinks(): void {
@@ -136,7 +136,7 @@ class DataHandler {
   }
 
   private xGridSpacing(): number {
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     const finiteWidth = isFinite(config.width)
     const xValues = map(get("x"))(this.layout.nodes)
     const maxX = xValues.length > 0 ? Math.max(...xValues) : 0
@@ -150,7 +150,7 @@ class DataHandler {
   }
 
   private yGridSpacing(nRows: number): number {
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     const finiteHeight = isFinite(config.height)
     const spacing = isFinite(config.height)
       ? Math.min(config.height / (nRows + 1), config.verticalNodeSpacing)

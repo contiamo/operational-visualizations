@@ -78,11 +78,11 @@ class Polar implements Renderer {
   }
 
   private updateDraw(): void {
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     const duration = config.duration
     const maxTotalFontSize = config.maxTotalFontSize
     const minTotalFontSize = config.minTotalFontSize
-    const drawingDims = this.state.current.get("computed").canvas.drawingContainerDims
+    const drawingDims = this.state.current.getComputed().canvas.drawingContainerDims
 
     // Remove focus before updating chart
     this.events.emit(Events.FOCUS.ELEMENT.OUT)
@@ -129,11 +129,11 @@ class Polar implements Renderer {
     this.el.attr("transform", Utils.translateString(this.currentTranslation))
 
     const current = (this.el.node() as any).getBoundingClientRect()
-    const drawing = this.state.current.get("computed").canvas.drawingContainerRect
+    const drawing = this.state.current.getComputed().canvas.drawingContainerRect
     if (current.width === 0 && current.height === 0) {
       return
     }
-    const margin = this.state.current.get("config").outerBorderMargin
+    const margin = this.state.current.getConfig().outerBorderMargin
 
     const scale: number = Math.min(
       (drawing.width - 2 * margin) / current.width,
@@ -144,7 +144,7 @@ class Polar implements Renderer {
     this.el.selectAll("path").attr("d", this.computed.arc)
 
     const newCurrent = (this.el.node() as any).getBoundingClientRect()
-    const topOffset = this.state.current.get("computed").canvas.legend.node().offsetHeight
+    const topOffset = this.state.current.getComputed().canvas.legend.node().offsetHeight
 
     this.currentTranslation = [
       (drawing.width - newCurrent.width) / 2 + drawing.left - newCurrent.left,
@@ -219,7 +219,7 @@ class Polar implements Renderer {
   }
 
   private computeArcs(computed: Partial<ComputedData>): ComputedArcs {
-    const drawingDims = this.state.current.get("computed").canvas.drawingContainerDims
+    const drawingDims = this.state.current.getComputed().canvas.drawingContainerDims
     const r = this.computeOuterRadius(drawingDims)
     const rInner = this.computeInnerRadius(computed.data, r)
     const rHover = this.hoverOuterRadius(r)
@@ -243,15 +243,15 @@ class Polar implements Renderer {
     const domainMax = max(map((datum: Datum) => this.value(datum))(this.data))
     const scale = d3ScaleSqrt()
       .range([
-        this.state.current.get("config").minInnerRadius,
-        Math.min(drawingDims.width, drawingDims.height) / 2 - this.state.current.get("config").outerBorderMargin,
+        this.state.current.getConfig().minInnerRadius,
+        Math.min(drawingDims.width, drawingDims.height) / 2 - this.state.current.getConfig().outerBorderMargin,
       ])
       .domain([0, domainMax])
     return (d: Datum): number => scale(this.value(d)) * scaleFactor
   }
 
   private computeInnerRadius(data: ComputedDatum[], outerRadius: (d: Datum) => number): number {
-    const options = this.state.current.get("config")
+    const options = this.state.current.getConfig()
     const minWidth = this.minSegmentWidth || MIN_SEGMENT_WIDTH
     const maxWidth = options.maxWidth
     const minOuterRadius = min(map(outerRadius)(data))

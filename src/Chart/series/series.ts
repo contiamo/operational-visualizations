@@ -60,7 +60,7 @@ class ChartSeries {
     // Assign series accessors
     forEach.convert({ cap: false })((accessor: SeriesAccessor<any>, key: string) => {
       ;(this as any)[key] = () => accessor(this.options)
-    })(this.state.current.get("accessors").series)
+    })(this.state.current.getAccessors().series)
     // Assign series-specific datum accessors
     this.x = (datumAccessors && datumAccessors.x) || defaultDatumAccessors.x
     this.y = (datumAccessors && datumAccessors.y) || defaultDatumAccessors.y
@@ -154,18 +154,12 @@ class ChartSeries {
   }
 
   valueAtFocus(focus: any): any {
-    const xIsBaseline = this.state.current.get("computed").axes.baseline === "x"
+    const xIsBaseline = this.state.current.getComputed().axes.baseline === "x"
     const baselineAccessor = (d: Datum) => (xIsBaseline ? this.x(d) || d.injectedX : this.y(d) || d.injectedY)
     const valueAccessor = xIsBaseline ? this.y : this.x
     const positionAccessor = (d: Datum) =>
       xIsBaseline ? (hasValue(d.y1) ? d.y1 : this.y(d)) : hasValue(d.x1) ? d.x1 : this.x(d)
-    const valueScale = this.state.current.get([
-      "computed",
-      "axes",
-      "computed",
-      xIsBaseline ? this.yAxis() : this.xAxis(),
-      "scale",
-    ])
+    const valueScale = this.state.current.getComputed().axes.computed[xIsBaseline ? this.yAxis() : this.xAxis()].scale
     const datum: Datum = find(
       (d: Datum): boolean => {
         return baselineAccessor(d).toString() === focus.toString()

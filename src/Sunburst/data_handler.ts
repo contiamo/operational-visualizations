@@ -1,6 +1,7 @@
 import { Accessor, Accessors, Datum, RawData, State, StateWriter } from "./typings"
 import { hierarchy as d3Hierarchy, partition as d3Partition, HierarchyNode } from "d3-hierarchy"
 import { filter, forEach, isEmpty, map, reduce } from "lodash/fp"
+import { SeriesAccessors } from "./typings";
 
 class DataHandler {
   private color: (d: Datum) => string
@@ -9,7 +10,6 @@ class DataHandler {
   private name: (d: Datum) => string
   private state: State
   private stateWriter: StateWriter
-  private total: number
   private value: (d: Datum) => number
   topNode: Datum
 
@@ -19,7 +19,7 @@ class DataHandler {
   }
 
   private assignAccessors(): void {
-    const accessors: Accessors<Datum> = this.state.current.get("accessors").series
+    const accessors: SeriesAccessors = this.state.current.getAccessors().series
 
     // In prepared data, original data is saved in d.data, so accessors need to be modified accordingly
     forEach.convert({ cap: false })(
@@ -32,7 +32,7 @@ class DataHandler {
   prepareData(): Datum[] {
     this.assignAccessors()
 
-    const data: RawData = this.state.current.get("accessors").data.data(this.state.current.get("data")) || {}
+    const data: RawData = this.state.current.getAccessors().data.data(this.state.current.getData()) || {}
 
     const sortingFunction = (a: Datum, b: Datum) => {
       // Empty segments should always be last
@@ -51,9 +51,7 @@ class DataHandler {
       .each(this.assignNames.bind(this))
       .each(this.assignIDs.bind(this))
       .eachAfter(this.assignValues.bind(this))
-      .sort(this.state.current.get("config").sort ? sortingFunction : undefined)
-
-    this.total = hierarchyData.value
+      .sort(this.state.current.getConfig().sort ? sortingFunction : undefined)
 
     this.topNode = d3Partition()(hierarchyData)
       .descendants()
@@ -83,7 +81,7 @@ class DataHandler {
       return
     }
 
-    const propagateColors: boolean = this.state.current.get("config").propagateColors
+    const propagateColors: boolean = this.state.current.getConfig().propagateColors
     node.color = propagateColors && node.depth > 1 ? node.parent.color : node.depth > 0 ? this.color(node) : undefined
   }
 

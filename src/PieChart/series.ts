@@ -34,7 +34,7 @@ class Series {
   }
 
   assignData(): void {
-    this.attributes = this.state.current.get("data")
+    this.attributes = this.state.current.getData()
     this.assignAccessors()
     this.updateRenderer()
     this.prepareData()
@@ -48,13 +48,13 @@ class Series {
           return this.renderer.key(datum) && this.renderer.key(datum).length > 0 && this.renderer.value(datum) > 0
         },
       ),
-    )(this.state.current.get("accessors").data.data(this.attributes))
+    )(this.state.current.getAccessors().data.data(this.attributes))
     this.renderer.setData(this.data)
     this.stateWriter("data", this.data)
   }
 
   private assignAccessors(): void {
-    const accessors = this.state.current.get("accessors").series
+    const accessors = this.state.current.getAccessors().series
     forEach.convert({ cap: false })((accessor: any, key: string) => {
       ;(this as any)[key] = () => accessor(this.attributes)
     })(accessors)

@@ -53,7 +53,7 @@ class Renderer {
       .selectAll(`path.${styles.arc}`)
       .data(this.data, get("id"))
 
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     this.exit(arcs, config.duration, document.hidden || config.disableAnimations)
     this.enterAndUpdate(arcs, config.duration, document.hidden || config.disableAnimations)
   }
@@ -75,7 +75,7 @@ class Renderer {
   }
 
   private updateZoom(): void {
-    const matchers = this.state.current.get("config").zoomNode
+    const matchers = this.state.current.getConfig().zoomNode
     const zoomNode: Datum = find(
       (d: Datum): boolean => {
         return every(identity)(
@@ -124,9 +124,9 @@ class Renderer {
 
   // Computations
   private compute(): void {
-    const drawingDims = this.state.current.get("computed").canvas.drawingDims
+    const drawingDims = this.state.current.getComputed().canvas.drawingDims
     this.radius =
-      Math.min(drawingDims.width, drawingDims.height) / 2 - this.state.current.get("config").outerBorderMargin
+      Math.min(drawingDims.width, drawingDims.height) / 2 - this.state.current.getConfig().outerBorderMargin
 
     this.angleScale = d3ScaleLinear()
       .clamp(true)
@@ -173,7 +173,7 @@ class Renderer {
 
   // Center elements within drawing container
   private translate(): string {
-    const drawingDims = this.state.current.get("computed").canvas.drawingDims
+    const drawingDims = this.state.current.getComputed().canvas.drawingDims
     this.currentTranslation = [drawingDims.width / 2, drawingDims.height / 2]
     return `translate(${this.currentTranslation.join(", ")})`
   }
@@ -298,13 +298,13 @@ class Renderer {
     }
 
     // Set new scale domains
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
 
     let maxChildRadius: number = 0
     let truncated: boolean = false
     forEach(
       (child: Datum): void => {
-        if (child.depth - zoomNode.depth <= this.state.current.get("config").maxRings) {
+        if (child.depth - zoomNode.depth <= this.state.current.getConfig().maxRings) {
           maxChildRadius = Math.max(maxChildRadius, child.y1)
         } else {
           truncated = true
@@ -476,13 +476,13 @@ class Renderer {
   private arrowTransformation(d: Datum): string {
     const radAngle: number = d3Interpolate(this.angleScale(d.x0), this.angleScale(d.x1))(0.5)
     const degAngle: number = (radAngle * 180) / Math.PI
-    const r: number = this.radiusScale(d.y1) + this.state.current.get("config").arrowOffset
+    const r: number = this.radiusScale(d.y1) + this.state.current.getConfig().arrowOffset
     return `translate(0, ${-r}) rotate(${degAngle} 0 ${r})`
   }
 
   private updateTruncationArrows(): void {
     const centerNode = this.zoomNode || this.dataHandler.topNode
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
 
     const data: Datum[] = map(get("parent"))(
       filter(

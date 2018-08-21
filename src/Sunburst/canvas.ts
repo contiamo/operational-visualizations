@@ -91,7 +91,7 @@ class SunburstCanvas implements Canvas {
   }
 
   private drawingDims(): Dimensions {
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     return {
       width: config.width,
       height: config.height - this.breadcrumb.node().getBoundingClientRect().height,
@@ -100,12 +100,12 @@ class SunburstCanvas implements Canvas {
 
   // Lifecycle
   draw(): void {
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     const drawingDims = this.drawingDims()
     this.stateWriter("drawingDims", drawingDims)
 
     this.chartContainer
-      .style("visibility", this.state.current.get("config").hidden ? "hidden" : "visible")
+      .style("visibility", this.state.current.getConfig().hidden ? "hidden" : "visible")
       .style("width", config.width + "px")
       .style("height", config.height + "px")
     this.el.style("width", drawingDims.width + "px").style("height", drawingDims.height + "px")

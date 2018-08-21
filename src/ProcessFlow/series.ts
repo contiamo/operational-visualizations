@@ -28,7 +28,7 @@ class Series {
   }
 
   draw(): void {
-    const seriesConfig = this.state.current.get("computed").series
+    const seriesConfig = this.state.current.getComputed().series
     this.el.attr("width", seriesConfig.width).attr("height", seriesConfig.height)
     this.renderer.draw(this.data)
     this.drawn = true

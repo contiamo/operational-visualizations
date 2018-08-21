@@ -51,14 +51,14 @@ class ChartCanvas implements Canvas {
 
   // Lifecycle
   draw(): void {
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     const dims = this.calculateDrawingContainerDims()
     this.stateWriter("drawingContainerDims", dims)
 
     // Resize elements
     this.chartContainer
-      .attr("class", `${styles.chartContainer} ${this.state.current.get("config").uid}`)
-      .classed("hidden", this.state.current.get("config").hidden)
+      .attr("class", `${styles.chartContainer} ${this.state.current.getConfig().uid}`)
+      .classed("hidden", this.state.current.getConfig().hidden)
       .style("width", `${config.width}px`)
       .style("height", `${config.height}px`)
     this.stateWriter(["containerRect"], this.chartContainer.node().getBoundingClientRect())
@@ -160,7 +160,7 @@ class ChartCanvas implements Canvas {
   }
 
   private legendHeight(position: "top" | "bottom", float: "left" | "right"): number {
-    return get([position, float])(this.state.current.get("computed").series.dataForLegends)
+    return get([position, float])(this.state.current.getComputed().series.dataForLegends)
       ? this.elementFor(`legend-${position}-${float}`).node().offsetHeight
       : 0
   }
@@ -210,7 +210,7 @@ class ChartCanvas implements Canvas {
       memo[renderer] = series
         .append("svg:g")
         .attr("class", `series-${renderer}`)
-        .attr("clip-path", `url(#${this.state.current.get("config").uid}_${clip})`)
+        .attr("clip-path", `url(#${this.state.current.getConfig().uid}_${clip})`)
       return memo
     }, {})(seriesElements)
   }
@@ -260,16 +260,16 @@ class ChartCanvas implements Canvas {
   }
 
   private prefixedId(id: string): string {
-    return this.state.current.get("config").uid + id
+    return this.state.current.getConfig().uid + id
   }
 
   private margin(axis: AxisPosition): number {
-    const margins = this.state.current.get("computed").axes.margins || {}
+    const margins = this.state.current.getComputed().axes.margins || {}
     return margins[axis] || 0
   }
 
   private calculateDrawingContainerDims(): Dimensions {
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     return {
       height: config.height - this.totalLegendHeight(),
       width: config.width,
@@ -277,7 +277,7 @@ class ChartCanvas implements Canvas {
   }
 
   private calculateDrawingDims(): Dimensions {
-    const drawingContainerDims = this.state.current.get("computed").canvas.drawingContainerDims
+    const drawingContainerDims = this.state.current.getComputed().canvas.drawingContainerDims
     return {
       width: drawingContainerDims.width - this.margin("y1") - this.margin("y2"),
       height: drawingContainerDims.height - this.margin("x1") - this.margin("x2"),

@@ -4,7 +4,6 @@ import { symbol as d3Symbol, symbolDiamond, symbolSquare, symbolCircle } from "d
 import { withD3Element, onTransitionEnd } from "../../utils/d3_utils"
 import * as styles from "./styles"
 import Events from "../../shared/event_catalog"
-import { every, invoke, map } from "lodash/fp"
 import { exitGroups, filterByMatchers, sizeScale } from "./renderer_utils"
 
 import {
@@ -141,7 +140,7 @@ class Nodes implements Renderer {
 
   draw(data: TNode[]): void {
     this.data = data
-    this.config = this.state.current.get("config")
+    this.config = this.state.current.getConfig()
     const groups = this.el
       .select("g.nodes-group")
       .selectAll("g.node-group")
@@ -264,7 +263,7 @@ class Nodes implements Renderer {
   }
 
   private getAutomaticLabelPosition(d: TNode): string {
-    const columnSpacing = this.state.current.get("computed").series.horizontalNodeSpacing
+    const columnSpacing = this.state.current.getComputed().series.horizontalNodeSpacing
     return (d.x / columnSpacing) % 2 === 1 ? "top" : "bottom"
   }
 
@@ -280,7 +279,7 @@ class Nodes implements Renderer {
 
   private getLabelText(d: TNode): string {
     // Pixel width of character approx 1/2 of font-size - allow 7px per character
-    const desiredPixelWidth = this.state.current.get("computed").series.horizontalNodeSpacing
+    const desiredPixelWidth = this.state.current.getComputed().series.horizontalNodeSpacing
     const numberOfCharacters = desiredPixelWidth / 7
     return d.label().substring(0, numberOfCharacters) + (d.label().length > numberOfCharacters ? "..." : "")
   }

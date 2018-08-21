@@ -13,10 +13,12 @@ import defaultNumberFormatter from "../utils/number_formatter"
 
 import {
   Accessors,
+  AccessorsObject,
   AxesData,
   AxisPosition,
   ChartConfig,
   Components,
+  Computed,
   Data,
   Datum,
   Facade,
@@ -84,7 +86,7 @@ class ChartFacade implements Facade {
   private customColorAccessor: boolean = false
   private events: EventEmitter
   private series: ChartSeriesManager
-  private state: StateHandler<ChartConfig, Data>
+  private state: StateHandler<Data, ChartConfig, AccessorsObject, Computed>
 
   constructor(context: Element) {
     this.context = context
@@ -99,7 +101,7 @@ class ChartFacade implements Facade {
     return new EventEmitter()
   }
 
-  private initializeState(): StateHandler<ChartConfig, Data> {
+  private initializeState(): StateHandler<Data, ChartConfig, AccessorsObject, Computed> {
     return new StateHandler({
       data: {},
       config: defaultConfig(),

@@ -16,21 +16,17 @@ export interface Accessors<D> {
 }
 
 // State
-import StateHandler, { ChartStateReadOnly } from "./state_handler"
+export { ChartStateReadOnly, StateWriter } from "./state_handler"
 
-export { StateWriter } from "./state_handler"
-
-export type State = ChartStateReadOnly<ChartStateObject>
-
-export interface ChartStateObject {
-  data: any
+export interface ChartStateObject<Data, Config, AccessorsObject, Computed> {
+  data: Data
   config: Config
-  accessors: any
-  computed: { [key: string]: any }
+  accessors: AccessorsObject
+  computed: Computed
 }
 
 // Base config, required for all visualisations
-export interface Config {
+export interface BaseConfig {
   duration: number
   height: number
   hidden: boolean

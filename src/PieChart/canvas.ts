@@ -105,7 +105,7 @@ class PieChartCanvas implements Canvas {
   }
 
   private drawingContainerDims(): Dimensions {
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     return {
       height: config.height - this.elMap.legend.node().offsetHeight,
       width: config.width,
@@ -114,10 +114,10 @@ class PieChartCanvas implements Canvas {
 
   // Lifecycle
   draw(): void {
-    this.chartContainer.classed("hidden", this.state.current.get("config").hidden)
+    this.chartContainer.classed("hidden", this.state.current.getConfig().hidden)
     this.stateWriter(["containerRect"], this.chartContainer.node().getBoundingClientRect())
 
-    const config = this.state.current.get("config")
+    const config = this.state.current.getConfig()
     const dims = this.drawingContainerDims()
     this.stateWriter("drawingContainerDims", dims)
 
