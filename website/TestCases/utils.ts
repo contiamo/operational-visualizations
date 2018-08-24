@@ -1,18 +1,5 @@
 import { TestSuiteGroup, CurrentTestSuite } from "./types"
 
-/*
- * Returns the index of the first element that matches a condition.
- */
-const findIndex = (condition: (member: any, index: number) => boolean) => (array: any[]): number | null => {
-  const match = array
-    .map((member, index) => (condition(member, index) ? [member, index] : null))
-    .filter(memberWithIndex => memberWithIndex !== null)[0]
-  if (!match) {
-    return null
-  }
-  return match[1] as number
-}
-
 /**
  * Finds a test from the pathname, also returning whether an exact path match was found so that a redirct may take place.
  */
@@ -26,8 +13,8 @@ export const fromPathname = (testGroups: TestSuiteGroup[]) => (pathname: string)
   if (!groupSlug) {
     return defaultTest
   }
-  const groupIndex = findIndex((testCase, index) => testCase.slug === groupSlug)(testGroups)
-  if (groupIndex === null) {
+  const groupIndex = testGroups.findIndex((testCase, index) => testCase.slug === groupSlug)
+  if (!groupIndex === null) {
     return defaultTest
   }
   if (!testSlug) {
@@ -37,7 +24,7 @@ export const fromPathname = (testGroups: TestSuiteGroup[]) => (pathname: string)
     }
   }
   const group = testGroups[groupIndex] as any
-  const testIndex = findIndex(({ slug }, index) => slug === testSlug)(group.children)
+  const testIndex = group.children.findIndex(({ slug }, index) => slug === testSlug)
   if (testIndex === null) {
     return {
       groupIndex,

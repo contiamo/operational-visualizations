@@ -52,7 +52,6 @@ class VisualTests extends React.Component<Props, State> {
   render() {
     const pathInfo = fromPathname(this.props.pathname)
     const { groupIndex, testIndex } = pathInfo
-    const test = allTestCases[groupIndex].children[testIndex].marathon
     return (
       <Layout
         header={<HeaderBar main={<h3>Visual Tests</h3>} logo={<Logo name="OperationalUI" to="/" />} />}
@@ -108,7 +107,7 @@ class VisualTests extends React.Component<Props, State> {
             <Card>
               {pathInfo.exactPath && (
                 <Marathon
-                  test={test}
+                  test={allTestCases[groupIndex].children[testIndex].marathon}
                   onCompleted={() => {
                     if (this.state.isLooping) {
                       this.props.pushState(toPathname(next({ groupIndex, testIndex })))

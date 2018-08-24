@@ -25,16 +25,20 @@ const Header = () => <HeaderBar logo={<Logo name="OperationalUI" />} end={<Versi
 
 const LandingPage = () => (
   <Splash
-    color="#6B42B7"
+    color="#343972"
     title="Operational Visualizations"
     actions={
       <>
-        <Button to="/visual-tests">Visual Tests</Button>
+        <Button to="/visual-tests">Explore</Button>
         <Button to="https://github.com/contiamo/operational-visualizations/">GitHub</Button>
       </>
     }
   >
-    <p>Operational Visualizations ..</p>
+    <p>
+      Operational Visualizations is a set of robust and opinionated visualizations ready for enterprise volume and
+      complexity, from simple line charts to fully custom process visualization algorithms.
+    </p>
+    <p>Just bring your own data 🤓</p>
   </Splash>
 )
 
