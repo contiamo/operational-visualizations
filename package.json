@@ -18,7 +18,7 @@
     "build:package": "rimraf lib && tsc",
     "deploy": "npm run build && gh-pages -d dist",
     "test": "jest",
-    "prepublish": "npm run package",
+    "prepublish": "npm run build:package",
     "prettier": "prettier 'website/**/*.{ts,tsx}' --write",
     "precommit": "npm run prettier && git add ."
   },

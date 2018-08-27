@@ -57,9 +57,14 @@ class VisualTests extends React.Component<Props, State> {
         header={<HeaderBar main={<h3>Visual Tests</h3>} logo={<Logo name="OperationalUI" to="/" />} />}
         sidenav={
           <Sidenav>
-            {allTestCases.map((test, groupIndex) => (
-              <SidenavHeader key={groupIndex} to={toPathname({ groupIndex, testIndex: 0 })} label={test.title} active>
-                {test.children.map((test, testIndex) => {
+            {allTestCases.map((testGroup, groupIndex) => (
+              <SidenavHeader
+                key={groupIndex}
+                to={toPathname({ groupIndex, testIndex: 0 })}
+                label={testGroup.title}
+                active
+              >
+                {testGroup.children.map((test, testIndex) => {
                   const pathname = toPathname({ groupIndex, testIndex })
                   return (
                     <SidenavItem
