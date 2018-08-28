@@ -105,42 +105,22 @@
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.stat/-/fs.stat-1.1.0.tgz#50c1e2260ac0ed9439a181de3725a0168d59c48a"
 
-"@operational/components@^6.2.0":
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/@operational/components/-/components-6.2.0.tgz#dca2dd76bd5be8b29244bd531fec8f4a491c19bd"
+"@operational/components@^8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@operational/components/-/components-8.0.0.tgz#bfd7c5378bccd49a1f0203e19245559d76d40ccd"
   dependencies:
-    emotion "^9.2.3"
-    emotion-theming "^9.2.3"
-    moment "^2.19.0"
+    create-emotion-styled "^9.2.6"
+    emotion "^9.2.5"
+    emotion-theming "^9.2.6"
+    lodash "^4.17.10"
+    moment "^2.22.2"
     react "^16.4.1"
     react-copy-to-clipboard "^5.0.1"
     react-dom "^16.4.1"
-    react-emotion "^9.2.3"
-    react-feather "^1.1.0"
+    react-emotion "^9.2.6"
     react-highlight "^0.12.0"
-    react-icons "^2.2.5"
+    react-waypoint "^8.0.3"
     tinycolor2 "^1.4.1"
-
-"@operational/utils@^5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@operational/utils/-/utils-5.0.0.tgz#979166a88e821fa87e9c7c5bbd1097f393a1bea5"
-  dependencies:
-    glamor "^2.20.40"
-    tinycolor2 "^1.4.1"
-
-"@operational/visualizations@^5.2.0":
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/@operational/visualizations/-/visualizations-5.2.0.tgz#6c1d8890dca28d79c70dea9cb4ec6c16b5f24f5b"
-  dependencies:
-    "@operational/utils" "^5.0.0"
-    "@types/d3-format" "^1.3.0"
-    d3 "^5.4.0"
-    glamor "^2.20.40"
-    glamorous "^4.8.0"
-    lodash "^4.17.4"
-    moment "^2.21.0"
-    moment-range "^3.1.1"
-    react "^16.2.0"
 
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.0"
@@ -1715,6 +1695,10 @@ console-control-strings@^1.0.0, console-control-strings@~1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/console-control-strings/-/console-control-strings-1.1.0.tgz#3d7cf4464db6446ea644bf4b39507f9851008e8e"
 
+"consolidated-events@^1.1.0 || ^2.0.0":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/consolidated-events/-/consolidated-events-2.0.2.tgz#da8d8f8c2b232831413d9e190dc11669c79f4a91"
+
 constants-browserify@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/constants-browserify/-/constants-browserify-1.0.0.tgz#c20b96d8c617748aaf1c16021760cd27fcb8cb75"
@@ -2549,13 +2533,13 @@ emojis-list@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/emojis-list/-/emojis-list-2.1.0.tgz#4daa4d9db00f9819880c79fa457ae5b09a1fd389"
 
-emotion-theming@^9.2.3, emotion-theming@^9.2.6:
+emotion-theming@^9.2.6:
   version "9.2.6"
   resolved "https://registry.yarnpkg.com/emotion-theming/-/emotion-theming-9.2.6.tgz#ca69b94e28f66a5d9ca1e259633246beaa24afbc"
   dependencies:
     hoist-non-react-statics "^2.3.1"
 
-emotion@^9.2.3, emotion@^9.2.6:
+emotion@^9.2.5, emotion@^9.2.6:
   version "9.2.6"
   resolved "https://registry.yarnpkg.com/emotion/-/emotion-9.2.6.tgz#48517515e769bca6d8f7ff18425a7f133b010f22"
   dependencies:
@@ -5128,7 +5112,7 @@ moment-range@^3.1.1:
   dependencies:
     es6-symbol "^3.1.0"
 
-moment@^2.18.1, moment@^2.19.0, moment@^2.21.0:
+moment@^2.18.1, moment@^2.21.0, moment@^2.22.2:
   version "2.22.2"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
 
@@ -6349,7 +6333,7 @@ prompts@^0.1.9:
     kleur "^1.0.0"
     sisteransi "^0.1.1"
 
-prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.0:
+prop-types@^15.0.0, prop-types@^15.5.10, prop-types@^15.5.8, prop-types@^15.6.0:
   version "15.6.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.2.tgz#05d5ca77b4453e985d60fc7ff8c859094a497102"
   dependencies:
@@ -6481,16 +6465,12 @@ react-dom@^16.4.1:
     object-assign "^4.1.1"
     prop-types "^15.6.0"
 
-react-emotion@^9.2.3, react-emotion@^9.2.6:
+react-emotion@^9.2.6:
   version "9.2.6"
   resolved "https://registry.yarnpkg.com/react-emotion/-/react-emotion-9.2.6.tgz#3941f78779f9a8ad8300042ddfa9b2cb111442c2"
   dependencies:
     babel-plugin-emotion "^9.2.6"
     create-emotion-styled "^9.2.6"
-
-react-feather@^1.1.0:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/react-feather/-/react-feather-1.1.1.tgz#dd59143af457601e68f2cd3bf32c0d94d30f89e7"
 
 react-highlight@^0.12.0:
   version "0.12.0"
@@ -6504,22 +6484,19 @@ react-html-attributes@^1.4.2:
   dependencies:
     html-element-attributes "^1.0.0"
 
-react-icon-base@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/react-icon-base/-/react-icon-base-2.1.0.tgz#a196e33fdf1e7aaa1fda3aefbb68bdad9e82a79d"
-
-react-icons@^2.2.5:
-  version "2.2.7"
-  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-2.2.7.tgz#d7860826b258557510dac10680abea5ca23cf650"
-  dependencies:
-    react-icon-base "2.1.0"
-
 react-test-renderer@16.0.0:
   version "16.0.0"
   resolved "https://registry.yarnpkg.com/react-test-renderer/-/react-test-renderer-16.0.0.tgz#9fe7b8308f2f71f29fc356d4102086f131c9cb15"
   dependencies:
     fbjs "^0.8.16"
     object-assign "^4.1.1"
+
+react-waypoint@^8.0.3:
+  version "8.0.3"
+  resolved "https://registry.yarnpkg.com/react-waypoint/-/react-waypoint-8.0.3.tgz#860db860d3301c6f449800f7a330856028730af5"
+  dependencies:
+    consolidated-events "^1.1.0 || ^2.0.0"
+    prop-types "^15.0.0"
 
 react@^16.2.0, react@^16.4.1:
   version "16.4.1"
@@ -7651,9 +7628,9 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typescript@next:
-  version "3.0.0-dev.20180712"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.0.0-dev.20180712.tgz#ffdadf6a5a108c44d5325e83e2afbd088f2a5f84"
+typescript@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.0.1.tgz#43738f29585d3a87575520a4b93ab6026ef11fdb"
 
 ua-parser-js@^0.7.18:
   version "0.7.18"

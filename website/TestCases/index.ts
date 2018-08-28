@@ -1,8 +1,8 @@
+import * as utils from "./utils"
 import chartTestCases from "./Chart"
 import pieChartTestCases from "./PieChart"
 import processFlowTestCases from "./ProcessFlow"
 import sunburstTestCases from "./Sunburst"
-
 import { TestSuiteGroup } from "./types"
 import { MarathonEnvironment } from "../Marathon"
 
@@ -15,4 +15,6 @@ const testGroups: TestSuiteGroup[] = [
 
 export default testGroups
 
-export { fromHash, toHash } from "./utils"
+export const fromPathname = utils.fromPathname(testGroups)
+export const toPathname = utils.toPathname(testGroups)
+export const next = utils.next(testGroups)

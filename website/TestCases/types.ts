@@ -16,4 +16,5 @@ export interface TestSuite {
 export interface CurrentTestSuite {
   groupIndex: number
   testIndex: number
+  exactPath?: boolean
 }
