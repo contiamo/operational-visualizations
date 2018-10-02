@@ -30,7 +30,7 @@ const data2 = [
 
 const App = () => (
   <OperationalUI>
-    <Legend data={data}/>
+    <Legend data={data} title={"Title"}/>
     <Legend data={data2} style={{ width: 150 }}/>
   </OperationalUI>
 )

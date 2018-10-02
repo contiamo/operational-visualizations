@@ -4,6 +4,8 @@ import theme from "../utils/constants"
 const legendStyle: React.CSSProperties = {
   padding: `${theme.space.small}px ${theme.space.default}px`,
   float: "left",
+  color: theme.font.color,
+  fontSize: theme.font.size.default,
 }
 
 const seriesLegendStyle: React.CSSProperties = {
@@ -23,9 +25,12 @@ const colorStyle = (color: string): React.CSSProperties => ({
 
 const nameStyle: React.CSSProperties = {
   float: "left",
-  fontSize: theme.font.size.default,
   fontWeight: theme.font.weight.regular,
   lineHeight: 1,
+}
+
+const titleStyle: React.CSSProperties = {
+  fontWeight: theme.font.weight.bold,
 }
 
 interface LegendDatum {
@@ -38,6 +43,7 @@ type LegendData = LegendDatum[]
 
 export interface Props {
   style?: {}
+  title?: string
   data: LegendData
 }
 
@@ -45,6 +51,7 @@ class Legend extends React.Component<Props, {}> {
   render() {
     return (
       <div style={{...this.props.style, ...legendStyle}}>
+        {this.props.title && <div style={titleStyle}>{this.props.title}</div>}
         {this.props.data.map(datum => {
           return <div className={datum.key} style={seriesLegendStyle}>
             <div style={colorStyle(datum.color)}></div>
