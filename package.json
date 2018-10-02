@@ -1,6 +1,6 @@
 {
   "name": "@operational/visualizations",
-  "version": "5.2.0",
+  "version": "5.3.0-4370ca3",
   "description": "Contiamo visualization library.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -10,6 +10,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "dev": "parcel scripts/dev-server/index.html",
     "start": "parcel website/index.html",
