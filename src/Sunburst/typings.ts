@@ -53,7 +53,6 @@ export interface Datum extends HierarchyRectangularNode<RawData> {
   name?: string
   zoomable?: boolean
   hops?: boolean
-  parent: Datum | null
 }
 
 export interface DataAccessors {
