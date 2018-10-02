@@ -51,7 +51,7 @@ const Legend = (props: Props) => (
   <div style={{...props.style, ...legendStyle}}>
     {props.title && <div style={titleStyle}>{props.title}</div>}
     {props.data.map((datum: LegendDatum) => {
-      return <div className={datum.key} style={seriesLegendStyle}>
+      return <div className={datum.key} key={datum.key} style={seriesLegendStyle}>
         <div style={colorStyle(datum.color)}></div>
         <div style={nameStyle}>{datum.label}</div>
       </div>
