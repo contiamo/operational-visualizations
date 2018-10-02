@@ -47,20 +47,16 @@ export interface Props {
   data: LegendData
 }
 
-class Legend extends React.Component<Props, {}> {
-  render() {
-    return (
-      <div style={{...this.props.style, ...legendStyle}}>
-        {this.props.title && <div style={titleStyle}>{this.props.title}</div>}
-        {this.props.data.map(datum => {
-          return <div className={datum.key} style={seriesLegendStyle}>
-            <div style={colorStyle(datum.color)}></div>
-            <div style={nameStyle}>{datum.label}</div>
-          </div>
-        })}
+const Legend = (props: Props) => (
+  <div style={{...props.style, ...legendStyle}}>
+    {props.title && <div style={titleStyle}>{props.title}</div>}
+    {props.data.map((datum: LegendDatum) => {
+      return <div className={datum.key} style={seriesLegendStyle}>
+        <div style={colorStyle(datum.color)}></div>
+        <div style={nameStyle}>{datum.label}</div>
       </div>
-    )
-  }
-}
+    })}
+  </div>
+)
 
 export default Legend
