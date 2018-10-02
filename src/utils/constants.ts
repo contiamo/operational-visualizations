@@ -54,7 +54,7 @@ const colors = {
 type FontWeight = 400 | 700
 
 const font = {
-  color: "#999999",
+  color: "#545454",
   size: {
     /** 12 */
     default: 12,
