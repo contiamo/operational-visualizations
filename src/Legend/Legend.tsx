@@ -3,7 +3,6 @@ import theme from "../utils/constants"
 
 const legendStyle: React.CSSProperties = {
   padding: `${theme.space.small}px ${theme.space.default}px`,
-  float: "left",
   color: theme.font.color,
   fontSize: theme.font.size.default,
 }
@@ -31,6 +30,7 @@ const nameStyle: React.CSSProperties = {
 
 const titleStyle: React.CSSProperties = {
   fontWeight: theme.font.weight.bold,
+  padding: `2px ${theme.space.small}px`,
 }
 
 interface LegendDatum {
