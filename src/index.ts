@@ -7,3 +7,4 @@ export { default as ProcessFlowLoopHandler } from "./utils/process_flow_loop_han
 export { default as Sunburst } from "./Sunburst/facade"
 export { default as VisualizationWrapper } from "./utils/VisualizationWrapper"
 export { default as Legend } from "./Legend/Legend"
+export { colorAssigner } from "./utils/colorAssigner"

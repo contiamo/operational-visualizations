@@ -86,14 +86,14 @@ const createData: any = () => {
     series: [
       {
         data: [
-          { x: "March 10th", y: Math.floor(Math.random() * 500) - 250 },
-          { x: "March 11th", y: Math.floor(Math.random() * 500) - 250 },
-          { x: "March 12th", y: Math.floor(Math.random() * 500) - 250 },
-          { x: "March 13th", y: Math.floor(Math.random() * 500) - 250 },
-          { x: "March 14th", y: Math.floor(Math.random() * 500) - 250 },
-          { x: "March 15th", y: Math.floor(Math.random() * 500) - 250 },
-          { x: "March 16th", y: Math.floor(Math.random() * 500) - 250 },
-          { x: "March 17th", y: Math.floor(Math.random() * 500) - 250 },
+          { x: new Date(2018, 2, 10), y: Math.floor(Math.random() * 500) - 250 },
+          { x: new Date(2018, 2, 11), y: Math.floor(Math.random() * 500) - 250 },
+          { x: new Date(2018, 2, 12), y: Math.floor(Math.random() * 500) - 250 },
+          { x: new Date(2018, 2, 13), y: Math.floor(Math.random() * 500) - 250 },
+          { x: new Date(2018, 2, 14), y: Math.floor(Math.random() * 500) - 250 },
+          { x: new Date(2018, 2, 15), y: Math.floor(Math.random() * 500) - 250 },
+          { x: new Date(2018, 2, 16), y: Math.floor(Math.random() * 500) - 250 },
+          { x: new Date(2018, 2, 11), y: Math.floor(Math.random() * 500) - 250 },
         ],
         name: "Pageviews 2018",
         key: "series1",
@@ -101,14 +101,14 @@ const createData: any = () => {
       },
       {
         data: [
-          { x: "March 10th", y: Math.floor(Math.random() * 300) - 150 },
-          { x: "March 11th", y: Math.floor(Math.random() * 300) - 150 },
-          { x: "March 12th", y: Math.floor(Math.random() * 300) - 150 },
-          { x: "March 13th", y: Math.floor(Math.random() * 300) - 150 },
-          { x: "March 14th", y: Math.floor(Math.random() * 300) - 150 },
-          { x: "March 15th", y: Math.floor(Math.random() * 300) - 150 },
-          { x: "March 16th", y: Math.floor(Math.random() * 300) - 150 },
-          { x: "March 17th", y: Math.floor(Math.random() * 300) - 150 },
+          { x: new Date(2018, 2, 10), y: Math.floor(Math.random() * 300) - 150 },
+          { x: new Date(2018, 2, 11), y: Math.floor(Math.random() * 300) - 150 },
+          { x: new Date(2018, 2, 12), y: Math.floor(Math.random() * 300) - 150 },
+          { x: new Date(2018, 2, 13), y: Math.floor(Math.random() * 300) - 150 },
+          { x: new Date(2018, 2, 14), y: Math.floor(Math.random() * 300) - 150 },
+          { x: new Date(2018, 2, 15), y: Math.floor(Math.random() * 300) - 150 },
+          { x: new Date(2018, 2, 16), y: Math.floor(Math.random() * 300) - 150 },
+          { x: new Date(2018, 2, 11), y: Math.floor(Math.random() * 300) - 150 },
         ],
         name: "Users 2018",
         key: "series2",
@@ -118,13 +118,13 @@ const createData: any = () => {
         series: [
           {
             data: [
-              { y: "March 10th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 11th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 13th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 14th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 15th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 16th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 17th", x: Math.floor(Math.random() * 200 + 1000) },
+              { y: new Date(2018, 2, 10), x: Math.floor(Math.random() * 200 + 1000) },
+              { y: new Date(2018, 2, 11), x: Math.floor(Math.random() * 200 + 1000) },
+              { y: new Date(2018, 2, 12), x: Math.floor(Math.random() * 200 + 1000) },
+              { y: new Date(2018, 2, 13), x: Math.floor(Math.random() * 200 + 1000) },
+              { y: new Date(2018, 2, 14), x: Math.floor(Math.random() * 200 + 1000) },
+              { y: new Date(2018, 2, 15), x: Math.floor(Math.random() * 200 + 1000) },
+              { y: new Date(2018, 2, 16), x: Math.floor(Math.random() * 200 + 1000) },
             ],
             name: "Metric 1",
             key: "series3",
@@ -136,14 +136,14 @@ const createData: any = () => {
           },
           {
             data: [
-              { y: "March 10th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 11th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 12th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 13th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 14th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 15th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 16th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 17th", x: Math.floor(Math.random() * 200 + 1000) },
+              { y: new Date(2018, 2, 10), x: Math.floor(Math.random() * 200 + 1000) },
+              { y: new Date(2018, 2, 11), x: Math.floor(Math.random() * 200 + 1000) },
+              { y: new Date(2018, 2, 12), x: Math.floor(Math.random() * 200 + 1000) },
+              { y: new Date(2018, 2, 13), x: Math.floor(Math.random() * 200 + 1000) },
+              { y: new Date(2018, 2, 14), x: Math.floor(Math.random() * 200 + 1000) },
+              { y: new Date(2018, 2, 15), x: Math.floor(Math.random() * 200 + 1000) },
+              { y: new Date(2018, 2, 16), x: Math.floor(Math.random() * 200 + 1000) },
+              { y: new Date(2018, 2, 11), x: Math.floor(Math.random() * 200 + 1000) },
             ],
             name: "Metric 2",
             key: "series4",
@@ -187,10 +187,15 @@ const createData: any = () => {
     ],
     axes: {
       x1: {
-        type: "categorical",
+        type: "time",
+        start: new Date(2018, 2, 10),
+        end: new Date(2018, 2, 17),
+        interval: "day",
+        title: "2018",
       },
       y1: {
         type: "quant",
+        title: "TEST",
       },
       y2: {
         type: "quant",
@@ -198,8 +203,6 @@ const createData: any = () => {
     },
   }
 }
-
-const data = createData()
 
 const App = () => (
   <OperationalUI>

@@ -3,8 +3,10 @@ import Series from "../series"
 import * as styles from "./styles"
 import { withD3Element, setRectAttributes } from "../../../utils/d3_utils"
 import { area as d3Area, curveStepAfter } from "d3-shape"
+import Events from "../../../shared/event_catalog"
 
 import {
+  AxisPosition,
   BarsRendererAccessors,
   D3Selection,
   Datum,
@@ -16,8 +18,6 @@ import {
   State,
   AxisOrientation,
 } from "../../typings"
-
-import Events from "../../../shared/event_catalog"
 
 export type Options = SingleRendererOptions<BarsRendererAccessors>
 
@@ -183,8 +183,8 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   }
 
   private seriesTranslation(): string {
-    const seriesBars = this.state.current.getComputed().axes.computedBars[this.series.key()]
-    return this.xIsBaseline ? `translate(${seriesBars.offset}, 0)` : `translate(0, ${seriesBars.offset})`
+    const offset = (axis: AxisPosition) => this.state.current.getComputed().axes.computed[axis].offset(this.series.key())
+    return this.xIsBaseline ? `translate(${offset(this.series.xAxis())}, 0)` : `translate(0, ${offset(this.series.yAxis())})`
   }
 
   private startAttributes(attributes: any) {
@@ -198,7 +198,7 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   }
 
   private attributes() {
-    const barWidth = this.state.current.getComputed().axes.computedBars[this.series.key()].width
+    const barWidth = this.state.current.getComputed().axes.computed[this.xIsBaseline ? this.series.xAxis() : this.series.yAxis()].width(this.series.key())
     return {
       x: this.x0,
       y: this.y1,
@@ -211,7 +211,7 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   private onMouseOver(d: Datum, el: HTMLElement): void {
     const isNegative = this.xIsBaseline ? this.y(d) < 0 : this.x(d) < 0
     const dimensions = el.getBoundingClientRect()
-    const barOffset = this.state.current.getComputed().axes.computedBars[this.series.key()].offset
+    const barOffset = this.state.current.getComputed().axes.computed[this.xIsBaseline ? this.series.xAxis() : this.series.yAxis()].offset(this.series.key())
 
     const focusPoint = {
       content: this.focusContent(d),
@@ -266,7 +266,7 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   }
 
   private clipPath(data: any[]): string {
-    const barWidth = this.state.current.getComputed().axes.computedBars[this.series.key()].width
+    const barWidth = this.state.current.getComputed().axes.computed[this.xIsBaseline ? this.series.xAxis() : this.series.yAxis()].width(this.series.key())
     const offset = this.state.current.getConfig().outerBarSpacing / 2
     const clipPath = this.xIsBaseline ? this.xClipPath.bind(this) : this.yClipPath.bind(this)
     return clipPath(barWidth, offset)(data)

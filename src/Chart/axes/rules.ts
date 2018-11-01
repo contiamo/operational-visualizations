@@ -1,6 +1,6 @@
-import { AxisPosition, D3Selection, State, AxisOrientation } from "../typings"
+import { D3Selection, State, AxisOrientation } from "../typings"
 import * as styles from "../../shared/styles"
-import { clone, includes } from "lodash/fp"
+import { clone } from "lodash/fp"
 
 class Rules {
   el: D3Selection

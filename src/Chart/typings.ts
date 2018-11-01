@@ -1,5 +1,7 @@
 import { Accessor, BaseConfig, Facade, Focus, Legend, ChartStateReadOnly } from "../shared/typings"
-import { DateRange } from "moment-range"
+import { AxisPosition, AxisOptions, AxisOrientation } from "../axis_utils/typings"
+
+export * from "../axis_utils/typings"
 
 export {
   Accessor,
@@ -17,21 +19,6 @@ export {
 } from "../shared/typings"
 
 export type State = ChartStateReadOnly<Data, ChartConfig, AccessorsObject, Computed>
-
-export interface AxisConfig {
-  fontSize: number
-  margin: number
-  minTicks: number
-  outerPadding: number
-  rotateLabels: boolean
-  showRules: boolean
-  showTicks: boolean
-  tickOffset: number
-  tickSpacing: number
-  title: string
-  titleFontSize: number
-  minTopOffsetTopTick?: number
-}
 
 export type FocusElement = { type: "element" | "date"; value: string | Date }
 
@@ -182,57 +169,8 @@ export interface SeriesAccessors {
 }
 
 // Axes
-export type AxisOrientation = "x" | "y"
-
-export type AxisPosition = "x1" | "x2" | "y1" | "y2"
-
-export type AxisType = "time" | "quant" | "categorical"
-
-export type TimeIntervals = "hour" | "day" | "week" | "month" | "quarter" | "year"
-
-export interface TimeAxisOptions extends AxisConfig {
-  type: string
-  start: Date
-  end: Date
-  interval: TimeIntervals
-}
-
-export interface QuantAxisOptions extends AxisConfig {
-  type: string
-  start?: number
-  end?: number
-  interval?: number
-  ruleInterval?: number
-  tickInterval: number
-  unit?: string
-}
-
-export interface CategoricalAxisOptions extends AxisConfig {
-  type: string
-  values?: string[]
-}
-
-export type AxisOptions = TimeAxisOptions | QuantAxisOptions | CategoricalAxisOptions
-
 export interface AxesData {
   [key: string]: Partial<AxisOptions>
-}
-
-export interface AxisComputed {
-  domain?: [number, number] | DateRange
-  labelSteps?: [number, number, number]
-  labelTicks?: any[]
-  range: [number, number]
-  ruleSteps?: [number, number, number]
-  ruleTicks?: any[]
-  ruleOffset?: number
-  scale: any
-  tickSteps?: [number, number, number]
-  tickFormatter?: (d: any) => string
-  ticks: any[]
-  ticksInDomain?: Date[]
-  tickNumber?: number
-  tickWidth?: number
 }
 
 export interface AxisAttributes {
@@ -241,22 +179,6 @@ export interface AxisAttributes {
   text: any
   x: any
   y: any
-}
-
-export interface AxisClass<T> {
-  type: "time" | "quant" | "categorical"
-  validate: Accessor<any, boolean>
-  compute: () => void
-  computed: AxisComputed
-  computeAligned?: (computed: { [key: string]: any }) => void
-  computeInitial?: () => { [key: string]: any }
-  draw: (duration?: number) => void
-  interval?: any
-  isXAxis: boolean
-  options: AxisOptions
-  previous: AxisComputed
-  update: (options: Partial<AxisOptions>, data: T[]) => void
-  close: () => void
 }
 
 // Data

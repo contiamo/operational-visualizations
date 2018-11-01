@@ -44,10 +44,10 @@ const rulesStyle = {
   stroke: theme.colors.axis.rules,
   strokeWidth: 1,
   shapeRendering: "crispedges",
-  "& .zero": {
+  "&.zero": {
     strokeWidth: 2,
   },
-  "& .now": {
+  "&.now": {
     stroke: theme.colors.primary,
     strokeDasharray: "2, 4",
   },

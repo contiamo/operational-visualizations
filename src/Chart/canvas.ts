@@ -42,8 +42,8 @@ class ChartCanvas implements Canvas {
     this.el = this.renderEl()
     this.renderClipPaths()
     this.drawingGroup = this.renderDrawingGroup()
-    this.renderAxes()
     this.renderRules()
+    this.renderAxes()
     this.renderSeriesDrawingGroups()
     this.renderFocusElements()
     this.events.on("margins:update", this.draw.bind(this))
@@ -184,20 +184,20 @@ class ChartCanvas implements Canvas {
     return this.el.append("svg:g").attr("class", "drawing")
   }
 
-  private renderAxes(): void {
-    forEach(
-      (axis: string): void => {
-        const axesGroup = this.drawingGroup.append("svg:g").attr("class", `${axis}-axes-group`)
-        this.elMap[`${axis}Axes`] = axesGroup
-      },
-    )(axes)
-  }
-
   private renderRules(): void {
     forEach(
       (axis: string): void => {
         const rulesGroup = this.drawingGroup.append("svg:g").attr("class", `${axis}-rules-group`)
         this.elMap[`${axis}Rules`] = rulesGroup
+      },
+    )(axes)
+  }
+
+  private renderAxes(): void {
+    forEach(
+      (axis: string): void => {
+        const axesGroup = this.drawingGroup.append("svg:g").attr("class", `${axis}-axes-group`)
+        this.elMap[`${axis}Axes`] = axesGroup
       },
     )(axes)
   }
