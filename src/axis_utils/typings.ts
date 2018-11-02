@@ -13,9 +13,17 @@ export interface AxisConfig {
   minTopOffsetTopTick?: number
 }
 
-export interface Tick<T> {
-  /** Tick value */
-  value: T;
+export interface InputDatum<TValue, TOptions> {
+  range: Extent;
+  values: TValue[];
+  options: TOptions;
+}
+
+export type InputData<TValue, TOptions> = Record<AxisPosition, InputDatum<TValue, TOptions>>;
+
+export interface Tick {
+  /** Tick position on axis */
+  position: number;
   /** Label to display at tick, if any */
   label?: string;
   /** Class name for additional formatting */
@@ -35,10 +43,12 @@ export interface AxisComputed<TScale, TValue> {
   /** Length of axis */
   length: number;
   /** Ticks */
-  ticks: Tick<TValue>[];
+  ticks: Tick[];
   /** Position of rules */
   rules: Rule[];
 }
+
+export type Extent = [number, number];
 
 export interface BarsInfo {
   barWidth: number;
@@ -81,3 +91,13 @@ export interface TimeAxisOptions extends BaseAxisOptions {
 }
 
 export type AxisOptions = TimeAxisOptions | QuantAxisOptions | CategoricalAxisOptions;
+
+export interface ComputedSeries {
+  barSeries: Record<string, BarsInfo>,
+  barIndices: Record<string, number>
+}
+
+export interface BaseConfig {
+  innerBarSpacing: number;
+  minBarWidth: number
+}

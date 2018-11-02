@@ -4,6 +4,7 @@ import { D3Selection, EventBus, StateWriter, ComponentHoverPayload, ComponentCon
 import * as styles from "../../shared/styles"
 import { setLineAttributes, setTextAttributes, setRectAttributes } from "../../utils/d3_utils";
 import Events from "../../shared/event_catalog";
+import { Tick } from "../../axis_utils/typings";
 
 const defaultOptions = (type: AxisType) => ({
   showRules: type === "quant",
@@ -109,7 +110,6 @@ class Axis {
 
   /** Renders tick lines */
   private drawTicks(duration?: number): void {
-    const startAttributes = this.getTickStartAttributes()
     const attributes = this.getTickAttributes()
 
     const ticks = this.el
@@ -120,7 +120,7 @@ class Axis {
     ticks
       .enter()
       .append("svg:line")
-      .call(setLineAttributes, startAttributes)
+      .call(setLineAttributes, attributes)
       .merge(ticks)
       .attr("class", styles.axisTick)
       .call(setLineAttributes, attributes, duration)
@@ -128,21 +128,12 @@ class Axis {
     ticks.exit().remove()
   }
 
-  private getTickStartAttributes() {
-    return {
-      x1: (d: any) => this.isXAxis ? this.previous.scale(d.value) : 0,
-      x2: (d: any) => this.isXAxis ? this.previous.scale(d.value) : this.options.tickOffset * 0.6,
-      y1: (d: any) => this.isXAxis ? 0 : this.previous.scale(d.value),
-      y2: (d: any) => this.isXAxis ? this.options.tickOffset * 0.6 : this.previous.scale(d.value),
-    }
-  }
-
   private getTickAttributes() {
     return {
-      x1: (d: any) => this.isXAxis ? this.computed.scale(d.value) : 0,
-      x2: (d: any) => this.isXAxis ? this.computed.scale(d.value) : this.options.tickOffset * 0.6,
-      y1: (d: any) => this.isXAxis ? 0 : this.computed.scale(d.value),
-      y2: (d: any) => this.isXAxis ? this.options.tickOffset * 0.6 : this.computed.scale(d.value),
+      x1: (d: Tick) => this.isXAxis ? d.position : 0,
+      x2: (d: Tick) => this.isXAxis ? d.position : this.options.tickOffset * 0.6,
+      y1: (d: Tick) => this.isXAxis ? 0 : d.position,
+      y2: (d: Tick) => this.isXAxis ? this.options.tickOffset * 0.6 : d.position,
     }
   }
 
@@ -170,18 +161,18 @@ class Axis {
 
   private getAttributes(): AxisAttributes {
     const attrs: any = {
-      x: (d: any) => this.isXAxis ? this.computed.scale(d.value) : 0,
-      y: (d: any) => this.isXAxis ? 0 : this.computed.scale(d.value),
+      x: (d: Tick) => this.isXAxis ? d.position : 0,
+      y: (d: Tick) => this.isXAxis ? 0 : d.position,
       dx: this.isXAxis ? 0 : this.options.tickOffset,
       dy: this.isXAxis
         ? this.options.tickOffset + (this.position === "x1" ? this.options.fontSize : 0)
         : Math.abs(this.options.tickOffset / 2),
-      text: (d: any) => d.label,
+      text: (d: Tick) => d.label,
       textAnchor: textAnchor[this.position](this.options.rotateLabels),
     }
 
     attrs.transform = this.options.rotateLabels
-      ? (d: any) => `rotate(-45, ${attrs.x(d) + attrs.dx}, ${attrs.y(d) + attrs.dy})`
+      ? (d: Tick) => `rotate(-45, ${attrs.x(d) + attrs.dx}, ${attrs.y(d) + attrs.dy})`
       : ""
 
     return attrs
@@ -189,9 +180,9 @@ class Axis {
 
   private getStartAttributes(attributes: AxisAttributes): AxisAttributes {
     const startAttributes = cloneDeep(attributes)
-    startAttributes[this.isXAxis ? "x" : "y"] = (d: any) => this.previous.scale(d.value)
+    startAttributes[this.isXAxis ? "x" : "y"] = (d: Tick) => d.position
     startAttributes.transform = this.options.rotateLabels
-      ? (d: any) =>
+      ? (d: Tick) =>
           `rotate(-45, ${startAttributes.x(d) + startAttributes.dx}, ${startAttributes.y(d) + startAttributes.dy})`
       : ""
     return startAttributes

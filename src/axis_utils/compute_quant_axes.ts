@@ -1,23 +1,17 @@
 import { extent as d3Extent, range as d3Range } from "d3-array"
 import { rangeStep, mapValues, keys } from "lodash/fp"
-import { AxisComputed, AxisPosition, QuantAxisOptions, Tick} from "./typings"
+import { AxisComputed, AxisPosition, Extent, InputData, InputDatum, QuantAxisOptions, Tick} from "./typings"
 import * as d3 from "d3-selection"
 import { scaleLinear, ScaleLinear } from "d3-scale";
-
-interface InputDatum {
-  range: [number, number];
-  values: number[];
-  options: QuantAxisOptions;
-}
-
-type InputData = Record<AxisPosition, InputDatum>
 
 interface Config {
   numberFormatter: (value: number) => string
 }
 
-type InitialComputedDatum = InputDatum & {
-  domain: [number, number];
+type Steps = [number, number, number];
+
+type InitialComputedDatum = InputDatum<number, QuantAxisOptions> & {
+  domain: Extent;
   tickSteps: Steps;
   labelSteps: Steps;
   ruleSteps: Steps;
@@ -26,9 +20,6 @@ type InitialComputedDatum = InputDatum & {
 const tuple = <T extends string[]>(...args: T) => args;
 const STEPS_TO_ALIGN = tuple("tickSteps", "labelSteps", "ruleSteps");
 type StepsToAlign = typeof STEPS_TO_ALIGN[number];
-
-type Extent = [number, number];
-type Steps = [number, number, number];
 
 const computeDomain = (data: number[], start: number, end: number): Extent => {
   if (end < start) {
@@ -110,15 +101,15 @@ const computeInterval = (range: Extent, domain: Extent, options: QuantAxisOption
   return step
 }
 
-const computeTickArray = (datum: InitialComputedDatum, formatter: (value: number) => string): Tick<number>[] => {
+const computeTickArray = (datum: InitialComputedDatum, scale: ScaleLinear<number, number>, formatter: (value: number) => string): Tick[] => {
   const ticks = computeTickValues(datum.tickSteps)
   const labels = computeTickValues(datum.labelSteps)
 
   return ticks.map(tickVal => ({
-    value: tickVal,
+    position: scale(tickVal),
     ...{
-      label: labels.includes(tickVal) ? formatter(tickVal) : "",
-      class: tickVal === 0 ? "zero" : undefined
+      label: labels.includes(tickVal) && formatter(tickVal),
+      class: tickVal === 0 && "zero"
     }
   }))
 }
@@ -161,6 +152,10 @@ const computeRuleTicks = (steps: Steps, options: QuantAxisOptions, scale: ScaleL
 }
 
 const alignAxes = (axes: Record<AxisPosition, InitialComputedDatum>) => {
+  if (keys(axes).length === 1) {
+    return
+  }
+
   const axisKeys = keys(axes)
   STEPS_TO_ALIGN.forEach((key: StepsToAlign) => {
     const one = axes[axisKeys[0]][key]
@@ -199,8 +194,8 @@ const containsZero = (step: number[]): [number, number] =>
   step[0] <= 0 && step[1] >= 0 ? [Math.abs(step[0] / step[2]), step[1] / step[2]] : undefined
 
 
-export default (data: InputData, config: Config): Record<AxisPosition, AxisComputed<ScaleLinear<number, number>, number>> => {
-  const initialComputed = mapValues((datum: InputDatum) => {
+export default (data: InputData<number, QuantAxisOptions>, config: Config): Record<AxisPosition, AxisComputed<ScaleLinear<number, number>, number>> => {
+  const initialComputed = mapValues((datum: InputDatum<number, QuantAxisOptions>) => {
     const domain = computeDomain(datum.values, datum.options.start, datum.options.end)
     return {
       ...datum,
@@ -214,12 +209,12 @@ export default (data: InputData, config: Config): Record<AxisPosition, AxisCompu
   alignAxes(initialComputed)
 
   return mapValues((datum: InitialComputedDatum) => {
-    const ticks = computeTickArray(datum, config.numberFormatter)
-    const scale = scaleLinear().range(datum.range).domain(d3Extent(ticks.map(tick => tick.value)))
+    const tickValues = computeTickValues(datum.tickSteps)
+    const scale = scaleLinear().range(datum.range).domain(d3Extent(tickValues))
 
     return {
       scale,
-      ticks,
+      ticks: computeTickArray(datum, scale, config.numberFormatter),
       length: Math.abs(datum.range[1] - datum.range[0]),
       rules: computeRuleTicks(datum.ruleSteps, datum.options, scale),
     }

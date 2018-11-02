@@ -1,25 +1,16 @@
 import { scaleTime, ScaleTime } from "d3-scale"
-import { compact, get, groupBy, identity, isEmpty, keys, last, mapValues, partition, pickBy, sortBy, uniq, uniqueId, values } from "lodash/fp"
-import { AxisComputed, AxisPosition, BarsInfo, Rule, Tick, TimeAxisOptions, TimeIntervals } from "./typings"
+import { compact, get, groupBy, isEmpty, keys, last, mapValues, partition, times, uniqueId } from "lodash/fp"
+import { AxisComputed, AxisPosition, BarsInfo, ComputedSeries, Extent, InputData, InputDatum, Rule, TimeAxisOptions, TimeIntervals } from "./typings"
 import { timeFormat } from "d3-time-format"
-
-interface InputDatum {
-  range: [number, number];
-  values: Date[];
-  options: TimeAxisOptions;
-}
-
-type InputData = Record<AxisPosition, InputDatum>
+import { computeBarPositions } from "./discrete_axis_utils"
+import * as Moment from "moment"
+import { extendMoment } from "moment-range"
+const moment: any = extendMoment(Moment)
 
 interface Config {
   innerBarSpacing: number;
   outerBarSpacing: number;
   minBarWidth: number
-}
-
-interface ComputedSeries {
-  barSeries: Record<string, BarsInfo>,
-  barIndices: Record<string, number>
 }
 
 // @TODO - add in more options
@@ -43,7 +34,7 @@ const tickFormatter = (interval: TimeIntervals) => {
   }
 }
 
-const computeTickInfo = (datum: InputDatum, config: Config, computedSeries: ComputedSeries) => {
+const computeTickInfo = (datum: InputDatum<Date, TimeAxisOptions>, config: Config, computedSeries: ComputedSeries) => {
   const barSeries = computedSeries.barSeries
   // Ticks only have widths if bars are being rendered
   if (isEmpty(barSeries)) {
@@ -63,8 +54,7 @@ const computeTickInfo = (datum: InputDatum, config: Config, computedSeries: Comp
   const stacks = groupBy((s: BarsInfo) => s.stackIndex || uniqueId("stackIndex"))(barSeries)
 
   const partitionedStacks = partition(
-    (stack: BarsInfo[]) =>
-      compact(stack.map(get("barWidth"))).length > 0
+    (stack: BarsInfo[]) => compact(stack.map(get("barWidth"))).length > 0
   )(stacks)
 
   // Compute total inner padding between bars of same tick
@@ -89,7 +79,7 @@ const computeTickInfo = (datum: InputDatum, config: Config, computedSeries: Comp
   const tickWidth = (requiredWidthForFixedWidthStacks + innerPaddingTotal + variableBarWidth * variableWidthStacks.length)
   const tickWidthWithPadding = tickWidth + config.outerBarSpacing
 
-  const range: [number, number] = [
+  const range: Extent = [
     datum.range[0] + tickWidthWithPadding / 2,
     datum.range[0] + tickWidthWithPadding * (nTicks - 0.5)
   ]
@@ -101,43 +91,19 @@ const computeTickInfo = (datum: InputDatum, config: Config, computedSeries: Comp
   }
 }
 
-const computeBarPositions = (defaultBarWidth: number, tickWidth: number, config: Config, computedSeries: any) => {
-  const indices = sortBy(identity)(uniq(values(computedSeries.barIndices)))
-  let offset = -tickWidth / 2
-
-  const lookup = indices.reduce<Record<string, { width: number, offset: number }>>((memo, index) => {
-    const seriesAtIndex = keys(pickBy((d: number) => d === index)(computedSeries.barIndices))
-    const width = computedSeries.barSeries[seriesAtIndex[0]].barWidth || defaultBarWidth
-    seriesAtIndex.forEach((series: string) => {
-      memo[series] = { width, offset }
-    })
-    offset = offset + width + config.innerBarSpacing
-    return memo
-  }, {})
-
-  return {
-    width: (seriesId: string) => lookup[seriesId].width,
-    offset: (seriesId: string) => lookup[seriesId].offset
-  }
-}
-
-const computeTickArray = (values: Date[], formatter: (value: Date) => string): Tick<Date>[] =>
-  values.map((tickVal: Date) => ({
-    value: tickVal,
+const computeTickArray = (values: Date[], scale: ScaleTime<number, number>, formatter: (value: Date) => string) =>
+  values.map(tickVal => ({
+    position: scale(tickVal),
     label: formatter(tickVal)
   }))
 
-const computeRuleTicks = (datum: InputDatum, scale: ScaleTime<number, number>, tickWidth: number): Rule[] =>
+const computeRuleTicks = (datum: InputDatum<Date, TimeAxisOptions>, scale: ScaleTime<number, number>, tickWidth: number): Rule[] =>
   datum.options.showRules
     ? datum.values.map(value => ({ position: scale(value) - tickWidth / 2 })).slice(1)
     : []
 
-export default (data: InputData, config: Config, computedSeries: ComputedSeries): Record<AxisPosition, AxisComputed<ScaleTime<number, number>, string>> => {
-  if (keys(data).length > 1) {
-    throw new Error("Categorical axes cannot be aligned.")
-  }
-
-  return mapValues((datum: InputDatum) => {
+export default (data: InputData<Date, TimeAxisOptions>, config: Config, computedSeries: ComputedSeries): Record<AxisPosition, AxisComputed<ScaleTime<number, number>, string>> => {
+  return mapValues((datum: InputDatum<Date, TimeAxisOptions>) => {
     const tickInfo = computeTickInfo(datum, config, computedSeries)
     const scale = scaleTime().range(tickInfo.range).domain([datum.values[0], last(datum.values)])
 
@@ -145,7 +111,7 @@ export default (data: InputData, config: Config, computedSeries: ComputedSeries)
       ...tickInfo,
       scale,
       length: Math.abs(datum.range[1] - datum.range[0]),
-      ticks: computeTickArray(datum.values, tickFormatter(datum.options.interval)),
+      ticks: computeTickArray(datum.values, scale, tickFormatter(datum.options.interval)),
       rules: computeRuleTicks(datum, scale, tickInfo.tickWidth),
     }
   })(data)
