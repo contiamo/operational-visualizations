@@ -102,7 +102,54 @@ const computeRuleTicks = (datum: InputDatum<Date, TimeAxisOptions>, scale: Scale
     ? datum.values.map(value => ({ position: scale(value) - tickWidth / 2 })).slice(1)
     : []
 
+const alignAxes = (axes: InputData<Date, TimeAxisOptions>) => {
+  const axisKeys = keys(axes);
+  if (axisKeys.length === 1) {
+    return
+  }
+
+  const intervalOne = axes[axisKeys[0]].options.interval
+  const intervalTwo = axes[axisKeys[1]].options.interval
+
+  if (intervalOne !== intervalTwo) {
+    throw new Error("Time axes must have the same interval")
+  }
+
+  const ticksOne = ticksInDomain(axes[axisKeys[0]])
+  const ticksTwo = ticksInDomain(axes[axisKeys[1]])
+
+  if (ticksOne.length < ticksTwo.length) {
+    times(() => {
+      ticksOne.push(
+        moment.default(last(ticksOne))
+          .add(1, intervalOne)
+          .toDate(),
+      )
+    })(ticksTwo.length - ticksOne.length)
+  } else {
+    times(() => {
+      ticksTwo.push(
+        moment.default(last(ticksTwo))
+          .add(1, intervalTwo)
+          .toDate(),
+      )
+    })(ticksOne.length - ticksTwo.length)
+  }
+
+  axes[axisKeys[0]].values = ticksOne
+  axes[axisKeys[1]].values = ticksTwo
+}
+
+const ticksInDomain = (datum: InputDatum<Date, TimeAxisOptions>): Date[] =>
+  Array.from(
+    moment
+      .range(datum.options.start, datum.options.end)
+      .by(datum.options.interval)
+  ).map((d: any) => d.toDate())
+
 export default (data: InputData<Date, TimeAxisOptions>, config: Config, computedSeries: ComputedSeries): Record<AxisPosition, AxisComputed<ScaleTime<number, number>, string>> => {
+  alignAxes(data)
+
   return mapValues((datum: InputDatum<Date, TimeAxisOptions>) => {
     const tickInfo = computeTickInfo(datum, config, computedSeries)
     const scale = scaleTime().range(tickInfo.range).domain([datum.values[0], last(datum.values)])
