@@ -1,6 +1,6 @@
 import { scaleBand, ScaleBand } from "d3-scale"
 import { compact, get, groupBy, isEmpty, keys, mapValues, partition, uniqueId } from "lodash/fp"
-import { AxisComputed, AxisPosition, BarsInfo, CategoricalAxisOptions, ComputedSeries, Extent, InputData, InputDatum, Tick, Rule } from "./typings"
+import { AxisPosition, BarsInfo, CategoricalAxisOptions, ComputedSeries, Extent, InputData, InputDatum, Rule, CategoricalAxisComputed, Tick } from "./typings"
 import { computeBarPositions } from "./discrete_axis_utils"
 
 interface Config {
@@ -9,7 +9,17 @@ interface Config {
   minBarWidth: number
 }
 
-const computeTickInfo = (datum: InputDatum<string, CategoricalAxisOptions>, config: Config, computedSeries: ComputedSeries) => {
+const defaultConfig = {
+  innerBarSpacingCategorical: 0.2,
+  innerBarSpacing: 2,
+  minBarWidth: 3
+}
+
+type Datum = InputDatum<string, CategoricalAxisOptions>;
+
+type Scale = ScaleBand<string>;
+
+const computeTickInfo = (datum: Datum, config: Config, computedSeries: ComputedSeries) => {
   const barSeries = computedSeries.barSeries
   // Ticks only have widths if bars are being rendered
   if (isEmpty(barSeries)) {
@@ -45,14 +55,16 @@ const computeTickInfo = (datum: InputDatum<string, CategoricalAxisOptions>, conf
   , 0)
 
   // Width of stacks without pre-defined width
-  const variableBarWidth = Math.max(
-    config.minBarWidth,
-    (defaultTickWidthWithoutOuterPadding - innerPaddingTotal - requiredWidthForFixedWidthStacks) / variableWidthStacks.length
-  )
+  const variableBarWidth = variableWidthStacks.length
+    ? Math.max(
+      config.minBarWidth,
+      (defaultTickWidthWithoutOuterPadding - innerPaddingTotal - requiredWidthForFixedWidthStacks) / variableWidthStacks.length
+    )
+    : 0
 
   // Required tick width
-  const tickWidth = (requiredWidthForFixedWidthStacks + innerPaddingTotal + variableBarWidth * variableWidthStacks.length)
-  const tickWidthWithPadding = tickWidth * (1 + config.innerBarSpacingCategorical)
+  const tickWidth = requiredWidthForFixedWidthStacks + innerPaddingTotal + variableBarWidth * variableWidthStacks.length
+  const tickWidthWithPadding = Math.max(tickWidth, defaultTickWidthWithoutOuterPadding) * (1 + config.innerBarSpacingCategorical)
 
   const range: Extent = [
     datum.range[0] + tickWidth / 2,
@@ -66,31 +78,36 @@ const computeTickInfo = (datum: InputDatum<string, CategoricalAxisOptions>, conf
   }
 }
 
-const computeTickArray = (values: string[], scale: ScaleBand<string>): Tick[] =>
-  values.map(tickVal => ({
-    position: scale(tickVal),
-    label: tickVal
+const computeTickArray = (values: string[], scale: Scale): Tick<string>[] =>
+  values.map(value => ({
+    value,
+    position: scale(value),
+    label: value
   }))
 
-const computeRuleTicks = (datum: InputDatum<string, CategoricalAxisOptions>, scale: ScaleBand<string>): Rule[] =>
+const computeRuleTicks = (datum: Datum, scale: Scale): Rule[] =>
   datum.options.showRules
     ? datum.values.map(value => ({ position: scale(value) - scale.step() / 2 })).slice(1)
     : []
 
-export default (data: InputData<string, CategoricalAxisOptions>, config: Config, computedSeries: ComputedSeries): Record<AxisPosition, AxisComputed<ScaleBand<string>, string>> => {
+export default (data: InputData<string, CategoricalAxisOptions>, computedSeries: ComputedSeries, config?: Config): Record<AxisPosition, CategoricalAxisComputed> => {
   if (keys(data).length > 1) {
     throw new Error("Categorical axes cannot be aligned.")
   }
 
-  return mapValues((datum: InputDatum<string, CategoricalAxisOptions>) => {
-    const tickInfo = computeTickInfo(datum, config, computedSeries)
-    const scale = scaleBand().range(tickInfo.range).domain(datum.values).padding(config.innerBarSpacingCategorical)
+  const fullConfig = { ...defaultConfig, ...config };
+
+  return mapValues((datum: Datum) => {
+    const tickInfo = computeTickInfo(datum, fullConfig, computedSeries)
+    const scale = scaleBand().range(tickInfo.range).domain(datum.values).padding(fullConfig.innerBarSpacingCategorical)
+
     return {
       ...tickInfo,
       scale,
       length: Math.abs(datum.range[1] - datum.range[0]),
       ticks: computeTickArray(datum.values, scale),
       rules: computeRuleTicks(datum, scale),
+      options: datum.options
     }
   })(data)
 }

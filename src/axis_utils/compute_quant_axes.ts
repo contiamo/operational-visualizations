@@ -1,12 +1,18 @@
 import { extent as d3Extent, range as d3Range } from "d3-array"
 import { rangeStep, mapValues, keys } from "lodash/fp"
-import { AxisComputed, AxisPosition, Extent, InputData, InputDatum, QuantAxisOptions, Tick} from "./typings"
+import { AxisPosition, Extent, InputData, InputDatum, QuantAxisOptions, QuantAxisComputed } from "./typings"
 import * as d3 from "d3-selection"
 import { scaleLinear, ScaleLinear } from "d3-scale";
+import defaultNumberFormatter from "../utils/number_formatter"
+import defaultOptions from "./axis_config"
+
+type Formatter = (value: number) => string
 
 interface Config {
-  numberFormatter: (value: number) => string
+  numberFormatter: Formatter
 }
+
+type Scale = ScaleLinear<number, number>;
 
 type Steps = [number, number, number];
 
@@ -73,7 +79,7 @@ export const guess = (data: number[] = []): Extent => {
 const stepScaleFactors = (step: number): number[] =>
   step === 1 ? [10, 5, 2, 1] : rangeStep(0.5)(0, 10)
 
-export const computeTickNumber = (range: Extent, tickSpacing: number, minTicks: number = 0): number => {
+export const computeTickNumber = (range: Extent, tickSpacing: number, minTicks: number = 0) => {
   const length = Math.abs(range[0]) + Math.abs(range[1])
   return Math.max(Math.floor(length / tickSpacing), minTicks)
 }
@@ -101,40 +107,41 @@ const computeInterval = (range: Extent, domain: Extent, options: QuantAxisOption
   return step
 }
 
-const computeTickArray = (datum: InitialComputedDatum, scale: ScaleLinear<number, number>, formatter: (value: number) => string): Tick[] => {
+const computeTickArray = (datum: InitialComputedDatum, scale: Scale, formatter: Formatter) => {
   const ticks = computeTickValues(datum.tickSteps)
   const labels = computeTickValues(datum.labelSteps)
 
-  return ticks.map(tickVal => ({
-    position: scale(tickVal),
+  return ticks.map(value => ({
+    value,
+    position: scale(value),
     ...{
-      label: labels.includes(tickVal) && formatter(tickVal),
-      class: tickVal === 0 && "zero"
+      label: labels.includes(value) && formatter(value),
+      class: value === 0 && "zero"
     }
   }))
 }
 
-const computeTickSteps = (range: Extent, domain: Extent, options: QuantAxisOptions): Steps => {
+const computeTickSteps = (range: Extent, domain: Extent, options: QuantAxisOptions) => {
   const defaultInterval = options.interval || computeInterval(range, domain, options)
   const interval = options.tickInterval ? Math.min(options.tickInterval, defaultInterval) : defaultInterval
   return computeSteps(domain, interval, options)
 }
 
-const computeLabelSteps = (range: Extent, domain: Extent, options: QuantAxisOptions): Steps => {
+const computeLabelSteps = (range: Extent, domain: Extent, options: QuantAxisOptions) => {
   const interval = options.interval || computeInterval(range, domain, options)
   return computeSteps(domain, interval, options)
 }
 
-const computeRuleSteps = (range: Extent, domain: Extent, options: QuantAxisOptions): Steps => {
+const computeRuleSteps = (range: Extent, domain: Extent, options: QuantAxisOptions) => {
   const interval = options.ruleInterval || options.interval || computeInterval(range, domain, options)
   return computeSteps(domain, interval, options)
 }
 
-const computeTickValues = (steps: Steps): number[] => {
+const computeTickValues = (steps: Steps) => {
   return [...d3Range.apply(d3, steps), steps[1]]
 }
 
-const computeSteps = (domain: Extent, interval: number, options: QuantAxisOptions): Steps => {
+const computeSteps = (domain: Extent, interval: number, options: QuantAxisOptions) => {
   const steps: Steps = [options.start, options.end, interval]
   let computedStart = options.end % steps[2]
   computedStart = computedStart - (computedStart > domain[0] ? steps[2] : 0)
@@ -143,7 +150,7 @@ const computeSteps = (domain: Extent, interval: number, options: QuantAxisOption
   return steps
 }
 
-const computeRuleTicks = (steps: Steps, options: QuantAxisOptions, scale: ScaleLinear<number, number>) => {
+const computeRuleTicks = (steps: Steps, options: QuantAxisOptions, scale: Scale) => {
   const values = options.showRules ? [...d3Range.apply(d3, steps), steps[1]] : []
   return values.map(value => ({
     position: scale(value),
@@ -166,7 +173,7 @@ const alignAxes = (axes: Record<AxisPosition, InitialComputedDatum>) => {
   })
 }
 
-const alignSteps = (one: number[], two: number[]): void => {
+const alignSteps = (one: number[], two: number[]) => {
   const zeroOne = containsZero(one)
   const zeroTwo = containsZero(two)
 
@@ -190,11 +197,18 @@ const alignSteps = (one: number[], two: number[]): void => {
   }
 }
 
-const containsZero = (step: number[]): [number, number] =>
+const containsZero = (step: number[]): Extent =>
   step[0] <= 0 && step[1] >= 0 ? [Math.abs(step[0] / step[2]), step[1] / step[2]] : undefined
 
 
-export default (data: InputData<number, QuantAxisOptions>, config: Config): Record<AxisPosition, AxisComputed<ScaleLinear<number, number>, number>> => {
+export default (data: InputData<number, QuantAxisOptions>, config?: Config): Record<AxisPosition, QuantAxisComputed> => {
+  keys(data).forEach((axis: AxisPosition) => {
+    data[axis].options = {
+      ...defaultOptions(data[axis].options.type, axis),
+      ...data[axis].options
+    } as QuantAxisOptions
+  })
+
   const initialComputed = mapValues((datum: InputDatum<number, QuantAxisOptions>) => {
     const domain = computeDomain(datum.values, datum.options.start, datum.options.end)
     return {
@@ -214,9 +228,10 @@ export default (data: InputData<number, QuantAxisOptions>, config: Config): Reco
 
     return {
       scale,
-      ticks: computeTickArray(datum, scale, config.numberFormatter),
+      ticks: computeTickArray(datum, scale, config && config.numberFormatter || defaultNumberFormatter),
       length: Math.abs(datum.range[1] - datum.range[0]),
       rules: computeRuleTicks(datum.ruleSteps, datum.options, scale),
+      options: datum.options
     }
   })(initialComputed)
 }

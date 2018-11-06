@@ -9,6 +9,11 @@ import Chart from "../../src/Chart/facade"
 import { VisualizationWrapper } from "../../src/index"
 import { timeFormat } from "d3-time-format"
 
+import computeQuantAxes from "../../src/axis_utils/compute_quant_axes"
+import computeTimeAxes from "../../src/axis_utils/compute_time_axes"
+
+import { mapValues } from "lodash/fp"
+
 const AreaRenderer: any = {
   accessors: {
     interpolate: (series: any, d: any) => "monotoneX",
@@ -216,7 +221,7 @@ const data: any = {
       ],
       name: "Pageviews 2018",
       key: "series1",
-      renderAs: [LineRenderer],
+      renderAs: [BarsRenderer],
     },
     {
       data: [
@@ -229,29 +234,62 @@ const data: any = {
       name: "Pageviews 2017",
       xAxis: "x2",
       key: "series2",
-      renderAs: [LineRenderer],
+      renderAs: [BarsRenderer],
     },
   ],
-  axes: {
-    x1: {
-      type: "time",
-      start: new Date(2018, 2, 10),
-      end: new Date(2018, 2, 15),
-      interval: "day",
-      title: "2018",
-    },
-    x2: {
-      type: "time",
-      start: new Date(2017, 2, 10),
-      end: new Date(2017, 2, 15),
-      interval: "day",
-      title: "2017",
-    },
-    y1: {
-      type: "quant",
-      title: "Profit",
-    },
-  },
+  axes: (mapValues as any)(computed => ({ type: "computed", computed }))({
+    ...(computeTimeAxes({
+      x1: {
+        range: [0, 632],
+        values: [],
+        options: {
+          type: "time",
+          start: new Date(2018, 2, 10),
+          end: new Date(2018, 2, 15),
+          interval: "day",
+          // showTicks: false,
+          // showLabels: false,
+          // showRules: true,
+        }
+      },
+      x2: {
+        range: [0, 632],
+        values: [],
+        options: {
+          type: "time",
+          start: new Date(2017, 2, 10),
+          end: new Date(2017, 2, 15),
+          interval: "day",
+          // showTicks: false,
+          // showLabels: false,
+          // showRules: true,
+        }
+      }
+    }, {
+      barSeries: {
+        series1: {
+          barWidth: 20
+        }, series2: {
+          barWidth: 50
+        }
+      },
+      barIndices: {
+        series1: 0,
+        series2: 1
+      }
+    })),
+    ...(computeQuantAxes({
+      y1: {
+        range: [439, 0],
+        values: [100, 300, 500, 300, 200, 500, 450, 250, 425, 570],
+        options: {
+          type: "quant",
+          // showTicks: false,
+          // showLabels: false,
+        }
+      }
+    }))
+  }),
 }
 
 const App = () => (
@@ -259,7 +297,7 @@ const App = () => (
     <VisualizationWrapper
       facade={Chart}
       data={data}
-      config={{ uid: "TEST", width: 700, showComponentFocus: true, maxFocusLabelWidth: 200 }}
+      config={{ uid: "TEST", width: 700, showComponentFocus: true, maxFocusLabelWidth: 200, legend: false }}
     />
   </OperationalUI>
 )

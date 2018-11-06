@@ -1,5 +1,6 @@
-import { Accessor, BaseConfig, Facade, Focus, Legend, ChartStateReadOnly } from "../shared/typings"
-import { AxisPosition, AxisOptions, AxisOrientation } from "../axis_utils/typings"
+import { Accessor, BaseConfig, Facade, Focus, Legend, ChartStateReadOnly, Dimensions } from "../shared/typings"
+import { AxisPosition, AxesData, AxisOrientation } from "../axis_utils/typings"
+export { AxesData } from "../axis_utils/typings"
 
 export * from "../axis_utils/typings"
 
@@ -166,11 +167,6 @@ export interface SeriesAccessors {
   axis: SeriesAccessor<AxisPosition>
   xAxis: SeriesAccessor<"x1" | "x2">
   yAxis: SeriesAccessor<"y1" | "y2">
-}
-
-// Axes
-export interface AxesData {
-  [key: string]: Partial<AxisOptions>
 }
 
 export interface AxisAttributes {

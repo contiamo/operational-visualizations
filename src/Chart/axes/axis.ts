@@ -1,15 +1,11 @@
 import { AxisAttributes, AxisComputed, AxisOptions, AxisPosition, AxisType, State } from "../typings";
-import { cloneDeep, defaults } from "lodash/fp"
+import { cloneDeep } from "lodash/fp"
 import { D3Selection, EventBus, StateWriter, ComponentHoverPayload, ComponentConfigInfo } from "../../shared/typings";
 import * as styles from "../../shared/styles"
 import { setLineAttributes, setTextAttributes, setRectAttributes } from "../../utils/d3_utils";
 import Events from "../../shared/event_catalog";
-import { Tick } from "../../axis_utils/typings";
-
-const defaultOptions = (type: AxisType) => ({
-  showRules: type === "quant",
-  showTicks: true,
-})
+import { Tick, ComputedAxisInput } from "../../axis_utils/typings";
+import defaultOptions from "../../axis_utils/axis_config"
 
 const titlePositions = {
   x1: { x: 0.5, y: 1 },
@@ -26,15 +22,16 @@ const textAnchor = {
 }
 
 class Axis {
-  computed: AxisComputed<any, any>
+  computed: AxisComputed
+  preComputed: AxisComputed
   el: D3Selection
   events: EventBus
   isXAxis: boolean
   options: AxisOptions
   position: AxisPosition
-  previous: AxisComputed<any, any>
   state: State
   stateWriter: StateWriter
+  ticks: Tick<any>[]
   type: AxisType
 
   constructor(state: State, stateWriter: StateWriter, events: EventBus, el: D3Selection, position: AxisPosition) {
@@ -59,14 +56,17 @@ class Axis {
 
   // Public methods
   /** Update the axis options */
-  update(options: AxisOptions): void {
-    this.options = defaults(defaultOptions(options.type))(options)
+  update(options: AxisOptions | ComputedAxisInput) {
+    const rawOptions = options.type === "computed" ? options.computed.options : options
+    this.options = { ...defaultOptions(rawOptions.type, this.position), ...rawOptions }
+    this.preComputed = options.type === "computed" && options.computed
   }
 
+  /** Check if options already contain  */
   /** Trigger axis draw/transition with new computed values */
-  draw(computed: AxisComputed<any, any>, duration?: number): void {
-    this.previous = cloneDeep(this.computed || computed)
+  draw(computed: AxisComputed, duration?: number) {
     this.computed = computed
+    this.ticks = (this.computed.ticks as Tick<any>[]).filter((tick: Tick<any>) => !tick.hideTick)
     this.translateAxis()
     this.drawTicks(duration)
     this.drawLabels(duration)
@@ -76,7 +76,7 @@ class Axis {
   }
 
   /** Calculates the amount of space required by the axis, and positions the axis accordingly */
-  adjustMargins(): void {
+  adjustMargins() {
     let requiredMargin = this.computeRequiredMargin()
 
     // Add space for flags
@@ -93,7 +93,7 @@ class Axis {
   }
 
   /** Removes axis */
-  close(): void {
+  close() {
     this.el.node().remove()
   }
 
@@ -109,13 +109,13 @@ class Axis {
   }
 
   /** Renders tick lines */
-  private drawTicks(duration?: number): void {
+  private drawTicks(duration?: number) {
     const attributes = this.getTickAttributes()
 
     const ticks = this.el
       .select("g.axis-elements")
       .selectAll(`line.${styles.axisTick}`)
-      .data(this.options.showTicks ? this.computed.ticks : [], String)
+      .data(this.options.showTicks ? this.ticks : [], String)
 
     ticks
       .enter()
@@ -130,22 +130,22 @@ class Axis {
 
   private getTickAttributes() {
     return {
-      x1: (d: Tick) => this.isXAxis ? d.position : 0,
-      x2: (d: Tick) => this.isXAxis ? d.position : this.options.tickOffset * 0.6,
-      y1: (d: Tick) => this.isXAxis ? 0 : d.position,
-      y2: (d: Tick) => this.isXAxis ? this.options.tickOffset * 0.6 : d.position,
+      x1: (d: Tick<any>) => this.isXAxis ? d.position : 0,
+      x2: (d: Tick<any>) => this.isXAxis ? d.position : this.options.tickOffset * 0.6,
+      y1: (d: Tick<any>) => this.isXAxis ? 0 : d.position,
+      y2: (d: Tick<any>) => this.isXAxis ? this.options.tickOffset * 0.6 : d.position,
     }
   }
 
   /** Renders tick labels */
-  private drawLabels(duration?: number): void {
+  private drawLabels(duration?: number) {
     const attributes = this.getAttributes()
     const startAttributes = this.getStartAttributes(attributes)
 
     const labels = this.el
       .select("g.axis-elements")
       .selectAll(`text.${styles.axisLabel}`)
-      .data(this.computed.ticks, String)
+      .data(this.options.showLabels ? this.ticks : [], String)
 
     labels
       .enter()
@@ -161,18 +161,18 @@ class Axis {
 
   private getAttributes(): AxisAttributes {
     const attrs: any = {
-      x: (d: Tick) => this.isXAxis ? d.position : 0,
-      y: (d: Tick) => this.isXAxis ? 0 : d.position,
+      x: (d: Tick<any>) => this.isXAxis ? d.position : 0,
+      y: (d: Tick<any>) => this.isXAxis ? 0 : d.position,
       dx: this.isXAxis ? 0 : this.options.tickOffset,
       dy: this.isXAxis
         ? this.options.tickOffset + (this.position === "x1" ? this.options.fontSize : 0)
         : Math.abs(this.options.tickOffset / 2),
-      text: (d: Tick) => d.label,
+      text: (d: Tick<any>) => d.label,
       textAnchor: textAnchor[this.position](this.options.rotateLabels),
     }
 
     attrs.transform = this.options.rotateLabels
-      ? (d: Tick) => `rotate(-45, ${attrs.x(d) + attrs.dx}, ${attrs.y(d) + attrs.dy})`
+      ? (d: Tick<any>) => `rotate(-45, ${attrs.x(d) + attrs.dx}, ${attrs.y(d) + attrs.dy})`
       : ""
 
     return attrs
@@ -180,16 +180,16 @@ class Axis {
 
   private getStartAttributes(attributes: AxisAttributes): AxisAttributes {
     const startAttributes = cloneDeep(attributes)
-    startAttributes[this.isXAxis ? "x" : "y"] = (d: Tick) => d.position
+    startAttributes[this.isXAxis ? "x" : "y"] = (d: Tick<any>) => d.position
     startAttributes.transform = this.options.rotateLabels
-      ? (d: Tick) =>
+      ? (d: Tick<any>) =>
           `rotate(-45, ${startAttributes.x(d) + startAttributes.dx}, ${startAttributes.y(d) + startAttributes.dy})`
       : ""
     return startAttributes
   }
 
   /** Renders axis border line */
-  private drawBorder(duration?: number): void {
+  private drawBorder(duration?: number) {
     const drawingDims = this.state.current.getComputed().canvas.drawingDims
     const border = {
       x1: 0,
@@ -200,7 +200,7 @@ class Axis {
     this.el.select(`line.${styles.axisBorder}`).call(setLineAttributes, border, duration)
   }
 
-  private computeRequiredMargin = (): number => {
+  private computeRequiredMargin = () => {
     const axisDimension = this.el.node().getBBox()[this.isXAxis ? "height" : "width"]
     return Math.max(this.options.margin, Math.ceil(axisDimension) + this.options.outerPadding)
   }
@@ -211,7 +211,7 @@ class Axis {
     this.el.selectAll(`rect.${styles.componentRect}`).call(setRectAttributes, {})
 
     // Position background rect only once axis has finished transitioning.
-    setTimeout((): void => {
+    setTimeout(() => {
       // Position background rect
       const group = this.el.node().getBBox()
       this.el.selectAll("rect").call(setRectAttributes, {
@@ -258,7 +258,7 @@ class Axis {
   }
 
   // Event handlers
-  private onComponentHover(): void {
+  private onComponentHover() {
     const payload: ComponentHoverPayload = { component: this.el, options: this.hoverInfo() }
     this.events.emit(Events.FOCUS.COMPONENT.HOVER, payload)
   }

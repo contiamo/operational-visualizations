@@ -1,40 +1,11 @@
 import Axis from "./axes/axis"
 import Rules from "./rules"
-import { assign, defaults, difference, find, flow, forEach, get, invoke, keys, map, mapValues, omitBy, pick, pickBy, uniqBy, values } from "lodash/fp"
-import { AxisConfig, AxisOptions, AxisOrientation, AxisPosition, AxisType, D3Selection, EventBus, State, StateWriter } from "./typings"
+import { difference, find, flow, forEach, get, invoke, keys, map, mapValues, omitBy, pick, pickBy, uniqBy, values } from "lodash/fp"
+import { AxisOptions, AxisOrientation, AxisPosition, AxisType, ComputedAxisInput, D3Selection, EventBus, State, StateWriter } from "./typings"
 import computeQuantAxes from "../axis_utils/compute_quant_axes"
-import computeCategoricalAxis from "../axis_utils/compute_categorical_axis"
-import computeTimeAxis from "../axis_utils/compute_time_axis"
-
-const generalAxisConfig = {
-  fontSize: 11,
-  titleFontSize: 12,
-  showTicks: true,
-}
-
-const xAxisConfig = defaults(generalAxisConfig)({
-  margin: 15,
-  minTicks: 2,
-  rotateLabels: false,
-  tickSpacing: 65,
-  outerPadding: 3,
-})
-
-const yAxisConfig = defaults(generalAxisConfig)({
-  margin: 34,
-  minTicks: 4,
-  minTopOffsetTopTick: 21,
-  rotateLabels: false,
-  tickSpacing: 40,
-  outerPadding: 3,
-})
-
-const axisConfig: Record<AxisPosition, AxisConfig> = {
-  x1: assign({ tickOffset: 8 })(xAxisConfig),
-  x2: assign({ tickOffset: -8 })(xAxisConfig),
-  y1: assign({ tickOffset: -8 })(yAxisConfig),
-  y2: assign({ tickOffset: 8 })(yAxisConfig),
-}
+import computeCategoricalAxis from "../axis_utils/compute_categorical_axes"
+import computeTimeAxis from "../axis_utils/compute_time_axes"
+import { defaultMargins } from "../axis_utils/axis_config"
 
 const configValuesForAxis: Record<AxisType, string[]> = {
   quant: ["numberFormatter"],
@@ -78,15 +49,11 @@ class AxesManager {
   }
 
   updateMargins(): void {
-    const defaultMargins: { [key: string]: number } = {
-      x1: xAxisConfig.margin,
-      x2: xAxisConfig.margin,
-      y1: yAxisConfig.margin,
-      y2: yAxisConfig.margin,
+    const computedMargins: Record<AxisPosition, number> = {
+      ...defaultMargins,
+      ...get(["axes", "margins"])(this.state.current.getComputed()) || {}
     }
-    const computedMargins: { [key: string]: number } = defaults(defaultMargins)(
-      get(["axes", "margins"])(this.state.current.getComputed()) || {},
-    )
+
     this.stateWriter("margins", computedMargins)
   }
 
@@ -96,8 +63,9 @@ class AxesManager {
 
     // Check all required axes have been configured
     const requiredAxes = keys(this.state.current.getComputed().series.dataForAxes)
-    const axesOptions = this.state.current.getAccessors().data.axes(this.state.current.getData())
-    const undefinedAxes = difference(requiredAxes)(keys(axesOptions))
+    const configuredAxes = this.state.current.getAccessors().data.axes(this.state.current.getData())
+
+    const undefinedAxes = difference(requiredAxes)(keys(configuredAxes))
     if (undefinedAxes.length) {
       throw new Error(`The following axes have not been configured: ${undefinedAxes.join(", ")}`)
     }
@@ -105,35 +73,33 @@ class AxesManager {
 
     // Remove axes that are no longer needed, or whose type has changed
     const axesToRemove = omitBy(
-      (axis: Axis, key: AxisPosition): boolean => {
-        return !axesOptions[key] || axesOptions[key].type === axis.type
-      },
+      (axis: Axis, key: AxisPosition) => !configuredAxes[key] || configuredAxes[key].type === axis.type
     )(this.axes)
     forEach.convert({ cap: false })(this.removeAxis.bind(this))(axesToRemove)
+
     // Create or update currently required axes
-    forEach.convert({ cap: false })(this.createOrUpdate.bind(this))(axesOptions)
+    forEach.convert({ cap: false })(this.createOrUpdate.bind(this))(configuredAxes)
     this.setBaselines()
     this.stateWriter("priorityTimeAxis", this.priorityTimeAxis())
   }
 
-  private createOrUpdate(options: Partial<AxisOptions>, position: AxisPosition): void {
-    const fullOptions = defaults(axisConfig[position])(options)
+  private createOrUpdate(options: AxisOptions | ComputedAxisInput, position: AxisPosition) {
     const existing = this.axes[position]
-    existing ? this.update(position, fullOptions) : this.create(position, fullOptions)
+    existing ? this.update(position, options) : this.create(position, options)
   }
 
-  private create(position: AxisPosition, options: AxisOptions): void {
+  private create(position: AxisPosition, options: AxisOptions | ComputedAxisInput) {
     const el = this.els[`${position[0]}Axes`]
     const axis = new Axis(this.state, this.stateWriter, this.events, el, position)
     this.axes[position] = axis as Axis
     this.update(position, options)
   }
 
-  private update(position: AxisPosition, options: AxisOptions): void {
+  private update(position: AxisPosition, options: AxisOptions | ComputedAxisInput) {
     this.axes[position].update(options)
   }
 
-  private setBaselines(): void {
+  private setBaselines() {
     const xType = (this.axes.x1 || this.axes.x2).type
     const yType = (this.axes.y1 || this.axes.y2).type
     const baseline: AxisOrientation = xType === "quant" && yType !== "quant" ? "y" : "x"
@@ -141,7 +107,7 @@ class AxesManager {
   }
 
   private priorityTimeAxis(): AxisPosition {
-    return find((axis: AxisPosition): boolean => this.axes[axis] && this.axes[axis].type === "time")(
+    return find((axis: AxisPosition): boolean => this.axes[axis] && this.axes[axis].options.type === "time")(
       this.state.current.getConfig().timeAxisPriority,
     )
   }
@@ -173,6 +139,20 @@ class AxesManager {
   private computeAxes(axes: Partial<Record<AxisPosition, Axis>>, orientation: "x" | "y") {
     const computed = this.state.current.getComputed()
 
+    const isAlreadyComputed = flow(
+      values,
+      map((axis: Axis) => !!axis.preComputed),
+      uniqBy(Boolean)
+    )(axes)
+
+    if (isAlreadyComputed.length > 1) {
+      throw new Error("Axes with the same orientation must either both be pre-computed, or neither pre-computed.")
+    }
+
+    if (isAlreadyComputed[0]) {
+      return mapValues((axis: Axis) => axis.preComputed)(axes)
+    }
+
     const axesTypes: AxisType[] = flow(
       values,
       map((axis: Axis) => axis.options.type),
@@ -200,9 +180,9 @@ class AxesManager {
       case "quant":
         return computeQuantAxes(inputData, config);
       case "categorical":
-        return computeCategoricalAxis(inputData, config, computedSeries);
+        return computeCategoricalAxis(inputData, computedSeries, config);
       case "time":
-        return computeTimeAxis(inputData, config, computedSeries);
+        return computeTimeAxis(inputData, computedSeries, config);
     }
   }
 

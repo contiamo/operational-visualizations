@@ -1,21 +1,33 @@
 import { scaleTime, ScaleTime } from "d3-scale"
-import { compact, get, groupBy, isEmpty, keys, last, mapValues, partition, times, uniqueId } from "lodash/fp"
-import { AxisComputed, AxisPosition, BarsInfo, ComputedSeries, Extent, InputData, InputDatum, Rule, TimeAxisOptions, TimeIntervals } from "./typings"
+import { compact, forEach, get, groupBy, isEmpty, keys, last, mapValues, partition, times, uniqueId } from "lodash/fp"
+import { AxisPosition, BarsInfo, ComputedSeries, Extent, InputData, InputDatum, Rule, TimeAxisOptions, TimeIntervals, TimeAxisComputed } from "./typings"
 import { timeFormat } from "d3-time-format"
 import { computeBarPositions } from "./discrete_axis_utils"
 import * as Moment from "moment"
 import { extendMoment } from "moment-range"
+import { timeMonday } from "d3-time";
 const moment: any = extendMoment(Moment)
+import defaultOptions from "./axis_config"
 
 interface Config {
   innerBarSpacing: number;
   outerBarSpacing: number;
-  minBarWidth: number
+  minBarWidth: number;
 }
+
+const defaultConfig = {
+  innerBarSpacing: 2,
+  outerBarSpacing: 10,
+  minBarWidth: 3,
+}
+
+type Datum = InputDatum<Date, TimeAxisOptions>;
+
+type Scale = ScaleTime<number, number>;
 
 // @TODO - add in more options
 // Have removed "now", and any formatting to account for change in month/year
-const tickFormatter = (interval: TimeIntervals) => {
+export const tickFormatter = (interval: TimeIntervals) => {
   switch (interval) {
     case "hour":
       return timeFormat("%b %d %H:00")
@@ -34,8 +46,9 @@ const tickFormatter = (interval: TimeIntervals) => {
   }
 }
 
-const computeTickInfo = (datum: InputDatum<Date, TimeAxisOptions>, config: Config, computedSeries: ComputedSeries) => {
+const computeTickInfo = (datum: Datum, computedSeries: ComputedSeries, config: Config) => {
   const barSeries = computedSeries.barSeries
+
   // Ticks only have widths if bars are being rendered
   if (isEmpty(barSeries)) {
     return {
@@ -70,14 +83,16 @@ const computeTickInfo = (datum: InputDatum<Date, TimeAxisOptions>, config: Confi
   , 0)
 
   // Width of stacks without pre-defined width
-  const variableBarWidth = Math.max(
-    config.minBarWidth,
-    (defaultTickWidth - innerPaddingTotal - requiredWidthForFixedWidthStacks) / variableWidthStacks.length
-  )
+  const variableBarWidth = variableWidthStacks.length
+    ? Math.max(
+      config.minBarWidth,
+      (defaultTickWidth - innerPaddingTotal - requiredWidthForFixedWidthStacks) / variableWidthStacks.length
+    )
+    : 0
 
   // Required tick width
-  const tickWidth = (requiredWidthForFixedWidthStacks + innerPaddingTotal + variableBarWidth * variableWidthStacks.length)
-  const tickWidthWithPadding = tickWidth + config.outerBarSpacing
+  const tickWidth = requiredWidthForFixedWidthStacks + innerPaddingTotal + variableBarWidth * variableWidthStacks.length
+  const tickWidthWithPadding = Math.max(tickWidth, defaultTickWidth) + config.outerBarSpacing
 
   const range: Extent = [
     datum.range[0] + tickWidthWithPadding / 2,
@@ -91,18 +106,34 @@ const computeTickInfo = (datum: InputDatum<Date, TimeAxisOptions>, config: Confi
   }
 }
 
-const computeTickArray = (values: Date[], scale: ScaleTime<number, number>, formatter: (value: Date) => string) =>
-  values.map(tickVal => ({
-    position: scale(tickVal),
-    label: formatter(tickVal)
-  }))
+const computeTickArray = (datum: Datum, scale: Scale, formatter: (value: Date) => string) => {
+  let ticksToShow: Date[];
+  const width = Math.abs(datum.range[1] - datum.range[0])
+  const tickNumber = Math.min(datum.values.length, Math.max(Math.floor(width / datum.options.tickSpacing), datum.options.minTicks))
+  if (datum.options.interval === "week") {
+    const mondayTicks = scale.ticks(timeMonday)
+    ticksToShow = mondayTicks.filter((tick: Date, i: number) => i % 6 === 0)
+  } else {
+    const ticks = scale.ticks(tickNumber || 1)
+    ticksToShow = ticks.length > datum.values.length ? datum.values : ticks;
+  }
 
-const computeRuleTicks = (datum: InputDatum<Date, TimeAxisOptions>, scale: ScaleTime<number, number>, tickWidth: number): Rule[] =>
+  return datum.values.map(value => ({
+    value,
+    hideTick: !ticksToShow.map(tick => tick.toString()).includes(value.toString()),
+    position: scale(value),
+    label: formatter(value)
+  }))
+}
+
+const computeRuleTicks = (datum: Datum, scale: Scale, tickWidth: number): Rule[] =>
   datum.options.showRules
-    ? datum.values.map(value => ({ position: scale(value) - tickWidth / 2 })).slice(1)
+    ? datum.values.map(value => ({ position: scale(value) - tickWidth / 2 })).slice(tickWidth ? 1 : 0)
     : []
 
 const alignAxes = (axes: InputData<Date, TimeAxisOptions>) => {
+  forEach((axis: Datum) => axis.values = ticksInDomain(axis))(axes)
+
   const axisKeys = keys(axes);
   if (axisKeys.length === 1) {
     return
@@ -140,26 +171,36 @@ const alignAxes = (axes: InputData<Date, TimeAxisOptions>) => {
   axes[axisKeys[1]].values = ticksTwo
 }
 
-const ticksInDomain = (datum: InputDatum<Date, TimeAxisOptions>): Date[] =>
+const ticksInDomain = (datum: Datum): Date[] =>
   Array.from(
     moment
       .range(datum.options.start, datum.options.end)
       .by(datum.options.interval)
   ).map((d: any) => d.toDate())
 
-export default (data: InputData<Date, TimeAxisOptions>, config: Config, computedSeries: ComputedSeries): Record<AxisPosition, AxisComputed<ScaleTime<number, number>, string>> => {
+export default (data: InputData<Date, TimeAxisOptions>, computedSeries: ComputedSeries, config?: Config): Record<AxisPosition, TimeAxisComputed> => {
+  keys(data).forEach((axis: AxisPosition) => {
+    data[axis].options = {
+      ...defaultOptions(data[axis].options.type, axis),
+      ...data[axis].options
+    } as TimeAxisOptions
+  })
+
   alignAxes(data)
 
-  return mapValues((datum: InputDatum<Date, TimeAxisOptions>) => {
-    const tickInfo = computeTickInfo(datum, config, computedSeries)
+  return mapValues((datum: Datum) => {
+    const tickInfo = computeTickInfo(datum, computedSeries, { ...defaultConfig, ...config })
     const scale = scaleTime().range(tickInfo.range).domain([datum.values[0], last(datum.values)])
+    const formatter = tickFormatter(datum.options.interval)
 
     return {
       ...tickInfo,
       scale,
+      formatter,
       length: Math.abs(datum.range[1] - datum.range[0]),
-      ticks: computeTickArray(datum.values, scale, tickFormatter(datum.options.interval)),
+      ticks: computeTickArray(datum, scale, formatter),
       rules: computeRuleTicks(datum, scale, tickInfo.tickWidth),
+      options: datum.options
     }
   })(data)
 }
