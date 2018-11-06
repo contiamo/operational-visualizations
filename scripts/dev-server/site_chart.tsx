@@ -86,210 +86,243 @@ const RangeRenderer = {
   renderAs: [AreaRenderer, LineRenderer, SymbolRenderer],
 }
 
-// const createData: any = () => {
-//   return {
-//     series: [
-//       {
-//         data: [
-//           { x: new Date(2018, 2, 10), y: Math.floor(Math.random() * 500) - 250 },
-//           { x: new Date(2018, 2, 11), y: Math.floor(Math.random() * 500) - 250 },
-//           { x: new Date(2018, 2, 12), y: Math.floor(Math.random() * 500) - 250 },
-//           { x: new Date(2018, 2, 13), y: Math.floor(Math.random() * 500) - 250 },
-//           { x: new Date(2018, 2, 14), y: Math.floor(Math.random() * 500) - 250 },
-//           { x: new Date(2018, 2, 15), y: Math.floor(Math.random() * 500) - 250 },
-//           { x: new Date(2018, 2, 16), y: Math.floor(Math.random() * 500) - 250 },
-//           { x: new Date(2018, 2, 11), y: Math.floor(Math.random() * 500) - 250 },
-//         ],
-//         name: "Pageviews 2018",
-//         key: "series1",
-//         renderAs: [TextRenderer, BarsRenderer],
-//       },
-//       {
-//         data: [
-//           { x: new Date(2018, 2, 10), y: Math.floor(Math.random() * 300) - 150 },
-//           { x: new Date(2018, 2, 11), y: Math.floor(Math.random() * 300) - 150 },
-//           { x: new Date(2018, 2, 12), y: Math.floor(Math.random() * 300) - 150 },
-//           { x: new Date(2018, 2, 13), y: Math.floor(Math.random() * 300) - 150 },
-//           { x: new Date(2018, 2, 14), y: Math.floor(Math.random() * 300) - 150 },
-//           { x: new Date(2018, 2, 15), y: Math.floor(Math.random() * 300) - 150 },
-//           { x: new Date(2018, 2, 16), y: Math.floor(Math.random() * 300) - 150 },
-//           { x: new Date(2018, 2, 11), y: Math.floor(Math.random() * 300) - 150 },
-//         ],
-//         name: "Users 2018",
-//         key: "series2",
-//         renderAs: [TextRenderer, BarsRenderer],
-//       },
-//       {
-//         series: [
-//           {
-//             data: [
-//               { y: new Date(2018, 2, 10), x: Math.floor(Math.random() * 200 + 1000) },
-//               { y: new Date(2018, 2, 11), x: Math.floor(Math.random() * 200 + 1000) },
-//               { y: new Date(2018, 2, 12), x: Math.floor(Math.random() * 200 + 1000) },
-//               { y: new Date(2018, 2, 13), x: Math.floor(Math.random() * 200 + 1000) },
-//               { y: new Date(2018, 2, 14), x: Math.floor(Math.random() * 200 + 1000) },
-//               { y: new Date(2018, 2, 15), x: Math.floor(Math.random() * 200 + 1000) },
-//               { y: new Date(2018, 2, 16), x: Math.floor(Math.random() * 200 + 1000) },
-//             ],
-//             name: "Metric 1",
-//             key: "series3",
-//             datumAccessors: {
-//               x: (d: any) => d.y,
-//               y: (d: any) => d.x,
-//             },
-//             yAxis: "y2",
-//           },
-//           {
-//             data: [
-//               { y: new Date(2018, 2, 10), x: Math.floor(Math.random() * 200 + 1000) },
-//               { y: new Date(2018, 2, 11), x: Math.floor(Math.random() * 200 + 1000) },
-//               { y: new Date(2018, 2, 12), x: Math.floor(Math.random() * 200 + 1000) },
-//               { y: new Date(2018, 2, 13), x: Math.floor(Math.random() * 200 + 1000) },
-//               { y: new Date(2018, 2, 14), x: Math.floor(Math.random() * 200 + 1000) },
-//               { y: new Date(2018, 2, 15), x: Math.floor(Math.random() * 200 + 1000) },
-//               { y: new Date(2018, 2, 16), x: Math.floor(Math.random() * 200 + 1000) },
-//               { y: new Date(2018, 2, 11), x: Math.floor(Math.random() * 200 + 1000) },
-//             ],
-//             name: "Metric 2",
-//             key: "series4",
-//             datumAccessors: {
-//               x: (d: any) => d.y,
-//               y: (d: any) => d.x,
-//             },
-//             yAxis: "y2",
-//           },
-//         ],
-//         renderAs: [StackedRenderer],
-//       },
-//       {
-//         data: [
-//           {
-//             y: 400,
-//             label: "Event 3",
-//             description:
-//               "Insert very long, long, long description here to see how the labels wrap when the description is very long.",
-//           },
-//         ],
-//         name: "Event flags",
-//         key: "flagsY1",
-//         hideInLegend: true,
-//         renderAs: [Y1FlagRenderer],
-//       },
-//       {
-//         data: [
-//           {
-//             y: 2000,
-//             label: "Event 4",
-//             description:
-//               "Insert very long, long, long description here to see how the labels wrap when the description is very long.",
-//           },
-//         ],
-//         name: "Event flags",
-//         key: "flagsY2",
-//         hideInLegend: true,
-//         renderAs: [Y2FlagRenderer],
-//       },
-//     ],
-//     axes: {
-//       x1: {
-//         type: "time",
-//         start: new Date(2018, 2, 10),
-//         end: new Date(2018, 2, 17),
-//         interval: "day",
-//         title: "2018",
-//       },
-//       y1: {
-//         type: "quant",
-//         title: "TEST",
-//       },
-//       y2: {
-//         type: "quant",
-//       },
+// const data = {
+//   series: [
+//     {
+//       data: [
+//         { x: new Date(2018, 2, 10), y: Math.floor(Math.random() * 500) - 250 },
+//         { x: new Date(2018, 2, 11), y: Math.floor(Math.random() * 500) - 250 },
+//         { x: new Date(2018, 2, 12), y: Math.floor(Math.random() * 500) - 250 },
+//         { x: new Date(2018, 2, 13), y: Math.floor(Math.random() * 500) - 250 },
+//         { x: new Date(2018, 2, 14), y: Math.floor(Math.random() * 500) - 250 },
+//         { x: new Date(2018, 2, 15), y: Math.floor(Math.random() * 500) - 250 },
+//         { x: new Date(2018, 2, 16), y: Math.floor(Math.random() * 500) - 250 },
+//         { x: new Date(2018, 2, 11), y: Math.floor(Math.random() * 500) - 250 },
+//       ],
+//       name: "Pageviews 2018",
+//       key: "series1",
+//       renderAs: [TextRenderer, BarsRenderer],
 //     },
-//   }
+//     {
+//       data: [
+//         { x: new Date(2018, 2, 10), y: Math.floor(Math.random() * 300) - 150 },
+//         { x: new Date(2018, 2, 11), y: Math.floor(Math.random() * 300) - 150 },
+//         { x: new Date(2018, 2, 12), y: Math.floor(Math.random() * 300) - 150 },
+//         { x: new Date(2018, 2, 13), y: Math.floor(Math.random() * 300) - 150 },
+//         { x: new Date(2018, 2, 14), y: Math.floor(Math.random() * 300) - 150 },
+//         { x: new Date(2018, 2, 15), y: Math.floor(Math.random() * 300) - 150 },
+//         { x: new Date(2018, 2, 16), y: Math.floor(Math.random() * 300) - 150 },
+//         { x: new Date(2018, 2, 11), y: Math.floor(Math.random() * 300) - 150 },
+//       ],
+//       name: "Users 2018",
+//       key: "series2",
+//       renderAs: [TextRenderer, BarsRenderer],
+//     },
+//     {
+//       series: [
+//         {
+//           data: [
+//             { y: new Date(2018, 2, 10), x: Math.floor(Math.random() * 200 + 1000) },
+//             { y: new Date(2018, 2, 11), x: Math.floor(Math.random() * 200 + 1000) },
+//             { y: new Date(2018, 2, 12), x: Math.floor(Math.random() * 200 + 1000) },
+//             { y: new Date(2018, 2, 13), x: Math.floor(Math.random() * 200 + 1000) },
+//             { y: new Date(2018, 2, 14), x: Math.floor(Math.random() * 200 + 1000) },
+//             { y: new Date(2018, 2, 15), x: Math.floor(Math.random() * 200 + 1000) },
+//             { y: new Date(2018, 2, 16), x: Math.floor(Math.random() * 200 + 1000) },
+//           ],
+//           name: "Metric 1",
+//           key: "series3",
+//           datumAccessors: {
+//             x: (d: any) => d.y,
+//             y: (d: any) => d.x,
+//           },
+//           yAxis: "y2",
+//         },
+//         {
+//           data: [
+//             { y: new Date(2018, 2, 10), x: Math.floor(Math.random() * 200 + 1000) },
+//             { y: new Date(2018, 2, 11), x: Math.floor(Math.random() * 200 + 1000) },
+//             { y: new Date(2018, 2, 12), x: Math.floor(Math.random() * 200 + 1000) },
+//             { y: new Date(2018, 2, 13), x: Math.floor(Math.random() * 200 + 1000) },
+//             { y: new Date(2018, 2, 14), x: Math.floor(Math.random() * 200 + 1000) },
+//             { y: new Date(2018, 2, 15), x: Math.floor(Math.random() * 200 + 1000) },
+//             { y: new Date(2018, 2, 16), x: Math.floor(Math.random() * 200 + 1000) },
+//             { y: new Date(2018, 2, 11), x: Math.floor(Math.random() * 200 + 1000) },
+//           ],
+//           name: "Metric 2",
+//           key: "series4",
+//           datumAccessors: {
+//             x: (d: any) => d.y,
+//             y: (d: any) => d.x,
+//           },
+//           yAxis: "y2",
+//         },
+//       ],
+//       renderAs: [StackedRenderer],
+//     },
+//     {
+//       data: [
+//         {
+//           y: 400,
+//           label: "Event 3",
+//           description:
+//             "Insert very long, long, long description here to see how the labels wrap when the description is very long.",
+//         },
+//       ],
+//       name: "Event flags",
+//       key: "flagsY1",
+//       hideInLegend: true,
+//       renderAs: [Y1FlagRenderer],
+//     },
+//     {
+//       data: [
+//         {
+//           y: 2000,
+//           label: "Event 4",
+//           description:
+//             "Insert very long, long, long description here to see how the labels wrap when the description is very long.",
+//         },
+//       ],
+//       name: "Event flags",
+//       key: "flagsY2",
+//       hideInLegend: true,
+//       renderAs: [Y2FlagRenderer],
+//     },
+//   ],
+//   axes: {
+//     x1: {
+//       type: "categorical",
+//       start: new Date(2018, 2, 10),
+//       end: new Date(2018, 2, 17),
+//       interval: "day",
+//       title: "2018",
+//     },
+//     y1: {
+//       type: "quant",
+//       title: "TEST",
+//     },
+//     y2: {
+//       type: "quant",
+//     },
+//   },
 // }
 
-const data: any = {
-  series: [
+// const data: any = {
+//   series: [
+//     {
+//       data: [
+//         { x: new Date(2018, 2, 11), y: 100 },
+//         { x: new Date(2018, 2, 12), y: 300 },
+//         { x: new Date(2018, 2, 13), y: 500 },
+//         { x: new Date(2018, 2, 14), y: 300 },
+//         { x: new Date(2018, 2, 15), y: 200 },
+//       ],
+//       name: "Pageviews 2018",
+//       key: "series1",
+//       renderAs: [BarsRenderer],
+//     },
+//     {
+//       data: [
+//         { x: new Date(2017, 2, 10), y: 500 },
+//         { x: new Date(2017, 2, 11), y: 450 },
+//         { x: new Date(2017, 2, 12), y: 250 },
+//         { x: new Date(2017, 2, 13), y: 425 },
+//         { x: new Date(2017, 2, 14), y: 570 },
+//       ],
+//       name: "Pageviews 2017",
+//       xAxis: "x2",
+//       key: "series2",
+//       renderAs: [BarsRenderer],
+//     },
+//   ],
+//   axes: (mapValues as any)(computed => ({ type: "computed", computed }))({
+//     ...(computeTimeAxes({
+//       x1: {
+//         range: [0, 632],
+//         values: [],
+//         options: {
+//           type: "time",
+//           start: new Date(2018, 2, 10),
+//           end: new Date(2018, 2, 15),
+//           interval: "day",
+//           // showTicks: false,
+//           // showLabels: false,
+//           // showRules: true,
+//         }
+//       },
+//       x2: {
+//         range: [0, 632],
+//         values: [],
+//         options: {
+//           type: "time",
+//           start: new Date(2017, 2, 10),
+//           end: new Date(2017, 2, 15),
+//           interval: "day",
+//           // showTicks: false,
+//           // showLabels: false,
+//           // showRules: true,
+//         }
+//       }
+//     }, {
+//       barSeries: {
+//         series1: {
+//           barWidth: 20
+//         }, series2: {
+//           barWidth: 50
+//         }
+//       },
+//       barIndices: {
+//         series1: 0,
+//         series2: 1
+//       }
+//     })),
+//     ...(computeQuantAxes({
+//       y1: {
+//         range: [439, 0],
+//         values: [100, 300, 500, 300, 200, 500, 450, 250, 425, 570],
+//         options: {
+//           type: "quant",
+//           // showTicks: false,
+//           // showLabels: false,
+//         }
+//       }
+//     }))
+//   }),
+// }
+
+const data = {
+  "series": [
     {
-      data: [
-        { x: new Date(2018, 2, 11), y: 100 },
-        { x: new Date(2018, 2, 12), y: 300 },
-        { x: new Date(2018, 2, 13), y: 500 },
-        { x: new Date(2018, 2, 14), y: 300 },
-        { x: new Date(2018, 2, 15), y: 200 },
+      "key": "sales",
+      "name": "sales",
+      "data": [
+        { "x": 101, "y": "Berlin" },
+        { "x": 201, "y": "Dresden" },
+        { "x": 301, "y": "Hamburg" },
+        { "x": 601, "y": "Hamburg" },
       ],
-      name: "Pageviews 2018",
-      key: "series1",
-      renderAs: [BarsRenderer],
-    },
-    {
-      data: [
-        { x: new Date(2017, 2, 10), y: 500 },
-        { x: new Date(2017, 2, 11), y: 450 },
-        { x: new Date(2017, 2, 12), y: 250 },
-        { x: new Date(2017, 2, 13), y: 425 },
-        { x: new Date(2017, 2, 14), y: 570 },
-      ],
-      name: "Pageviews 2017",
-      xAxis: "x2",
-      key: "series2",
-      renderAs: [BarsRenderer],
-    },
-  ],
-  axes: (mapValues as any)(computed => ({ type: "computed", computed }))({
-    ...(computeTimeAxes({
-      x1: {
-        range: [0, 632],
-        values: [],
-        options: {
-          type: "time",
-          start: new Date(2018, 2, 10),
-          end: new Date(2018, 2, 15),
-          interval: "day",
-          // showTicks: false,
-          // showLabels: false,
-          // showRules: true,
-        }
-      },
-      x2: {
-        range: [0, 632],
-        values: [],
-        options: {
-          type: "time",
-          start: new Date(2017, 2, 10),
-          end: new Date(2017, 2, 15),
-          interval: "day",
-          // showTicks: false,
-          // showLabels: false,
-          // showRules: true,
-        }
-      }
+      "quantAxisOrientation": "x",
+      "xAxis": "x2",
+      "renderAs": [{ "type": "bars" }]
     }, {
-      barSeries: {
-        series1: {
-          barWidth: 20
-        }, series2: {
-          barWidth: 50
-        }
-      },
-      barIndices: {
-        series1: 0,
-        series2: 1
-      }
-    })),
-    ...(computeQuantAxes({
-      y1: {
-        range: [439, 0],
-        values: [100, 300, 500, 300, 200, 500, 450, 250, 425, 570],
-        options: {
-          type: "quant",
-          // showTicks: false,
-          // showLabels: false,
-        }
-      }
-    }))
-  }),
+      "key": "revenue",
+      "name": "revenue",
+      "data": [
+        { "x": 1.02, "y": "Berlin" },
+        { "x": 2.02, "y": "Dresden" },
+        { "x": 3.02, "y": "Hamburg" },
+        { "x": 6.02, "y": "Hamburg" },
+      ],
+      "quantAxisOrientation": "x",
+      "xAxis": "x1",
+      "renderAs": [{ "type": "bars" }]
+    }
+  ],
+  "axes": {
+    "y1": { "type": "categorical" },
+    "x1": { "type": "quant"},
+    "x2": { "type": "quant" }
+  }
 }
 
 const App = () => (

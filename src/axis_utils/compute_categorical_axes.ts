@@ -66,10 +66,13 @@ const computeTickInfo = (datum: Datum, config: Config, computedSeries: ComputedS
   const tickWidth = requiredWidthForFixedWidthStacks + innerPaddingTotal + variableBarWidth * variableWidthStacks.length
   const tickWidthWithPadding = Math.max(tickWidth, defaultTickWidthWithoutOuterPadding) * (1 + config.innerBarSpacingCategorical)
 
-  const range: Extent = [
-    datum.range[0] + tickWidth / 2,
-    datum.range[0] + tickWidthWithPadding * nTicks + tickWidth * config.innerBarSpacingCategorical + tickWidth / 2
-  ]
+  // Adjust range to account for tick widths
+  const rangeTop = Math.min(...datum.range) + tickWidthWithPadding * nTicks + tickWidth * config.innerBarSpacingCategorical + tickWidth / 2;
+  const rangeBottom = Math.min(...datum.range) + tickWidth / 2;
+
+  const range: Extent = datum.range[0] < datum.range[1]
+    ? [rangeBottom, rangeTop]
+    : [rangeTop, rangeBottom]
 
   return {
     tickWidth: tickWidthWithPadding,

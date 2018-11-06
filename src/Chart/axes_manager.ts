@@ -100,8 +100,8 @@ class AxesManager {
   }
 
   private setBaselines() {
-    const xType = (this.axes.x1 || this.axes.x2).type
-    const yType = (this.axes.y1 || this.axes.y2).type
+    const xType = (this.axes.x1 || this.axes.x2).options.type
+    const yType = (this.axes.y1 || this.axes.y2).options.type
     const baseline: AxisOrientation = xType === "quant" && yType !== "quant" ? "y" : "x"
     this.stateWriter("baseline", baseline)
   }
