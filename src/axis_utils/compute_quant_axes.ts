@@ -5,6 +5,7 @@ import * as d3 from "d3-selection"
 import { scaleLinear, ScaleLinear } from "d3-scale";
 import defaultNumberFormatter from "../utils/number_formatter"
 import defaultOptions from "./axis_config"
+import { tuple } from "../shared/typings";
 
 type Formatter = (value: number) => string
 
@@ -23,7 +24,6 @@ type InitialComputedDatum = InputDatum<number, QuantAxisOptions> & {
   ruleSteps: Steps;
 }
 
-const tuple = <T extends string[]>(...args: T) => args;
 const STEPS_TO_ALIGN = tuple("tickSteps", "labelSteps", "ruleSteps");
 type StepsToAlign = typeof STEPS_TO_ALIGN[number];
 

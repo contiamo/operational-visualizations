@@ -1,4 +1,5 @@
 import { ScaleLinear, ScaleBand, ScaleTime } from "d3-scale";
+import { tuple } from "../shared/typings";
 
 /** Axis configuration */
 export interface AxisConfig {
@@ -55,13 +56,17 @@ export interface QuantAxisOptions extends BaseAxisOptions {
 
 export interface CategoricalAxisOptions extends BaseAxisOptions {
   type: "categorical";
+  /** Array of tick values to display, in order. */
   values: string[];
 }
 
 export interface TimeAxisOptions extends BaseAxisOptions {
   type: "time";
+  /** Start date */
   start: Date;
+  /** End date */
   end: Date;
+  /** Tick interval */
   interval: TimeIntervals;
 }
 
@@ -155,12 +160,16 @@ export interface BaseConfig {
   minBarWidth: number
 }
 
-export type AxisOrientation = "x" | "y";
+export const AXIS_ORIENTATIONS = tuple("x", "y");
+export type AxisOrientation = typeof AXIS_ORIENTATIONS[number];
 
-export type AxisPosition = "x1" | "x2" | "y1" | "y2";
+export const AXIS_POSITIONS = tuple("x1", "x2", "y1", "y2");
+export type AxisPosition = typeof AXIS_POSITIONS[number];
 
-export type AxisType = "quant" | "categorical" | "time";
+export const AXIS_TYPE = tuple("quant", "categorical", "time");
+export type AxisType = typeof AXIS_TYPE[number];
 
-export type TimeIntervals = "hour" | "day" | "week" | "month" | "quarter" | "year";
+export const TIME_INTERVALS = tuple("hour", "day", "week", "month", "quarter", "year");
+export type TimeIntervals = typeof TIME_INTERVALS[number];
 
 export type AxesData = Partial<Record<AxisPosition, AxisOptions | ComputedAxisInput>>;
