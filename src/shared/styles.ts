@@ -5,7 +5,7 @@ import theme from "../utils/constants"
 const drawingContainerStyle = {
   fontSize: "11px",
   position: "relative",
-  overflow: "hidden",
+  float: "left",
 }
 
 const chartContainerStyle = {
