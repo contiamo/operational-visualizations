@@ -1,5 +1,5 @@
 import Axis from "./axes/axis"
-import Rules from "./rules"
+import Rules from "./axes/rules"
 import { difference, find, flow, forEach, get, invoke, keys, map, mapValues, omitBy, pick, pickBy, uniqBy, values } from "lodash/fp"
 import { AxisOptions, AxisOrientation, AxisPosition, AxisType, ComputedAxisInput, D3Selection, EventBus, State, StateWriter } from "./typings"
 import computeQuantAxes from "../axis_utils/compute_quant_axes"
