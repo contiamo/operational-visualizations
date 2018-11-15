@@ -41,6 +41,7 @@ const defaultConfig = (): ChartConfig => {
     maxBarWidthRatio: 1 / 3,
     maxFocusLabelWidth: 350,
     minBarWidth: 3,
+    noAxisMargin: 15,
     numberFormatter: defaultNumberFormatter,
     outerBarSpacing: 10,
     palette: theme.palettes.qualitative.generic,

@@ -34,6 +34,7 @@ export interface ChartConfig extends BaseConfig {
   maxBarWidthRatio: number
   maxFocusLabelWidth: number
   minBarWidth: number
+  noAxisMargin: number
   numberFormatter: (x: number) => string
   outerBarSpacing: number
   palette: string[]

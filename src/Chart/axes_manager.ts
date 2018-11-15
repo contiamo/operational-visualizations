@@ -50,10 +50,9 @@ class AxesManager {
 
   updateMargins(): void {
     const computedMargins: Record<AxisPosition, number> = {
-      ...defaultMargins,
+      ...defaultMargins(this.state.current.getConfig().noAxisMargin),
       ...get(["axes", "margins"])(this.state.current.getComputed()) || {}
     }
-
     this.stateWriter("margins", computedMargins)
   }
 

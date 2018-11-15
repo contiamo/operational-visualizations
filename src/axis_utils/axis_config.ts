@@ -3,38 +3,37 @@ import { AxisType, AxisPosition, AxisConfig } from "./typings";
 const generalAxisConfig = (type: AxisType) => ({
   type,
   fontSize: 11,
+  hideAxis: false,
+  tickLength: 5,
   titleFontSize: 12,
   showTicks: true,
   showLabels: true,
   showRules: type === "quant",
+  outerPadding: 3,
+  rotateLabels: false,
+  margin: 0,
 })
 
 const xAxisConfig = {
-  margin: 15,
   minTicks: 2,
-  rotateLabels: false,
   tickSpacing: 65,
-  outerPadding: 3,
 }
 
 const yAxisConfig = {
-  margin: 34,
   minTicks: 4,
   minTopOffsetTopTick: 21,
-  rotateLabels: false,
   tickSpacing: 40,
-  outerPadding: 3,
 }
 
-export const defaultMargins = {
-  x1: xAxisConfig.margin,
-  x2: xAxisConfig.margin,
-  y1: yAxisConfig.margin,
-  y2: yAxisConfig.margin,
-}
+export const defaultMargins = (noAxisMargin: number) => ({
+  x1: noAxisMargin,
+  x2: noAxisMargin,
+  y1: noAxisMargin,
+  y2: noAxisMargin,
+})
 
 export default (type: AxisType, axis: AxisPosition): AxisConfig => ({
-  tickOffset: ["x1", "y2"].includes(axis) ? 8 : -8,
+  labelOffset: ["x1", "y2"].includes(axis) ? 8 : -8,
   ...generalAxisConfig(type),
   ...(axis[0] === "x" ? xAxisConfig : yAxisConfig)
 })

@@ -1,23 +1,41 @@
 import { ScaleLinear, ScaleBand, ScaleTime } from "d3-scale";
 
-// Axis configuration
+/** Axis configuration */
 export interface AxisConfig {
-  fontSize: number
-  margin: number
-  minTicks: number
-  outerPadding: number
-  rotateLabels: boolean
-  showRules: boolean
-  showTicks: boolean
-  showLabels: boolean
-  tickOffset: number
-  tickSpacing: number
-  title?: string
-  titleFontSize: number
-  minTopOffsetTopTick?: number
+  /** Font size for tick labels. */
+  fontSize: number;
+  /** Boolean to hide axis ticks and labels. Reduces axis margin to 0, displays only the axis line. */
+  hideAxis: boolean;
+  /** Axis margin. */
+  margin: number;
+  /** Minimum number of ticks to display. */
+  minTicks: number;
+  /** Offset of labels from axis line. */
+  labelOffset: number
+  /** Padding between edge of axis and edge of drawing container. */
+  outerPadding: number;
+  /** Rotates labels to a 45° angle. */
+  rotateLabels: boolean;
+  /** Toggles display of rules between ticks. */
+  showRules: boolean;
+  /** Toggles display of tick lines. */
+  showTicks: boolean;
+  /** Toggles display of tick labels. */
+  showLabels: boolean;
+  /** Length of ticks. */
+  tickLength: number;
+  /** Optimal distance between ticks. */
+  tickSpacing: number;
+  /** Axis title (optional). */
+  title?: string;
+  /** Font size for axis title. */
+  titleFontSize: number;
+  /** Minimum distance between top of y axis and top tick. */
+  minTopOffsetTopTick?: number;
 }
 
 type BaseAxisOptions = Partial<AxisConfig> & {
+  /** Axis type */
   type: AxisType;
 }
 

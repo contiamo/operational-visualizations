@@ -66,7 +66,7 @@ class Axis {
   /** Trigger axis draw/transition with new computed values */
   draw(computed: AxisComputed, duration?: number) {
     this.computed = computed
-    this.ticks = (this.computed.ticks as Tick<any>[]).filter((tick: Tick<any>) => !tick.hideTick)
+    this.ticks = this.options.hideAxis ? [] : (this.computed.ticks as Tick<any>[]).filter(tick => !tick.hideTick)
     this.translateAxis()
     this.drawTicks(duration)
     this.drawLabels(duration)
@@ -131,9 +131,9 @@ class Axis {
   private getTickAttributes() {
     return {
       x1: (d: Tick<any>) => this.isXAxis ? d.position : 0,
-      x2: (d: Tick<any>) => this.isXAxis ? d.position : this.options.tickOffset * 0.6,
+      x2: (d: Tick<any>) => this.isXAxis ? d.position : Math.sign(this.options.labelOffset) * this.options.tickLength,
       y1: (d: Tick<any>) => this.isXAxis ? 0 : d.position,
-      y2: (d: Tick<any>) => this.isXAxis ? this.options.tickOffset * 0.6 : d.position,
+      y2: (d: Tick<any>) => this.isXAxis ? Math.sign(this.options.labelOffset) * this.options.tickLength : d.position,
     }
   }
 
@@ -163,10 +163,10 @@ class Axis {
     const attrs: any = {
       x: (d: Tick<any>) => this.isXAxis ? d.position : 0,
       y: (d: Tick<any>) => this.isXAxis ? 0 : d.position,
-      dx: this.isXAxis ? 0 : this.options.tickOffset,
+      dx: this.isXAxis ? 0 : this.options.labelOffset,
       dy: this.isXAxis
-        ? this.options.tickOffset + (this.position === "x1" ? this.options.fontSize : 0)
-        : Math.abs(this.options.tickOffset / 2),
+        ? this.options.labelOffset + (this.position === "x1" ? this.options.fontSize : 0)
+        : Math.abs(this.options.labelOffset / 2),
       text: (d: Tick<any>) => d.label,
       textAnchor: textAnchor[this.position](this.options.rotateLabels),
     }
@@ -202,7 +202,7 @@ class Axis {
 
   private computeRequiredMargin = () => {
     const axisDimension = this.el.node().getBBox()[this.isXAxis ? "height" : "width"]
-    return Math.max(this.options.margin, Math.ceil(axisDimension) + this.options.outerPadding)
+    return Math.max(this.options.margin, Math.ceil(axisDimension) + (axisDimension ? this.options.outerPadding : 0))
   }
 
   /** Positions and sizes the axis background rect to ensure proper hovering behaviour */
