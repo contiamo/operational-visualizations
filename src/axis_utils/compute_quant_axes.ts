@@ -115,25 +115,24 @@ const computeTickArray = (datum: InitialComputedDatum, scale: Scale, formatter: 
     value,
     position: scale(value),
     ...{
-      label: labels.includes(value) && formatter(value),
+      label: labels.includes(value) ? formatter(value) : "",
       class: value === 0 && "zero"
     }
   }))
 }
 
 const computeTickSteps = (range: Extent, domain: Extent, options: QuantAxisOptions) => {
-  const defaultInterval = options.interval || computeInterval(range, domain, options)
-  const interval = options.tickInterval ? Math.min(options.tickInterval, defaultInterval) : defaultInterval
+  const interval = options.tickInterval || computeInterval(range, domain, options)
   return computeSteps(domain, interval, options)
 }
 
 const computeLabelSteps = (range: Extent, domain: Extent, options: QuantAxisOptions) => {
-  const interval = options.interval || computeInterval(range, domain, options)
+  const interval = options.labelInterval || options.tickInterval || computeInterval(range, domain, options)
   return computeSteps(domain, interval, options)
 }
 
 const computeRuleSteps = (range: Extent, domain: Extent, options: QuantAxisOptions) => {
-  const interval = options.ruleInterval || options.interval || computeInterval(range, domain, options)
+  const interval = options.ruleInterval || options.tickInterval || computeInterval(range, domain, options)
   return computeSteps(domain, interval, options)
 }
 

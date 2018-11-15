@@ -23,11 +23,16 @@ type BaseAxisOptions = Partial<AxisConfig> & {
 
 export interface QuantAxisOptions extends BaseAxisOptions {
   type: "quant";
+  /** Hardcoded start value for axis. */
   start?: number;
+  /** Hardcoded end value for axis. */
   end?: number;
-  interval?: number;
-  ruleInterval?: number;
+  /** Hardcoded interval between ticks. */
   tickInterval?: number;
+  /** Hardcoded interval between rules. */
+  ruleInterval?: number;
+  /** Hardcoded interval between displayed tick labels. */
+  labelInterval?: number;
 }
 
 export interface CategoricalAxisOptions extends BaseAxisOptions {
