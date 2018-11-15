@@ -3,11 +3,9 @@ import { render } from "react-dom"
 import { OperationalUI } from "@operational/components"
 
 const containerNode = document.getElementById("app")
-const containerNode2 = document.getElementById("app2")
 
 import Chart from "../../src/Chart/facade"
 import { VisualizationWrapper } from "../../src/index"
-import { timeFormat } from "d3-time-format"
 
 import computeQuantAxes from "../../src/axis_utils/compute_quant_axes"
 import computeTimeAxes from "../../src/axis_utils/compute_time_axes"
@@ -207,122 +205,85 @@ const RangeRenderer = {
 //   },
 // }
 
-// const data: any = {
-//   series: [
-//     {
-//       data: [
-//         { x: new Date(2018, 2, 11), y: 100 },
-//         { x: new Date(2018, 2, 12), y: 300 },
-//         { x: new Date(2018, 2, 13), y: 500 },
-//         { x: new Date(2018, 2, 14), y: 300 },
-//         { x: new Date(2018, 2, 15), y: 200 },
-//       ],
-//       name: "Pageviews 2018",
-//       key: "series1",
-//       renderAs: [BarsRenderer],
-//     },
-//     {
-//       data: [
-//         { x: new Date(2017, 2, 10), y: 500 },
-//         { x: new Date(2017, 2, 11), y: 450 },
-//         { x: new Date(2017, 2, 12), y: 250 },
-//         { x: new Date(2017, 2, 13), y: 425 },
-//         { x: new Date(2017, 2, 14), y: 570 },
-//       ],
-//       name: "Pageviews 2017",
-//       xAxis: "x2",
-//       key: "series2",
-//       renderAs: [BarsRenderer],
-//     },
-//   ],
-//   axes: (mapValues as any)(computed => ({ type: "computed", computed }))({
-//     ...(computeTimeAxes({
-//       x1: {
-//         range: [0, 632],
-//         values: [],
-//         options: {
-//           type: "time",
-//           start: new Date(2018, 2, 10),
-//           end: new Date(2018, 2, 15),
-//           interval: "day",
-//           // showTicks: false,
-//           // showLabels: false,
-//           // showRules: true,
-//         }
-//       },
-//       x2: {
-//         range: [0, 632],
-//         values: [],
-//         options: {
-//           type: "time",
-//           start: new Date(2017, 2, 10),
-//           end: new Date(2017, 2, 15),
-//           interval: "day",
-//           // showTicks: false,
-//           // showLabels: false,
-//           // showRules: true,
-//         }
-//       }
-//     }, {
-//       barSeries: {
-//         series1: {
-//           barWidth: 20
-//         }, series2: {
-//           barWidth: 50
-//         }
-//       },
-//       barIndices: {
-//         series1: 0,
-//         series2: 1
-//       }
-//     })),
-//     ...(computeQuantAxes({
-//       y1: {
-//         range: [439, 0],
-//         values: [100, 300, 500, 300, 200, 500, 450, 250, 425, 570],
-//         options: {
-//           type: "quant",
-//           // showTicks: false,
-//           // showLabels: false,
-//         }
-//       }
-//     }))
-//   }),
-// }
-
-const data = {
-  "series": [
+const data: any = {
+  series: [
     {
-      "key": "sales",
-      "name": "sales",
-      "data": [
-        { "x": 101, "y": "Berlin" },
-        { "x": 201, "y": "Dresden" },
-        { "x": 301, "y": "Hamburg" },
-        { "x": 601, "y": "Hamburg" },
+      data: [
+        { x: new Date(2018, 2, 11), y: 100 },
+        { x: new Date(2018, 2, 12), y: 300 },
+        { x: new Date(2018, 2, 13), y: 500 },
+        { x: new Date(2018, 2, 14), y: 300 },
+        { x: new Date(2018, 2, 15), y: 200 },
       ],
-      "quantAxisOrientation": "x",
-      "xAxis": "x2",
-      "renderAs": [{ "type": "bars" }]
-    }, {
-      "key": "revenue",
-      "name": "revenue",
-      "data": [
-        { "x": 1.02, "y": "Berlin" },
-        { "x": 2.02, "y": "Dresden" },
-        { "x": 3.02, "y": "Hamburg" },
-        { "x": 6.02, "y": "Hamburg" },
+      name: "Pageviews 2018",
+      key: "series1",
+      renderAs: [BarsRenderer],
+    },
+    {
+      data: [
+        { x: new Date(2017, 2, 10), y: 500 },
+        { x: new Date(2017, 2, 11), y: 450 },
+        { x: new Date(2017, 2, 12), y: 250 },
+        { x: new Date(2017, 2, 13), y: 425 },
+        { x: new Date(2017, 2, 14), y: 570 },
       ],
-      "quantAxisOrientation": "x",
-      "xAxis": "x1",
-      "renderAs": [{ "type": "bars" }]
-    }
+      name: "Pageviews 2017",
+      xAxis: "x2",
+      key: "series2",
+      renderAs: [BarsRenderer],
+    },
   ],
-  "axes": {
-    "y1": { "type": "categorical" },
-    "x1": { "type": "quant"},
-    "x2": { "type": "quant" }
-  }
+  axes: (mapValues as any)(computed => ({ type: "computed", computed }))({
+    ...(computeTimeAxes({
+      x1: {
+        range: [0, 694],
+        values: [],
+        options: {
+          type: "time",
+          start: new Date(2018, 2, 10),
+          end: new Date(2018, 2, 15),
+          interval: "day",
+          hideAxis: true,
+          margin: 3,
+        }
+      },
+      x2: {
+        range: [0, 694],
+        values: [],
+        options: {
+          type: "time",
+          start: new Date(2017, 2, 10),
+          end: new Date(2017, 2, 15),
+          interval: "day",
+          hideAxis: true,
+          margin: 3,
+        }
+      }
+    }, {
+      barSeries: {
+        series1: {
+          barWidth: 20
+        }, series2: {
+          barWidth: 50
+        }
+      },
+      barIndices: {
+        series1: 0,
+        series2: 1
+      }
+    })),
+    ...(computeQuantAxes({
+      y1: {
+        range: [494, 0],
+        values: [100, 300, 500, 300, 200, 500, 450, 250, 425, 570],
+        options: {
+          type: "quant",
+          hideAxis: true,
+          margin: 3
+        }
+      }
+    }))
+  }),
 }
 
 const App = () => (
@@ -330,7 +291,11 @@ const App = () => (
     <VisualizationWrapper
       facade={Chart}
       data={data}
-      config={{ uid: "TEST", width: 700, showComponentFocus: true, maxFocusLabelWidth: 200, legend: false }}
+      config={{
+        width: 700,
+        legend: false,
+        noAxisMargin: 3
+      }}
     />
   </OperationalUI>
 )
