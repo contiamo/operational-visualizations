@@ -22,6 +22,7 @@ import {
 
 const defaultConfig = (): PieChartConfig => {
   return {
+    backgroundColor: theme.colors.white,
     displayPercentages: true,
     duration: 1e3,
     focusOffset: 5,

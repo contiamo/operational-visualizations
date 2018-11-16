@@ -11,7 +11,6 @@ const drawingContainerStyle = {
 const chartContainerStyle = {
   position: "relative",
   display: "block",
-  backgroundColor: theme.colors.white,
   "&.hidden": {
     display: "none",
   },

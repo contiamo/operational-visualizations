@@ -33,7 +33,9 @@ class PieChartCanvas implements Canvas {
     container.addEventListener("mouseenter", this.onMouseEnter.bind(this))
     container.addEventListener("mouseleave", this.onMouseLeave.bind(this))
     container.addEventListener("click", this.onClick.bind(this))
-    return d3.select(container).attr("class", styles.chartContainer)
+    return d3.select(container)
+      .attr("class", styles.chartContainer)
+      .style("background-color", this.state.current.getConfig().backgroundColor)
   }
 
   private onMouseEnter(): void {

@@ -292,6 +292,7 @@ const App = () => (
       facade={Chart}
       data={data}
       config={{
+        backgroundColor: "#ddd",
         width: 700,
         legend: false,
         noAxisMargin: 3

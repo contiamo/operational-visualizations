@@ -30,6 +30,7 @@ export interface ChartStateObject<Data, Config, AccessorsObject, Computed> {
 
 // Base config, required for all visualisations
 export interface BaseConfig {
+  backgroundColor: string
   duration: number
   height: number
   hidden: boolean

@@ -29,6 +29,7 @@ import {
 
 const defaultConfig = (): ChartConfig => {
   return {
+    backgroundColor: theme.colors.white,
     duration: 1e3,
     flagFocusOffset: 15,
     focusDateOptions: ["line", "points", "label"],

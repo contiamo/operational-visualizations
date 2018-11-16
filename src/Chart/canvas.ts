@@ -61,6 +61,8 @@ class ChartCanvas implements Canvas {
       .classed("hidden", this.state.current.getConfig().hidden)
       .style("width", `${config.width}px`)
       .style("height", `${config.height}px`)
+      .style("background-color", config.backgroundColor)
+
     this.stateWriter(["containerRect"], this.chartContainer.node().getBoundingClientRect())
 
     this.drawingContainer.style("width", `${dims.width}px`).style("height", `${dims.height}px`)
