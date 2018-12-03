@@ -94,8 +94,8 @@ class Marathon extends React.Component<Props, State> {
         const error = actual === expected ? null : `Expected ${String(actual)} to equal ${String(expected)}`
         this.setStateById(({ id, tests, completed }: State) => ({
           id,
-          tests: tests.map(
-            (test, index) => (index === completed ? { ...test, errors: [...test.errors, error] } : test),
+          tests: tests.map((test, index) =>
+            index === completed ? { ...test, errors: [...test.errors, error] } : test,
           ),
         }))
       },
@@ -130,9 +130,8 @@ class Marathon extends React.Component<Props, State> {
       } catch (err) {
         await this.setStateById(prevState => ({
           id: currentTestId,
-          tests: prevState.tests.map(
-            (test: Test, index: number) =>
-              index === prevState.completed ? { ...test, errors: [...test.errors, String(err)] } : test,
+          tests: prevState.tests.map((test: Test, index: number) =>
+            index === prevState.completed ? { ...test, errors: [...test.errors, String(err)] } : test,
           ),
         }))
       }

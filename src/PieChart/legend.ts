@@ -37,7 +37,7 @@ class PieChartLegend implements Legend {
       return
     }
 
-    const legends = this.legend.selectAll(`div.${globalStyles.seriesLegend}`).data(this.data(), get("label"))
+    const legends: D3Selection = this.legend.selectAll(`div.${globalStyles.seriesLegend}`).data(this.data(), get("label"))
 
     legends.exit().remove()
 
@@ -78,7 +78,7 @@ class PieChartLegend implements Legend {
       this.state.current.getComputed().series.dataForLegend,
     )
 
-    const legends = this.legend.selectAll(`div.comparison`).data(data)
+    const legends: D3Selection = this.legend.selectAll(`div.comparison`).data(data)
 
     legends.exit().remove()
 

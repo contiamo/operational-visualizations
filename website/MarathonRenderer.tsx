@@ -25,11 +25,11 @@ const MarathonRendererComponent = ({ results, ref }: MarathonRenderer) => (
             return index === 0 || results[index - 1].isCompleted ? "running" : "waiting"
           }
           if (result.errors.length > 0) {
-            return "error"
+            return "failure"
           }
           return "success"
         })(),
-        error: result.errors.length > 0 ? result.errors.concat(" ") : undefined,
+        error: result.errors.length > 0 ? result.errors.join(" ") : undefined,
       }))}
     />
     <Content innerRef={ref} />

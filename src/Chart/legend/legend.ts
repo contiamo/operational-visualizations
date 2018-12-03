@@ -41,7 +41,7 @@ class ChartLegend implements Legend {
     }
 
     this.el.attr("visibility", "visible")
-    const legends = this.el.selectAll(`div.${styles.seriesLegend}`).data(this.data, get("label"))
+    const legends: D3Selection = this.el.selectAll(`div.${styles.seriesLegend}`).data(this.data, get("label"))
 
     legends.exit().remove()
 

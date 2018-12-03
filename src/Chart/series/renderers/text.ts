@@ -74,7 +74,7 @@ class Text implements RendererClass<TextRendererAccessors> {
     const startAttributes = this.startAttributes()
     const attributes = this.attributes()
 
-    const text = this.el.selectAll("text").data(data)
+    const text: D3Selection = this.el.selectAll("text").data(data)
 
     text
       .enter()
