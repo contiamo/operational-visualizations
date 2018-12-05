@@ -4,9 +4,9 @@ import * as styles from "./styles"
 import { withD3Element, setRectAttributes } from "../../../utils/d3_utils"
 import { area as d3Area, curveStepAfter } from "d3-shape"
 import Events from "../../../shared/event_catalog"
+import { AxisOrientation } from "../../../axis_utils/typings";
 
 import {
-  AxisPosition,
   BarsRendererAccessors,
   D3Selection,
   Datum,

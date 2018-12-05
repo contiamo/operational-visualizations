@@ -1,10 +1,9 @@
-import { D3Selection, EventBus, State, MousePosition, AxisPosition, AxisComputed, AxisOrientation } from "../typings"
+import { D3Selection, EventBus, State, MousePosition, AxisPosition, AxisOrientation, Tick, TimeAxisComputed } from "../typings"
 import Events from "../../shared/event_catalog"
 import { includes, filter, find, forEach, get, groupBy, isFinite, map, partition, reduce, sortBy } from "lodash/fp"
 import { drawHidden, labelDimensions, positionLabel } from "../../utils/focus_utils"
 import * as styles from "./styles"
 import * as globalStyles from "../../shared/styles"
-import { Tick, TimeAxisComputed } from "../../axis_utils/typings";
 
 class DateFocus {
   el: D3Selection

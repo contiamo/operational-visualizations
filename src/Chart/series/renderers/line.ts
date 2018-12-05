@@ -1,5 +1,7 @@
 import { compact, defaults, find, forEach, get, map, sortBy } from "lodash/fp"
 import Series from "../series"
+import { AxisOrientation } from "../../../axis_utils/typings";
+import * as styles from "./styles"
 
 import {
   line as d3Line,
@@ -11,8 +13,6 @@ import {
   curveStepAfter,
   curveStepBefore,
 } from "d3-shape"
-
-import * as styles from "./styles"
 
 import {
   LineRendererAccessors,

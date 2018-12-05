@@ -2,6 +2,8 @@ import { compact, defaults, filter, get, map } from "lodash/fp"
 import Series from "../series"
 import * as styles from "./styles"
 import { withD3Element } from "../../../utils/d3_utils"
+import { AxisOrientation } from "../../../axis_utils/typings";
+import Events from "../../../shared/event_catalog"
 
 import {
   symbol as d3Symbol,
@@ -12,8 +14,6 @@ import {
   symbolStar,
   symbolTriangle,
 } from "d3-shape"
-
-import Events from "../../../shared/event_catalog"
 
 import {
   SymbolRendererAccessors,

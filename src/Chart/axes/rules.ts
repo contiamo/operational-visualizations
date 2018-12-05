@@ -1,13 +1,14 @@
 import { D3Selection, Rule, State } from "../typings"
 import * as styles from "../../shared/styles"
+import { AxisOrientation } from "../../axis_utils/typings";
 
 class Rules {
   el: D3Selection
-  orientation: "x" | "y"
+  orientation: AxisOrientation
   state: State
   yRules: boolean
 
-  constructor(state: State, el: D3Selection, orientation: "x" | "y") {
+  constructor(state: State, el: D3Selection, orientation: AxisOrientation) {
     this.state = state
     this.el = el
     this.orientation = orientation
