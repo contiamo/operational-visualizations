@@ -6,6 +6,7 @@ export { default as ProcessFlowLoopHandler } from "./utils/process_flow_loop_han
 export { default as Sunburst } from "./Sunburst/facade"
 export { default as VisualizationWrapper } from "./utils/VisualizationWrapper"
 export { default as Legend } from "./Legend/Legend"
+export { default as Axis } from "./Axis/Axis"
 export { colorAssigner } from "./utils/colorAssigner"
 export { default as computeQuantAxes } from "./axis_utils/compute_quant_axes"
 export { default as computeCategoricalAxes } from "./axis_utils/compute_categorical_axes"
