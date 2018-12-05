@@ -1,27 +1,15 @@
 import Axis from "./axes/axis"
 import Rules from "./axes/rules"
-import { difference, find, flow, forEach, get, invoke, keys, map, mapValues, omitBy, pick, pickBy, uniqBy, values } from "lodash/fp"
-import { AxisOptions, AxisOrientation, AxisPosition, AxisType, ComputedAxisInput, D3Selection, EventBus, State, StateWriter } from "./typings"
+import { compact, difference, every, find, flow, forEach, get, groupBy, invoke, isEmpty, keys, map, mapValues, omitBy, partition, pickBy, uniqBy, uniqueId, values } from "lodash/fp"
+import { AxisOptions, AxisPosition, AxisType, D3Selection, EventBus, State, StateWriter } from "./typings"
 import computeQuantAxes from "../axis_utils/compute_quant_axes"
-import computeCategoricalAxis from "../axis_utils/compute_categorical_axes"
-import computeTimeAxis from "../axis_utils/compute_time_axes"
+import computeCategoricalAxes from "../axis_utils/compute_categorical_axes"
+import computeTimeAxes, { ticksInDomain } from "../axis_utils/compute_time_axes"
 import { defaultMargins } from "../axis_utils/axis_config"
+import { ComputedAxisInput, Extent, BarSeries, AxisOrientation, InputDatum, AxisRecord } from "../axis_utils/typings";
+import { computeBarPositions, computeTickWidth } from "../axis_utils/discrete_axis_utils";
 
-const configValuesForAxis: Record<AxisType, string[]> = {
-  quant: ["numberFormatter"],
-  categorical: [
-    "innerBarSpacingCategorical",
-    "innerBarSpacing",
-    "minBarWidth"
-  ],
-  time: [
-    "innerBarSpacing",
-    "outerBarSpacing",
-    "minBarWidth"
-  ]
-}
-
-type Axes = Partial<Record<AxisPosition, Axis>>;
+type Axes = AxisRecord<Axis>;
 
 class AxesManager {
   axes: Axes = {}
@@ -115,7 +103,7 @@ class AxesManager {
     forEach(this.drawAxesByOrientation.bind(this))(["y", "x"])
   }
 
-  private drawAxesByOrientation(orientation: "x" | "y") {
+  private drawAxesByOrientation(orientation: AxisOrientation) {
     const axes: Axes = pickBy(
       (axis: Axis) => orientation === "x" ? axis.isXAxis : !axis.isXAxis
     )(this.axes)
@@ -135,23 +123,8 @@ class AxesManager {
     })(axes)
   }
 
-  private computeAxes(axes: Partial<Record<AxisPosition, Axis>>, orientation: "x" | "y") {
-    const computed = this.state.current.getComputed()
-
-    const isAlreadyComputed = flow(
-      values,
-      map((axis: Axis) => !!axis.preComputed),
-      uniqBy(Boolean)
-    )(axes)
-
-    if (isAlreadyComputed.length > 1) {
-      throw new Error("Axes with the same orientation must either both be pre-computed, or neither pre-computed.")
-    }
-
-    if (isAlreadyComputed[0]) {
-      return mapValues((axis: Axis) => axis.preComputed)(axes)
-    }
-
+  // Returns common type of multiple axes. If axes do not all have the same type, throws an error.
+  private getAxesType(axes: Axes) {
     const axesTypes: AxisType[] = flow(
       values,
       map((axis: Axis) => axis.options.type),
@@ -161,28 +134,131 @@ class AxesManager {
     if (axesTypes.length > 1) {
       throw new Error(`Axes of types ${axesTypes.join(", ")} cannot be aligned`)
     }
+    return axesTypes[0];
+  }
 
-    const range: [number, number] = orientation === "x"
+  // Checks if axes have already been computed externally.
+  private areAxesPrecomputed(axes: Axes) {
+    const alreadyComputed: boolean[] = flow(
+      values,
+      map((axis: Axis) => !!axis.preComputed),
+      uniqBy(Boolean)
+    )(axes)
+
+    if (alreadyComputed.length > 1) {
+      throw new Error("Axes with the same orientation must either both be pre-computed, or neither pre-computed.")
+    }
+    return alreadyComputed[0];
+  }
+
+  private getAxesRange(axes: Axes, precomputed: boolean, orientation: AxisOrientation): Extent {
+    const computed = this.state.current.getComputed()
+    if (precomputed) {
+      const ranges: Extent[] = map((axis: Axis) => axis.preComputed.range)(values(axes))
+      const rangesAreEqual = every((range: Extent) => range[0] === ranges[0][0] && range[1] === ranges[0][1])(ranges)
+      if (!rangesAreEqual) {
+        throw new Error(`Ranges ${keys(axes).join(", ")} should have the same range.`)
+      }
+      return ranges[0]
+    }
+    return orientation === "x"
       ? [0, computed.canvas.drawingDims.width]
       : [computed.canvas.drawingDims.height, 0]
+  }
 
-    const inputData = mapValues.convert({ cap: false })((axis: Axis, key: AxisPosition) => ({
+  private getNTicks(axes: Axes) {
+    return Math.max(...keys(axes).map(axis => {
+      const axisOptions = axes[axis].options
+      return axisOptions.type === "time"
+        ? ticksInDomain(axisOptions).length
+        : this.state.current.getComputed().series.dataForAxes[axis].length
+    }))
+  }
+
+  private computeAxes(axes: Axes, orientation: AxisOrientation) {
+    const computedSeries = this.state.current.getComputed().series
+    const precomputed = this.areAxesPrecomputed(axes)
+
+    // Get available range for axis
+    let range = this.getAxesRange(axes, precomputed, orientation)
+    const type = this.getAxesType(axes)
+
+    // Check if axis needs to be adjusted to account for the width of bars.
+    // Bars can only be rendered on discrete (categorical or time) axes.
+    const hasBars = type !== "quant" && !isEmpty(computedSeries.barSeries)
+    if (hasBars) {
+      const nTicks = this.getNTicks(axes)
+      const barPositions = this.computeBars(range, axes, nTicks)
+      const config = this.state.current.getConfig()
+
+      const tickWidth = (keys(computedSeries.barSeries) as string[]).reduce<number>((width, seriesKey) =>
+        width + barPositions.width(seriesKey) + config.innerBarSpacing
+      , config.outerBarSpacing - config.innerBarSpacing)
+
+      // Update range
+      range = orientation === "x" ? [0, tickWidth * nTicks] : [tickWidth * nTicks, 0]
+    }
+
+    // If axes have been computed before being passed to the chart, no further computation is necessary
+    if (precomputed) {
+      return mapValues((axis: Axis) => axis.preComputed)(axes)
+    }
+
+    // Pass computed range, values, options and tickWidth to appropriate axis calculator.
+    const inputData = mapValues.convert({ cap: false })((axis: Axis, key: AxisPosition): InputDatum => ({
       range,
-      values: computed.series.dataForAxes[key],
+      values: computedSeries.dataForAxes[key],
       options: axis.options,
     }))(axes)
 
-    const config = pick(configValuesForAxis[axesTypes[0]])(this.state.current.getConfig())
-    const computedSeries = pick(["barSeries", "barIndices"])(this.state.current.getComputed().series)
-
-    switch (axesTypes[0]) {
+    switch (type) {
       case "quant":
-        return computeQuantAxes(inputData, config);
+        return computeQuantAxes(inputData, this.state.current.getConfig().numberFormatter);
       case "categorical":
-        return computeCategoricalAxis(inputData, computedSeries, config);
+        return computeCategoricalAxes(mapValues((datum: InputDatum) => ({ ...datum, hasBars }))(inputData));
       case "time":
-        return computeTimeAxis(inputData, computedSeries, config);
+        return computeTimeAxes(mapValues((datum: InputDatum) => ({ ...datum, hasBars }))(inputData));
     }
+  }
+
+  private computeBars(range: Extent, axes: Axes, nTicks: number) {
+    const computedSeries = this.state.current.getComputed().series
+    const barSeries = computedSeries.barSeries
+    const config = this.state.current.getConfig()
+
+    // Compute default tick width based on available space, disregarding bar widths and padding
+    const defaultTickWidth = computeTickWidth(range, nTicks, true)
+
+    // Identify (groups of stacked) bars that need to be placed side-by-side in each tick,
+    // and partition by whether they have explicitly defined widths.
+    const stacks = groupBy((s: BarSeries) => s.stackIndex || uniqueId("stackIndex"))(barSeries)
+
+    const partitionedStacks = partition(
+      (stack: BarSeries[]) => compact(stack.map(get("barWidth"))).length > 0
+    )(stacks)
+
+    const fixedWidthStacks: BarSeries[][] = partitionedStacks[0]
+    const variableWidthStacks: BarSeries[][] = partitionedStacks[1]
+
+    // Compute total padding needed per tick - outerPadding + innerPadding between ticks
+    const totalPadding = config.outerBarSpacing + config.innerBarSpacing * (keys(stacks).length - 1)
+
+    // Total width needed for stacks of pre-defined width
+    const requiredWidthForFixedWidthStacks = fixedWidthStacks.reduce<number>((sum, stack) =>
+      sum + stack[0].barWidth
+    , 0)
+
+    const defaultBarWidth = variableWidthStacks.length
+      ? Math.max(
+        config.minBarWidth,
+        (defaultTickWidth - totalPadding - requiredWidthForFixedWidthStacks) / variableWidthStacks.length
+      )
+      : 0
+
+    const tickWidth = totalPadding + requiredWidthForFixedWidthStacks + defaultBarWidth * variableWidthStacks.length
+    const barPositions = computeBarPositions(defaultBarWidth, tickWidth, config, barSeries)
+    this.stateWriter("barPositions", barPositions)
+    return barPositions
   }
 
   updateRules(orientation: AxisOrientation): void {

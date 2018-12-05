@@ -183,8 +183,8 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   }
 
   private seriesTranslation(): string {
-    const offset = (axis: AxisPosition) => this.state.current.getComputed().axes.computed[axis].offset(this.series.key())
-    return this.xIsBaseline ? `translate(${offset(this.series.xAxis())}, 0)` : `translate(0, ${offset(this.series.yAxis())})`
+    const offset = this.state.current.getComputed().axes.barPositions.offset(this.series.key())
+    return this.xIsBaseline ? `translate(${offset}, 0)` : `translate(0, ${offset})`
   }
 
   private startAttributes(attributes: any) {
@@ -198,7 +198,7 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   }
 
   private attributes() {
-    const barWidth = this.state.current.getComputed().axes.computed[this.xIsBaseline ? this.series.xAxis() : this.series.yAxis()].width(this.series.key())
+    const barWidth = this.state.current.getComputed().axes.barPositions.width(this.series.key())
     return {
       x: this.x0,
       y: this.y1,
@@ -211,7 +211,7 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   private onMouseOver(d: Datum, el: HTMLElement): void {
     const isNegative = this.xIsBaseline ? this.y(d) < 0 : this.x(d) < 0
     const dimensions = el.getBoundingClientRect()
-    const barOffset = this.state.current.getComputed().axes.computed[this.xIsBaseline ? this.series.xAxis() : this.series.yAxis()].offset(this.series.key())
+    const barOffset = this.state.current.getComputed().axes.barPositions.offset(this.series.key())
 
     const focusPoint = {
       content: this.focusContent(d),

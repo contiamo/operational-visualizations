@@ -7,11 +7,9 @@
     "moduleResolution": "node",
     "declaration": true,
     "allowSyntheticDefaultImports": true,
-    "outDir": "lib",
     "module": "commonjs",
     "sourceMap": true,
     "noImplicitAny": true,
-    "jsx": "react",
     "lib": [
       "dom",
       "es6",

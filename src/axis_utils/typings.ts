@@ -1,5 +1,6 @@
 import { ScaleLinear, ScaleBand, ScaleTime } from "d3-scale";
 import { tuple } from "../shared/typings";
+export { AxisProps } from "../Axis/Axis"
 
 /** Axis configuration */
 export interface AxisConfig {
@@ -73,7 +74,7 @@ export interface TimeAxisOptions extends BaseAxisOptions {
 export type AxisOptions = QuantAxisOptions | CategoricalAxisOptions | TimeAxisOptions;
 
 // Inputs for axis calculations
-export interface InputDatum<TValue, TOptions> {
+export interface InputDatum<TValue=any, TOptions=any> {
   /** Axis range, from left-to-right (x-axes) or top-to-bottom (y-axes) */
   range: Extent;
   /**
@@ -85,7 +86,16 @@ export interface InputDatum<TValue, TOptions> {
   options: TOptions;
 }
 
-export type InputData<TValue, TOptions> = Partial<Record<AxisPosition, InputDatum<TValue, TOptions>>>;
+export type DiscreteInputDatum<TValue=any, TOptions=any> = InputDatum<TValue, TOptions> & {
+  /** Whether bars are to be displayed on the axis. Default: false. */
+  hasBars?: boolean;
+}
+
+export type AxisRecord<TRecord> = Partial<Record<AxisPosition, TRecord>>;
+
+export type InputData<TValue=any, TOptions=any> = AxisRecord<InputDatum<TValue, TOptions>>;
+
+export type DiscreteInputData<TValue=any, TOptions=any> = AxisRecord<DiscreteInputDatum<TValue, TOptions>>;
 
 // Computed
 export interface Tick<TValue> {
@@ -113,6 +123,8 @@ export type Extent = [number, number];
 export interface BaseAxisComputed<TScale, TValue> {
   /** Axis scale */
   scale: TScale;
+  /** Full range of axis */
+  range: Extent;
   /** Length of axis */
   length: number;
   /** Ticks */
@@ -126,7 +138,6 @@ export interface BaseAxisComputed<TScale, TValue> {
 export type QuantAxisComputed = BaseAxisComputed<ScaleLinear<number, number>, number>;
 
 type DiscreteAxisComputed<TScale, TValue> = BaseAxisComputed<TScale, TValue> & {
-  tickWidth: number;
   range: Extent;
   width? : (seriesId: string) => number;
   offset? : (seriesId: string) => number;
@@ -145,20 +156,13 @@ export interface ComputedAxisInput {
   computed: AxisComputed;
 }
 
-export interface BarsInfo {
+export interface BarSeries {
   barWidth?: number;
+  index: number;
   stackIndex?: number;
 }
 
-export interface ComputedSeries {
-  barSeries: Record<string, BarsInfo>,
-  barIndices: Record<string, number>
-}
-
-export interface BaseConfig {
-  innerBarSpacing: number;
-  minBarWidth: number
-}
+export type BarSeriesInfo = Record<string, BarSeries>
 
 export const AXIS_ORIENTATIONS = tuple("x", "y");
 export type AxisOrientation = typeof AXIS_ORIENTATIONS[number];
@@ -172,4 +176,4 @@ export type AxisType = typeof AXIS_TYPE[number];
 export const TIME_INTERVALS = tuple("hour", "day", "week", "month", "quarter", "year");
 export type TimeIntervals = typeof TIME_INTERVALS[number];
 
-export type AxesData = Partial<Record<AxisPosition, AxisOptions | ComputedAxisInput>>;
+export type AxesData = AxisRecord<AxisOptions | ComputedAxisInput>;

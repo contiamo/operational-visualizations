@@ -20,7 +20,7 @@ class Rules {
     const data = axisComputed.rules
     const attributes = this.attributes()
 
-    const rules = this.el.selectAll(`line.${styles.rules}`).data(data, String)
+    const rules = this.el.selectAll(`line.${styles.rules}`).data(data, (d, i) => `${i}`)
 
     rules
       .exit()

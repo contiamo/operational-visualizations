@@ -7,18 +7,18 @@ import Events from "../../shared/event_catalog";
 import { Tick, ComputedAxisInput } from "../../axis_utils/typings";
 import defaultOptions from "../../axis_utils/axis_config"
 
-const titlePositions = {
+const titlePositions: Record<AxisPosition, Record<"x" | "y", number>> = {
   x1: { x: 0.5, y: 1 },
   x2: { x: 0.5, y: -1 },
   y1: { x: -1, y: 0.5 },
   y2: { x: 1, y: 0.5 },
 }
 
-const textAnchor = {
+const textAnchor: Record<AxisPosition, (rotateLabels?: boolean) => "start" | "middle" | "end"> = {
   x1: (rotateLabels: boolean) => (rotateLabels ? "end" : "middle"),
   x2: (rotateLabels: boolean) => (rotateLabels ? "start" : "middle"),
-  y1: (rotateLabels: boolean) => "end",
-  y2: (rotateLabels: boolean) => "start",
+  y1: () => "end",
+  y2: () => "start",
 }
 
 class Axis {
@@ -190,12 +190,11 @@ class Axis {
 
   /** Renders axis border line */
   private drawBorder(duration?: number) {
-    const drawingDims = this.state.current.getComputed().canvas.drawingDims
     const border = {
-      x1: 0,
-      x2: this.isXAxis ? drawingDims.width : 0,
-      y1: this.isXAxis ? 0 : drawingDims.height,
-      y2: 0,
+      x1: this.isXAxis ? this.computed.range[0] : 0,
+      x2: this.isXAxis ? this.computed.range[1] : 0,
+      y1: this.isXAxis ? 0 : this.computed.range[0],
+      y2: this.isXAxis ? 0 : this.computed.range[1],
     }
     this.el.select(`line.${styles.axisBorder}`).call(setLineAttributes, border, duration)
   }
@@ -227,7 +226,7 @@ class Axis {
   private drawTitle() {
     const attributes = this.getTitleAttributes()
 
-    const title = this.el.selectAll("text.title").data(this.options.title ? [this.options.title] : [])
+    const title = this.el.selectAll("text.title").data(this.options.title && !this.options.hideAxis ? [this.options.title] : [])
 
     title.exit().remove()
 

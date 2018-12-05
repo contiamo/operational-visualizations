@@ -1,6 +1,6 @@
 import { extent as d3Extent, range as d3Range } from "d3-array"
 import { rangeStep, mapValues, keys } from "lodash/fp"
-import { AxisPosition, Extent, InputData, InputDatum, QuantAxisOptions, QuantAxisComputed } from "./typings"
+import { AxisPosition, Extent, InputData, InputDatum, QuantAxisOptions, QuantAxisComputed, AxisRecord } from "./typings"
 import * as d3 from "d3-selection"
 import { scaleLinear, ScaleLinear } from "d3-scale";
 import defaultNumberFormatter from "../utils/number_formatter"
@@ -80,7 +80,7 @@ const stepScaleFactors = (step: number): number[] =>
   step === 1 ? [10, 5, 2, 1] : rangeStep(0.5)(0, 10)
 
 export const computeTickNumber = (range: Extent, tickSpacing: number, minTicks: number = 0) => {
-  const length = Math.abs(range[0]) + Math.abs(range[1])
+  const length = Math.abs(range[1] - range[0])
   return Math.max(Math.floor(length / tickSpacing), minTicks)
 }
 
@@ -200,7 +200,7 @@ const containsZero = (step: number[]): Extent =>
   step[0] <= 0 && step[1] >= 0 ? [Math.abs(step[0] / step[2]), step[1] / step[2]] : undefined
 
 
-export default (data: InputData<number, QuantAxisOptions>, config?: Config): Record<AxisPosition, QuantAxisComputed> => {
+export default (data: InputData<number, QuantAxisOptions>, formatter?: (x: number) => string): AxisRecord<QuantAxisComputed> => {
   keys(data).forEach((axis: AxisPosition) => {
     data[axis].options = {
       ...defaultOptions(data[axis].options.type, axis),
@@ -221,14 +221,15 @@ export default (data: InputData<number, QuantAxisOptions>, config?: Config): Rec
 
   alignAxes(initialComputed)
 
-  return mapValues((datum: InitialComputedDatum) => {
+  return mapValues((datum: InitialComputedDatum): QuantAxisComputed => {
     const tickValues = computeTickValues(datum.tickSteps)
     const scale = scaleLinear().range(datum.range).domain(d3Extent(tickValues))
 
     return {
       scale,
-      ticks: computeTickArray(datum, scale, config && config.numberFormatter || defaultNumberFormatter),
       length: Math.abs(datum.range[1] - datum.range[0]),
+      range: datum.range,
+      ticks: computeTickArray(datum, scale, formatter || defaultNumberFormatter),
       rules: computeRuleTicks(datum.ruleSteps, datum.options, scale),
       options: datum.options
     }

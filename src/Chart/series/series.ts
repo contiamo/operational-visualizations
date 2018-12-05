@@ -1,5 +1,6 @@
 import Renderer from "./renderer"
 import { compact, filter, find, flatten, flow, forEach, get, includes, invoke, isNil, map, uniqBy } from "lodash/fp"
+import { AxisOrientation } from "../../axis_utils/typings";
 
 import {
   D3Selection,
@@ -124,18 +125,6 @@ class ChartSeries {
 
   legendFloat(): LegendFloat {
     return this.legendPosition() === "top" && this.yAxis() === "y2" ? "right" : "left"
-  }
-
-  getBarsInfo() {
-    const barRenderer = find({ type: "bars" })(this.renderers)
-    if (!barRenderer) {
-      return
-    }
-
-    return {
-      barWidth: (barRenderer as any).barWidth(),
-      stackIndex: this.options.stackIndex,
-    }
   }
 
   displayFocusPoint(): boolean {
