@@ -9,10 +9,6 @@ import { tuple } from "../shared/typings";
 
 type Formatter = (value: number) => string
 
-interface Config {
-  numberFormatter: Formatter
-}
-
 type Scale = ScaleLinear<number, number>;
 
 type Steps = [number, number, number];

@@ -188,7 +188,7 @@ class AxesManager {
     const hasBars = type !== "quant" && !isEmpty(computedSeries.barSeries)
     if (hasBars) {
       const nTicks = this.getNTicks(axes)
-      const barPositions = this.computeBars(range, axes, nTicks)
+      const barPositions = this.computeBars(range, nTicks)
       const config = this.state.current.getConfig()
 
       const tickWidth = (keys(computedSeries.barSeries) as string[]).reduce<number>((width, seriesKey) =>
@@ -221,7 +221,7 @@ class AxesManager {
     }
   }
 
-  private computeBars(range: Extent, axes: Axes, nTicks: number) {
+  private computeBars(range: Extent, nTicks: number) {
     const computedSeries = this.state.current.getComputed().series
     const barSeries = computedSeries.barSeries
     const config = this.state.current.getConfig()

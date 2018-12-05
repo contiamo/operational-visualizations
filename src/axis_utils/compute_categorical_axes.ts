@@ -1,6 +1,6 @@
 import { scaleBand, ScaleBand } from "d3-scale"
 import { keys, mapValues } from "lodash/fp"
-import { AxisPosition, CategoricalAxisOptions, InputData, InputDatum, CategoricalAxisComputed, Tick, Extent, DiscreteInputData, DiscreteInputDatum, AxisRecord } from "./typings"
+import { AxisPosition, CategoricalAxisOptions, CategoricalAxisComputed, Tick, Extent, DiscreteInputData, DiscreteInputDatum, AxisRecord } from "./typings"
 import defaultOptions from "./axis_config"
 import { computeRuleTicks, computeTickWidth } from "./discrete_axis_utils"
 

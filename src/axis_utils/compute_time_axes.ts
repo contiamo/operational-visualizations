@@ -1,6 +1,6 @@
 import { scaleTime, ScaleTime } from "d3-scale"
 import { forEach, keys, last, mapValues, times } from "lodash/fp"
-import { AxisPosition, InputData, InputDatum, TimeAxisOptions, TimeIntervals, TimeAxisComputed, Extent, DiscreteInputData, DiscreteInputDatum, AxisRecord } from "./typings"
+import { AxisPosition, TimeAxisOptions, TimeIntervals, TimeAxisComputed, Extent, DiscreteInputData, DiscreteInputDatum, AxisRecord } from "./typings"
 import { timeFormat } from "d3-time-format"
 import * as Moment from "moment"
 import { extendMoment } from "moment-range"
