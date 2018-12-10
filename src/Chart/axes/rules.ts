@@ -1,14 +1,14 @@
-import { AxisPosition, D3Selection, State } from "../typings"
+import { AxisPosition, D3Selection, State, AxisOrientation } from "../typings"
 import * as styles from "../../shared/styles"
 import { clone, includes } from "lodash/fp"
 
 class Rules {
   el: D3Selection
-  orientation: "x" | "y"
+  orientation: AxisOrientation
   state: State
   yRules: boolean
 
-  constructor(state: State, el: D3Selection, orientation: "x" | "y") {
+  constructor(state: State, el: D3Selection, orientation: AxisOrientation) {
     this.state = state
     this.el = el
     this.orientation = orientation

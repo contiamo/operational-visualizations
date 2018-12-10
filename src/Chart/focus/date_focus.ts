@@ -1,4 +1,4 @@
-import { D3Selection, EventBus, State, MousePosition, AxisPosition, AxisComputed } from "../typings"
+import { D3Selection, EventBus, State, MousePosition, AxisPosition, AxisComputed, AxisOrientation } from "../typings"
 import Events from "../../shared/event_catalog"
 import { includes, filter, find, forEach, get, groupBy, isFinite, map, partition, reduce, sortBy } from "lodash/fp"
 import { drawHidden, labelDimensions, positionLabel } from "../../utils/focus_utils"
@@ -33,7 +33,7 @@ class DateFocus {
     }
 
     const timeAxisComputed: AxisComputed = computedAxes.computed[timeAxis]
-    const orientation: "x" | "y" = timeAxis[0] as "x" | "y"
+    const orientation: AxisOrientation = timeAxis[0] as AxisOrientation
     const focusDate: Date = this.clampDate(timeAxisComputed.ticks)(
       timeAxisComputed.scale.invert(mousePosition[orientation]),
     )

@@ -13,6 +13,7 @@ import {
   RendererType,
   SingleRendererOptions,
   State,
+  AxisOrientation,
 } from "../../typings"
 
 export type Options = SingleRendererOptions<TextRendererAccessors>
@@ -60,7 +61,7 @@ class Text implements RendererClass<TextRendererAccessors> {
     this.data = data
   }
 
-  dataForAxis(axis: "x" | "y") {
+  dataForAxis(axis: AxisOrientation) {
     const data = map((this as any)[axis])(this.data)
       .concat(map(get(`${axis}0`))(this.data))
       .concat(map(get(`${axis}1`))(this.data))
@@ -127,7 +128,7 @@ class Text implements RendererClass<TextRendererAccessors> {
 
   private assignConfig(customConfig: Partial<TextRendererConfig>): void {
     forEach.convert({ cap: false })((value: any, key: string) => {
-      ;(this as any)[key] = value
+      ; (this as any)[key] = value
     })(customConfig)
   }
 

@@ -1,6 +1,6 @@
 import Events from "../shared/event_catalog"
 import * as d3 from "d3-selection"
-import { AxisPosition, Canvas, D3Selection, Dimensions, EventBus, SeriesElements, State, StateWriter } from "./typings"
+import { AxisPosition, Canvas, D3Selection, Dimensions, EventBus, SeriesElements, State, StateWriter, LegendPosition, LegendFloat } from "./typings"
 import * as styles from "../shared/styles"
 import * as localStyles from "./styles"
 import { forEach, get, reduce } from "lodash/fp"
@@ -138,7 +138,7 @@ class ChartCanvas implements Canvas {
     forEach(this.renderLegend.bind(this))(legends)
   }
 
-  private renderLegend(options: { position: "top" | "bottom"; float: "left" | "right" }): void {
+  private renderLegend(options: { position: LegendPosition; float: LegendFloat }): void {
     const legendNode = document.createElementNS(d3.namespaces["xhtml"], "div")
     options.position === "top" ? this.insertLegend(legendNode) : this.appendLegend(legendNode)
 
@@ -159,7 +159,7 @@ class ChartCanvas implements Canvas {
     this.chartContainer.node().appendChild(legendNode)
   }
 
-  private legendHeight(position: "top" | "bottom", float: "left" | "right"): number {
+  private legendHeight(position: LegendPosition, float: LegendFloat): number {
     return get([position, float])(this.state.current.getComputed().series.dataForLegends)
       ? this.elementFor(`legend-${position}-${float}`).node().offsetHeight
       : 0

@@ -24,6 +24,7 @@ import {
   RendererType,
   SingleRendererOptions,
   State,
+  AxisOrientation,
 } from "../../typings"
 
 export type Options = SingleRendererOptions<AreaRendererAccessors>
@@ -123,7 +124,7 @@ class Area implements RendererClass<AreaRendererAccessors> {
     this.el.remove()
   }
 
-  dataForAxis(axis: "x" | "y"): any[] {
+  dataForAxis(axis: AxisOrientation): any[] {
     const data = map((this as any)[axis])(this.data)
       .concat(map(get(`${axis}0`))(this.data))
       .concat(map(get(`${axis}1`))(this.data))

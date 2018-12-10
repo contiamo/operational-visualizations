@@ -34,6 +34,9 @@ import {
   State,
   StateWriter,
   Datum,
+  AxisOrientation,
+  LegendPosition,
+  LegendFloat,
 } from "./typings"
 
 type GroupedRendererType = "stacked" | "range"
@@ -176,8 +179,8 @@ class ChartSeriesManager implements SeriesManager {
   // Compute stack values and add stack index to grouped stack series
   private computeStack(stack: { [key: string]: any }, index: number): void {
     // By default, stacks are vertical
-    const stackAxis: "x" | "y" = (this.renderAs(stack)[0] as GroupedRendererOptions).stackAxis || "y"
-    const baseAxis: "x" | "y" = stackAxis === "y" ? "x" : "y"
+    const stackAxis: AxisOrientation = (this.renderAs(stack)[0] as GroupedRendererOptions).stackAxis || "y"
+    const baseAxis: AxisOrientation = stackAxis === "y" ? "x" : "y"
     const baseValue = (series: any) => (series.datumAccessors && series.datumAccessors[baseAxis]) || get(baseAxis)
 
     // Transform data into suitable structure for d3 stack
@@ -242,8 +245,8 @@ class ChartSeriesManager implements SeriesManager {
       if (series.hideInLegend()) {
         return memo
       }
-      const position: "top" | "bottom" = series.legendPosition()
-      const float: "left" | "right" = series.legendFloat()
+      const position: LegendPosition = series.legendPosition()
+      const float: LegendFloat = series.legendFloat()
       return set([position, float])((get([position, float])(memo) || []).concat(series.dataForLegend()))(memo)
     }, {})(this.series)
   }

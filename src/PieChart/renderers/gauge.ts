@@ -24,6 +24,7 @@ import {
   Renderer,
   RendererAccessor,
   State,
+  RendererType,
 } from "../typings"
 
 class Gauge implements Renderer {
@@ -41,7 +42,7 @@ class Gauge implements Renderer {
   private total: number
   key: RendererAccessor<string>
   state: State
-  type: "donut" | "polar" | "gauge" = "gauge"
+  type: RendererType = "gauge"
   value: RendererAccessor<number>
 
   constructor(state: State, events: EventBus, el: D3Selection, options: { [key: string]: any }) {

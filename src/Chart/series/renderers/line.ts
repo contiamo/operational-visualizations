@@ -24,6 +24,7 @@ import {
   RendererType,
   SingleRendererOptions,
   State,
+  AxisOrientation,
 } from "../../typings"
 
 export type Options = SingleRendererOptions<LineRendererAccessors>
@@ -119,7 +120,7 @@ class Line implements RendererClass<LineRendererAccessors> {
     this.el.remove()
   }
 
-  dataForAxis(axis: "x" | "y") {
+  dataForAxis(axis: AxisOrientation) {
     const data = map((this as any)[axis])(this.data)
       .concat(map(get(`${axis}0`))(this.data))
       .concat(map(get(`${axis}1`))(this.data))
