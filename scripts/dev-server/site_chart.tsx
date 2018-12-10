@@ -19,7 +19,6 @@ const BarsRenderer: any = {
   }
 }
 
-
 const data: any = {
   series: [
     {
@@ -48,21 +47,6 @@ const data: any = {
       renderAs: [BarsRenderer],
     },
   ],
-  // axes: {
-  //   x1: {
-  //     type: "time",
-  //     start: new Date(2018, 2, 10),
-  //     end: new Date(2018, 2, 15),
-  //     interval: "day",
-  //   },
-  //   x2: {
-  //     type: "time",
-  //     start: new Date(2017, 2, 10),
-  //     end: new Date(2017, 2, 15),
-  //     interval: "day",
-  //   },
-  //   y1: { type: "quant" }
-  // }
   axes: (mapValues as any)(computed => ({ type: "computed", computed }))({
     ...(computeTimeAxes({
       x1: {
@@ -74,8 +58,6 @@ const data: any = {
           start: new Date(2018, 2, 10),
           end: new Date(2018, 2, 15),
           interval: "day",
-          // hideAxis: true,
-          // margin: 3,
         }
       },
       x2: {
@@ -87,8 +69,6 @@ const data: any = {
           start: new Date(2017, 2, 10),
           end: new Date(2017, 2, 15),
           interval: "day",
-          // hideAxis: true,
-          // margin: 3,
         }
       }
     })),
@@ -98,8 +78,6 @@ const data: any = {
         values: [100, 300, 500, 300, 200, 500, 450, 250, 425, 570],
         options: {
           type: "quant",
-          // hideAxis: true,
-          // margin: 3
         }
       }
     }))

@@ -7,54 +7,6 @@ import ComputeQuantAxes from "../../src/axis_utils/compute_quant_axes"
 
 const containerNode = document.getElementById("app")
 
-// const x1: Props = {
-//   length: 100,
-//   width: 40,
-//   ticks: [
-//     { value: "0", position: 0, class: "zero" },
-//     { value: "500", position: 50 },
-//     { value: "1000", position: 100 },
-//   ],
-//   axis: "x1",
-//   tickLength: 5,
-// }
-
-// const x2: Props = {
-//   length: 100,
-//   width: 40,
-//   ticks: [
-//     { value: "0", position: 0, class: "zero" },
-//     { value: "500", position: 50 },
-//     { value: "1000", position: 100 },
-//   ],
-//   axis: "x2",
-//   tickLength: 5,
-// }
-
-// const y1: Props = {
-//   length: 100,
-//   width: 40,
-//   ticks: [
-//     { value: "0", position: 100, class: "zero" },
-//     { value: "500", position: 50 },
-//     { value: "1000", position: 0 },
-//   ],
-//   axis: "y1",
-//   tickLength: 5,
-// }
-
-// const y2: Props = {
-//   length: 100,
-//   width: 40,
-//   ticks: [
-//     { value: "0", position: 100, class: "zero" },
-//     { value: "500", position: 50 },
-//     { value: "1000", position: 0 },
-//   ],
-//   axis: "y2",
-//   tickLength: 5,
-// }
-
 const categorical = ComputeCategoricalAxes({
   y1: {
     range: [600, 0],

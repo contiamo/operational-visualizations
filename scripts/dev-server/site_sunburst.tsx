@@ -603,7 +603,7 @@ const accessors: any = {
 }
 
 const App = () => (
-  <OperationalUI withBaseStyles>
+  <OperationalUI>
     <VisualizationWrapper facade={Sunburst} data={data} config={config} accessors={accessors} />
   </OperationalUI>
 )
