@@ -34,7 +34,7 @@ export const tickFormatter = (interval: TimeIntervals) => {
   }
 }
 
-const computeTickArray = (datum: Datum, scale: Scale, formatter: (value: Date) => string) => {
+const computeTickArray = (datum: Datum, scale: Scale) => {
   let ticksToShow: Date[];
   const width = Math.abs(datum.range[1] - datum.range[0])
   const tickNumber = Math.min(datum.values.length, Math.max(Math.floor(width / datum.options.tickSpacing), datum.options.minTicks))
@@ -50,7 +50,7 @@ const computeTickArray = (datum: Datum, scale: Scale, formatter: (value: Date) =
     value,
     hideTick: !ticksToShow.map(tick => tick.toString()).includes(value.toString()),
     position: scale(value),
-    label: formatter(value)
+    label: tickFormatter(datum.options.interval)(value)
   }))
 }
 
@@ -132,7 +132,7 @@ export default (data: Data): AxisRecord<TimeAxisComputed> => {
       length: Math.abs(datum.range[1] - datum.range[0]),
       range: datum.range,
       formatter,
-      ticks: computeTickArray(datum, scale, formatter),
+      ticks: computeTickArray(datum, scale),
       rules: computeRuleTicks(datum, scale),
       options: datum.options
     }

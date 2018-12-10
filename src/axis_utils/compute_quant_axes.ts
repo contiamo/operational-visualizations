@@ -23,7 +23,7 @@ type InitialComputedDatum = Datum & {
 const STEPS_TO_ALIGN = tuple("tickSteps", "labelSteps", "ruleSteps");
 type StepsToAlign = typeof STEPS_TO_ALIGN[number];
 
-const computeDomain = (data: number[], start: number, end: number): Extent => {
+export const computeDomain = (data: number[], start?: number, end?: number): Extent => {
   if (end < start) {
     throw new Error("Start value cannot be greater than end value.")
   }
@@ -34,7 +34,7 @@ const computeDomain = (data: number[], start: number, end: number): Extent => {
 // Increase the extent by 5% on both sides (so that there's some space
 // between the drawings and the borders of the chart), unless one of the ends
 // equals 0
-const extentCushion = (extent: Extent): Extent => {
+export const extentCushion = (extent: Extent): Extent => {
   const distance: number = extent[1] - extent[0]
   return [
     extent[0] !== 0 ? extent[0] - 0.05 * distance : extent[0],
@@ -168,7 +168,7 @@ const alignAxes = (axes: Record<AxisPosition, InitialComputedDatum>) => {
   })
 }
 
-const alignSteps = (one: number[], two: number[]) => {
+const alignSteps = (one: Steps, two: Steps) => {
   const zeroOne = containsZero(one)
   const zeroTwo = containsZero(two)
 
@@ -192,7 +192,7 @@ const alignSteps = (one: number[], two: number[]) => {
   }
 }
 
-const containsZero = (step: number[]): Extent =>
+export const containsZero = (step: Steps): Extent =>
   step[0] <= 0 && step[1] >= 0 ? [Math.abs(step[0] / step[2]), step[1] / step[2]] : undefined
 
 
