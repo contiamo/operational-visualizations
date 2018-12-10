@@ -1,3 +1,6 @@
+import { stack as d3Stack } from "d3-shape"
+import Series from "./series/series"
+
 import {
   cloneDeep,
   filter,
@@ -17,12 +20,9 @@ import {
   uniqBy,
 } from "lodash/fp"
 
-import { stack as d3Stack } from "d3-shape"
-import Series from "./series/series"
-import { BarSeriesInfo, AxisOrientation } from "../axis_utils/typings";
-
 import {
   Accessor,
+  BarSeriesInfo,
   D3Selection,
   DataForLegends,
   EventBus,

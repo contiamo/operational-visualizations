@@ -1,7 +1,6 @@
 import { compact, defaults, filter, forEach, get, isBoolean, map } from "lodash/fp"
 import Series from "../series"
 import * as styles from "./styles"
-import { AxisOrientation } from "../../../axis_utils/typings";
 
 import {
   TextRendererAccessors,

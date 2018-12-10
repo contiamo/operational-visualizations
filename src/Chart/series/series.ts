@@ -1,6 +1,5 @@
 import Renderer from "./renderer"
 import { compact, filter, find, flatten, flow, forEach, get, includes, invoke, isNil, map, uniqBy } from "lodash/fp"
-import { AxisOrientation } from "../../axis_utils/typings";
 
 import {
   D3Selection,

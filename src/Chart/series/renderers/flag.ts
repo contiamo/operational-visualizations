@@ -4,7 +4,6 @@ import { assign, compact, defaults, filter, forEach, identity, map } from "lodas
 import { setLineAttributes, setPathAttributes, withD3Element } from "../../../utils/d3_utils"
 import * as d3 from "d3-selection"
 import Events from "../../../shared/event_catalog"
-import { AxisOrientation } from "../../../axis_utils/typings";
 
 import {
   AxisPosition,

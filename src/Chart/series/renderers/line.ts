@@ -1,6 +1,5 @@
 import { compact, defaults, find, forEach, get, map, sortBy } from "lodash/fp"
 import Series from "../series"
-import { AxisOrientation } from "../../../axis_utils/typings";
 import * as styles from "./styles"
 
 import {
