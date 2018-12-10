@@ -105,11 +105,11 @@ export const ticksInDomain = (options: TimeAxisOptions): Date[] =>
       .by(options.interval)
   ).map((d: any) => d.toDate())
 
-const adjustRange = (range: Extent, datum: Datum): Extent => {
+export const adjustRange = (datum: Datum): Extent => {
   const tickWidth = computeTickWidth(datum.range, datum.values.length, datum.hasBars)
-  return range[1] > range[0]
-    ? [range[0] + tickWidth / 2, range[1] - tickWidth / 2]
-    : [range[0] - tickWidth / 2, range[1] + tickWidth / 2]
+  return datum.range[1] > datum.range[0]
+    ? [datum.range[0] + tickWidth / 2, datum.range[1] - tickWidth / 2]
+    : [datum.range[0] - tickWidth / 2, datum.range[1] + tickWidth / 2]
 }
 
 export default (data: Data): AxisRecord<TimeAxisComputed> => {
@@ -123,7 +123,7 @@ export default (data: Data): AxisRecord<TimeAxisComputed> => {
   alignAxes(data)
 
   return mapValues((datum: Datum): TimeAxisComputed => {
-    const adjustedRange = adjustRange(datum.range, datum)
+    const adjustedRange = adjustRange(datum)
     const scale = scaleTime().range(adjustedRange).domain([datum.values[0], last(datum.values)])
     const formatter = tickFormatter(datum.options.interval)
 

@@ -1,13 +1,13 @@
 import Axis from "./axes/axis"
 import Rules from "./axes/rules"
-import { compact, difference, every, find, flow, forEach, get, groupBy, invoke, isEmpty, keys, map, mapValues, omitBy, partition, pickBy, uniqBy, uniqueId, values } from "lodash/fp"
+import { difference, every, find, flow, forEach, get, invoke, isEmpty, keys, map, mapValues, omitBy, pickBy, uniqBy, values } from "lodash/fp"
 import { AxisOptions, AxisPosition, AxisType, D3Selection, EventBus, State, StateWriter } from "./typings"
 import computeQuantAxes from "../axis_utils/compute_quant_axes"
 import computeCategoricalAxes from "../axis_utils/compute_categorical_axes"
 import computeTimeAxes, { ticksInDomain } from "../axis_utils/compute_time_axes"
 import { defaultMargins } from "../axis_utils/axis_config"
-import { ComputedAxisInput, Extent, BarSeries, AxisOrientation, InputDatum, AxisRecord } from "../axis_utils/typings";
-import { computeBarPositions, computeTickWidth } from "../axis_utils/discrete_axis_utils";
+import { ComputedAxisInput, Extent, AxisOrientation, InputDatum, AxisRecord } from "../axis_utils/typings";
+import { computeBarPositions } from "../axis_utils/discrete_axis_utils";
 
 type Axes = AxisRecord<Axis>;
 
@@ -188,10 +188,11 @@ class AxesManager {
     const hasBars = type !== "quant" && !isEmpty(computedSeries.barSeries)
     if (hasBars) {
       const nTicks = this.getNTicks(axes)
-      const barPositions = this.computeBars(range, nTicks)
+      const barPositions = computeBarPositions(range, nTicks, this.state.current.getConfig(), computedSeries.barSeries)
+      this.stateWriter("barPositions", barPositions)
       const config = this.state.current.getConfig()
 
-      const tickWidth = (keys(computedSeries.barSeries) as string[]).reduce<number>((width, seriesKey) =>
+      const tickWidth = (uniqBy(barPositions.offset)(keys(computedSeries.barSeries)) as string[]).reduce<number>((width, seriesKey) =>
         width + barPositions.width(seriesKey) + config.innerBarSpacing
       , config.outerBarSpacing - config.innerBarSpacing)
 
@@ -219,46 +220,6 @@ class AxesManager {
       case "time":
         return computeTimeAxes(mapValues((datum: InputDatum) => ({ ...datum, hasBars }))(inputData));
     }
-  }
-
-  private computeBars(range: Extent, nTicks: number) {
-    const computedSeries = this.state.current.getComputed().series
-    const barSeries = computedSeries.barSeries
-    const config = this.state.current.getConfig()
-
-    // Compute default tick width based on available space, disregarding bar widths and padding
-    const defaultTickWidth = computeTickWidth(range, nTicks, true)
-
-    // Identify (groups of stacked) bars that need to be placed side-by-side in each tick,
-    // and partition by whether they have explicitly defined widths.
-    const stacks = groupBy((s: BarSeries) => s.stackIndex || uniqueId("stackIndex"))(barSeries)
-
-    const partitionedStacks = partition(
-      (stack: BarSeries[]) => compact(stack.map(get("barWidth"))).length > 0
-    )(stacks)
-
-    const fixedWidthStacks: BarSeries[][] = partitionedStacks[0]
-    const variableWidthStacks: BarSeries[][] = partitionedStacks[1]
-
-    // Compute total padding needed per tick - outerPadding + innerPadding between ticks
-    const totalPadding = config.outerBarSpacing + config.innerBarSpacing * (keys(stacks).length - 1)
-
-    // Total width needed for stacks of pre-defined width
-    const requiredWidthForFixedWidthStacks = fixedWidthStacks.reduce<number>((sum, stack) =>
-      sum + stack[0].barWidth
-    , 0)
-
-    const defaultBarWidth = variableWidthStacks.length
-      ? Math.max(
-        config.minBarWidth,
-        (defaultTickWidth - totalPadding - requiredWidthForFixedWidthStacks) / variableWidthStacks.length
-      )
-      : 0
-
-    const tickWidth = totalPadding + requiredWidthForFixedWidthStacks + defaultBarWidth * variableWidthStacks.length
-    const barPositions = computeBarPositions(defaultBarWidth, tickWidth, config, barSeries)
-    this.stateWriter("barPositions", barPositions)
-    return barPositions
   }
 
   updateRules(orientation: AxisOrientation): void {

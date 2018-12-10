@@ -1,8 +1,44 @@
-import { identity, keys, pickBy, pluck, sortBy, uniq } from "lodash/fp"
-import { BarSeriesInfo, BarSeries, Extent, DiscreteInputDatum, Rule } from "./typings";
-import { ChartConfig } from "../Chart/typings";
+import { compact, get, identity, groupBy, keys, partition, pickBy, pluck, sortBy, uniq, uniqueId } from "lodash/fp"
+import { BarSeries, Extent, DiscreteInputDatum, Rule, BarSeriesInfo } from "./typings";
 
-export const computeBarPositions = (defaultBarWidth: number, tickWidth: number, config: Readonly<ChartConfig>, barSeries: BarSeriesInfo) => {
+interface Config {
+  outerBarSpacing: number;
+  innerBarSpacing: number;
+  minBarWidth: number;
+}
+
+export const computeBarPositions = (range: Extent, nTicks: number, config: Config, barSeries: BarSeriesInfo) => {
+  // Compute default tick width based on available space, disregarding bar widths and padding
+  const defaultTickWidth = computeTickWidth(range, nTicks, true)
+
+  // Identify (groups of stacked) bars that need to be placed side-by-side in each tick,
+  // and partition by whether they have explicitly defined widths.
+  const stacks = groupBy((s: BarSeries) => s.stackIndex || uniqueId("stackIndex"))(barSeries)
+
+  const partitionedStacks = partition(
+    (stack: BarSeries[]) => compact(stack.map(get("barWidth"))).length > 0
+  )(stacks)
+
+  const fixedWidthStacks: BarSeries[][] = partitionedStacks[0]
+  const variableWidthStacks: BarSeries[][] = partitionedStacks[1]
+
+  // Compute total padding needed per tick - outerPadding + innerPadding between ticks
+  const totalPadding = config.outerBarSpacing + config.innerBarSpacing * (keys(stacks).length - 1)
+
+  // Total width needed for stacks of pre-defined width
+  const requiredWidthForFixedWidthStacks = fixedWidthStacks.reduce<number>((sum, stack) =>
+    sum + stack[0].barWidth
+  , 0)
+
+  const defaultBarWidth = variableWidthStacks.length
+    ? Math.max(
+      config.minBarWidth,
+      (defaultTickWidth - totalPadding - requiredWidthForFixedWidthStacks) / variableWidthStacks.length
+    )
+    : 0
+
+  const tickWidth = totalPadding + requiredWidthForFixedWidthStacks + defaultBarWidth * variableWidthStacks.length
+
   const indices = sortBy(identity)(uniq(pluck("index")(barSeries))) as number[]
   let offset = (config.outerBarSpacing - tickWidth) / 2
 
@@ -27,7 +63,10 @@ export const computeTickWidth = (range: Extent, nTicks: number, hasBars: boolean
 
 export const computeRuleTicks = (datum: DiscreteInputDatum, scale: any): Rule[] => {
   const tickWidth = computeTickWidth(datum.range, datum.values.length, datum.hasBars)
+  const sliceStartIndex = tickWidth && datum.range[1] >= datum.range[0] ? 1 : 0
+  const sliceEndIndex = tickWidth && datum.range[1] < datum.range[0] ? datum.values.length - 1 : datum.values.length
+
   return datum.options.showRules
-    ? datum.values.map(value => ({ position: scale(value) - tickWidth / 2 })).slice(tickWidth ? 1 : 0)
+    ? datum.values.map(value => ({ position: scale(value) - tickWidth / 2 })).slice(sliceStartIndex, sliceEndIndex)
     : []
 }

@@ -15,7 +15,7 @@ const computeTickArray = (values: string[], scale: Scale): Tick<string>[] =>
     label: value
   }))
 
-const adjustRange = (datum: Datum): Extent => {
+export const adjustRange = (datum: Datum): Extent => {
   const tickWidth = computeTickWidth(datum.range, datum.values.length, true)
   return [datum.range[0] + tickWidth / 2, datum.range[1] + tickWidth / 2]
 }

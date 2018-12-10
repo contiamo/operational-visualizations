@@ -37,9 +37,6 @@
     "tinycolor2": "^1.4.1"
   },
   "jest": {
-    "setupFiles": [
-      "../../test-polyfills.js"
-    ],
     "moduleFileExtensions": [
       "ts",
       "tsx",
@@ -47,15 +44,15 @@
       "jsx"
     ],
     "transform": {
-      "\\.(ts|tsx)$": "<rootDir>/../../node_modules/ts-jest/preprocessor.js"
+      "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
     "roots": [
       "<rootDir>/src"
     ],
     "testRegex": "/__tests__/.*\\.(ts|tsx|js|jsx)$",
-    "setupTestFrameworkScriptFile": "<rootDir>/../../node_modules/jest-enzyme/lib/index.js",
+    "setupTestFrameworkScriptFile": "<rootDir>/node_modules/jest-enzyme/lib/index.js",
     "snapshotSerializers": [
-      "<rootDir>/../../node_modules/jest-serializer-enzyme"
+      "<rootDir>/node_modules/jest-serializer-enzyme"
     ]
   },
   "devDependencies": {
