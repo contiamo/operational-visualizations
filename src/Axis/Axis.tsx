@@ -108,10 +108,10 @@ class Axis extends React.Component<AxisProps, {}> {
           const position = this.labelPosition(tick)
           const transform = this.props.data.options.rotateLabels ? `rotate(-45, ${position.x}, ${position.y + position.dy})` : ""
           return (
-            <>
-              <line {...this.tickPosition(tick)} className={styles.axisTick} key={i}></line>
+            <React.Fragment key={i}>
+              <line {...this.tickPosition(tick)} className={styles.axisTick}></line>
               <text {...position} transform={transform} className={styles.axisLabel} style={labelStyle(this.props.data.options, this.props.position)}>{tick.label}</text>
-            </>
+            </React.Fragment>
           )
         })}
       </svg>
