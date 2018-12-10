@@ -7,13 +7,13 @@ import defaultNumberFormatter from "../utils/number_formatter"
 import defaultOptions from "./axis_config"
 import { tuple } from "../shared/typings";
 
-type Formatter = (value: number) => string
-
+type Formatter = (value: number) => string;
+type Datum = InputDatum<number, QuantAxisOptions>;
+type Data = InputData<number, QuantAxisOptions>;
 type Scale = ScaleLinear<number, number>;
-
 type Steps = [number, number, number];
 
-type InitialComputedDatum = InputDatum<number, QuantAxisOptions> & {
+type InitialComputedDatum = Datum & {
   domain: Extent;
   tickSteps: Steps;
   labelSteps: Steps;
@@ -196,15 +196,15 @@ const containsZero = (step: number[]): Extent =>
   step[0] <= 0 && step[1] >= 0 ? [Math.abs(step[0] / step[2]), step[1] / step[2]] : undefined
 
 
-export default (data: InputData<number, QuantAxisOptions>, formatter?: (x: number) => string): AxisRecord<QuantAxisComputed> => {
+export default (data: Data, formatter?: Formatter): AxisRecord<QuantAxisComputed> => {
   keys(data).forEach((axis: AxisPosition) => {
     data[axis].options = {
       ...defaultOptions(data[axis].options.type, axis),
       ...data[axis].options
-    } as QuantAxisOptions
+    }
   })
 
-  const initialComputed = mapValues((datum: InputDatum<number, QuantAxisOptions>) => {
+  const initialComputed = mapValues((datum: Datum) => {
     const domain = computeDomain(datum.values, datum.options.start, datum.options.end)
     return {
       ...datum,

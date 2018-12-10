@@ -78,7 +78,7 @@ class AxesManager {
   private create(position: AxisPosition, options: AxisOptions | ComputedAxisInput) {
     const el = this.els[`${position[0]}Axes`]
     const axis = new Axis(this.state, this.stateWriter, this.events, el, position)
-    this.axes[position] = axis as Axis
+    this.axes[position] = axis
     this.update(position, options)
   }
 

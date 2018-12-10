@@ -10,7 +10,7 @@ import defaultOptions from "./axis_config"
 import { computeRuleTicks, computeTickWidth } from "./discrete_axis_utils"
 
 type Datum = DiscreteInputDatum<Date, TimeAxisOptions>;
-
+type Data = DiscreteInputData<Date, TimeAxisOptions>;
 type Scale = ScaleTime<number, number>;
 
 // @TODO - add in more options
@@ -61,7 +61,7 @@ const addNextTick = (ticks: Date[], interval: TimeIntervals) =>
       .toDate()
   )
 
-const alignAxes = (axes: DiscreteInputData<Date, TimeAxisOptions>) => {
+const alignAxes = (axes: Data) => {
   forEach((axis: Datum) => axis.values = ticksInDomain(axis.options))(axes)
 
   // If there is only one axes, no alignment is necessary
@@ -112,12 +112,12 @@ const adjustRange = (range: Extent, datum: Datum): Extent => {
     : [range[0] - tickWidth / 2, range[1] + tickWidth / 2]
 }
 
-export default (data: DiscreteInputData<Date, TimeAxisOptions>): AxisRecord<TimeAxisComputed> => {
+export default (data: Data): AxisRecord<TimeAxisComputed> => {
   keys(data).forEach((axis: AxisPosition) => {
     data[axis].options = {
       ...defaultOptions(data[axis].options.type, axis),
       ...data[axis].options
-    } as TimeAxisOptions
+    }
   })
 
   alignAxes(data)
