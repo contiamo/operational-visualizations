@@ -126,18 +126,6 @@ class ChartSeries {
     return this.legendPosition() === "top" && this.yAxis() === "y2" ? "right" : "left"
   }
 
-  getBarsInfo() {
-    const barRenderer = find({ type: "bars" })(this.renderers)
-    if (!barRenderer) {
-      return
-    }
-
-    return {
-      barWidth: (barRenderer as any).barWidth(),
-      stackIndex: this.options.stackIndex,
-    }
-  }
-
   displayFocusPoint(): boolean {
     return (
       filter(

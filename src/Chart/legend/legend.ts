@@ -40,7 +40,7 @@ class ChartLegend implements Legend {
       return
     }
 
-    this.el.attr("visibility", "visible")
+    this.el.style("display", "initial")
     const legends: D3Selection = this.el.selectAll(`div.${styles.seriesLegend}`).data(this.data, get("label"))
 
     legends.exit().remove()
@@ -78,7 +78,7 @@ class ChartLegend implements Legend {
 
   remove(): void {
     this.el.node().innerHTML = ""
-    this.el.attr("visibility", "hidden")
+    this.el.style("display", "none")
   }
 
   private onComponentHover(d: LegendDatum, el: HTMLElement): void {

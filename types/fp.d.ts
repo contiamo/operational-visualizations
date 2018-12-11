@@ -42,8 +42,8 @@ declare namespace fp {
      * @param thisArg The this binding of iteratee.
      * @return Returns the composed aggregate object.
      */
-    groupBy<T>(term: string): (collection: List<T>) => T[]
-    groupBy<T>(fn: (item: T) => string): (collection: List<T>) => T[]
+    groupBy<T>(term: string): (collection: any) => T[]
+    groupBy<T>(fn: (item: T) => string): (collection: any) => T[]
 
     /**
      * Creates an array of the own enumerable property values of object.
@@ -189,6 +189,7 @@ declare namespace fp {
     omit: any
     omitBy: any
     partition: any
+    pick: any
     pickBy: any
     pluck: any
     rangeStep: any

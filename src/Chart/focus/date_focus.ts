@@ -1,4 +1,4 @@
-import { D3Selection, EventBus, State, MousePosition, AxisPosition, AxisComputed, AxisOrientation } from "../typings"
+import { D3Selection, EventBus, State, MousePosition, AxisPosition, AxisOrientation, Tick, TimeAxisComputed } from "../typings"
 import Events from "../../shared/event_catalog"
 import { includes, filter, find, forEach, get, groupBy, isFinite, map, partition, reduce, sortBy } from "lodash/fp"
 import { drawHidden, labelDimensions, positionLabel } from "../../utils/focus_utils"
@@ -32,8 +32,9 @@ class DateFocus {
       return
     }
 
-    const timeAxisComputed: AxisComputed = computedAxes.computed[timeAxis]
-    const orientation: AxisOrientation = timeAxis[0] as AxisOrientation
+    const timeAxisComputed: TimeAxisComputed = computedAxes.computed[timeAxis]
+    const orientation: AxisOrientation = timeAxis[0]
+
     const focusDate: Date = this.clampDate(timeAxisComputed.ticks)(
       timeAxisComputed.scale.invert(mousePosition[orientation]),
     )
@@ -49,9 +50,9 @@ class DateFocus {
     this.focusDate(focusDate)
   }
 
-  private clampDate(ticks: Date[]) {
+  private clampDate(ticks: Tick<Date>[]) {
     return (date: Date) => {
-      return sortBy((tick: Date) => Math.abs(tick.valueOf() - date.valueOf()))(ticks)[0]
+      return sortBy((tick: Tick<Date>) => Math.abs(tick.value.valueOf() - date.valueOf()))(ticks)[0].value
     }
   }
 
@@ -61,7 +62,7 @@ class DateFocus {
     const mainAxis = computedAxes.priorityTimeAxis
     const mainAxisComputed = computedAxes.computed[mainAxis]
 
-    if (!includes(date.toString())(map(String)(mainAxisComputed.ticks))) {
+    if (!includes(date.toString())(map((tick: Tick<Date>) => tick.value.toString())(mainAxisComputed.ticks))) {
       return
     }
 
@@ -92,6 +93,7 @@ class DateFocus {
     this.events.emit(Events.FOCUS.CLEAR)
     // Get focus data
     const focusData = this.state.current.getComputed().series.dataForFocus(dates)
+
     // Draw focus line and points
     const isVertical: boolean = dates.main.axis[0] === "x"
     const position: number = Math.round(
@@ -173,7 +175,7 @@ class DateFocus {
   }
 
   private drawItemsForAxis(labels: D3Selection, data: any, date: Date, axis: AxisPosition) {
-    const formatter = this.state.current.getComputed().axes.computed[axis].tickFormatter
+    const formatter = this.state.current.getComputed().axes.computed[axis].formatter
     this.addTitle(labels, formatter(date))
 
     const partitionedStacks = partition(get("stack"))(data)
@@ -189,13 +191,6 @@ class DateFocus {
       this.addTitle(labels, `Stacked total: ${total}`)
       this.addSeriesItems(labels, stack)
     })(stacks)
-  }
-
-  private margin(axis: AxisPosition): number {
-    return (
-      this.state.current.getComputed().axes.margins[axis] ||
-      this.state.current.getConfig()[axis].margin
-    )
   }
 
   private getDrawingPosition() {

@@ -3,210 +3,98 @@ import { render } from "react-dom"
 import { OperationalUI } from "@operational/components"
 
 const containerNode = document.getElementById("app")
-const containerNode2 = document.getElementById("app2")
 
 import Chart from "../../src/Chart/facade"
 import { VisualizationWrapper } from "../../src/index"
-import { timeFormat } from "d3-time-format"
 
-const AreaRenderer: any = {
-  accessors: {
-    interpolate: (series: any, d: any) => "monotoneX",
-  },
-  type: "area",
-}
+import computeQuantAxes from "../../src/axis_utils/compute_quant_axes"
+import computeTimeAxes from "../../src/axis_utils/compute_time_axes"
 
-const LineRenderer: any = {
-  accessors: {
-    interpolate: (series: any, d: any) => "monotoneX",
-  },
-  type: "line",
-}
+import { mapValues } from "lodash/fp"
 
 const BarsRenderer: any = {
   type: "bars",
-}
-
-const SymbolRenderer: any = {
   accessors: {
-    symbol: (series: any, d: any) => (d.y >= 1000 ? "cross" : "diamond"),
-    size: (series: any, d: any) => (series.key() === "series2" ? 150 : 60),
-    fill: () => "#bbb",
-  },
-  type: "symbol",
-}
-
-const TextRenderer: any = {
-  type: "text",
-  config: {
-    offset: 5,
-  },
-}
-
-const StackedRenderer = {
-  type: "stacked",
-  renderAs: [BarsRenderer, TextRenderer],
-}
-
-const X1FlagRenderer = {
-  type: "flag",
-  config: {
-    axis: "x1",
-  },
-}
-
-const X2FlagRenderer = {
-  type: "flag",
-  config: {
-    axis: "x2",
-  },
-}
-
-const Y1FlagRenderer = {
-  type: "flag",
-  config: {
-    axis: "y1",
-  },
-}
-
-const Y2FlagRenderer = {
-  type: "flag",
-  config: {
-    axis: "y2",
-  },
-}
-
-const RangeRenderer = {
-  type: "range",
-  renderAs: [AreaRenderer, LineRenderer, SymbolRenderer],
-}
-
-const createData: any = () => {
-  return {
-    series: [
-      {
-        data: [
-          { x: "March 10th", y: Math.floor(Math.random() * 500) - 250 },
-          { x: "March 11th", y: Math.floor(Math.random() * 500) - 250 },
-          { x: "March 12th", y: Math.floor(Math.random() * 500) - 250 },
-          { x: "March 13th", y: Math.floor(Math.random() * 500) - 250 },
-          { x: "March 14th", y: Math.floor(Math.random() * 500) - 250 },
-          { x: "March 15th", y: Math.floor(Math.random() * 500) - 250 },
-          { x: "March 16th", y: Math.floor(Math.random() * 500) - 250 },
-          { x: "March 17th", y: Math.floor(Math.random() * 500) - 250 },
-        ],
-        name: "Pageviews 2018",
-        key: "series1",
-        renderAs: [TextRenderer, BarsRenderer],
-      },
-      {
-        data: [
-          { x: "March 10th", y: Math.floor(Math.random() * 300) - 150 },
-          { x: "March 11th", y: Math.floor(Math.random() * 300) - 150 },
-          { x: "March 12th", y: Math.floor(Math.random() * 300) - 150 },
-          { x: "March 13th", y: Math.floor(Math.random() * 300) - 150 },
-          { x: "March 14th", y: Math.floor(Math.random() * 300) - 150 },
-          { x: "March 15th", y: Math.floor(Math.random() * 300) - 150 },
-          { x: "March 16th", y: Math.floor(Math.random() * 300) - 150 },
-          { x: "March 17th", y: Math.floor(Math.random() * 300) - 150 },
-        ],
-        name: "Users 2018",
-        key: "series2",
-        renderAs: [TextRenderer, BarsRenderer],
-      },
-      {
-        series: [
-          {
-            data: [
-              { y: "March 10th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 11th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 13th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 14th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 15th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 16th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 17th", x: Math.floor(Math.random() * 200 + 1000) },
-            ],
-            name: "Metric 1",
-            key: "series3",
-            datumAccessors: {
-              x: (d: any) => d.y,
-              y: (d: any) => d.x,
-            },
-            yAxis: "y2",
-          },
-          {
-            data: [
-              { y: "March 10th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 11th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 12th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 13th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 14th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 15th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 16th", x: Math.floor(Math.random() * 200 + 1000) },
-              { y: "March 17th", x: Math.floor(Math.random() * 200 + 1000) },
-            ],
-            name: "Metric 2",
-            key: "series4",
-            datumAccessors: {
-              x: (d: any) => d.y,
-              y: (d: any) => d.x,
-            },
-            yAxis: "y2",
-          },
-        ],
-        renderAs: [StackedRenderer],
-      },
-      {
-        data: [
-          {
-            y: 400,
-            label: "Event 3",
-            description:
-              "Insert very long, long, long description here to see how the labels wrap when the description is very long.",
-          },
-        ],
-        name: "Event flags",
-        key: "flagsY1",
-        hideInLegend: true,
-        renderAs: [Y1FlagRenderer],
-      },
-      {
-        data: [
-          {
-            y: 2000,
-            label: "Event 4",
-            description:
-              "Insert very long, long, long description here to see how the labels wrap when the description is very long.",
-          },
-        ],
-        name: "Event flags",
-        key: "flagsY2",
-        hideInLegend: true,
-        renderAs: [Y2FlagRenderer],
-      },
-    ],
-    axes: {
-      x1: {
-        type: "categorical",
-      },
-      y1: {
-        type: "quant",
-      },
-      y2: {
-        type: "quant",
-      },
-    },
+    barWidth: (series) => series.key() === "series1" ? 20 : 50
   }
 }
 
-const data = createData()
+const data: any = {
+  series: [
+    {
+      data: [
+        { x: new Date(2018, 2, 11), y: 100 },
+        { x: new Date(2018, 2, 12), y: 300 },
+        { x: new Date(2018, 2, 13), y: 500 },
+        { x: new Date(2018, 2, 14), y: 300 },
+        { x: new Date(2018, 2, 15), y: 200 },
+      ],
+      name: "Pageviews 2018",
+      key: "series1",
+      renderAs: [BarsRenderer],
+    },
+    {
+      data: [
+        { x: new Date(2017, 2, 10), y: 500 },
+        { x: new Date(2017, 2, 11), y: 450 },
+        { x: new Date(2017, 2, 12), y: 250 },
+        { x: new Date(2017, 2, 13), y: 425 },
+        { x: new Date(2017, 2, 14), y: 570 },
+      ],
+      name: "Pageviews 2017",
+      xAxis: "x2",
+      key: "series2",
+      renderAs: [BarsRenderer],
+    },
+  ],
+  axes: (mapValues as any)(computed => ({ type: "computed", computed }))({
+    ...(computeTimeAxes({
+      x1: {
+        range: [0, 500],
+        values: [],
+        hasBars: true,
+        options: {
+          type: "time",
+          start: new Date(2018, 2, 10),
+          end: new Date(2018, 2, 15),
+          interval: "day",
+        }
+      },
+      x2: {
+        range: [0, 500],
+        values: [],
+        hasBars: false,
+        options: {
+          type: "time",
+          start: new Date(2017, 2, 10),
+          end: new Date(2017, 2, 15),
+          interval: "day",
+        }
+      }
+    })),
+    ...(computeQuantAxes({
+      y1: {
+        range: [455, 0],
+        values: [100, 300, 500, 300, 200, 500, 450, 250, 425, 570],
+        options: {
+          type: "quant",
+        }
+      }
+    }))
+  }),
+}
 
 const App = () => (
   <OperationalUI>
     <VisualizationWrapper
       facade={Chart}
-      data={createData()}
-      config={{ uid: "TEST", width: 700, showComponentFocus: true, maxFocusLabelWidth: 200 }}
+      data={data}
+      config={{
+        backgroundColor: "#ddd",
+        width: 700,
+        legend: false,
+        noAxisMargin: 3
+      }}
     />
   </OperationalUI>
 )

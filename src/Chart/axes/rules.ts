@@ -1,6 +1,6 @@
-import { AxisPosition, D3Selection, State, AxisOrientation } from "../typings"
+import { D3Selection, Rule, State } from "../typings"
 import * as styles from "../../shared/styles"
-import { clone, includes } from "lodash/fp"
+import { AxisOrientation } from "../../axis_utils/typings";
 
 class Rules {
   el: D3Selection
@@ -18,11 +18,10 @@ class Rules {
   draw(): void {
     const computedAxes = this.state.current.getComputed().axes.computed
     const axisComputed = computedAxes[`${this.orientation}1`] || computedAxes[`${this.orientation}2`]
-    const data = clone(axisComputed.ruleTicks || axisComputed.ticks)
-    const startAttributes = this.startAttributes()
+    const data = axisComputed.rules
     const attributes = this.attributes()
 
-    const rules = this.el.selectAll(`line.${styles.rules}`).data(data, String)
+    const rules = this.el.selectAll(`line.${styles.rules}`).data(data, (d, i) => `${i}`)
 
     rules
       .exit()
@@ -38,11 +37,11 @@ class Rules {
     rules
       .enter()
       .append("svg:line")
-      .attr("class", (d: any) => `rule ${styles.rules} ${d === 0 ? "zero" : ""}`)
-      .attr("x1", startAttributes.x1)
-      .attr("x2", startAttributes.x2)
-      .attr("y1", startAttributes.y1)
-      .attr("y2", startAttributes.y2)
+      .attr("class", (d: Rule) => `rule ${styles.rules} ${d.class}`)
+      .attr("x1", attributes.x1)
+      .attr("x2", attributes.x2)
+      .attr("y1", attributes.y1)
+      .attr("y2", attributes.y2)
       .merge(rules)
       .transition()
       .duration(this.state.current.getConfig().duration)
@@ -52,29 +51,13 @@ class Rules {
       .attr("y2", attributes.y2)
   }
 
-  private startAttributes() {
-    const previousAxes = this.state.current.getComputed().axes.previous
-    const axisPrevious = previousAxes[`${this.orientation}1`] || previousAxes[`${this.orientation}2`]
-    const drawingDims = this.state.current.getComputed().canvas.drawingDims
-    return {
-      x1: this.yRules ? 0 : axisPrevious.scale,
-      x2: this.yRules ? drawingDims.width : axisPrevious.scale,
-      y1: this.yRules ? axisPrevious.scale : 0,
-      y2: this.yRules ? axisPrevious.scale : drawingDims.height,
-    }
-  }
-
   private attributes() {
-    const computedAxes = this.state.current.getComputed().axes.computed
-    const axisComputed = computedAxes[`${this.orientation}1`] || computedAxes[`${this.orientation}2`]
     const drawingDims = this.state.current.getComputed().canvas.drawingDims
-    const scale: any = (d: any) => axisComputed.scale(d) + (axisComputed.ruleOffset || 0)
-
     return {
-      x1: this.yRules ? 0 : scale,
-      x2: this.yRules ? drawingDims.width : scale,
-      y1: this.yRules ? scale : 0,
-      y2: this.yRules ? scale : drawingDims.height,
+      x1: (d: Rule) => this.yRules ? 0 : d.position,
+      x2: (d: Rule) => this.yRules ? drawingDims.width : d.position,
+      y1: (d: Rule) => this.yRules ? d.position : 0,
+      y2: (d: Rule) => this.yRules ? d.position : drawingDims.height,
     }
   }
 

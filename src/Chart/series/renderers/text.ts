@@ -147,8 +147,8 @@ class Text implements RendererClass<TextRendererAccessors> {
   }
 
   private startAttributes() {
-    const computedBars = this.state.current.getComputed().axes.computedBars
-    const offset = computedBars && computedBars[this.series.key()] ? computedBars[this.series.key()].width / 2 : 0
+    const barWidth = this.state.current.getComputed().axes.computed[this.xIsBaseline ? this.series.xAxis() : this.series.yAxis()].width
+    const offset = barWidth ? barWidth(this.series.key()) / 2 : 0
     const rotate = this.tilt ? (this.xIsBaseline ? verticalTiltAngle : horizontalTiltAngle) : 0
 
     const attrs: any = {
@@ -161,10 +161,12 @@ class Text implements RendererClass<TextRendererAccessors> {
   }
 
   private attributes() {
-    const computedBars = this.state.current.getComputed().axes.computedBars
-    const barOffset =
-      computedBars && computedBars[this.series.key()]
-        ? computedBars[this.series.key()].offset + computedBars[this.series.key()].width / 2
+    const barWidth = this.state.current.getComputed().axes.computed[this.xIsBaseline ? this.series.xAxis() : this.series.yAxis()].width
+    const barOffset = this.state.current.getComputed().axes.computed[this.xIsBaseline ? this.series.xAxis() : this.series.yAxis()].offset
+
+    const offset =
+      barWidth && barOffset
+        ? barOffset(this.series.key()) + barWidth(this.series.key()) / 2
         : 0
     const symbolOffset = (d: Datum) => (this.series.symbolOffset ? this.series.symbolOffset(d) : 0) + this.offset
     const rotate = this.tilt ? (this.xIsBaseline ? verticalTiltAngle : horizontalTiltAngle) : 0
@@ -173,8 +175,8 @@ class Text implements RendererClass<TextRendererAccessors> {
     const isPositive = (d: Datum) => (this.xIsBaseline ? y(d) >= 0 : x(d) >= 0)
 
     const attrs: any = {
-      x: (d: Datum) => this.xScale(x(d)) + (this.xIsBaseline ? barOffset : symbolOffset(d) * (isPositive(d) ? 1 : -1)),
-      y: (d: Datum) => this.yScale(y(d)) + (this.xIsBaseline ? symbolOffset(d) * (isPositive(d) ? -1 : 1) : barOffset),
+      x: (d: Datum) => this.xScale(x(d)) + (this.xIsBaseline ? offset : symbolOffset(d) * (isPositive(d) ? 1 : -1)),
+      y: (d: Datum) => this.yScale(y(d)) + (this.xIsBaseline ? symbolOffset(d) * (isPositive(d) ? -1 : 1) : offset),
       text: (d: Datum) => (this.xIsBaseline ? this.y(d) : this.x(d)).toString(),
       anchor: (d: Datum) => (this.xIsBaseline && !this.tilt ? "middle" : isPositive(d) ? "start" : "end"),
       baseline: this.xIsBaseline ? "initial" : "central",

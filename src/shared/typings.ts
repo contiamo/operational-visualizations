@@ -1,3 +1,6 @@
+// Helper function for string tuples
+export const tuple = <T extends string[]>(...args: T) => args;
+
 // d3 types
 import { Selection } from "d3-selection"
 
@@ -27,6 +30,7 @@ export interface ChartStateObject<Data, Config, AccessorsObject, Computed> {
 
 // Base config, required for all visualisations
 export interface BaseConfig {
+  backgroundColor: string
   duration: number
   height: number
   hidden: boolean

@@ -1,3 +1,6 @@
+import { stack as d3Stack } from "d3-shape"
+import Series from "./series/series"
+
 import {
   cloneDeep,
   filter,
@@ -11,18 +14,15 @@ import {
   map,
   mapKeys,
   merge,
-  omitBy,
   reduce,
   remove,
   set,
   uniqBy,
 } from "lodash/fp"
 
-import { stack as d3Stack } from "d3-shape"
-import Series from "./series/series"
-
 import {
   Accessor,
+  BarSeriesInfo,
   D3Selection,
   DataForLegends,
   EventBus,
@@ -60,13 +60,22 @@ class ChartSeriesManager implements SeriesManager {
     this.el = el
   }
 
+  // Helpers
+  private isNotHidden(series: { [key: string]: any }) {
+    return !this.state.current.getAccessors().series.hide(series)
+  }
+
+  private findBarsRenderer(series: Series) {
+    return find({ type: "bars" })(series.renderers)
+  }
+
   assignData(): void {
     this.key = this.state.current.getAccessors().series.key
     this.renderAs = this.state.current.getAccessors().series.renderAs
     this.prepareData()
     this.stateWriter("dataForLegends", this.dataForLegends())
     this.stateWriter("dataForAxes", this.dataForAxes())
-    this.stateWriter("barSeries", this.barSeries())
+    this.stateWriter("barSeries", this.computeBarSeries())
     this.stateWriter("axesWithFlags", this.axesWithFlags())
     this.stateWriter("dataForFocus", this.dataForFocus.bind(this))
   }
@@ -79,8 +88,7 @@ class ChartSeriesManager implements SeriesManager {
    */
   private prepareData(): void {
     const data = flow(
-      omitBy(this.state.current.getAccessors().series.hide),
-      this.assignBarIndices.bind(this),
+      filter(this.isNotHidden.bind(this)),
       this.handleGroupedSeries("stacked", this.computeStack.bind(this)),
       this.handleGroupedSeries("range", this.computeRange.bind(this)),
     )(this.state.current.getAccessors().data.series(this.state.current.getData()))
@@ -99,34 +107,22 @@ class ChartSeriesManager implements SeriesManager {
    * Grouped series will have the same bar index, while individual series will have unique indices
    * The bar indices are used to determine where bars are rendered respective to each tick.
    */
-  private assignBarIndices(data: SeriesData): SeriesData {
+  private computeBarSeries(): BarSeriesInfo {
+    let barSeries: BarSeriesInfo = {}
     let index = 0
-    const barIndices: { [key: string]: number } = {}
-    forEach(
-      (series: { [key: string]: any }): void => {
-        const hasBars: boolean = !!find({ type: "bars" })(this.renderAs(series))
-
-        const groupedRenderer: RendererOptions = find((options: any) => includes(options.type)(["stacked", "range"]))(
-          this.renderAs(series),
-        )
-        const hasStackedBars: boolean = !!groupedRenderer && !!find({ type: "bars" })(this.renderAs(groupedRenderer))
-        if (!hasBars && !hasStackedBars) {
-          return
+    this.series
+      .filter(this.findBarsRenderer)
+      .forEach((series) => {
+        barSeries[series.key()] = {
+          index,
+          stackIndex: series.options.stackIndex,
+          barWidth: this.findBarsRenderer(series).barWidth(series)
         }
-        if (hasBars) {
-          barIndices[this.key(series)] = index
+        if (!series.options.stackIndex) {
+          index = index + 1
         }
-        if (hasStackedBars) {
-          forEach((stackedSeries: { [key: string]: any }) => {
-            barIndices[this.key(stackedSeries)] = index
-          })(series.series)
-        }
-        index = index + 1
-      },
-    )(data)
-
-    this.stateWriter("barIndices", barIndices)
-    return data
+      })
+    return barSeries
   }
 
   /**
@@ -257,17 +253,6 @@ class ChartSeriesManager implements SeriesManager {
       const yAxis = series.yAxis()
       memo[xAxis] = uniqBy(String)((memo[xAxis] || []).concat(series.dataForAxis("x")))
       memo[yAxis] = uniqBy(String)((memo[yAxis] || []).concat(series.dataForAxis("y")))
-      return memo
-    }, {})(this.series)
-  }
-
-  private barSeries() {
-    return reduce((memo: { [key: string]: any }, series: Series): { [key: string]: any } => {
-      const barsInfo = series.getBarsInfo()
-      if (!barsInfo) {
-        return memo
-      }
-      memo[series.key()] = barsInfo
       return memo
     }, {})(this.series)
   }

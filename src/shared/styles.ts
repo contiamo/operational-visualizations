@@ -5,13 +5,12 @@ import theme from "../utils/constants"
 const drawingContainerStyle = {
   fontSize: "11px",
   position: "relative",
-  overflow: "hidden",
+  float: "left",
 }
 
 const chartContainerStyle = {
   position: "relative",
   display: "block",
-  backgroundColor: theme.colors.white,
   "&.hidden": {
     display: "none",
   },
@@ -44,10 +43,10 @@ const rulesStyle = {
   stroke: theme.colors.axis.rules,
   strokeWidth: 1,
   shapeRendering: "crispedges",
-  "& .zero": {
+  "&.zero": {
     strokeWidth: 2,
   },
-  "& .now": {
+  "&.now": {
     stroke: theme.colors.primary,
     strokeDasharray: "2, 4",
   },

@@ -141,8 +141,8 @@ export const marathon = ({ test, afterAll, container }: MarathonEnvironment): vo
     data.axes.y1 = {
       type: "quant",
       title: "New Users",
-      interval: 50,
       tickInterval: 25,
+      labelInterval: 50,
       ruleInterval: 100,
     }
     viz.data(data)

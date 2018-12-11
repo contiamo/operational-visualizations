@@ -13,6 +13,7 @@ import { Accessors, AccessorsObject, Components, Computed, Facade, RawData, Sunb
 
 const defaultConfig = (): SunburstConfig => {
   return {
+    backgroundColor: theme.colors.white,
     arrowOffset: 10,
     breadcrumbItemWidth: 80,
     centerCircleRadius: 0.9,

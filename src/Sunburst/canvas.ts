@@ -29,7 +29,9 @@ class SunburstCanvas implements Canvas {
   private renderChartContainer(context: Element): D3Selection {
     const container: Element = document.createElementNS(d3.namespaces["xhtml"], "div")
     context.appendChild(container)
-    return d3.select(container).attr("class", styles.chartContainer)
+    return d3.select(container)
+      .attr("class", styles.chartContainer)
+      .style("background-color", this.state.current.getConfig().backgroundColor)
   }
 
   // Breadcrumb

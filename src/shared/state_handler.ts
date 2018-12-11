@@ -49,7 +49,7 @@ export default class StateHandler<Data, Config, AccessorsObject, Computed> {
 
     const invalidOptions: string[] = reduce.convert({ cap: false })(
       (memo: string[], value: any, key: string): string[] => {
-        if (!value && value !== false) {
+        if (!value && value !== false && value !== 0) {
           memo.push(key)
         }
         return memo
