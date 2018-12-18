@@ -3,6 +3,7 @@ import { select } from "d3-selection";
 import { Pie, pie as d3Pie, PieArcDatum } from "d3-shape";
 import { defaults, forEach, LodashForEach, map, reduce } from "lodash/fp";
 import { colorAssigner } from "../../utils/colorAssigner";
+import theme from "../../utils/constants";
 import { withD3Element } from "../../utils/d3_utils";
 import { approxZero, stepFunction } from "../../utils/font_sizing_utils";
 import * as styles from "./styles";
@@ -37,7 +38,7 @@ export const defaultAccessors = (ctx: Renderer): RendererAccessors => {
   return {
     value: (d: InputDatum) => d.value || 0,
     key: (d: InputDatum) => d.key || "",
-    color: (d: InputDatum) => (d.unfilled ? "transparent" : assignColor(ctx.key(d))),
+    color: (d: InputDatum) => (d.unfilled ? theme.colors.lightGrey : assignColor(ctx.key(d))),
   };
 };
 

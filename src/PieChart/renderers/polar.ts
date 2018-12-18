@@ -19,6 +19,7 @@ import {
   EventBus,
   HoverPayload,
   InputData,
+  InputDatum,
   LegendDatum,
   Renderer,
   RendererAccessor,
@@ -194,7 +195,7 @@ class Polar implements Renderer {
 
     const d = {
       layout: Utils.layout(this.angleValue, ANGLE_RANGE),
-      total: Utils.computeTotal(this.data, this.value),
+      total: Utils.computeTotal(this.inputData, this.value),
     };
 
     // data should not become part of this.previousComputed in first computation
@@ -301,15 +302,15 @@ class Polar implements Renderer {
   }
 
   // External methods
-  public dataForLegend(): LegendDatum[] {
+  public dataForLegend() {
     return map(
-      (datum: Datum): LegendDatum => {
+      (datum: InputDatum): LegendDatum => {
         return {
           label: this.key(datum),
           color: this.color(datum),
         };
       },
-    )(this.data);
+    )(this.inputData);
   }
 
   // Remove & clean up

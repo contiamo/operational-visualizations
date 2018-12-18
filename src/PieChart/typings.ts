@@ -1,5 +1,6 @@
 // Type definitions for the Contiamo Process Flow visualization
 import { Arc, Pie, PieArcDatum } from "d3-shape";
+
 import {
   Accessor,
   BaseConfig,

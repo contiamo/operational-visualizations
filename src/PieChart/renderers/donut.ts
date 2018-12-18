@@ -270,15 +270,15 @@ class Donut implements Renderer {
   }
 
   // External methods
-  public dataForLegend(): LegendDatum[] {
+  public dataForLegend() {
     return map(
-      (datum: Datum): LegendDatum => {
+      (datum: InputDatum): LegendDatum => {
         return {
           label: this.key(datum),
           color: this.color(datum),
         };
       },
-    )(this.data);
+    )(this.inputData);
   }
 
   // Remove & clean up

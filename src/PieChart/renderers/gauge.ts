@@ -135,7 +135,7 @@ class Gauge implements Renderer {
   }
 
   private arcColor(d: Datum) {
-    return d.unfilled ? "transparent" : this.color(d);
+    return this.color(d);
   }
 
   private angleRange(): [number, number] {
@@ -260,7 +260,7 @@ class Gauge implements Renderer {
   // Data computation / preparation
   private compute() {
     this.previousComputed = this.computed;
-    this.total = Utils.computeTotal(this.data, this.value);
+    this.total = Utils.computeTotal(this.inputData, this.value);
 
     this.fillGaugeExtent();
 
@@ -401,15 +401,16 @@ class Gauge implements Renderer {
   }
 
   // External methods
-  public dataForLegend(): LegendDatum[] {
+  public dataForLegend() {
     const data: LegendDatum[] = map(
-      (datum: Datum): LegendDatum => {
+      (datum: InputDatum): LegendDatum => {
         return {
           label: this.key(datum),
           color: this.color(datum),
         };
       },
-    )(this.data);
+    )(this.inputData);
+
     if (this.comparison) {
       data.push({
         label: this.key(this.comparison),
