@@ -270,9 +270,7 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   }
 
   private clipPath(data: any[]) {
-    const barWidth = this.state.current
-      .getComputed()
-      .axes.computed[this.xIsBaseline ? this.series.xAxis() : this.series.yAxis()].width(this.series.key());
+    const barWidth = this.state.current.getComputed().axes.barPositions.width(this.series.key());
     const offset = this.state.current.getConfig().outerBarSpacing / 2;
     const clipPath = this.xIsBaseline ? this.xClipPath.bind(this) : this.yClipPath.bind(this);
     return clipPath(barWidth, offset)(data);
