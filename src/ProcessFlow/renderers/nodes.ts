@@ -206,32 +206,34 @@ class Nodes implements Renderer<TNode, NodeFocusElement> {
     groups
       .merge(enteringGroups)
       .selectAll(`path.node.${styles.border}`)
+      .data(this.data, node => (node as TNode).id())
       .transition()
       .duration(this.config.duration)
       // NOTE: changing shape from one with straight edges to a circle/one with curved edges throws errors,
       // but doesn't break the viz.
       .attr("d", d =>
         d3Symbol()
-          .type(nodeShapeOptions[(d as TNode).shape()].symbol)
-          .size(borderScale((d as TNode).size()))(),
+          .type(nodeShapeOptions[d.shape()].symbol)
+          .size(borderScale(d.size()))(),
       )
-      .attr("transform", d => this.rotate(d as TNode));
+      .attr("transform", d => this.rotate(d));
 
     groups
       .merge(enteringGroups)
       .selectAll(`path.node.${styles.element}`)
+      .data(this.data, node => (node as TNode).id())
       .transition()
       .duration(this.config.duration)
       // NOTE: changing shape from one with straight edges to a circle/one with curved edges throws errors,
       // but doesn't break the viz.
       .attr("d", d =>
         d3Symbol()
-          .type(nodeShapeOptions[(d as TNode).shape()].symbol)
-          .size(scale((d as TNode).size()))(),
+          .type(nodeShapeOptions[d.shape()].symbol)
+          .size(scale(d.size()))(),
       )
-      .attr("transform", d => this.rotate(d as TNode))
-      .attr("fill", d => (d as TNode).color())
-      .attr("stroke", d => (d as TNode).stroke())
+      .attr("transform", d => this.rotate(d))
+      .attr("fill", d => d.color())
+      .attr("stroke", d => d.stroke())
       .attr("opacity", 1)
       .call(onTransitionEnd, this.updateNodeLabels.bind(this));
   }

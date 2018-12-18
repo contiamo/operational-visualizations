@@ -1,4 +1,5 @@
 import { ProcessFlow } from "../../../";
+import { Accessors } from "../../../ProcessFlow/typings";
 import { MarathonEnvironment } from "../../Marathon";
 
 const data = {
@@ -47,12 +48,12 @@ const groupAccessorValue: any = {
   },
 };
 
-const dataAccessors: any = {
+const dataAccessors: Accessors<any> = {
   nodes: (d: any) => d.nodeList,
   journeys: (d: any) => d.journeyList,
 };
 
-const nodeAccessors: any = {
+const nodeAccessors: Accessors<any> = {
   color: (d: any) => {
     return d.group ? groupAccessorValue[d.group].color : "#fff";
   },
@@ -73,10 +74,10 @@ const nodeAccessors: any = {
   },
 };
 
-const linkAccessors: any = {
+const linkAccessors: Accessors<any> = {
   stroke: (link: any) => (link.size > 1000 ? "blue" : "#bbb"),
-  dash: "10 2",
-  size: 2,
+  dash: () => "10 2",
+  size: () => 2,
 };
 
 export const marathon = ({ test, afterAll, container }: MarathonEnvironment): void => {

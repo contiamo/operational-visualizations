@@ -20,9 +20,9 @@ class DataHandler {
 
   public prepareData(): Data {
     const data = this.state.current.getData();
-    const accessors = this.state.current.getAccessors();
-    this.journeys = accessors.data.journeys(data);
-    this.initializeNodes(accessors.data.nodes(data));
+    const dataAccessors = this.state.current.getAccessors().data;
+    this.journeys = dataAccessors.journeys(data);
+    this.initializeNodes(dataAccessors.nodes(data));
     this.initializeLinks();
     this.layout.computeLayout(this.nodes);
     this.positionNodes();

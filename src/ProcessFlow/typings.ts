@@ -20,7 +20,7 @@ export type State = ChartStateReadOnly<InputData, ProcessFlowConfig, AccessorsOb
 
 export interface ProcessFlowConfig extends BaseConfig {
   borderColor: string;
-  focusElement?: FocusElement;
+  focusElement: FocusElement;
   focusLabelPosition: string;
   highlightColor: string;
   horizontalNodeSpacing: number;
@@ -43,8 +43,8 @@ export type TNode = Nodes;
 export type Scale = (size: number) => number;
 
 interface BaseFocusElement {
-  type: "node" | "link" | "path";
-  matchers: Record<string, any>;
+  type: "node" | "link" | "path" | "none";
+  matchers?: Record<string, any>;
   hideLabel?: boolean;
 }
 
@@ -70,7 +70,11 @@ export interface PathFocusElement extends BaseFocusElement {
   };
 }
 
-export type FocusElement = NodeFocusElement | LinkFocusElement | PathFocusElement;
+export interface NoFocusElement extends BaseFocusElement {
+  type: "none";
+}
+
+export type FocusElement = NodeFocusElement | LinkFocusElement | PathFocusElement | NoFocusElement;
 
 export interface Journey {
   size: number;

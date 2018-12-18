@@ -61,7 +61,6 @@ class ProcessFlowFocus implements Focus {
       .append("span")
       .text(` (${this.state.current.getConfig().numberFormatter(datum.size())})`);
 
-    // @TODO remove? Doesn't seem to be doing anything...
     if (datum.content().length > 0) {
       this.appendContent(content, datum.content());
     }

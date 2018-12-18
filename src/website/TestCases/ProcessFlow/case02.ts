@@ -77,7 +77,7 @@ export const marathon = ({ test, afterAll, container }: MarathonEnvironment): vo
   });
 
   test("Removes focus", () => {
-    viz.config({ focusElement: undefined });
+    viz.config({ focusElement: { type: "none" } });
     viz.draw();
   });
 

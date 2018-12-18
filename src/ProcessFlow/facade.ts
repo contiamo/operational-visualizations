@@ -1,4 +1,4 @@
-import { isEmpty, uniqueId } from "lodash/fp";
+import { uniqueId } from "lodash/fp";
 import EventEmitter from "../shared/event_bus";
 import Events from "../shared/event_catalog";
 import StateHandler from "../shared/state_handler";
@@ -26,6 +26,7 @@ const defaultConfig = (): ProcessFlowConfig => ({
   backgroundColor: theme.colors.white,
   borderColor: "#fff",
   duration: 1e3,
+  focusElement: { type: "none" },
   focusLabelPosition: "toRight",
   height: Infinity,
   hidden: false,
@@ -183,7 +184,7 @@ class ProcessFlowFacade implements Facade {
 
     // Focus behaviour is applied through events only - there is no focus.draw() method.
     const focusElement: FocusElement = this.state.config().focusElement;
-    !isEmpty(focusElement)
+    focusElement.type !== "none"
       ? this.events.emit(Events.FOCUS.ELEMENT.HIGHLIGHT, focusElement)
       : this.events.emit(Events.FOCUS.ELEMENT.OUT);
   }
