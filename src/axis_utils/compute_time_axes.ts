@@ -7,6 +7,7 @@ import { extendMoment } from "moment-range";
 import { WithConvert } from "../shared/typings";
 import defaultOptions from "./axis_config";
 import { computeRuleTicks, computeTickWidth } from "./discrete_axis_utils";
+
 import {
   AxisPosition,
   AxisRecord,
@@ -68,8 +69,7 @@ const computeTickArray = (datum: Datum, options: FullTimeAxisOptions, scale: Sca
 
 const addNextTick = (ticks: Date[], interval: TimeIntervals) => () =>
   ticks.push(
-    moment
-      .default(last(ticks))
+    moment(last(ticks))
       .add(1, interval)
       .toDate(),
   );
