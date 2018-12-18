@@ -1,5 +1,6 @@
 import { hierarchy as d3Hierarchy, HierarchyNode, partition as d3Partition } from "d3-hierarchy";
 import { filter, flow, forEach, isEmpty, LodashForEach, map, reduce } from "lodash/fp";
+
 import {
   Accessor,
   Data,
@@ -53,10 +54,10 @@ class DataHandler {
 
     const processedData = flow(
       (d: Data) => this.assignColors(d),
-      this.assignNames,
-      this.assignIDs,
-      this.assignZoomable,
-      this.assignValues,
+      this.assignNames.bind(this),
+      this.assignIDs.bind(this),
+      this.assignZoomable.bind(this),
+      this.assignValues.bind(this),
     )(data);
 
     const hierarchyData = d3Hierarchy(processedData).sort(
@@ -124,7 +125,7 @@ class DataHandler {
     // All data points must have a value assigned
     const noValueData: HierarchyDatum[] = filter((d: HierarchyDatum) => !d.data.value)(this.data);
 
-    if (noValueData.length > 0) {
+    if (this.data.length > 1 && noValueData.length > 0) {
       throw new Error(
         `The following nodes do not have values: ${map((d: HierarchyDatum) => this.name(d.data))(noValueData)}`,
       );

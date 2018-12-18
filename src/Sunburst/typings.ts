@@ -49,7 +49,7 @@ export interface Data {
 
 export interface ProcessedData {
   empty?: boolean;
-  color?: string;
+  color: string;
   name: string;
   id: string;
   zoomable: boolean;

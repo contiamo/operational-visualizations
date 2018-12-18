@@ -2,6 +2,7 @@ import { every, filter, find, findIndex, forEach, get, identity, keys, LodashFil
 import Events from "../shared/event_catalog";
 import DataHandler from "./data_handler";
 import * as styles from "./styles";
+
 import {
   ClickPayload,
   D3Selection,
@@ -117,7 +118,7 @@ class Renderer {
       .append("svg:path")
       .merge(arcs)
       .attr("class", this.arcClass.bind(this))
-      .style("fill", get("color"))
+      .style("fill", d => d.data.color)
       .on("mouseenter", withD3Element(this.onMouseOver.bind(this)))
       .on("click", (d: HierarchyDatum) => this.events.emit(Events.FOCUS.ELEMENT.CLICK, { d, force: true }));
 
