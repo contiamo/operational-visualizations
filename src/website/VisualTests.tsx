@@ -48,20 +48,19 @@ class VisualTests extends React.Component<Props, State> {
 
   public render() {
     const pathInfo = fromPathname(this.props.pathname);
-    const { groupIndex, testIndex } = pathInfo;
     return (
       <Layout
         header={<HeaderBar main={<h3>Visual Tests</h3>} logo={<Logo name="OperationalUI" to="/" />} />}
         sidenav={
           <Sidenav>
-            {allTestCases.map(testGroup => (
+            {allTestCases.map((testGroup, groupIndex) => (
               <SidenavHeader
                 key={groupIndex}
                 to={toPathname({ groupIndex, testIndex: 0 })}
                 label={testGroup.title}
                 active
               >
-                {testGroup.children.map(test => {
+                {testGroup.children.map((test, testIndex) => {
                   const pathname = toPathname({ groupIndex, testIndex });
                   return (
                     <SidenavItem
@@ -86,8 +85,8 @@ class VisualTests extends React.Component<Props, State> {
                   condensed
                   color="ghost"
                   to={`https://github.com/contiamo/operational-visualizations/blob/master/visual-tests/TestCases/${
-                    allTestCases[groupIndex].folder
-                  }/${allTestCases[groupIndex].children[testIndex].slug}.ts`}
+                    allTestCases[pathInfo.groupIndex].folder
+                  }/${allTestCases[pathInfo.groupIndex].children[pathInfo.testIndex].slug}.ts`}
                 >
                   View Code
                 </Button>
@@ -109,10 +108,10 @@ class VisualTests extends React.Component<Props, State> {
             <Card>
               {pathInfo.exactPath && (
                 <Marathon
-                  test={allTestCases[groupIndex].children[testIndex].marathon}
+                  test={allTestCases[pathInfo.groupIndex].children[pathInfo.testIndex].marathon}
                   onCompleted={() => {
                     if (this.state.isLooping) {
-                      this.props.pushState(toPathname(next({ groupIndex, testIndex })));
+                      this.props.pushState(toPathname(next(pathInfo)));
                     }
                   }}
                   timeout={2000}
