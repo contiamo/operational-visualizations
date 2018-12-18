@@ -42,10 +42,10 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   private color!: (d: Datum) => string;
   private focusContent!: (d: Datum) => Array<{ name: string; value: any }>;
   private opacity!: (d: Datum) => number;
-  private x!: (d: Datum) => number | Date | string;
+  private x!: (d: Datum) => any;
   private x0!: (d: Datum) => number;
   private x1!: (d: Datum) => number;
-  private y!: (d: Datum) => number | Date | string;
+  private y!: (d: Datum) => any;
   private y0!: (d: Datum) => number;
   private y1!: (d: Datum) => number;
 
@@ -153,8 +153,8 @@ class Bars implements RendererClass<BarsRendererAccessors> {
 
   private assignAccessors(customAccessors: Partial<BarsRendererAccessors> = {}) {
     const accessors: BarsRendererAccessors = defaults(defaultAccessors)(customAccessors);
-    this.x = (d: Datum) => this.series.x(d) || d.injectedX || 0;
-    this.y = (d: Datum) => this.series.y(d) || d.injectedY || 0;
+    this.x = (d: Datum) => this.series.x(d) || d.injectedX;
+    this.y = (d: Datum) => this.series.y(d) || d.injectedY;
     this.color = (d: Datum) => accessors.color(this.series, d);
     this.barWidth = (d: Datum) => accessors.barWidth(this.series, d);
     this.focusContent = (d: Datum) =>

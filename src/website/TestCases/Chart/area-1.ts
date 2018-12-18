@@ -2,13 +2,13 @@ import { Chart } from "../../../";
 import { Data } from "../../../Chart/typings";
 import { MarathonEnvironment } from "../../Marathon";
 
-const AreaRenderer = {
-  type: "area",
-};
+// const AreaRenderer = {
+//   type: "area",
+// };
 
-const LineRenderer = {
-  type: "line",
-};
+// const LineRenderer = {
+//   type: "line",
+// };
 
 const PointsRenderer = {
   type: "symbol",
@@ -17,27 +17,27 @@ const PointsRenderer = {
   },
 };
 
-const AreaRendererWithColor = {
-  type: "area",
-  accessors: {
-    color: () => "#ccc",
-  },
-};
+// const AreaRendererWithColor = {
+//   type: "area",
+//   accessors: {
+//     color: () => "#ccc",
+//   },
+// };
 
-const AreaRendererWithInterpolation = {
-  type: "area",
-  accessors: {
-    color: () => "#ccc",
-    interpolate: () => "monotoneX",
-  },
-};
+// const AreaRendererWithInterpolation = {
+//   type: "area",
+//   accessors: {
+//     color: () => "#ccc",
+//     interpolate: () => "monotoneX",
+//   },
+// };
 
-const LineRendererWithInterpolation = {
-  type: "line",
-  accessors: {
-    interpolate: () => "monotoneX",
-  },
-};
+// const LineRendererWithInterpolation = {
+//   type: "line",
+//   accessors: {
+//     interpolate: () => "monotoneX",
+//   },
+// };
 
 const AreaRendererWithGaps = {
   type: "area",
@@ -56,34 +56,34 @@ const LineRendererWithGaps = {
   },
 };
 
-const LineRendererDashed = {
-  type: "line",
-  accessors: {
-    interpolate: () => "monotoneX",
-    closeGaps: () => false,
-    dashed: () => true,
-  },
-};
+// const LineRendererDashed = {
+//   type: "line",
+//   accessors: {
+//     interpolate: () => "monotoneX",
+//     closeGaps: () => false,
+//     dashed: () => true,
+//   },
+// };
 
-const AreaRendererOpacity = {
-  type: "area",
-  accessors: {
-    color: () => "#ccc",
-    interpolate: () => "monotoneX",
-    closeGaps: () => false,
-    opacity: () => 0.2,
-  },
-};
+// const AreaRendererOpacity = {
+//   type: "area",
+//   accessors: {
+//     color: () => "#ccc",
+//     interpolate: () => "monotoneX",
+//     closeGaps: () => false,
+//     opacity: () => 0.2,
+//   },
+// };
 
-const LineRendererOpacity = {
-  type: "line",
-  accessors: {
-    interpolate: () => "monotoneX",
-    closeGaps: () => false,
-    dashed: () => true,
-    opacity: () => 0.3,
-  },
-};
+// const LineRendererOpacity = {
+//   type: "line",
+//   accessors: {
+//     interpolate: () => "monotoneX",
+//     closeGaps: () => false,
+//     dashed: () => true,
+//     opacity: () => 0.3,
+//   },
+// };
 
 const createData = (renderers: any[]): Data => {
   return {
@@ -124,43 +124,43 @@ const createData = (renderers: any[]): Data => {
 export const marathon = ({ test, afterAll, container }: MarathonEnvironment) => {
   const viz = new Chart(container);
 
-  test("Render", () => {
-    viz.data(createData([AreaRenderer, LineRenderer, PointsRenderer]));
-    viz.draw();
-  });
+  // test("Render", () => {
+  //   viz.data(createData([AreaRenderer, LineRenderer, PointsRenderer]));
+  //   viz.draw();
+  // });
 
-  test("Update colors", () => {
-    viz.data(createData([AreaRendererWithColor, LineRenderer, PointsRenderer]));
-    viz.draw();
-  });
+  // test("Update colors", () => {
+  //   viz.data(createData([AreaRendererWithColor, LineRenderer, PointsRenderer]));
+  //   viz.draw();
+  // });
 
-  test("Change interpolation", () => {
-    viz.data(createData([AreaRendererWithInterpolation, LineRendererWithInterpolation, PointsRenderer]));
-    viz.draw();
-  });
+  // test("Change interpolation", () => {
+  //   viz.data(createData([AreaRendererWithInterpolation, LineRendererWithInterpolation, PointsRenderer]));
+  //   viz.draw();
+  // });
 
   test("Turn off `closeGaps`", () => {
     viz.data(createData([AreaRendererWithGaps, LineRendererWithGaps, PointsRenderer]));
     viz.draw();
   });
 
-  test("Dashed lines", () => {
-    viz.data(createData([AreaRendererWithGaps, LineRendererDashed, PointsRenderer]));
-    viz.draw();
-  });
+  // test("Dashed lines", () => {
+  //   viz.data(createData([AreaRendererWithGaps, LineRendererDashed, PointsRenderer]));
+  //   viz.draw();
+  // });
 
-  test("Reduce opacity", () => {
-    viz.data(createData([AreaRendererOpacity, LineRendererOpacity, PointsRenderer]));
-    viz.draw();
-  });
+  // test("Reduce opacity", () => {
+  //   viz.data(createData([AreaRendererOpacity, LineRendererOpacity, PointsRenderer]));
+  //   viz.draw();
+  // });
 
-  test("Resize", () => {
-    viz.config({
-      width: 600,
-      height: 300,
-    });
-    viz.draw();
-  });
+  // test("Resize", () => {
+  //   viz.config({
+  //     width: 600,
+  //     height: 300,
+  //   });
+  //   viz.draw();
+  // });
 
   afterAll(() => {
     viz.close();

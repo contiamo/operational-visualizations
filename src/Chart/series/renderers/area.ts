@@ -63,11 +63,11 @@ class Area implements RendererClass<AreaRendererAccessors> {
   private color!: () => string;
   private interpolate!: () => any;
   private opacity!: () => number;
-  private x!: (d: Datum) => number | Date | string;
+  private x!: (d: Datum) => any;
   private x0!: (d: Datum) => number;
   private x1!: (d: Datum) => number;
   private xScale: any;
-  private y!: (d: Datum) => number | Date | string;
+  private y!: (d: Datum) => any;
   private y0!: (d: Datum) => number;
   private y1!: (d: Datum) => number;
   private yScale: any;
@@ -153,8 +153,8 @@ class Area implements RendererClass<AreaRendererAccessors> {
 
   private assignAccessors(customAccessors: Partial<AreaRendererAccessors> = {}) {
     const accessors: AreaRendererAccessors = defaults(defaultAccessors)(customAccessors);
-    this.x = (d: Datum) => (hasValue(this.series.x(d)) ? this.series.x(d) : d.injectedX) || 0;
-    this.y = (d: Datum) => (hasValue(this.series.y(d)) ? this.series.y(d) : d.injectedY) || 0;
+    this.x = (d: Datum) => (hasValue(this.series.x(d)) ? this.series.x(d) : d.injectedX);
+    this.y = (d: Datum) => (hasValue(this.series.y(d)) ? this.series.y(d) : d.injectedY);
     this.color = () => accessors.color(this.series);
     this.interpolate = () => interpolator[accessors.interpolate(this.series)];
     this.closeGaps = () => accessors.closeGaps(this.series);

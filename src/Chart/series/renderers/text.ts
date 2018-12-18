@@ -37,9 +37,9 @@ class Text implements RendererClass<TextRendererAccessors> {
   // Accessors
   private size!: (d: Datum) => number;
   private opacity!: (d: Datum) => number;
-  private x!: (d: Datum) => number | string | Date;
+  private x!: (d: Datum) => any;
   private xScale!: any;
-  private y!: (d: Datum) => number | string | Date;
+  private y!: (d: Datum) => any;
   private yScale!: any;
   // Config
   private offset: number = 2;
@@ -120,8 +120,8 @@ class Text implements RendererClass<TextRendererAccessors> {
 
   private assignAccessors(customAccessors: Partial<TextRendererAccessors> = {}) {
     const accessors = defaults(defaultAccessors)(customAccessors);
-    this.x = (d: Datum) => this.series.x(d) || d.injectedX || 0;
-    this.y = (d: Datum) => this.series.y(d) || d.injectedY || 0;
+    this.x = (d: Datum) => this.series.x(d) || d.injectedX;
+    this.y = (d: Datum) => this.series.y(d) || d.injectedY;
     this.size = (d: Datum) => accessors.size(this.series, d);
     this.opacity = (d: Datum) => accessors.opacity(this.series, d);
   }

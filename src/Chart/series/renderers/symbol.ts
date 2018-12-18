@@ -79,8 +79,8 @@ class Symbol implements RendererClass<SymbolRendererAccessors> {
   private size!: (d: Datum) => number;
   private stroke!: (d: Datum) => string;
   private symbol!: (d: Datum) => any;
-  private x!: (d: Datum) => number | Date | string;
-  private y!: (d: Datum) => number | Date | string;
+  private x!: (d: Datum) => any;
+  private y!: (d: Datum) => any;
 
   constructor(state: State, el: D3Selection, data: Datum[], options: Options, series: Series, events: EventBus) {
     this.state = state;
@@ -164,8 +164,8 @@ class Symbol implements RendererClass<SymbolRendererAccessors> {
 
   private assignAccessors(customAccessors: Partial<SymbolRendererAccessors> = {}) {
     const accessors = defaults(defaultAccessors)(customAccessors);
-    this.x = (d: Datum): any => this.series.x(d) || d.injectedX;
-    this.y = (d: Datum): any => this.series.y(d) || d.injectedY;
+    this.x = (d: Datum) => this.series.x(d) || d.injectedX;
+    this.y = (d: Datum) => this.series.y(d) || d.injectedY;
     this.fill = (d: Datum) => accessors.fill(this.series, d);
     this.focusContent = (d: Datum) =>
       accessors.focusContent ? accessors.focusContent(this.series, d) : this.defaultFocusContent(d);

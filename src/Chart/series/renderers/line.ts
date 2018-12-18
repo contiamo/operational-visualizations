@@ -63,10 +63,10 @@ class Line implements RendererClass<LineRendererAccessors> {
   private dashed!: () => boolean;
   private interpolate!: () => any;
   private opacity!: () => number;
-  private x!: (d: Datum) => number | Date;
+  private x!: (d: Datum) => any;
   private adjustedX!: (d: Datum) => number;
   private xScale: any;
-  private y!: (d: Datum) => number | Date;
+  private y!: (d: Datum) => any;
   private adjustedY!: (d: Datum) => number;
   private yScale: any;
 
@@ -132,8 +132,8 @@ class Line implements RendererClass<LineRendererAccessors> {
 
   private assignAccessors(customAccessors: Partial<LineRendererAccessors> = {}) {
     const accessors: LineRendererAccessors = defaults(defaultAccessors)(customAccessors);
-    this.x = (d: Datum): any => (hasValue(this.series.x(d)) ? this.series.x(d) : d.injectedX);
-    this.y = (d: Datum): any => (hasValue(this.series.y(d)) ? this.series.y(d) : d.injectedY);
+    this.x = (d: Datum) => (hasValue(this.series.x(d)) ? this.series.x(d) : d.injectedX);
+    this.y = (d: Datum) => (hasValue(this.series.y(d)) ? this.series.y(d) : d.injectedY);
     this.color = () => accessors.color(this.series);
     this.dashed = () => accessors.dashed(this.series);
     this.interpolate = () => interpolator[accessors.interpolate(this.series) as keyof typeof interpolator];
