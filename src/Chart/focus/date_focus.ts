@@ -2,6 +2,8 @@ import { filter, find, forEach, get, groupBy, includes, isFinite, map, partition
 import Events from "../../shared/event_catalog";
 import * as globalStyles from "../../shared/styles";
 import { drawHidden, labelDimensions, positionLabel } from "../../utils/focus_utils";
+import * as styles from "./styles";
+
 import {
   AxisOrientation,
   AxisPosition,
@@ -14,7 +16,6 @@ import {
   Tick,
   TimeAxisComputed,
 } from "../typings";
-import * as styles from "./styles";
 
 class DateFocus {
   private el: D3Selection;

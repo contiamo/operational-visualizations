@@ -1,3 +1,5 @@
+import Renderer from "./renderer";
+
 import {
   compact,
   filter,
@@ -13,7 +15,6 @@ import {
   map,
   uniqBy,
 } from "lodash/fp";
-import Renderer from "./renderer";
 
 import {
   AxisOrientation,
@@ -175,7 +176,7 @@ class ChartSeries {
     const valueScale = this.state.current.getComputed().axes.computed[xIsBaseline ? this.yAxis() : this.xAxis()].scale;
     const datum = find(
       (d: Datum): boolean => {
-        return baselineAccessor(d).toString() === focus.toString();
+        return baselineAccessor(d).toString() === focus.date.toString();
       },
     )(this.data());
 

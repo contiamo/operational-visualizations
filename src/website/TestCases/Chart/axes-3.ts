@@ -6,8 +6,8 @@ const BarsRenderer = {
   type: "bars",
 };
 
-const LineRenderer = {
-  type: "line",
+const SymbolRenderer = {
+  type: "symbol",
 };
 
 const data: Data = {
@@ -100,7 +100,7 @@ const data2: Data = {
         { x: "A", y: 100 },
         { x: "F", y: 200 },
       ],
-      renderAs: [LineRenderer],
+      renderAs: [SymbolRenderer],
     },
     {
       key: "series2",
@@ -112,7 +112,7 @@ const data2: Data = {
         { x: "A", y: 80 },
         { x: "F", y: 190 },
       ],
-      renderAs: [LineRenderer],
+      renderAs: [SymbolRenderer],
     },
   ],
 };

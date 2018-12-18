@@ -28,7 +28,6 @@ import {
 
 const defaultAccessors: SymbolRendererAccessors = {
   fill: () => "#fff",
-  focusContent: () => [],
   size: () => 50,
   stroke: (series: Series) => series.legendColor(),
   symbol: () => "circle",
@@ -179,16 +178,23 @@ class Symbol implements RendererClass<SymbolRendererAccessors> {
   private defaultFocusContent(d: Datum): Array<{ name: string; value: any }> {
     const xTitle = this.state.current.getAccessors().data.axes(this.state.current.getData())[this.series.xAxis()].title;
     const yTitle = this.state.current.getAccessors().data.axes(this.state.current.getData())[this.series.yAxis()].title;
-    return [
-      {
-        name: xTitle || "X",
-        value: this.x(d),
-      },
-      {
-        name: yTitle || "Y",
-        value: this.y(d),
-      },
-    ];
+    return xTitle || yTitle
+      ? [
+          {
+            name: xTitle || "X",
+            value: this.x(d),
+          },
+          {
+            name: yTitle || "Y",
+            value: this.y(d),
+          },
+        ]
+      : [
+          {
+            name: this.xIsBaseline ? this.x(d) : this.y(d),
+            value: this.xIsBaseline ? this.y(d) : this.x(d),
+          },
+        ];
   }
 
   private setAxisScales() {

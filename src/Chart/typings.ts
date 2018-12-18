@@ -80,7 +80,7 @@ export type AreaRendererAccessors = LinearRendererAccessors;
 export interface BarsRendererAccessors {
   barWidth: RendererAccessor<number | undefined>;
   color: RendererAccessor<string>;
-  focusContent: RendererAccessor<any>;
+  focusContent?: RendererAccessor<any>;
   opacity: RendererAccessor<number>;
 }
 
@@ -109,7 +109,7 @@ export type RangeRendererAccessors = LinearRendererAccessors;
 export interface SymbolRendererAccessors {
   stroke: RendererAccessor<string>;
   fill: RendererAccessor<string>;
-  focusContent: RendererAccessor<any>;
+  focusContent?: RendererAccessor<any>;
   symbol: RendererAccessor<any>;
   size: RendererAccessor<number>;
   opacity: RendererAccessor<number>;

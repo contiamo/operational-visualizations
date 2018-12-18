@@ -22,7 +22,6 @@ export type Options = SingleRendererOptions<BarsRendererAccessors>;
 const defaultAccessors: BarsRendererAccessors = {
   color: (series: Series) => series.legendColor(),
   barWidth: () => undefined,
-  focusContent: () => [],
   opacity: () => 0.8,
 };
 
@@ -166,16 +165,23 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   private defaultFocusContent(d: Datum): Array<{ name: string; value: any }> {
     const xTitle = this.state.current.getAccessors().data.axes(this.state.current.getData())[this.series.xAxis()].title;
     const yTitle = this.state.current.getAccessors().data.axes(this.state.current.getData())[this.series.yAxis()].title;
-    return [
-      {
-        name: xTitle || "X",
-        value: this.x(d),
-      },
-      {
-        name: yTitle || "Y",
-        value: this.y(d),
-      },
-    ];
+    return xTitle || yTitle
+      ? [
+          {
+            name: xTitle || "X",
+            value: this.x(d),
+          },
+          {
+            name: yTitle || "Y",
+            value: this.y(d),
+          },
+        ]
+      : [
+          {
+            name: this.xIsBaseline ? this.x(d) : this.y(d),
+            value: this.xIsBaseline ? this.y(d) : this.x(d),
+          },
+        ];
   }
 
   private seriesTranslation(): string {
