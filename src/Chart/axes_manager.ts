@@ -3,6 +3,10 @@ import computeCategoricalAxes from "../axis_utils/compute_categorical_axes";
 import computeQuantAxes from "../axis_utils/compute_quant_axes";
 import computeTimeAxes, { ticksInDomain } from "../axis_utils/compute_time_axes";
 import { computeBarPositions } from "../axis_utils/discrete_axis_utils";
+import Axis from "./axes/axis";
+import Rules from "./axes/rules";
+import { AxisOptions, AxisPosition, AxisType, D3Selection, EventBus, State, StateWriter, WithConvert } from "./typings";
+
 import {
   AxisComputed,
   AxisOrientation,
@@ -11,9 +15,6 @@ import {
   Extent,
   InputDatum,
 } from "../axis_utils/typings";
-import Axis from "./axes/axis";
-import Rules from "./axes/rules";
-import { AxisOptions, AxisPosition, AxisType, D3Selection, EventBus, State, StateWriter, WithConvert } from "./typings";
 
 import {
   difference,

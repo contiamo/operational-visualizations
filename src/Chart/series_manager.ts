@@ -13,6 +13,7 @@ import {
   indexOf,
   invoke,
   LodashForEach,
+  LodashMapKeys,
   map,
   mapKeys,
   merge,
@@ -186,7 +187,9 @@ class ChartSeriesManager implements SeriesManager {
     // Transform data into suitable structure for d3 stack
     const dataToStack = reduce((memo: any[], series: any) => {
       forEach((d: any) => {
-        const datum = mapKeys((val: any) => (val === baseValue(series)(d) ? baseAxis : this.key(series)))(d);
+        const datum = (mapKeys as WithConvert<LodashMapKeys>).convert({ cap: false })((val: any, _: string) =>
+          val === baseValue(series)(d) ? baseAxis : this.key(series),
+        )(d);
         const existingDatum = find({ [baseAxis]: baseValue(series)(d) })(memo);
         existingDatum ? (memo[indexOf(existingDatum)(memo)] = merge(datum)(existingDatum)) : memo.push(datum);
       })(series.data);

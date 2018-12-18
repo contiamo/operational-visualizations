@@ -5,6 +5,7 @@ import { keys, LodashMapValues, mapValues, rangeStep } from "lodash/fp";
 import { tuple, WithConvert } from "../shared/typings";
 import defaultNumberFormatter from "../utils/number_formatter";
 import defaultOptions from "./axis_config";
+
 import {
   AxisPosition,
   AxisRecord,

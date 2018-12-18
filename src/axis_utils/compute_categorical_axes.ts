@@ -3,6 +3,7 @@ import { identity, keys, LodashMapValues, mapValues } from "lodash/fp";
 import { WithConvert } from "../shared/typings";
 import defaultOptions from "./axis_config";
 import { computeRuleTicks, computeTickWidth } from "./discrete_axis_utils";
+
 import {
   AxisPosition,
   AxisRecord,
