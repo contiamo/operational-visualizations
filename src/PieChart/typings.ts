@@ -1,7 +1,15 @@
 // Type definitions for the Contiamo Process Flow visualization
-import * as d3 from "d3-selection"
-import { Arc, Pie, PieArcDatum } from "d3-shape"
-import { Accessor, BaseConfig, Facade, Focus, Legend, ChartStateReadOnly } from "../shared/typings"
+import { Arc, Pie, PieArcDatum } from "d3-shape";
+import {
+  Accessor,
+  BaseConfig,
+  ChartStateReadOnly,
+  D3Selection,
+  Dimensions,
+  Facade,
+  Focus,
+  Legend,
+} from "../shared/typings";
 
 export {
   Accessor,
@@ -12,138 +20,165 @@ export {
   D3Selection,
   Dimensions,
   EventBus,
+  Focus,
   Legend,
   Point,
   Position,
   StateWriter,
-} from "../shared/typings"
+  WithConvert,
+} from "../shared/typings";
 
-export type State = ChartStateReadOnly<Data, PieChartConfig, AccessorsObject, Computed>
+export type State = ChartStateReadOnly<Data, PieChartConfig, AccessorsObject, Computed>;
 
-export type FocusElement = string
+export type FocusElement = string;
 
 export interface PieChartConfig extends BaseConfig {
-  displayPercentages: boolean
-  focusElement?: FocusElement
-  focusOffset: number
-  legend: true
-  maxWidth: number
-  maxLegendRatio: number
-  maxLegendWidth: number
-  maxTotalFontSize: number
-  minChartWithLegend: number
-  minWidth: number
-  minInnerRadius: number
-  minLegendWidth: number
-  minTotalFontSize: number
-  outerBorderMargin: number
-  palette: string[]
-  showComponentFocus: boolean
+  displayPercentages: boolean;
+  focusElement?: FocusElement;
+  focusOffset: number;
+  legend: true;
+  maxWidth: number;
+  maxLegendRatio: number;
+  maxLegendWidth: number;
+  maxTotalFontSize: number;
+  minChartWithLegend: number;
+  minWidth: number;
+  minInnerRadius: number;
+  minLegendWidth: number;
+  minTotalFontSize: number;
+  outerBorderMargin: number;
+  palette: string[];
+  showComponentFocus: boolean;
 }
 
-export type Datum = {
-  value?: number
-  key?: string
-  percentage?: number
-  unfilled?: boolean
+export interface Datum {
+  value: number;
+  key: string;
+  percentage: number;
+  unfilled: boolean;
 }
 
-export type Data = Datum[]
+export interface InputDatum {
+  value?: number;
+  key?: string;
+  percentage?: number;
+  unfilled?: boolean;
+}
+
+export type InputData = InputDatum[];
+
+export interface Data {
+  data: InputDatum[];
+  renderAs: RendererOptions[];
+}
 
 export interface LegendDatum {
-  label: string
-  color?: string
-  comparison?: boolean
+  label: string;
+  color?: string;
+  comparison?: boolean;
 }
 
 export interface DataAccessors {
-  data: Accessor<any, Data>
+  data: Accessor<Data, InputData>;
 }
 
 export interface SeriesAccessors {
-  name: Accessor<Datum, string>
-  renderAs: Accessor<Datum, any>
+  name: Accessor<InputDatum, string>;
+  renderAs: Accessor<InputDatum, any>;
 }
 
 export interface AccessorsObject {
-  data: DataAccessors
-  series: SeriesAccessors
+  data: DataAccessors;
+  series: SeriesAccessors;
 }
 
-export type RendererAccessor<T> = Accessor<Datum | ComputedDatum, T>
+export type RendererAccessor<T> = Accessor<InputDatum | ComputedDatum, T>;
 
 export interface RendererAccessors {
-  key: RendererAccessor<string>
-  value: RendererAccessor<number>
-  color: RendererAccessor<string>
-}
-
-export interface Computed {
-  canvas?: { [key: string]: any }
-  focus?: { [key: string]: any }
-  series?: { [key: string]: any }
+  key: RendererAccessor<string>;
+  value: RendererAccessor<number>;
+  color: RendererAccessor<string>;
 }
 
 export interface DatumInfo {
-  key: string
-  value: number
-  percentage: number
+  key: string;
+  value: number;
+  percentage: number;
 }
 
 export interface HoverPayload {
-  focusPoint: { centroid: [number, number] }
-  d: DatumInfo
+  focusPoint: { centroid: [number, number] };
+  d: DatumInfo;
 }
-
-export type Focus = Focus<HoverPayload>
 
 export interface Components {
-  focus: Focus<HoverPayload>
-  legend: Legend
+  focus: Focus;
+  legend: Legend;
 }
 
-export type Facade = Facade<PieChartConfig, Data>
+export type Facade = Facade<PieChartConfig, Data>;
 
 export interface RendererOptions {
-  type: RendererType
-  accessors?: { [key: string]: Accessor<Datum, any> }
-  extent?: "semi" | "full"
-  comparison?: Datum
-  target?: number
+  type: RendererType;
+  accessors?: { [key: string]: Accessor<Datum, any> };
+  extent?: "semi" | "full";
+  comparison?: InputDatum;
+  target?: number;
 }
 
+export type ComputedDatum = PieArcDatum<Datum>;
+
 export interface ComputedInitial {
-  layout: Pie<any, any>
-  total: number
-  target?: number
+  layout: Pie<any, any>;
+  total: number;
+  data: ComputedDatum[];
+  target?: number;
 }
 
 export interface ComputedArcs {
-  arc: Arc<any, any>
-  arcOver: Arc<any, any>
-  rInner: any
-  rInnerHover: any
-  r: any
-  rHover: any
+  arc: Arc<any, any>;
+  arcOver: Arc<any, any>;
+  rInner: any;
+  rInnerHover: any;
+  r: any;
+  rHover: any;
 }
-
-export type ComputedDatum = PieArcDatum<Datum>
 
 export interface ComputedData extends ComputedInitial, ComputedArcs {
-  comparison?: Datum
-  data: ComputedDatum[]
+  comparison?: Datum;
 }
 
-export type RendererType = "donut" | "polar" | "gauge"
+export type RendererType = "donut" | "polar" | "gauge";
 
 export interface Renderer {
-  dataForLegend: () => LegendDatum[]
-  draw: () => void
-  key: Accessor<Datum | ComputedDatum, string>
-  remove: () => void
-  setData: (data: Datum[]) => void
-  state: ChartStateReadOnly<Data, PieChartConfig, AccessorsObject, Computed>
-  type: RendererType
-  updateOptions: (options: { [key: string]: any }) => void
-  value: Accessor<Datum | ComputedDatum, number>
+  dataForLegend: () => LegendDatum[];
+  draw: () => void;
+  key: Accessor<InputDatum | Datum | ComputedDatum, string>;
+  remove: () => void;
+  setData: (data: InputData) => void;
+  state: ChartStateReadOnly<Data, PieChartConfig, AccessorsObject, Computed>;
+  type: RendererType;
+  updateOptions: (options: { [key: string]: any }) => void;
+  value: Accessor<InputDatum | Datum | ComputedDatum, number>;
+}
+
+// Computed values saved in state
+interface ComputedCanvas {
+  containerRect: DOMRect;
+  drawingContainerDims: Dimensions;
+  drawingContainerRect: DOMRect;
+  elements: Record<string, D3Selection>;
+  legend: D3Selection;
+}
+
+interface ComputedSeries {
+  data: InputData;
+  dataForLegend: LegendDatum[];
+}
+
+export interface Computed {
+  canvas: ComputedCanvas;
+  focus: {};
+  legend: {};
+  series: ComputedSeries;
 }

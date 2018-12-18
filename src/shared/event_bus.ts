@@ -1,34 +1,34 @@
 class EventEmitter {
-  subscribers: { [key: string]: any[] } = {}
+  private subscribers: Record<string, any[]> = {};
 
-  on(eventName: string, callback: any): void {
-    this.subscribers[eventName] = this.subscribers[eventName] || []
-    this.subscribers[eventName].push(callback)
+  public on(eventName: string, callback: any) {
+    this.subscribers[eventName] = this.subscribers[eventName] || [];
+    this.subscribers[eventName].push(callback);
   }
 
-  removeListener(eventName: string, callback: any): void {
+  public removeListener(eventName: string, callback: any) {
     if (!this.subscribers[eventName]) {
-      return
+      return;
     }
-    this.subscribers[eventName] = this.subscribers[eventName].filter(cb => cb !== callback)
+    this.subscribers[eventName] = this.subscribers[eventName].filter(cb => cb !== callback);
   }
 
-  removeAllListeners(eventName: string): void {
-    this.subscribers[eventName] = []
+  public removeAllListeners(eventName: string) {
+    this.subscribers[eventName] = [];
   }
 
-  emit(eventName: string, eventData: any = {}): void {
+  public emit(eventName: string, eventData: any = {}) {
     if (!this.subscribers[eventName]) {
-      return
+      return;
     }
     this.subscribers[eventName].forEach(subscriber => {
-      subscriber(eventData)
-    })
+      subscriber(eventData);
+    });
   }
 
-  removeAll(): void {
-    this.subscribers = {}
+  public removeAll() {
+    this.subscribers = {};
   }
 }
 
-export default EventEmitter
+export default EventEmitter;

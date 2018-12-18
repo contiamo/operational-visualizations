@@ -1,52 +1,45 @@
-export interface UsageCount {
-  [key: string]: number
-}
+export type UsageCount = Record<string, number>;
 
 export const colorAssigner = (palette: string[]) => {
   if (palette.length === 0) {
-    throw new Error("No color palette defined")
+    throw new Error("No color palette defined");
   }
 
-  const assigned: { [key: string]: string } = {}
-  const usedColors: string[] = []
+  const assigned: Record<string, string> = {};
+  const usedColors: string[] = [];
 
-  const getColor = (key: string): string => {
-    return assigned[key]
-  }
+  const getColor = (key: string) => {
+    return assigned[key];
+  };
 
-  const nextColor = (): string => {
+  const nextColor = () => {
     // Count how many times each colour has been used
-    const usageCount: UsageCount = palette.reduce((memo: UsageCount, color: string): UsageCount => {
-      memo[color] = 0
-      return memo
-    }, {})
+    const usageCount = palette.reduce<UsageCount>((memo, color) => {
+      memo[color] = 0;
+      return memo;
+    }, {});
 
-    usedColors.forEach(
-      (color: string): void => {
-        usageCount[color] += 1
-      },
-    )
+    usedColors.forEach(color => {
+      usageCount[color] += 1;
+    });
 
-    const min: number = palette.reduce((memo: number, color: string): number => {
-      return memo ? Math.min(memo, usageCount[color]) : usageCount[color]
-    }, undefined)
+    const min = palette.reduce<number | undefined>(
+      (memo, color) => (memo ? Math.min(memo, usageCount[color]) : usageCount[color]),
+      undefined,
+    );
 
     // Find a color with the minimum usage count
-    return palette.find(
-      (color: string): boolean => {
-        return usageCount[color] === min
-      },
-    )
-  }
+    return palette.find(color => usageCount[color] === min) as string;
+  };
 
-  const assignColor = (key: string): string => {
-    const color: string = nextColor()
-    assigned[key] = color
-    usedColors.push(color)
-    return color
-  }
+  const assignColor = (key: string) => {
+    const color = nextColor();
+    assigned[key] = color;
+    usedColors.push(color);
+    return color;
+  };
 
-  return (key: string): string => {
-    return getColor(key) || assignColor(key)
-  }
-}
+  return (key: string) => {
+    return getColor(key) || assignColor(key);
+  };
+};

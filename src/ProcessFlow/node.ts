@@ -1,40 +1,40 @@
-import { extend, forEach } from "lodash/fp"
-import { NodeAttrs, NodeAccessors, TLink } from "./typings"
+import { extend, forEach, LodashExtend, LodashForEach } from "lodash/fp";
+import { NodeAccessors, NodeAttrs, TLink, WithConvert } from "./typings";
 
 class Node {
-  accessors: NodeAccessors
-  attributes: NodeAttrs
-  color: () => string
-  content: () => { [key: string]: any }[]
-  id: () => string
-  journeyEnds: number = 0
-  journeyStarts: number = 0
-  label: () => string
-  labelPosition: () => string
-  shape: () => string
-  singleNodeJourneys: number = 0
-  size: () => number
-  sourceLinks: TLink[]
-  stroke: () => string
-  targetLinks: TLink[]
-  x: number
-  y: number
+  private accessors: NodeAccessors;
+  public attributes: NodeAttrs;
+  public journeyEnds: number = 0;
+  public journeyStarts: number = 0;
+  public singleNodeJourneys: number = 0;
+  public color!: () => string;
+  public content!: () => Array<Record<string, any>>;
+  public id!: () => string;
+  public label!: () => string;
+  public labelPosition!: () => string;
+  public shape!: () => string;
+  public size!: () => number;
+  public sourceLinks!: TLink[];
+  public stroke!: () => string;
+  public targetLinks!: TLink[];
+  public x!: number;
+  public y!: number;
 
   constructor(nodeAttributes: NodeAttrs, accessors: NodeAccessors) {
-    this.accessors = accessors
-    this.attributes = this.assignAttributes(nodeAttributes)
-    this.assignAccessors()
+    this.accessors = accessors;
+    this.attributes = this.assignAttributes(nodeAttributes);
+    this.assignAccessors();
   }
 
   private assignAttributes(nodeAttributes: NodeAttrs): NodeAttrs {
-    return extend.convert({ immutable: false })({})(nodeAttributes)
+    return (extend as WithConvert<LodashExtend>).convert({ immutable: false })({})(nodeAttributes);
   }
 
-  private assignAccessors(): void {
-    forEach.convert({ cap: false })((accessor: any, key: string) => {
-      ;(this as any)[key] = () => accessor(this.attributes)
-    })(this.accessors)
+  private assignAccessors() {
+    (forEach as WithConvert<LodashForEach>).convert({ cap: false })((accessor: any, key: string) => {
+      (this as any)[key] = () => accessor(this.attributes);
+    })(this.accessors);
   }
 }
 
-export default Node
+export default Node;

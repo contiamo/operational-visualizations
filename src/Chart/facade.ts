@@ -1,15 +1,16 @@
-import ChartCanvas from "./canvas"
-import ChartSeriesManager from "./series_manager"
-import ChartFocus from "./focus"
-import LegendManager from "./legend_manager"
-import AxesManager from "./axes_manager"
-import Events from "../shared/event_catalog"
-import StateHandler from "../shared/state_handler"
-import EventEmitter from "../shared/event_bus"
-import { colorAssigner } from "../utils/colorAssigner"
-import theme from "../utils/constants"
-import { has, isEmpty, uniqueId } from "lodash/fp"
-import defaultNumberFormatter from "../utils/number_formatter"
+import { has, isEmpty, uniqueId } from "lodash/fp";
+import { defaultMargins } from "../axis_utils/axis_config";
+import EventEmitter from "../shared/event_bus";
+import Events from "../shared/event_catalog";
+import StateHandler from "../shared/state_handler";
+import { colorAssigner } from "../utils/colorAssigner";
+import theme from "../utils/constants";
+import defaultNumberFormatter from "../utils/number_formatter";
+import AxesManager from "./axes_manager";
+import ChartCanvas from "./canvas";
+import ChartFocus from "./focus";
+import LegendManager from "./legend_manager";
+import ChartSeriesManager from "./series_manager";
 
 import {
   Accessors,
@@ -25,7 +26,7 @@ import {
   FocusElement,
   RendererOptions,
   SeriesData,
-} from "./typings"
+} from "./typings";
 
 const defaultConfig = (): ChartConfig => {
   return {
@@ -51,19 +52,54 @@ const defaultConfig = (): ChartConfig => {
     uid: uniqueId("chart"),
     visualizationName: "chart",
     width: 500,
-  }
-}
+  };
+};
+
+const defaultComputed = (): Computed => ({
+  axes: {
+    barPositions: {
+      width: () => 0,
+      offset: () => 0,
+    },
+    baseline: "x",
+    computed: {},
+    margins: defaultMargins(defaultConfig().noAxisMargin),
+    previous: {},
+    priorityTimeAxis: "x1",
+    requiredAxes: [],
+  },
+  canvas: {
+    drawingContainerDims: { width: 0, height: 0 },
+    drawingDims: { width: 0, height: 0 },
+    containerRect: new DOMRect(),
+  },
+  series: {
+    dataForLegends: {
+      top: {
+        left: [],
+        right: [],
+      },
+      bottom: {
+        left: [],
+      },
+    },
+    dataForAxes: {},
+    barSeries: {},
+    axesWithFlags: {},
+    dataForFocus: () => [],
+  },
+});
 
 const defaultColorAssigner = (palette: string[]): ((d: { [key: string]: any }) => string) => {
-  const assigner = colorAssigner(palette)
-  return (d: { [key: string]: any }): string => d.legendColor || assigner(d.key)
-}
+  const assigner = colorAssigner(palette);
+  return (d: { [key: string]: any }): string => d.legendColor || assigner(d.key);
+};
 
 const defaultAccessors = () => {
   return {
     data: {
-      series: (d: Data): SeriesData => d.series,
-      axes: (d: Data): AxesData => d.axes,
+      series: (d: Data): SeriesData => d.series || [],
+      axes: (d: Data): AxesData => d.axes || {},
     },
     series: {
       data: (d: { [key: string]: any }): Datum[] => d.data,
@@ -77,30 +113,30 @@ const defaultAccessors = () => {
       xAxis: (d: { [key: string]: any }): "x1" | "x2" => d.xAxis || "x1",
       yAxis: (d: { [key: string]: any }): "y1" | "y2" => d.yAxis || "y1",
     },
-  }
-}
+  };
+};
 
 class ChartFacade implements Facade {
-  private __disposed: boolean = false
-  private canvas: ChartCanvas
-  private components: Components
-  private context: Element
-  private customColorAccessor: boolean = false
-  private events: EventEmitter
-  private series: ChartSeriesManager
-  private state: StateHandler<Data, ChartConfig, AccessorsObject, Computed>
+  private DISPOSED: boolean = false;
+  private canvas: ChartCanvas;
+  private components: Components;
+  private context: Element;
+  private customColorAccessor: boolean = false;
+  private events: EventEmitter;
+  private series: ChartSeriesManager;
+  private state: StateHandler<Data, ChartConfig, AccessorsObject, Computed>;
 
   constructor(context: Element) {
-    this.context = context
-    this.events = this.initializeEvents()
-    this.state = this.initializeState()
-    this.canvas = this.initializeCanvas()
-    this.components = this.initializeComponents()
-    this.series = this.initializeSeries()
+    this.context = context;
+    this.events = this.initializeEvents();
+    this.state = this.initializeState();
+    this.canvas = this.initializeCanvas();
+    this.components = this.initializeComponents();
+    this.series = this.initializeSeries();
   }
 
   private initializeEvents(): EventEmitter {
-    return new EventEmitter()
+    return new EventEmitter();
   }
 
   private initializeState(): StateHandler<Data, ChartConfig, AccessorsObject, Computed> {
@@ -108,12 +144,12 @@ class ChartFacade implements Facade {
       data: {},
       config: defaultConfig(),
       accessors: defaultAccessors(),
-      computed: {},
-    })
+      computed: defaultComputed(),
+    });
   }
 
   private initializeCanvas(): ChartCanvas {
-    return new ChartCanvas(this.state.readOnly(), this.state.computedWriter(["canvas"]), this.events, this.context)
+    return new ChartCanvas(this.state.readOnly(), this.state.computedWriter(["canvas"]), this.events, this.context);
   }
 
   private initializeComponents(): any {
@@ -138,7 +174,7 @@ class ChartFacade implements Facade {
         component: this.canvas.elementFor("componentFocus"),
         group: this.canvas.elementFor("focusGroup"),
       }),
-    }
+    };
   }
 
   private initializeSeries(): ChartSeriesManager {
@@ -147,64 +183,64 @@ class ChartFacade implements Facade {
       this.state.computedWriter(["series"]),
       this.events,
       this.canvas.elementFor("series"),
-    )
+    );
   }
 
-  data(data?: Data): Data {
-    return this.state.data(data)
+  public data(data?: Data): Data {
+    return this.state.data(data);
   }
 
-  config(config?: Partial<ChartConfig>): ChartConfig {
+  public config(config?: Partial<ChartConfig>): ChartConfig {
     /**
      * Changing the palette config only updates the legendColor accessor if the default is still be used.
      * It will not overwrite a user-defined legendColor accessor.
      */
-    if (config.palette && !this.customColorAccessor) {
-      this.state.accessors("series", { legendColor: defaultColorAssigner(config.palette) })
+    if (config && config.palette && !this.customColorAccessor) {
+      this.state.accessors("series", { legendColor: defaultColorAssigner(config.palette) });
     }
-    return this.state.config(config)
+    return this.state.config(config);
   }
 
-  accessors(type: string, accessors: Accessors<any>): Accessors<any> {
+  public accessors(type: string, accessors: Accessors<any>): Accessors<any> {
     // If a custom legendColor accessor is specified, this must not be overwritten if the palette config changes.
     if (type === "series" && has("legendColor")(accessors)) {
-      this.customColorAccessor = true
+      this.customColorAccessor = true;
     }
-    return this.state.accessors(type, accessors)
+    return this.state.accessors(type, accessors);
   }
 
-  on(event: string, handler: any): void {
-    this.events.on(event, handler)
+  public on(event: string, handler: any) {
+    this.events.on(event, handler);
   }
 
-  off(event: string, handler: any): void {
-    this.events.removeListener(event, handler)
+  public off(event: string, handler: any) {
+    this.events.removeListener(event, handler);
   }
 
-  draw(): void {
-    this.state.captureState()
-    this.series.assignData()
-    this.components.legends.draw()
-    this.components.axes.updateMargins()
-    this.canvas.draw()
-    this.components.axes.draw()
-    this.series.draw()
+  public draw() {
+    this.state.captureState();
+    this.series.assignData();
+    this.components.legends.draw();
+    this.components.axes.updateMargins();
+    this.canvas.draw();
+    this.components.axes.draw();
+    this.series.draw();
 
     // Focus behaviour is applied through events only - there is no focus.draw() method.
-    const focus: FocusElement = this.state.config().focus
+    const focus: FocusElement = this.state.config().focus;
     !isEmpty(focus)
       ? this.events.emit(focus.type === "date" ? Events.FOCUS.DATE : Events.FOCUS.ELEMENT.HIGHLIGHT, focus.value)
-      : this.events.emit(Events.FOCUS.CLEAR)
+      : this.events.emit(Events.FOCUS.CLEAR);
   }
 
-  close(): void {
-    if (this.__disposed) {
-      return
+  public close() {
+    if (this.DISPOSED) {
+      return;
     }
-    this.__disposed = true
-    this.events.removeAll()
-    this.context.innerHTML = ""
+    this.DISPOSED = true;
+    this.events.removeAll();
+    this.context.innerHTML = "";
   }
 }
 
-export default ChartFacade
+export default ChartFacade;
