@@ -38,18 +38,22 @@ const createData = (): Data => {
         data,
         name: "Netherlands",
         key: "netherlands",
-        xAttribute: "profit",
-        yAttribute: "sales",
         renderAs: [renderer],
         legendColor: "#ff7f0e",
+        datumAccessors: {
+          x: (d: any) => d.profit,
+          y: (d: any) => d.sales,
+        },
       },
       {
         data: [{ profit: 0, sales: 0 }, { profit: maxProfit, sales: maxProfit * (meanSales / meanProfit) }],
         key: "trendline",
         hideInLegend: true,
-        xAttribute: "profit",
-        yAttribute: "sales",
         renderAs: [trendline],
+        datumAccessors: {
+          x: (d: any) => d.profit,
+          y: (d: any) => d.sales,
+        },
       },
     ],
     axes: {
