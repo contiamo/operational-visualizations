@@ -1,5 +1,6 @@
-import { stack as d3Stack } from "d3-shape"
-import Series from "./series/series"
+import { stack as d3Stack } from "d3-shape";
+import { AxisPosition } from "../axis_utils/typings";
+import Series from "./series/series";
 
 import {
   cloneDeep,
@@ -11,6 +12,8 @@ import {
   includes,
   indexOf,
   invoke,
+  LodashForEach,
+  LodashMapKeys,
   map,
   mapKeys,
   merge,
@@ -18,66 +21,70 @@ import {
   remove,
   set,
   uniqBy,
-} from "lodash/fp"
+} from "lodash/fp";
 
 import {
-  Accessor,
+  AxisOrientation,
   BarSeriesInfo,
   D3Selection,
   DataForLegends,
+  DatesToFocus,
+  DateToFocus,
+  Datum,
   EventBus,
   GroupedRendererOptions,
+  LegendFloat,
+  LegendPosition,
   RendererOptions,
   SeriesAccessor,
   SeriesData,
+  SeriesDatum,
   SeriesManager,
   State,
   StateWriter,
-  Datum,
-  AxisOrientation,
-  LegendPosition,
-  LegendFloat,
-} from "./typings"
+  WithConvert,
+} from "./typings";
 
-type GroupedRendererType = "stacked" | "range"
+type GroupedRendererType = "stacked" | "range";
 
-type GroupCalculation = (group: { [key: string]: any }, index: number) => void
+type GroupCalculation = (group: { [key: string]: any }, index: number) => void;
 
 class ChartSeriesManager implements SeriesManager {
-  el: D3Selection
-  events: EventBus
-  key: SeriesAccessor<string>
-  oldSeries: Series[] = []
-  renderAs: Accessor<any, RendererOptions[]>
-  series: Series[] = []
-  state: State
-  stateWriter: StateWriter
+  private el: D3Selection;
+  private events: EventBus;
+  private key!: SeriesAccessor<string>;
+  private oldSeries: Series[] = [];
+  private renderAs!: SeriesAccessor<RendererOptions[]>;
+  private series: Series[] = [];
+  private state: State;
+  private stateWriter: StateWriter;
 
   constructor(state: State, stateWriter: StateWriter, events: EventBus, el: D3Selection) {
-    this.state = state
-    this.stateWriter = stateWriter
-    this.events = events
-    this.el = el
+    this.state = state;
+    this.stateWriter = stateWriter;
+    this.events = events;
+    this.el = el;
   }
 
   // Helpers
   private isNotHidden(series: { [key: string]: any }) {
-    return !this.state.current.getAccessors().series.hide(series)
+    return !this.state.current.getAccessors().series.hide(series);
   }
 
   private findBarsRenderer(series: Series) {
-    return find({ type: "bars" })(series.renderers)
+    return find({ type: "bars" })(series.renderers);
   }
 
-  assignData(): void {
-    this.key = this.state.current.getAccessors().series.key
-    this.renderAs = this.state.current.getAccessors().series.renderAs
-    this.prepareData()
-    this.stateWriter("dataForLegends", this.dataForLegends())
-    this.stateWriter("dataForAxes", this.dataForAxes())
-    this.stateWriter("barSeries", this.computeBarSeries())
-    this.stateWriter("axesWithFlags", this.axesWithFlags())
-    this.stateWriter("dataForFocus", this.dataForFocus.bind(this))
+  public assignData() {
+    const accessors = this.state.current.getAccessors().series;
+    this.key = accessors.key;
+    this.renderAs = accessors.renderAs;
+    this.prepareData();
+    this.stateWriter("dataForLegends", this.dataForLegends());
+    this.stateWriter("dataForAxes", this.dataForAxes());
+    this.stateWriter("barSeries", this.computeBarSeries());
+    this.stateWriter("axesWithFlags", this.axesWithFlags());
+    this.stateWriter("dataForFocus", this.dataForFocus.bind(this));
   }
 
   /**
@@ -86,20 +93,20 @@ class ChartSeriesManager implements SeriesManager {
    * - Assign bar indices to enable correct placement on the axis
    * - Transform grouped series into individual series which can be rendered independently
    */
-  private prepareData(): void {
+  private prepareData() {
     const data = flow(
-      filter(this.isNotHidden.bind(this)),
+      filter((d: SeriesDatum) => this.isNotHidden(d)),
       this.handleGroupedSeries("stacked", this.computeStack.bind(this)),
       this.handleGroupedSeries("range", this.computeRange.bind(this)),
-    )(this.state.current.getAccessors().data.series(this.state.current.getData()))
+    )(this.state.current.getAccessors().data.series(this.state.current.getData()));
 
-    this.removeAllExcept(map(this.key)(data))
-    forEach(this.updateOrCreate.bind(this))(data)
+    this.removeAllExcept(map(this.key)(data));
+    forEach(this.updateOrCreate.bind(this))(data);
   }
 
-  private updateOrCreate(options: any): void {
-    const series = this.get(this.key(options))
-    series ? series.update(options) : this.create(options)
+  private updateOrCreate(options: any) {
+    const series = this.get(this.key(options));
+    series ? series.update(options) : this.create(options);
   }
 
   /**
@@ -108,21 +115,19 @@ class ChartSeriesManager implements SeriesManager {
    * The bar indices are used to determine where bars are rendered respective to each tick.
    */
   private computeBarSeries(): BarSeriesInfo {
-    let barSeries: BarSeriesInfo = {}
-    let index = 0
-    this.series
-      .filter(this.findBarsRenderer)
-      .forEach((series) => {
-        barSeries[series.key()] = {
-          index,
-          stackIndex: series.options.stackIndex,
-          barWidth: this.findBarsRenderer(series).barWidth(series)
-        }
-        if (!series.options.stackIndex) {
-          index = index + 1
-        }
-      })
-    return barSeries
+    const barSeries: BarSeriesInfo = {};
+    let index = 0;
+    this.series.filter(this.findBarsRenderer).forEach(series => {
+      barSeries[series.key()] = {
+        index,
+        stackIndex: series.options.stackIndex,
+        barWidth: (this.findBarsRenderer(series) as any).barWidth(series), // @TODO
+      };
+      if (!series.options.stackIndex) {
+        index = index + 1;
+      }
+    });
+    return barSeries;
   }
 
   /**
@@ -135,70 +140,70 @@ class ChartSeriesManager implements SeriesManager {
    */
   private handleGroupedSeries(type: GroupedRendererType, compute: GroupCalculation) {
     return (data: SeriesData) => {
-      const newData: any[] = []
-      let groupIndex: number = 0
-      forEach((series: any) => {
-        const rendererTypes = map(get("type"))(this.renderAs(series))
-        if (includes(type)(rendererTypes)) {
-          const computedSeries = cloneDeep(series)
+      const newData: SeriesData = [];
+      let groupIndex = 0;
+      forEach((series: SeriesDatum) => {
+        const rendererTypes = map((options: RendererOptions) => options.type)(this.renderAs(series));
+        if (rendererTypes.includes(type)) {
+          const computedSeries = cloneDeep(series);
           // Perform group calculation
-          compute(computedSeries, groupIndex)
+          compute(computedSeries, groupIndex);
           // Append each series in the group individually to the new data array
           forEach((options: any) => {
-            options.renderAs = this.renderAs(this.renderAs(computedSeries)[0])
-            newData.push(options)
-          })(computedSeries.series)
+            options.renderAs = this.renderAs(this.renderAs(computedSeries)[0]);
+            newData.push(options);
+          })(computedSeries.series);
           // Add one to the group index
-          groupIndex = groupIndex + 1
+          groupIndex = groupIndex + 1;
         } else {
-          newData.push(series)
+          newData.push(series);
         }
-      })(data)
+      })(data);
 
-      return newData
-    }
+      return newData;
+    };
   }
 
   // Add clip data and stack index to grouped range series
-  private computeRange(range: { [key: string]: any }, index: number): void {
+  private computeRange(range: { [key: string]: any }, index: number) {
     if (range.series.length !== 2) {
-      throw new Error("Range renderer must have exactly 2 series.")
+      throw new Error("Range renderer must have exactly 2 series.");
     }
 
     // Each series is assigned the data from the other series to be used for defining clip paths.
-    forEach.convert({ cap: false })((series: { [key: string]: any }, i: number) => {
-      series.clipData = range.series[1 - i].data
-      series.stackIndex = `range${index + 1}`
-    })(range.series)
+    (forEach as WithConvert<LodashForEach>).convert({ cap: false })((series: { [key: string]: any }, i: number) => {
+      series.clipData = range.series[1 - i].data;
+      series.stackIndex = `range${index + 1}`;
+    })(range.series);
   }
 
   // Compute stack values and add stack index to grouped stack series
-  private computeStack(stack: { [key: string]: any }, index: number): void {
+  private computeStack(stack: { [key: string]: any }, index: number) {
     // By default, stacks are vertical
-    const stackAxis: AxisOrientation = (this.renderAs(stack)[0] as GroupedRendererOptions).stackAxis || "y"
-    const baseAxis: AxisOrientation = stackAxis === "y" ? "x" : "y"
-    const baseValue = (series: any) => (series.datumAccessors && series.datumAccessors[baseAxis]) || get(baseAxis)
+    const stackAxis: AxisOrientation = (this.renderAs(stack)[0] as GroupedRendererOptions).stackAxis || "y";
+    const baseAxis: AxisOrientation = stackAxis === "y" ? "x" : "y";
+    const baseValue = (series: any) => (series.datumAccessors && series.datumAccessors[baseAxis]) || get(baseAxis);
 
     // Transform data into suitable structure for d3 stack
     const dataToStack = reduce((memo: any[], series: any) => {
       forEach((d: any) => {
-        const datum = mapKeys.convert({ cap: false })(
-          (val: any, key: string) => (val === baseValue(series)(d) ? baseAxis : this.key(series)),
-        )(d)
-        const existingDatum = find({ [baseAxis]: baseValue(series)(d) })(memo)
-        existingDatum ? (memo[indexOf(existingDatum)(memo)] = merge(datum)(existingDatum)) : memo.push(datum)
-      })(series.data)
-      return memo
-    }, [])(stack.series)
+        const datum = (mapKeys as WithConvert<LodashMapKeys>).convert({ cap: false })((val: any, _: string) =>
+          val === baseValue(series)(d) ? baseAxis : this.key(series),
+        )(d);
+        const existingDatum = find({ [baseAxis]: baseValue(series)(d) })(memo);
+        existingDatum ? (memo[indexOf(existingDatum)(memo)] = merge(datum)(existingDatum)) : memo.push(datum);
+      })(series.data);
+      return memo;
+    }, [])(stack.series);
 
     // Stack data
     const stackedData = d3Stack()
       .value((d, key) => d[key] || 0)
-      .keys(map(this.key)(stack.series))(dataToStack)
+      .keys(map(this.key)(stack.series))(dataToStack);
 
     // Return to required series data structure
     forEach((series: any) => {
-      const originalSeries: { [key: string]: any } = find({ key: series.key })(stack.series)
+      const originalSeries = find({ key: series.key })(stack.series) as SeriesDatum;
       originalSeries.data = map(
         (datum: any): Datum => {
           return {
@@ -206,97 +211,98 @@ class ChartSeriesManager implements SeriesManager {
             [stackAxis]: datum.data[series.key],
             [`${stackAxis}${0}`]: datum[0],
             [`${stackAxis}${1}`]: datum[1],
-          }
+          };
         },
-      )(series)
-      originalSeries.stacked = true
-      originalSeries.stackIndex = index + 1
-      delete originalSeries.datumAccessors
-    })(stackedData)
+      )(series);
+      originalSeries.stacked = true;
+      originalSeries.stackIndex = index + 1;
+      delete originalSeries.datumAccessors;
+    })(stackedData);
   }
 
   private get(key: string) {
-    return find((series: Series) => this.key(series.options) === key)(this.series)
+    return find((series: Series) => this.key(series.options) === key)(this.series);
   }
 
-  private remove(key: string): void {
-    const series: Series = this.get(key)
+  private remove(key: string) {
+    const series = this.get(key);
     if (!series) {
-      return
+      return;
     }
-    this.oldSeries.push(series)
-    remove((series: any) => this.key(series.options) === key)(this.series)
+    this.oldSeries.push(series);
+    remove((s: Series) => this.key(s.options) === key)(this.series);
   }
 
-  private removeAllExcept(keys: string[]): void {
+  private removeAllExcept(keys: string[]) {
     flow(
       filter((series: Series): boolean => !includes(this.key(series.options))(keys)),
       map((series: Series): string => this.key(series.options)),
       forEach(this.remove.bind(this)),
-    )(this.series)
+    )(this.series);
   }
 
-  private dataForLegends(): DataForLegends {
-    return reduce((memo: DataForLegends, series: Series) => {
+  private dataForLegends() {
+    return reduce((memo: Partial<DataForLegends>, series: Series) => {
       if (series.hideInLegend()) {
-        return memo
+        return memo;
       }
-      const position: LegendPosition = series.legendPosition()
-      const float: LegendFloat = series.legendFloat()
-      return set([position, float])((get([position, float])(memo) || []).concat(series.dataForLegend()))(memo)
-    }, {})(this.series)
+      const position: LegendPosition = series.legendPosition();
+      const float: LegendFloat = series.legendFloat();
+      return set([position, float])((get([position, float])(memo) || []).concat(series.dataForLegend()))(memo);
+    }, {})(this.series);
   }
 
   private dataForAxes() {
-    return reduce((memo: any, series: Series) => {
-      const xAxis = series.xAxis()
-      const yAxis = series.yAxis()
-      memo[xAxis] = uniqBy(String)((memo[xAxis] || []).concat(series.dataForAxis("x")))
-      memo[yAxis] = uniqBy(String)((memo[yAxis] || []).concat(series.dataForAxis("y")))
-      return memo
-    }, {})(this.series)
+    return reduce((memo: Partial<Record<AxisPosition, any>>, series: Series) => {
+      const xAxis = series.xAxis();
+      const yAxis = series.yAxis();
+      memo[xAxis] = uniqBy(String)((memo[xAxis] || []).concat(series.dataForAxis("x")));
+      memo[yAxis] = uniqBy(String)((memo[yAxis] || []).concat(series.dataForAxis("y")));
+      return memo;
+    }, {})(this.series);
   }
 
   private axesWithFlags() {
-    return reduce((axes: { [key: string]: any }, series: Series) => {
+    return reduce((axes: Record<string, any>, series: Series) => {
       if (series.hasFlags()) {
-        const flag: any = series.get("flag")
-        axes[flag.axis] = axes[flag.axis] || { axisPadding: 0 }
-        axes[flag.axis].axisPadding = Math.max(axes[flag.axis].axisPadding, flag.axisPadding)
+        const flag: any = series.get("flag");
+        axes[flag.axis] = axes[flag.axis] || { axisPadding: 0 };
+        axes[flag.axis].axisPadding = Math.max(axes[flag.axis].axisPadding, flag.axisPadding);
       }
-      return axes
-    }, {})(this.series)
+      return axes;
+    }, {})(this.series);
   }
 
-  private dataForFocus(focusDates: { [key: string]: any }) {
-    const seriesWithoutFlags = filter((series: Series) => !series.get("flag"))(this.series)
+  private dataForFocus(focusDates: DatesToFocus) {
+    const seriesWithoutFlags = filter((series: Series) => !series.get("flag"))(this.series);
 
     return map(
       (series: Series): { [key: string]: any } => {
-        const isMainAxis: boolean = includes(focusDates.main.axis)([series.xAxis(), series.yAxis()])
-        const axisPriority: string = isMainAxis ? "main" : "comparison"
+        const isMainAxis: boolean = includes(focusDates.main.axis)([series.xAxis(), series.yAxis()]);
+        const axisPriority: keyof DatesToFocus = isMainAxis ? "main" : "comparison";
+        const focusDate = focusDates[axisPriority] as DateToFocus;
 
         return {
-          ...series.valueAtFocus(focusDates[axisPriority].date),
+          ...series.valueAtFocus(focusDate),
           axisPriority,
           color: series.legendColor(),
           label: series.legendName(),
           displayPoint: series.displayFocusPoint(),
           stack: !series.options.clipData ? series.options.stackIndex : undefined,
-        }
+        };
       },
-    )(seriesWithoutFlags)
+    )(seriesWithoutFlags);
   }
 
-  private create(options: { [key: string]: any }): void {
-    this.series.push(new Series(this.state, this.events, this.el, options))
+  private create(options: { [key: string]: any }) {
+    this.series.push(new Series(this.state, this.events, this.el, options));
   }
 
-  draw(): void {
-    forEach(invoke("close"))(this.oldSeries)
-    this.oldSeries = []
-    forEach(invoke("draw"))(this.series)
+  public draw() {
+    forEach(invoke("close"))(this.oldSeries);
+    this.oldSeries = [];
+    forEach(invoke("draw"))(this.series);
   }
 }
 
-export default ChartSeriesManager
+export default ChartSeriesManager;

@@ -1,15 +1,15 @@
-import SunburstCanvas from "./canvas"
-import Renderer from "./renderer"
-import Breadcrumb from "./breadcrumb"
-import RootLabel from "./root_label"
-import SunburstFocus from "./focus"
-import StateHandler from "../shared/state_handler"
-import EventEmitter from "../shared/event_bus"
-import { has, uniqueId } from "lodash/fp"
-import { colorAssigner } from "../utils/colorAssigner"
-import theme from "../utils/constants"
-import defaultNumberFormatter from "../utils/number_formatter"
-import { Accessors, AccessorsObject, Components, Computed, Facade, RawData, SunburstConfig } from "./typings"
+import { has, uniqueId } from "lodash/fp";
+import EventEmitter from "../shared/event_bus";
+import StateHandler from "../shared/state_handler";
+import { colorAssigner } from "../utils/colorAssigner";
+import theme from "../utils/constants";
+import defaultNumberFormatter from "../utils/number_formatter";
+import Breadcrumb from "./breadcrumb";
+import SunburstCanvas from "./canvas";
+import SunburstFocus from "./focus";
+import Renderer from "./renderer";
+import RootLabel from "./root_label";
+import { Accessors, AccessorsObject, Components, Computed, Data, Facade, SunburstConfig } from "./typings";
 
 const defaultConfig = (): SunburstConfig => {
   return {
@@ -34,60 +34,74 @@ const defaultConfig = (): SunburstConfig => {
     uid: uniqueId("sunburst"),
     visualizationName: "sunburst",
     width: 500,
-  }
-}
+  };
+};
 
 const defaultColorAssigner = (palette: string[]): ((key: string) => string) => {
-  return colorAssigner(palette)
-}
+  return colorAssigner(palette);
+};
 
 const defaultAccessors = (): AccessorsObject => {
-  const assignColors: (key: string) => string = defaultColorAssigner(defaultConfig().palette)
+  const assignColors = defaultColorAssigner(defaultConfig().palette);
   return {
     data: {
-      data: (data: any): RawData => data,
+      data: (data: any): Data => data,
     },
     series: {
-      color: (d: RawData): string => assignColors(d.name),
-      id: (d: RawData): string => d.name,
-      name: (d: RawData): string => d.name || "",
-      value: (d: RawData): number => d.value,
+      color: (d: Data): string => assignColors(d.name || ""),
+      id: (d: Data) => d.name || uniqueId("series"),
+      name: (d: Data) => d.name || "",
+      value: (d: Data) => d.value || 0,
     },
-  }
-}
+  };
+};
+
+const defaultComputed = (): Computed => ({
+  canvas: {
+    drawingDims: { width: 0, height: 0 },
+    containerRect: new DOMRect(),
+  },
+  breadcrumb: {},
+  focus: {},
+  renderer: {
+    innerRadius: 0,
+    data: [],
+  },
+  rootLabel: {},
+});
 
 class SunburstFacade implements Facade {
-  private __disposed: boolean = false
-  private canvas: SunburstCanvas
-  private components: Components
-  private context: Element
-  private customColorAccessor: boolean = false
-  private events: EventEmitter
-  private state: StateHandler<RawData, SunburstConfig, AccessorsObject, Computed>
+  private DISPOSED: boolean = false;
+  private canvas: SunburstCanvas;
+  private components: Components;
+  private context: Element;
+  private customColorAccessor: boolean = false;
+  private events: EventEmitter;
+  private state: StateHandler<Data, SunburstConfig, AccessorsObject, Computed>;
 
   constructor(context: Element) {
-    this.context = context
-    this.events = this.initializeEvents()
-    this.state = this.initializeState()
-    this.canvas = this.initializeCanvas()
-    this.components = this.initializeComponents()
+    this.context = context;
+    this.events = this.initializeEvents();
+    this.state = this.initializeState();
+    this.canvas = this.initializeCanvas();
+    this.components = this.initializeComponents();
   }
 
   private initializeEvents(): EventEmitter {
-    return new EventEmitter()
+    return new EventEmitter();
   }
 
-  private initializeState(): StateHandler<RawData, SunburstConfig, AccessorsObject, Computed> {
+  private initializeState(): StateHandler<Data, SunburstConfig, AccessorsObject, Computed> {
     return new StateHandler({
       data: {},
       config: defaultConfig(),
       accessors: defaultAccessors(),
-      computed: {},
-    })
+      computed: defaultComputed(),
+    });
   }
 
   private initializeCanvas(): SunburstCanvas {
-    return new SunburstCanvas(this.state.readOnly(), this.state.computedWriter(["canvas"]), this.events, this.context)
+    return new SunburstCanvas(this.state.readOnly(), this.state.computedWriter(["canvas"]), this.events, this.context);
   }
 
   private initializeComponents(): Components {
@@ -116,53 +130,53 @@ class SunburstFacade implements Facade {
         this.events,
         this.canvas.elementFor("rootLabel"),
       ),
-    }
+    };
   }
 
-  data(data?: RawData): RawData {
-    return this.state.data(data)
+  public data(data?: Data): Data {
+    return this.state.data(data);
   }
 
-  config(config?: Partial<SunburstConfig>): SunburstConfig {
-    if (config.palette && !this.customColorAccessor) {
-      const assignColors: (key: string, color?: string) => string = defaultColorAssigner(config.palette)
+  public config(config?: Partial<SunburstConfig>): SunburstConfig {
+    if (config && config.palette && !this.customColorAccessor) {
+      const assignColors: (key: string, color?: string) => string = defaultColorAssigner(config.palette);
       this.accessors("series", {
-        color: (d: RawData): string => assignColors(d.name, d.color),
-      })
+        color: (d: Data): string => assignColors(d.name || "", d.color),
+      });
     }
-    return this.state.config(config)
+    return this.state.config(config);
   }
 
-  accessors(type: string, accessors: Accessors<any>): Accessors<any> {
+  public accessors(type: string, accessors: Accessors<any>): Accessors<any> {
     if (type === "series" && has("color")(accessors)) {
-      this.customColorAccessor = true
+      this.customColorAccessor = true;
     }
-    return this.state.accessors(type, accessors)
+    return this.state.accessors(type, accessors);
   }
 
-  on(event: string, handler: any): void {
-    this.events.on(event, handler)
+  public on(event: string, handler: any) {
+    this.events.on(event, handler);
   }
 
-  off(event: string, handler: any): void {
-    this.events.removeListener(event, handler)
+  public off(event: string, handler: any) {
+    this.events.removeListener(event, handler);
   }
 
-  draw(): void {
-    this.state.captureState()
-    this.canvas.draw()
-    this.components.renderer.draw()
+  public draw() {
+    this.state.captureState();
+    this.canvas.draw();
+    this.components.renderer.draw();
   }
 
-  close(): void {
-    if (this.__disposed) {
-      return
+  public close() {
+    if (this.DISPOSED) {
+      return;
     }
-    this.__disposed = true
-    this.canvas.remove()
-    this.events.removeAll()
-    this.context.innerHTML = ""
+    this.DISPOSED = true;
+    this.canvas.remove();
+    this.events.removeAll();
+    this.context.innerHTML = "";
   }
 }
 
-export default SunburstFacade
+export default SunburstFacade;

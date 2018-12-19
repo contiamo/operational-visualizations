@@ -1,26 +1,25 @@
 {
+  "exclude": ["node_modules", "dist", "lib", "__tests__", "**/*.test*", "**/*.spec*"],
+  "include": ["src"],
   "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "lib",
-    "jsx": "react",
+    "skipLibCheck": true,
     "target": "es5",
-    "moduleResolution": "node",
+    "module": "esnext",
+    "lib": ["es2015", "dom", "es2016.array.include", "es2017.object"],
+    "jsx": "react",
     "declaration": true,
+    "declarationMap": true,
+    "rootDir": "./src",
+    "outDir": "./lib",
+    "downlevelIteration": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
-    "module": "commonjs",
-    "sourceMap": true,
-    "noImplicitAny": true,
-    "lib": [
-      "dom",
-      "es6",
-      "es2016",
-      "dom.iterable",
-      "scripthost",
-      "es2017.object"
-    ]
-  },
-  "include": [
-    "src",
-    "types"
-  ]
+    "esModuleInterop": true,
+    "inlineSourceMap": true
+  }
 }

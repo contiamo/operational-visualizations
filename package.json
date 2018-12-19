@@ -14,20 +14,25 @@
     "lib"
   ],
   "scripts": {
-    "dev": "parcel scripts/dev-server/index.html",
-    "start": "parcel website/index.html",
-    "build": "run-p build:*",
-    "build:app": "parcel build website/index.html --public-url .",
-    "build:package": "rimraf lib && tsc",
-    "deploy": "npm run build && gh-pages -d dist",
-    "test": "jest",
-    "prepublish": "npm run build:package",
-    "prettier": "prettier 'website/**/*.{ts,tsx}' --write",
-    "precommit": "npm run prettier && git add ."
+    "test": "operational-scripts test",
+    "start": "operational-scripts start",
+    "build": "operational-scripts build",
+    "prepublishOnly": "operational-scripts prepare"
   },
   "dependencies": {
     "@types/d3-format": "^1.3.0",
     "d3": "^5.7.0",
+    "d3-array": "^2.0.2",
+    "d3-ease": "^1.0.5",
+    "d3-format": "^1.3.2",
+    "d3-hierarchy": "^1.1.8",
+    "d3-interpolate": "^1.3.2",
+    "d3-scale": "^2.1.2",
+    "d3-selection": "^1.3.2",
+    "d3-shape": "^1.2.2",
+    "d3-time": "^1.0.10",
+    "d3-time-format": "^2.1.3",
+    "d3-transition": "^1.1.3",
     "glamor": "^2.20.40",
     "glamorous": "^4.8.0",
     "lodash": "^4.17.4",
@@ -36,27 +41,9 @@
     "react": "^16.2.0",
     "tinycolor2": "^1.4.1"
   },
-  "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx"
-    ],
-    "transform": {
-      "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
-    },
-    "roots": [
-      "<rootDir>/src"
-    ],
-    "testRegex": "/__tests__/.*\\.(ts|tsx|js|jsx)$",
-    "setupTestFrameworkScriptFile": "<rootDir>/node_modules/jest-enzyme/lib/index.js",
-    "snapshotSerializers": [
-      "<rootDir>/node_modules/jest-serializer-enzyme"
-    ]
-  },
   "devDependencies": {
     "@operational/components": "^12.1.0",
+    "@operational/scripts": "^1.2.0",
     "@types/core-js": "0.9.43",
     "@types/d3-array": "^1.2.1",
     "@types/d3-ease": "^1.0.7",
@@ -70,7 +57,7 @@
     "@types/enzyme": "^3.1.5",
     "@types/highlight.js": "^9.12.3",
     "@types/jest": "^23.0.0",
-    "@types/lodash": "^4.14.109",
+    "@types/lodash": "^4.14.119",
     "@types/marked": "^0.3.0",
     "@types/moment-range": "^3.1.0",
     "@types/node": "8.0.27",
@@ -93,13 +80,12 @@
     "jest-serializer-enzyme": "1.0.0",
     "lint-staged": "^7.1.3",
     "npm-run-all": "^4.1.3",
-    "parcel-bundler": "^1.10.3",
     "prettier": "^1.13.7",
     "react-dom": "^16.4.1",
     "react-emotion": "^9.2.6",
     "react-test-renderer": "16.0.0",
     "rimraf": "^2.6.2",
-    "ts-jest": "21.0.0",
+    "ts-jest": "^23.10.5",
     "tslint": "^5.10.0",
     "tslint-config-airbnb": "5.8.0",
     "tslint-config-prettier": "1.12.0",

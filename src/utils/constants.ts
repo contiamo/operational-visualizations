@@ -30,18 +30,18 @@ const palettes = {
     rainbow: ["#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#ffffbf", "#e6f598", "#abdda4", "#66c2a5", "#3288bd"],
     earthy: ["#8c510a", "#bf812d", "#dfc27d", "#f6e8c3", "#f5f5f5", "#c7eae5", "#80cdc1", "#35978f", "#01665e"],
   },
-}
+};
 
 const axisColors = {
   border: "#adadad",
   rules: "#e8e8e8",
   label: "#999999",
-}
+};
 
 const focusColors = {
   label: "#2f3435",
   stroke: "#999999",
-}
+};
 
 const colors = {
   axis: axisColors,
@@ -49,9 +49,9 @@ const colors = {
   white: "#ffffff",
   primary: "#1499ce",
   lightGrey: "#e8e8e8",
-}
+};
 
-type FontWeight = 400 | 700
+type FontWeight = 400 | 700;
 
 const font = {
   color: "#545454",
@@ -63,9 +63,9 @@ const font = {
   },
   weight: {
     /** 400 */
-    regular: 400,
+    regular: 400 as FontWeight,
     /** 700 */
-    bold: 700,
+    bold: 700 as FontWeight,
   },
   small: {
     lineHeight: "1.5",
@@ -76,7 +76,7 @@ const font = {
   },
   family:
     "Helvetica Neue, Helvetica, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
-}
+};
 
 /**
  * A container of space-related constants to be
@@ -88,7 +88,7 @@ const space = {
 
   /** Default space is `8px` */
   default: 8,
-}
+};
 
 const constants = {
   palettes,
@@ -96,6 +96,6 @@ const constants = {
   font,
   space,
   borderRadius: 4,
-}
+};
 
-export default constants
+export default constants;

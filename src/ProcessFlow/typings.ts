@@ -1,9 +1,7 @@
 // Type definitions for the Contiamo Process Flow visualization
-import * as d3 from "d3-selection"
-import Nodes from "./node"
-import Link from "./link"
-
-import { Accessor, BaseConfig, D3Selection, Focus, Facade, ChartStateReadOnly } from "../shared/typings"
+import { Accessor, BaseConfig, ChartStateReadOnly, D3Selection, Facade, Focus } from "../shared/typings";
+import Link from "./link";
+import Nodes from "./node";
 
 export {
   Accessor,
@@ -12,147 +10,188 @@ export {
   D3Selection,
   Dimensions,
   EventBus,
+  Focus,
   Position,
   StateWriter,
-} from "../shared/typings"
+  WithConvert,
+} from "../shared/typings";
 
-export type State = ChartStateReadOnly<InputData, ProcessFlowConfig, AccessorsObject, Computed>
+export type State = ChartStateReadOnly<InputData, ProcessFlowConfig, AccessorsObject, Computed>;
 
 export interface ProcessFlowConfig extends BaseConfig {
-  borderColor: string
-  focusElement?: FocusElement
-  focusLabelPosition: string
-  highlightColor: string
-  horizontalNodeSpacing: number
-  labelOffset: number
-  linkBorderWidth: number
-  maxLinkWidth: number
-  maxNodeSize: number
-  minLinkWidth: number
-  minNodeSize: number
-  nodeBorderWidth: number
-  numberFormatter: (x: number) => string
-  showLinkFocusLabels: boolean
-  showNodeFocusLabels: boolean
-  verticalNodeSpacing: number
+  borderColor: string;
+  focusElement: FocusElement;
+  focusLabelPosition: string;
+  highlightColor: string;
+  horizontalNodeSpacing: number;
+  labelOffset: number;
+  linkBorderWidth: number;
+  maxLinkWidth: number;
+  maxNodeSize: number;
+  minLinkWidth: number;
+  minNodeSize: number;
+  nodeBorderWidth: number;
+  numberFormatter: (x: number) => string;
+  showLinkFocusLabels: boolean;
+  showNodeFocusLabels: boolean;
+  verticalNodeSpacing: number;
 }
 
-export type TLink = Link
-export type TNode = Nodes
+export type TLink = Link;
+export type TNode = Nodes;
 
-export type Scale = (size: number) => number
+export type Scale = (size: number) => number;
 
-export interface FocusElement {
-  type?: "node" | "link" | "path"
-  matchers?: { [key: string]: any }
-  hideLabel?: boolean
+interface BaseFocusElement {
+  type: "node" | "link" | "path" | "none";
+  matchers?: Record<string, any>;
+  hideLabel?: boolean;
 }
+
+export interface NodeFocusElement extends BaseFocusElement {
+  type: "node";
+  matchers: {
+    id: string;
+  };
+}
+
+export interface LinkFocusElement extends BaseFocusElement {
+  type: "link";
+  matchers: {
+    sourceId: string;
+    targetId: string;
+  };
+}
+
+export interface PathFocusElement extends BaseFocusElement {
+  type: "path";
+  matchers: {
+    path: string[];
+  };
+}
+
+export interface NoFocusElement extends BaseFocusElement {
+  type: "none";
+}
+
+export type FocusElement = NodeFocusElement | LinkFocusElement | PathFocusElement | NoFocusElement;
 
 export interface Journey {
-  size: number
-  path: string[]
+  size: number;
+  path: string[];
 }
 
 export interface LinkAttrs {
-  content?: { [key: string]: any }[]
-  dash?: string
-  focusLabel?: any
-  label?: string
-  size: number
-  source: TNode
-  sourceId: string
-  stroke?: string
-  target: TNode
-  targetId: string
+  content?: Array<Record<string, any>>;
+  dash?: string;
+  focusLabel?: any;
+  label?: string;
+  size: number;
+  source: TNode;
+  sourceId: string;
+  stroke?: string;
+  target: TNode;
+  targetId: string;
 }
 
 export interface NodeAttrs {
-  color?: string
-  content?: { [key: string]: any }[]
-  shape?: string
-  size?: number
-  stroke?: string
-  id?: string
-  label?: string
-  labelPosition?: string
+  color?: string;
+  content?: Array<Record<string, any>>;
+  shape?: string;
+  size: number;
+  stroke?: string;
+  id?: string;
+  label?: string;
+  labelPosition?: string;
 }
 
 // @TODO
 export interface DataAccessors {
-  nodes: Accessor<any, any>
-  journeys: Accessor<any, any>
+  nodes: Accessor<any, any>;
+  journeys: Accessor<any, any>;
 }
 
 export interface NodeAccessors {
-  color: Accessor<NodeAttrs, string>
-  content: Accessor<NodeAttrs, { [key: string]: any }[]>
-  shape: Accessor<NodeAttrs, string>
-  size: Accessor<NodeAttrs, number>
-  stroke: Accessor<NodeAttrs, string>
-  id: Accessor<NodeAttrs, string>
-  label: Accessor<NodeAttrs, string>
-  labelPosition: Accessor<NodeAttrs, string>
+  color: Accessor<NodeAttrs, string>;
+  content: Accessor<NodeAttrs, Array<Record<string, any>>>;
+  shape: Accessor<NodeAttrs, string>;
+  size: Accessor<NodeAttrs, number>;
+  stroke: Accessor<NodeAttrs, string>;
+  id: Accessor<NodeAttrs, string>;
+  label: Accessor<NodeAttrs, string>;
+  labelPosition: Accessor<NodeAttrs, string>;
 }
 
 export interface LinkAccessors {
-  content: (d: LinkAttrs) => { [key: string]: any }[]
-  dash: (d: LinkAttrs) => string
-  label: (d: LinkAttrs) => string
-  size: (d: LinkAttrs) => number
-  stroke: (d: LinkAttrs) => string
-  source: (d: LinkAttrs) => TNode | undefined
-  sourceId: (d: LinkAttrs) => string | undefined
-  target: (d: LinkAttrs) => TNode | undefined
-  targetId: (d: LinkAttrs) => string | undefined
+  content: (d: LinkAttrs) => Array<Record<string, any>>;
+  dash: (d: LinkAttrs) => string;
+  label: (d: LinkAttrs) => string;
+  size: (d: LinkAttrs) => number;
+  stroke: (d: LinkAttrs) => string;
+  source: (d: LinkAttrs) => TNode | undefined;
+  sourceId: (d: LinkAttrs) => string | undefined;
+  target: (d: LinkAttrs) => TNode | undefined;
+  targetId: (d: LinkAttrs) => string | undefined;
 }
 
 export interface AccessorsObject {
-  data: DataAccessors
-  node: NodeAccessors
-  link: LinkAccessors
+  data: DataAccessors;
+  node: NodeAccessors;
+  link: LinkAccessors;
 }
 
 export interface InputData {
-  journeys?: Journey[]
-  nodes?: any[]
-}
-
-export interface Computed {
-  canvas?: { [key: string]: any }
-  focus?: { [key: string]: any }
-  series?: { [key: string]: any }
+  journeys?: Journey[];
+  nodes?: any[];
 }
 
 export interface Data {
-  journeys: Journey[]
-  nodes: TNode[]
-  links: TLink[]
+  journeys: Journey[];
+  nodes: TNode[];
+  links: TLink[];
 }
 
 export interface FocusPoint {
-  offset: number
-  type: string
-  x: number
-  y: number
-  id: string
+  offset: number;
+  type: string;
+  x: number;
+  y: number;
+  id: string;
 }
 
 export interface HoverPayload {
-  d: TNode | TLink
-  focusPoint: FocusPoint
-  hideLabel?: boolean
+  d: TNode | TLink;
+  focusPoint: FocusPoint;
+  hideLabel?: boolean;
 }
 
-export type Focus = Focus<HoverPayload>
-
-export type Facade = Facade<ProcessFlowConfig, InputData>
+export type Facade = Facade<ProcessFlowConfig, InputData>;
 
 export interface Components {
-  focus: Focus<HoverPayload>
+  focus: Focus;
 }
 
-export interface Renderer {
-  draw: (data: TLink[] | TNode[]) => void
-  focusElement: (focusElement: FocusElement) => void
-  highlight: (element: D3Selection, d: TLink | TNode, keepCurrent: boolean) => void
+export interface Renderer<TElement, TFocus> {
+  draw: (data: TElement[]) => void;
+  focusElement: (focusElement: TFocus) => void;
+  highlight: (element: D3Selection, d: TElement, keepCurrent: boolean) => void;
+}
+
+// Computed values saved in state
+interface ComputedCanvas {
+  elRect: DOMRect;
+  containerRect: DOMRect;
+}
+
+interface ComputedSeries {
+  data: Data;
+  horizontalNodeSpacing: number;
+  width: number;
+  height: number;
+}
+
+export interface Computed {
+  canvas: ComputedCanvas;
+  focus: {};
+  series: ComputedSeries;
 }

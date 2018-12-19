@@ -1,111 +1,114 @@
-import { ClickPayload, D3Selection, Datum, EventBus, HoverPayload, State, StateWriter } from "./typings"
-import Events from "../shared/event_catalog"
-import { clone, defaults } from "lodash/fp"
-import * as styles from "./styles"
-import { readableTextColor } from "../utils/color"
+import { clone, defaults } from "lodash/fp";
+import Events from "../shared/event_catalog";
+import { readableTextColor } from "../utils/color";
+import * as styles from "./styles";
+import { ClickPayload, D3Selection, EventBus, HierarchyDatum, HoverPayload, State, StateWriter } from "./typings";
 
-const ARROW_WIDTH: number = 7
-const HOPS_WIDTH: number = 40
+const ARROW_WIDTH: number = 7;
+const HOPS_WIDTH: number = 40;
 
 class Breadcrumb {
-  private el: D3Selection
-  private events: EventBus
-  private state: State
-  private stateWriter: StateWriter
+  private el: D3Selection;
+  private events: EventBus;
+  private state: State;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventBus, el: D3Selection) {
-    this.state = state
-    this.stateWriter = stateWriter
-    this.events = events
-    this.el = el
-    this.events.on(Events.FOCUS.ELEMENT.CLICK, this.updateHoverPath.bind(this))
-    this.events.on(Events.FOCUS.ELEMENT.HOVER, this.updateHoverPath.bind(this))
-    this.events.on(Events.FOCUS.ELEMENT.OUT, this.updateHoverPath.bind(this))
+  constructor(state: State, _: StateWriter, events: EventBus, el: D3Selection) {
+    this.state = state;
+    this.events = events;
+    this.el = el;
+    this.events.on(Events.FOCUS.ELEMENT.CLICK, this.updateHoverPath.bind(this));
+    this.events.on(Events.FOCUS.ELEMENT.HOVER, this.updateHoverPath.bind(this));
+    this.events.on(Events.FOCUS.ELEMENT.OUT, this.updateHoverPath.bind(this));
   }
 
-  private updateHoverPath(payload: HoverPayload | ClickPayload): void {
+  private updateHoverPath(payload: HoverPayload | ClickPayload) {
     // Only display breadcrumb if drawing area is wide enough.
-    const config = this.state.current.getConfig()
-    const maxBreadcrumbWidth: number = config.breadcrumbItemWidth * config.maxBreadcrumbLength + ARROW_WIDTH
+    const config = this.state.current.getConfig();
+    const maxBreadcrumbWidth: number = config.breadcrumbItemWidth * config.maxBreadcrumbLength + ARROW_WIDTH;
     if (this.state.current.getConfig().width < maxBreadcrumbWidth) {
-      return
+      return;
     }
 
-    const computed = this.state.current.getComputed().renderer
-    const fixedNode = computed.zoomNode || computed.topNode
+    const computed = this.state.current.getComputed().renderer;
+    const fixedNode = computed.zoomNode || computed.topNode;
     if (!fixedNode || (payload.d && payload.d.data.empty)) {
-      return
+      return;
     }
-    const nodeArray = payload.d ? payload.d.ancestors().reverse() : fixedNode.ancestors().reverse()
-    this.update(nodeArray)
+    const nodeArray = payload.d ? payload.d.ancestors().reverse() : fixedNode.ancestors().reverse();
+    this.update(nodeArray);
   }
 
-  private label(d: any, i: number): string {
-    return d.hops ? "..." : d.name
+  private label(d: HierarchyDatum) {
+    return d.data.hops ? "..." : d.data.name;
   }
 
-  private truncateNodeArray(nodeArray: Datum[]): (Datum | string)[] {
-    const maxLength: number = this.state.current.getConfig().maxBreadcrumbLength
+  private truncateNodeArray(nodeArray: HierarchyDatum[]) {
+    const maxLength = this.state.current.getConfig().maxBreadcrumbLength;
     if (nodeArray.length <= maxLength) {
-      return nodeArray
+      return nodeArray;
     }
-    const firstNodes: (Datum)[] = nodeArray.slice(0, 1)
-    const lastNodes: (Datum)[] = nodeArray.slice(nodeArray.length - (maxLength - 2))
-    const dummyHopsNode = defaults({ hops: true })(clone(firstNodes[0]))
-    return firstNodes.concat([dummyHopsNode]).concat(lastNodes)
+    const firstNodes = nodeArray.slice(0, 1);
+    const lastNodes = nodeArray.slice(nodeArray.length - (maxLength - 2));
+    const dummyHopsNode = defaults({ hops: true })(clone(firstNodes[0]));
+    return firstNodes.concat([dummyHopsNode]).concat(lastNodes);
   }
 
-  private backgroundColor(d: Datum): string {
-    return d.hops ? "#fff" : d.color || "#eee"
+  private backgroundColor(d: HierarchyDatum) {
+    return d.data.hops ? "#fff" : d.data.color || "#eee";
   }
 
-  private labelColor(d: Datum): string {
-    return readableTextColor(this.backgroundColor(d), ["black", "white"])
+  private labelColor(d: HierarchyDatum) {
+    return readableTextColor(this.backgroundColor(d), ["black", "white"]);
   }
 
-  private update(nodeArray: Datum[]): void {
-    const data: any[] = nodeArray.length > 1 ? this.truncateNodeArray(nodeArray) : []
+  private update(nodeArray: HierarchyDatum[]) {
+    const data = nodeArray.length > 1 ? this.truncateNodeArray(nodeArray) : [];
 
     // Data join; key function combines name and depth (= position in sequence).
-    const trail = this.el.selectAll(`div.${styles.breadcrumbItem}`).data(data, d => (d.hops ? d : d.name + d.depth))
+    const trail = this.el
+      .selectAll(`div.${styles.breadcrumbItem}`)
+      .data(data, d =>
+        (d as HierarchyDatum).data.hops ? "hops" : (d as HierarchyDatum).data.name + (d as HierarchyDatum).depth,
+      );
 
     // Remove exiting nodes.
-    trail.exit().remove()
+    trail.exit().remove();
 
     // Add breadcrumb and label for entering nodes.
-    const itemWidth = (d: Datum): number => (d.hops ? HOPS_WIDTH : this.state.current.getConfig().breadcrumbItemWidth)
+    const itemWidth = (d: HierarchyDatum) =>
+      d.data.hops ? HOPS_WIDTH : this.state.current.getConfig().breadcrumbItemWidth;
 
     const entering: D3Selection = trail
       .enter()
       .append("div")
-      .attr("class", (d: Datum): string => `${styles.breadcrumbItem} ${d.hops ? "hops" : ""}`)
+      .attr("class", (d: HierarchyDatum) => `${styles.breadcrumbItem} ${d.data.hops ? "hops" : ""}`)
       .style("background-color", this.backgroundColor)
-      .style("width", (d: Datum) => `${itemWidth(d)}px`)
-      .attr("title", this.label)
+      .style("width", (d: HierarchyDatum) => `${itemWidth(d)}px`)
+      .attr("title", this.label);
 
     entering
       .append("div")
       .attr("class", "label")
-      .style("width", (d: Datum) => `${itemWidth(d) - ARROW_WIDTH * 3}px`)
+      .style("width", (d: HierarchyDatum) => `${itemWidth(d) - ARROW_WIDTH * 3}px`)
       .html(this.label)
-      .style("color", this.labelColor.bind(this))
+      .style("color", this.labelColor.bind(this));
 
-    entering.append("div").attr("class", "background-arrow")
+    entering.append("div").attr("class", "background-arrow");
 
     entering
       .append("div")
       .attr("class", "arrow")
-      .style("border-left-color", this.backgroundColor)
+      .style("border-left-color", this.backgroundColor);
 
-    entering.merge(trail).on("click", this.onClick.bind(this))
+    entering.merge(trail).on("click", this.onClick.bind(this));
   }
 
-  private onClick(d: Datum): void {
-    if (d.hops) {
-      return
+  private onClick(d: HierarchyDatum) {
+    if (d.data.hops) {
+      return;
     }
-    this.events.emit(Events.FOCUS.ELEMENT.CLICK, { d })
+    this.events.emit(Events.FOCUS.ELEMENT.CLICK, { d });
   }
 }
 
-export default Breadcrumb
+export default Breadcrumb;

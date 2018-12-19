@@ -1,89 +1,82 @@
-// import DataHandler from "./data_handler"
-import Renderer from "./renderers/renderer"
+import { filter, forEach, LodashForEach } from "lodash/fp";
+import Renderer from "./renderers/renderer";
 
 import {
   D3Selection,
-  Data,
-  Datum,
   EventBus,
+  InputData,
+  InputDatum,
   Renderer as RendererInterface,
   RendererOptions,
   State,
   StateWriter,
-} from "./typings"
-
-import { flow, filter, forEach } from "lodash/fp"
+  WithConvert,
+} from "./typings";
 
 class Series {
-  private attributes: any
-  private data: Data
-  private drawn: boolean
-  private el: D3Selection
-  private events: EventBus
-  private renderAs: () => RendererOptions[]
-  private renderer: RendererInterface
-  private state: State
-  private stateWriter: StateWriter
+  private attributes: any;
+  private data!: InputData;
+  private el: D3Selection;
+  private events: EventBus;
+  private renderAs!: () => RendererOptions[];
+  private renderer!: RendererInterface;
+  private state: State;
+  private stateWriter: StateWriter;
 
   constructor(state: State, stateWriter: StateWriter, events: EventBus, el: D3Selection) {
-    this.state = state
-    this.stateWriter = stateWriter
-    this.events = events
-    this.el = el
-    this.drawn = false
+    this.state = state;
+    this.stateWriter = stateWriter;
+    this.events = events;
+    this.el = el;
   }
 
-  assignData(): void {
-    this.attributes = this.state.current.getData()
-    this.assignAccessors()
-    this.updateRenderer()
-    this.prepareData()
-    this.stateWriter("dataForLegend", this.renderer.dataForLegend())
+  public assignData() {
+    this.attributes = this.state.current.getData();
+    this.assignAccessors();
+    this.updateRenderer();
+    this.prepareData();
+    this.stateWriter("dataForLegend", this.renderer.dataForLegend());
   }
 
-  private prepareData(): void {
-    this.data = flow(
-      filter(
-        (datum: Datum): boolean => {
-          return this.renderer.key(datum) && this.renderer.key(datum).length > 0 && this.renderer.value(datum) > 0
-        },
-      ),
-    )(this.state.current.getAccessors().data.data(this.attributes))
-    this.renderer.setData(this.data)
-    this.stateWriter("data", this.data)
+  private prepareData() {
+    this.data = filter(
+      (datum: InputDatum): boolean =>
+        !!this.renderer.key(datum) && this.renderer.key(datum).length > 0 && this.renderer.value(datum) > 0,
+    )(this.state.current.getAccessors().data.data(this.attributes));
+    this.renderer.setData(this.data);
+    this.stateWriter("data", this.data);
   }
 
-  private assignAccessors(): void {
-    const accessors = this.state.current.getAccessors().series
-    forEach.convert({ cap: false })((accessor: any, key: string) => {
-      ;(this as any)[key] = () => accessor(this.attributes)
-    })(accessors)
+  private assignAccessors() {
+    const accessors = this.state.current.getAccessors().series;
+    (forEach as WithConvert<LodashForEach>).convert({ cap: false })((accessor: any, key: string) => {
+      (this as any)[key] = () => accessor(this.attributes);
+    })(accessors);
   }
 
-  private updateRenderer(): void {
-    const options = this.renderAs()
+  private updateRenderer() {
+    const options = this.renderAs();
     if (!options || options.length !== 1) {
-      throw new Error(`Incorrect number of renderers: ${!options ? 0 : options.length} specified, 1 required`)
+      throw new Error(`Incorrect number of renderers: ${!options ? 0 : options.length} specified, 1 required`);
     }
-    const rendererOptions = options[0]
+    const rendererOptions = options[0];
     if (!this.renderer) {
-      this.renderer = this.createRenderer(rendererOptions)
+      this.renderer = this.createRenderer(rendererOptions);
     } else if (this.renderer.type !== rendererOptions.type) {
-      this.renderer.remove()
-      this.renderer = this.createRenderer(rendererOptions)
+      this.renderer.remove();
+      this.renderer = this.createRenderer(rendererOptions);
     } else {
-      this.renderer.updateOptions(rendererOptions)
+      this.renderer.updateOptions(rendererOptions);
     }
   }
 
   private createRenderer(options: RendererOptions): any {
-    return new Renderer(this.state, this.events, this.el.select("g.drawing"), options)
+    return new Renderer(this.state, this.events, this.el.select("g.drawing"), options);
   }
 
-  draw(): void {
-    this.renderer.draw()
-    this.drawn = true
+  public draw() {
+    this.renderer.draw();
   }
 }
 
-export default Series
+export default Series;

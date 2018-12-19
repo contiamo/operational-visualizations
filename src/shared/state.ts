@@ -1,37 +1,36 @@
-import { cloneDeep, defaults, get, set } from "lodash/fp"
-import { ChartStateObject } from "./typings"
+import { cloneDeep, defaults, set } from "lodash/fp";
+import { ChartStateObject } from "./typings";
 
-export type Path = string | string[]
+export type Path = string | string[];
 
 /*
  ** All visualizations have a common state structure with the following 4 properties:
  ** data, config, accessors and computed.
  **/
 export interface ReadOnlyState<Data, Config, AccessorsObject, Computed> {
-  getData: () => Readonly<Data>
-  getConfig: () => Readonly<Config>
-  getAccessors: () => Readonly<AccessorsObject>
-  getComputed: () => Readonly<Computed>
+  getData: () => Readonly<Data>;
+  getConfig: () => Readonly<Config>;
+  getAccessors: () => Readonly<AccessorsObject>;
+  getComputed: () => Readonly<Computed>;
 }
 
 export default class State<Data, Config, AccessorsObject, Computed> {
-  state: ChartStateObject<Data, Config, AccessorsObject, Computed>
-
+  private state: ChartStateObject<Data, Config, AccessorsObject, Computed>;
 
   constructor(obj: ChartStateObject<Data, Config, AccessorsObject, Computed>) {
-    this.state = cloneDeep(obj)
+    this.state = cloneDeep(obj);
   }
 
-  getData() {
-    return this.state.data
+  public getData() {
+    return this.state.data;
   }
 
-  getConfig() {
-    return this.state.config
+  public getConfig() {
+    return this.state.config;
   }
 
-  getAccessors() {
-    return this.state.accessors
+  public getAccessors() {
+    return this.state.accessors;
   }
 
   /*
@@ -39,42 +38,42 @@ export default class State<Data, Config, AccessorsObject, Computed> {
    ** support nesting. The deep clone protects against unintended changes to the computed object,
    ** but a TS error will only be thrown if first-level properties of the computed object are modified.
    */
-  getComputed() {
-    return cloneDeep(this.state.computed)
+  public getComputed() {
+    return cloneDeep(this.state.computed);
   }
 
-  set(path: Path, value: any) {
-    this.state = set(path)(value)(this.state)
-    return value
+  public set(path: Path, value: any) {
+    this.state = set(path)(value)(this.state);
+    return value;
   }
 
-  merge(path: Path, value: { [key: string]: any } = {}) {
-    return this.mergePath([].concat(path), value)
+  public merge(path: Path, value: Record<string, any> = {}) {
+    return this.mergePath(([] as string[]).concat(path), value);
   }
 
-  readOnly(): ReadOnlyState<Data, Config, AccessorsObject, Computed> {
+  public readOnly(): ReadOnlyState<Data, Config, AccessorsObject, Computed> {
     return {
       getData: this.getData.bind(this),
       getConfig: this.getConfig.bind(this),
       getAccessors: this.getAccessors.bind(this),
-      getComputed: this.getComputed.bind(this)
-    }
+      getComputed: this.getComputed.bind(this),
+    };
   }
 
-  clone(): State<Data, Config, AccessorsObject, Computed> {
+  public clone(): State<Data, Config, AccessorsObject, Computed> {
     // State object will be deep-cloned in constructor
-    return new State<Data, Config, AccessorsObject, Computed>(this.state)
+    return new State<Data, Config, AccessorsObject, Computed>(this.state);
   }
 
-  private mergePath(path: string[], value: { [key: string]: any }) {
+  private mergePath(path: string[], value: Record<string, any>) {
     return path.reduce((currentStateChunk: any, currentPath: string, index: number) => {
       if (currentStateChunk !== null && typeof currentStateChunk === "object") {
         if (index === path.length - 1) {
-          currentStateChunk[currentPath] = defaults(currentStateChunk[currentPath])(value)
+          currentStateChunk[currentPath] = defaults(currentStateChunk[currentPath])(value);
         }
-        return currentStateChunk[currentPath]
+        return currentStateChunk[currentPath];
       }
-      throw new Error(`Path [${path.join(", ")}] not found in object`)
-    }, this.state)
+      throw new Error(`Path [${path.join(", ")}] not found in object`);
+    }, this.state);
   }
 }
