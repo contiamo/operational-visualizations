@@ -96,6 +96,7 @@ const containerStyle = ({ position, margins, data, width }: AxisProps) => ({
   overflow: "visible",
   borderWidth: borderWidth(position),
   margin: margins,
+  verticalAlign: "top",
   ...(position[0] === "x"
     ? {
         width: data.length,
