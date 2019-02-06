@@ -11,24 +11,24 @@ Polar area charts are donut charts where the area representing the value of each
 ## Usage
 
 ```js
-;(() => {
+(() => {
   const colors = {
     Berlin: "#1499CE",
     Dortmund: "#00B34D",
     Bonn: "#FFAE00",
     Cologne: "#DE1A1A",
-  }
+  };
 
   const accessors = {
     key: d => d.key,
     value: d => d.value,
     color: d => colors[d.key],
-  }
+  };
 
   const DonutRenderer = {
     type: "donut",
     accessors,
-  }
+  };
 
   const GaugeRenderer = {
     type: "gauge",
@@ -36,12 +36,12 @@ Polar area charts are donut charts where the area representing the value of each
     comparison: { key: "Last month", value: 18 },
     target: 50,
     accessors,
-  }
+  };
 
   const PolarRenderer = {
     type: "polar",
     accessors,
-  }
+  };
 
   class Pie extends React.Component {
     state = {
@@ -64,7 +64,7 @@ Polar area charts are donut charts where the area representing the value of each
         renderAs: [DonutRenderer],
       },
       accessors: {},
-    }
+    };
 
     render() {
       return (
@@ -74,7 +74,7 @@ Polar area charts are donut charts where the area representing the value of each
           accessors={this.state.accessors}
           config={this.state.config}
         />
-      )
+      );
     }
   }
 
@@ -82,8 +82,8 @@ Polar area charts are donut charts where the area representing the value of each
     <div>
       <Pie />
     </div>
-  )
-})()
+  );
+})();
 ```
 
 For general use-cases, check out our collection of [visual test cases](/visualizations/pie-chart/testcases).
@@ -151,13 +151,9 @@ Data accessors are required if the data can not be accessed from the input data 
 | hidden             | Hide/show the visualization div                                                                                               | boolean  | false                                                                    | Yes      |
 | legend             | Show/hide legend                                                                                                              | boolean  | true                                                                     | Yes      |
 | maxWidth           | Maximum radial width of segments                                                                                              | number   | 100                                                                      | Yes      |
-| maxLegendRatio     | Maximum legend:chart ratio                                                                                                    | number   | 1/2                                                                      | Yes      |
-| maxLegendWidth     | Maximum legend width                                                                                                          | number   | 200                                                                      | Yes      |
 | maxTotalFontSize   | Maximum font size of total displayed in centre of chart                                                                       | number   | 80                                                                       | Yes      |
-| minChartWithLegend | Minimum width/height of chart for which legend is still rendered                                                              | number   | 1500                                                                     | Yes      |
 | minWidth           | Minimum radial width of segments                                                                                              | number   | 30                                                                       | Yes      |
 | minInnerRadius     | Minimum inner radius for which inner circle is still rendered                                                                 | number   | 30                                                                       | Yes      |
-| minLegendWidth     | Minimum legend width                                                                                                          | number   | 50                                                                       | Yes      |
 | minTotalFontSize   | Minimum font size of total displayed in centre of chart                                                                       | number   | 11                                                                       | Yes      |
 | numberFormatter    | Number formatter                                                                                                              | function | `(x: number): string => x.toString().replace(/B(?=(d{3})+(?!d))/g, ",")` | Yes      |
 | outerBorderMargin  | Margin between edge of chart and drawing area                                                                                 | number   | 1                                                                        | Yes      |

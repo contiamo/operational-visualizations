@@ -3,7 +3,6 @@ import { filter, get } from "lodash/fp";
 import Events from "../shared/event_catalog";
 import * as globalStyles from "../shared/styles";
 import { withD3Element } from "../utils/d3_utils";
-import { heightMargin, roundedUpHeight, totalWidth } from "../utils/legend_utils";
 import * as localStyles from "./styles";
 
 import {
@@ -64,8 +63,6 @@ class PieChartLegend implements Legend {
       );
 
     this.updateComparisonLegend();
-
-    this.updateDimensions();
   }
 
   private updateComparisonLegend() {
@@ -112,22 +109,6 @@ class PieChartLegend implements Legend {
           key: datum.label,
           type: "series",
         };
-  }
-
-  private updateDimensions() {
-    const legendNode = this.legend.node();
-    const config = this.state.current.getConfig();
-    const h = config.height;
-    const lh = roundedUpHeight(legendNode) + heightMargin(legendNode);
-
-    // Legend is higher than legend ratio or chart is smaller than chart min
-    if (lh / h > config.maxLegendRatio || h - lh < config.minChartWithLegend) {
-      this.remove();
-    } else {
-      if (totalWidth(legendNode) > config.width) {
-        this.remove();
-      }
-    }
   }
 
   public remove() {
