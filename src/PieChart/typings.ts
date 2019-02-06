@@ -39,13 +39,9 @@ export interface PieChartConfig extends BaseConfig {
   focusOffset: number;
   legend: true;
   maxWidth: number;
-  maxLegendRatio: number;
-  maxLegendWidth: number;
   maxTotalFontSize: number;
-  minChartWithLegend: number;
   minWidth: number;
   minInnerRadius: number;
-  minLegendWidth: number;
   minTotalFontSize: number;
   outerBorderMargin: number;
   palette: string[];
