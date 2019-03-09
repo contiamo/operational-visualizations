@@ -27,6 +27,7 @@ import * as bars3 from "./bars-3";
 import * as bars4 from "./bars-4";
 import * as bars5 from "./bars-5";
 import * as bars6 from "./bars-6";
+import * as bars7 from "./bars-7";
 
 import * as symbol1 from "./symbol-1";
 import * as symbol2 from "./symbol-2";
@@ -68,6 +69,7 @@ export default [
   bars4,
   bars5,
   bars6,
+  bars7,
   symbol1,
   symbol2,
   symbol3,
