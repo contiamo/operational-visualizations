@@ -28,10 +28,7 @@ export type RecursivePartial<T> = {
 /**
  * Merges grid config objects
  */
-export function mergeConfig(
-  config: RecursivePartial<GridConfig>,
-  customConfig: RecursivePartial<GridConfig>,
-): RecursivePartial<GridConfig> {
+export function mergeConfig(config: GridConfig, customConfig: RecursivePartial<GridConfig>): GridConfig {
   return {
     dimensionTitle: { ...config.dimensionTitle, ...customConfig.dimensionTitle },
     dimensionLabel: { ...config.dimensionLabel, ...customConfig.dimensionLabel },
@@ -89,40 +86,53 @@ const getRowOrColumnValue = <T>(config: ConstantOrPredicateArray<T>, rowOrColumn
 /** Returns a full set of grid accessors, based on provided custom config values and the default grid config. */
 export default (customConfig: RecursivePartial<GridConfig> = {}): Accessors => {
   const config = mergeConfig(defaultConfig, customConfig);
+
+  const titleConfig = config.dimensionTitle;
+  const titleConfigDefault = defaultConfig.dimensionTitle;
+  const labelConfig = config.dimensionLabel;
+  const labelConfigDefault = defaultConfig.dimensionLabel;
+  const rowHeaderConfig = config.rowHeaders;
+  const rowHeaderConfigDefault = defaultConfig.rowHeaders;
+  const cellConfig = config.cells;
+  const cellConfigDefault = defaultConfig.cells;
+
   return {
-    dimensionTitle: ((titleConfig, fallback) => ({
-      backgroundColor: dimensionTitleAccessor<string>(titleConfig.backgroundColor, fallback.backgroundColor),
-      borderColor: dimensionTitleAccessor<string>(titleConfig.borderColor, fallback.borderColor),
-      color: dimensionTitleAccessor<string>(titleConfig.color, fallback.color),
-      hide: dimensionTitleAccessor<boolean>(titleConfig.hide, fallback.hide),
-      lineHeight: dimensionTitleAccessor<number>(titleConfig.lineHeight, fallback.lineHeight),
+    dimensionTitle: {
+      backgroundColor: dimensionTitleAccessor<string>(titleConfig.backgroundColor, titleConfigDefault.backgroundColor),
+      borderColor: dimensionTitleAccessor<string>(titleConfig.borderColor, titleConfigDefault.borderColor),
+      color: dimensionTitleAccessor<string>(titleConfig.color, titleConfigDefault.color),
+      hide: dimensionTitleAccessor<boolean>(titleConfig.hide, titleConfigDefault.hide),
+      lineHeight: dimensionTitleAccessor<number>(titleConfig.lineHeight, titleConfigDefault.lineHeight),
       /** The "value" accessor is different because it cannot be a static, constant value */
       value: (dim: DimensionWithPrimitiveAndMetadata) => (titleConfig.value && titleConfig.value[dim.key]) || dim.key,
-    }))(config.dimensionTitle, defaultConfig.dimensionTitle),
-    dimensionLabel: ((labelConfig, fallback) => ({
-      backgroundColor: dimensionLabelAccessor<string>(labelConfig.backgroundColor, fallback.backgroundColor),
-      borderColor: dimensionLabelAccessor<string>(labelConfig.borderColor, fallback.borderColor),
-      color: dimensionLabelAccessor<string>(labelConfig.color, fallback.color),
+    },
+    dimensionLabel: {
+      backgroundColor: dimensionLabelAccessor<string>(labelConfig.backgroundColor, labelConfigDefault.backgroundColor),
+      borderColor: dimensionLabelAccessor<string>(labelConfig.borderColor, labelConfigDefault.borderColor),
+      color: dimensionLabelAccessor<string>(labelConfig.color, labelConfigDefault.color),
       /** The "lineHeight" accessor is different because it can be passed either a dimension OR a dimension value */
-      lineHeight: (dim: Dimension) => getValue(labelConfig.lineHeight, dim.key) || fallback.lineHeight,
+      lineHeight: (dim: Dimension) => getValue(labelConfig.lineHeight, dim.key) || labelConfigDefault.lineHeight,
       /** The "value" accessor is different because it cannot be a static, constant value */
       value: (dim: DimensionWithValueAndMetadata) => (labelConfig.value && labelConfig.value[dim.key]) || dim.value,
-    }))(config.dimensionLabel, defaultConfig.dimensionLabel),
-    rowHeaders: ((rowHeaderConfig, fallback) => ({
-      orientation: rowHeaderAccessor<RowHeaderOrientation>(rowHeaderConfig.orientation, fallback.orientation),
-      columnWidths: rowHeaderAccessor<number>(rowHeaderConfig.columnWidths, fallback.columnWidths),
-    }))(config.rowHeaders, defaultConfig.rowHeaders),
-    cells: ((cellConfig, fallback) => ({
-      backgroundColor: cellAccessor<string>(cellConfig.backgroundColor, fallback.backgroundColor),
-      borderColor: cellAccessor<string>(cellConfig.borderColor, fallback.borderColor),
-      borderWidth: cellAccessor<string>(cellConfig.borderWidth, fallback.borderWidth),
-      color: cellAccessor<string>(cellConfig.color, fallback.color),
-    }))(config.cells, defaultConfig.cells),
-    columns: ((columnConfig, fallback) => ({
-      width: rowOrColumnAccessor<number>(columnConfig.width, fallback.width),
-    }))(config.columns, defaultConfig.columns),
-    rows: ((rowConfig, fallback) => ({
-      height: rowOrColumnAccessor<number>(rowConfig.height, fallback.height),
-    }))(config.rows, defaultConfig.rows),
+    },
+    rowHeaders: {
+      orientation: rowHeaderAccessor<RowHeaderOrientation>(
+        rowHeaderConfig.orientation,
+        rowHeaderConfigDefault.orientation,
+      ),
+      columnWidths: rowHeaderAccessor<number>(rowHeaderConfig.columnWidths, rowHeaderConfigDefault.columnWidths),
+    },
+    cells: {
+      backgroundColor: cellAccessor<string>(cellConfig.backgroundColor, cellConfigDefault.backgroundColor),
+      borderColor: cellAccessor<string>(cellConfig.borderColor, cellConfigDefault.borderColor),
+      borderWidth: cellAccessor<string>(cellConfig.borderWidth, cellConfigDefault.borderWidth),
+      color: cellAccessor<string>(cellConfig.color, cellConfigDefault.color),
+    },
+    columns: {
+      width: rowOrColumnAccessor<number>(config.columns.width, defaultConfig.columns.width),
+    },
+    rows: {
+      height: rowOrColumnAccessor<number>(config.rows.height, defaultConfig.rows.height),
+    },
   };
 };
