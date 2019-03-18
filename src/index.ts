@@ -13,7 +13,10 @@ export { default as computeCategoricalAxes } from "./axis_utils/compute_categori
 export { default as computeTimeAxes } from "./axis_utils/compute_time_axes";
 export { default as MultidimensionalDataset } from "./data_handling/multidimensional_dataset";
 export { default as Grid } from "./Grid/Grid";
+export { default as gridConfigToAccessors } from "./Grid/gridConfigToAccessors";
 
 // Type exports
 export * from "./axis_utils/typings";
 export { AxesData, LegendDatum } from "./Chart/typings";
+export * from "./data_handling/multidimensional_dataset";
+export * from "./Grid/types";

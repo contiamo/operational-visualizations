@@ -1,23 +1,11 @@
 import React from "react";
-import { AxisPosition, AxisProps } from "../Chart/typings";
+import { AxisPosition } from "../Chart/typings";
 import { DimensionWithPrimitiveAndMetadata, ReadonlyDataset } from "../data_handling/multidimensional_dataset";
 import AxisBlock from "./axes/AxisBlock";
 import CellBlock from "./cells/CellBlock";
 import ColumnHeaderBlock from "./column_headers/ColumnHeaderBlock";
 import RowHeaderBlock from "./row_headers/RowHeaderBlock";
-import { Accessors } from "./types";
-
-export declare const AXIS_POSITIONS: ["x1", "x2", "y1", "y2"];
-
-export declare type AxisPosition = typeof AXIS_POSITIONS[number];
-
-export interface SingleAxis {
-  margins: string;
-  width: number;
-  draw: (i: number) => React.FunctionComponentElement<AxisProps>;
-}
-
-export type Axes = Partial<Record<AxisPosition, SingleAxis[]>>;
+import { Accessors, Axes } from "./types";
 
 export interface Props {
   data: ReadonlyDataset;

@@ -1,3 +1,6 @@
+import React from "react";
+import { AxisProps } from "../Axis/Axis";
+
 import {
   Cell,
   DimensionWithPrimitiveAndMetadata,
@@ -6,6 +9,18 @@ import {
   RowOrColumn,
   SliceOptions,
 } from "../data_handling/multidimensional_dataset";
+
+declare const AXIS_POSITIONS: ["x1", "x2", "y1", "y2"];
+
+declare type AxisPosition = typeof AXIS_POSITIONS[number];
+
+export interface SingleAxis {
+  margins: string;
+  width: number;
+  draw: (i: number) => React.ReactElement<AxisProps>;
+}
+
+export type Axes = Partial<Record<AxisPosition, SingleAxis[]>>;
 
 /** Constant value, or record returning values per key */
 export type ConstantOrRecord<T> = T | Record<string, T>;

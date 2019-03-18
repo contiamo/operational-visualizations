@@ -1,6 +1,6 @@
 import React from "react";
 import theme from "../../utils/constants";
-import { SingleAxis } from "../Grid";
+import { SingleAxis } from "../types";
 
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
