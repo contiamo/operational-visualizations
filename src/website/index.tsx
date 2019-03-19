@@ -6,16 +6,12 @@ import LandingPage from "./LandingPage";
 import VisualTests from "./VisualTests";
 
 export interface State {
-  /** Pathname, not including `basePath` */
   pathname: string;
 }
 
-// Allow the app to work on GitHub pages without hash URL's
-const basePath = "/operational-visualizations";
-
 // Extract the path from window location
 const getPathname = () => {
-  return window.location.pathname.replace(basePath, "");
+  return window.location.pathname;
 };
 
 class Website extends React.Component<{}, { pathname: string }> {
@@ -23,7 +19,7 @@ class Website extends React.Component<{}, { pathname: string }> {
 
   public pushState = (newUrl: string) => {
     this.setState(() => ({ pathname: newUrl }));
-    window.history.pushState({}, "", `${basePath}${newUrl}`);
+    window.history.pushState({}, "", newUrl);
   };
 
   public handlePopState = () => {
