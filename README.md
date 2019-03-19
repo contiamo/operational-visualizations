@@ -1,4 +1,4 @@
-# Operational Visualizations
+# Operational Visualizations [![Build Status](https://travis-ci.com/contiamo/operational-visualizations.svg?branch=master)](https://travis-ci.com/contiamo/operational-visualizations)
 
 ## Getting started
 
