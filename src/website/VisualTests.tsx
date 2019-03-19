@@ -114,9 +114,10 @@ class VisualTests extends React.Component<Props, State> {
                       try {
                         this.props.pushState(toPathname(next(pathInfo)));
                       } catch (e) {
-                        if (e.message === "Cannot read property 'slug' of undefined") {
-                          // tslint:disable-next-line
-                          console.log("Finished current section");
+                        if (e.message.startsWith("Next error")) {
+                          this.setState({
+                            isLooping: false,
+                          });
                         } else {
                           throw e;
                         }
