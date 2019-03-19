@@ -1,6 +1,5 @@
-import { OperationalStyleConstants, ProgressPanel } from "@operational/components";
+import { OperationalStyleConstants, ProgressPanel, styled } from "@operational/components";
 import * as React from "react";
-import styled from "react-emotion";
 import { MarathonRenderer } from "./Marathon";
 
 const Content = styled("div")(
