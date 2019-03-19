@@ -111,7 +111,16 @@ class VisualTests extends React.Component<Props, State> {
                   test={allTestCases[pathInfo.groupIndex].children[pathInfo.testIndex].marathon}
                   onCompleted={() => {
                     if (this.state.isLooping) {
-                      this.props.pushState(toPathname(next(pathInfo)));
+                      try {
+                        this.props.pushState(toPathname(next(pathInfo)));
+                      } catch (e) {
+                        if (e.message === "Cannot read property 'slug' of undefined") {
+                          // tslint:disable-next-line
+                          console.log("Finished current section");
+                        } else {
+                          throw e;
+                        }
+                      }
                     }
                   }}
                   timeout={2000}
