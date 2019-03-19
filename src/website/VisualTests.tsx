@@ -84,7 +84,7 @@ class VisualTests extends React.Component<Props, State> {
                   icon="Open"
                   condensed
                   color="ghost"
-                  to={`https://github.com/contiamo/operational-visualizations/blob/master/visual-tests/TestCases/${
+                  to={`https://github.com/contiamo/operational-visualizations/blob/master/src/website/TestCases/${
                     allTestCases[pathInfo.groupIndex].folder
                   }/${allTestCases[pathInfo.groupIndex].children[pathInfo.testIndex].slug}.ts`}
                 >
