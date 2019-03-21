@@ -16,4 +16,4 @@ export default testGroups;
 
 export const fromPathname = utils.fromPathname(testGroups);
 export const toPathname = utils.toPathname(testGroups);
-export const next = utils.next();
+export const next = utils.next(testGroups);

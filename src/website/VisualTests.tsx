@@ -111,7 +111,17 @@ class VisualTests extends React.Component<Props, State> {
                   test={allTestCases[pathInfo.groupIndex].children[pathInfo.testIndex].marathon}
                   onCompleted={() => {
                     if (this.state.isLooping) {
-                      this.props.pushState(toPathname(next(pathInfo)));
+                      try {
+                        this.props.pushState(toPathname(next(pathInfo)));
+                      } catch (e) {
+                        if (e.message.startsWith("Next error")) {
+                          this.setState({
+                            isLooping: false,
+                          });
+                        } else {
+                          throw e;
+                        }
+                      }
                     }
                   }}
                   timeout={2000}

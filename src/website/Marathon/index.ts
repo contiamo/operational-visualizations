@@ -79,7 +79,13 @@ class Marathon extends React.Component<Props, State> {
     const tentativeNewState = updater(this.state, this.props);
     return new Promise((resolve, reject) => {
       if (!ignoreId && tentativeNewState.id !== this.state.id) {
-        return reject();
+        return reject(
+          new Error(
+            `setStateById error - ignoreId: ${ignoreId}, tentativeNewState.id: ${
+              tentativeNewState.id
+            }, this.state.id: ${this.state.id}`,
+          ),
+        );
       }
       this.setState(updater, () => {
         resolve();
@@ -146,7 +152,11 @@ class Marathon extends React.Component<Props, State> {
         await this.setStateById((prevState: State) => ({ id: currentTestId, completed: prevState.completed + 1 }));
         this.runNext();
       } catch (err) {
-        throw new Error(err);
+        if (err.message.startsWith("setStateById")) {
+          // ignore
+        } else {
+          throw err;
+        }
       }
       return;
     }
@@ -162,7 +172,11 @@ class Marathon extends React.Component<Props, State> {
         await this.setStateById(prevState => ({ id: currentTestId, completed: prevState.completed + 1 }));
         this.runNext();
       } catch (err) {
-        throw new Error(err);
+        if (err.message.startsWith("setStateById")) {
+          // ignore
+        } else {
+          throw err;
+        }
       }
     });
   };

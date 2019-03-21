@@ -45,9 +45,23 @@ export const toPathname = (testGroups: TestSuiteGroup[]) => (currentTestSuite: C
   return pathname;
 };
 
-export const next = () => (currentTestSuite: CurrentTestSuite): CurrentTestSuite => {
-  return {
-    groupIndex: currentTestSuite.groupIndex,
-    testIndex: currentTestSuite.testIndex + 1,
-  };
+export const next = (testGroups: TestSuiteGroup[]) => (currentTestSuite: CurrentTestSuite): CurrentTestSuite => {
+  const group = testGroups[currentTestSuite.groupIndex];
+  if (!group) {
+    throw new Error(`Next error: there is no group #${currentTestSuite.groupIndex}`);
+  }
+  if (currentTestSuite.testIndex + 1 >= group.children.length) {
+    if (currentTestSuite.groupIndex + 1 >= testGroups.length) {
+      throw new Error(`Next error: there is no group #${currentTestSuite.groupIndex + 1}`);
+    }
+    return {
+      groupIndex: currentTestSuite.groupIndex + 1,
+      testIndex: 0,
+    };
+  } else {
+    return {
+      groupIndex: currentTestSuite.groupIndex,
+      testIndex: currentTestSuite.testIndex + 1,
+    };
+  }
 };
