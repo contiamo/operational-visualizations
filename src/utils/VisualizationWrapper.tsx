@@ -35,6 +35,8 @@ class VisualizationWrapper extends React.Component<Props, {}> {
   }
 
   public componentDidUpdate() {
+    this.viz.close();
+    this.viz = new this.props.facade(this.containerNode);
     this.updateViz();
     this.viz.draw();
   }
