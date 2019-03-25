@@ -66,15 +66,19 @@ export const marathon = ({ test, afterAll, container }: MarathonEnvironment): vo
 
   test("Render 10 charts", () => {
     charts.forEach(chart => {
-      chart.data(createData(10));
-      chart.draw();
+      setTimeout(() => {
+        chart.data(createData(10));
+        chart.draw();
+      }, 0);
     });
   });
 
   test("Transition 10 charts", () => {
     charts.forEach(chart => {
-      chart.data(createData(10));
-      chart.draw();
+      setTimeout(() => {
+        chart.data(createData(10));
+        chart.draw();
+      }, 0);
     });
   });
 
@@ -85,7 +89,7 @@ export const marathon = ({ test, afterAll, container }: MarathonEnvironment): vo
   });
 };
 
-export const title: string = "50 charts";
+export const title: string = "10 charts";
 
 // Must match the file name so we can link to the code on GitHub
 export const slug = "bars-7";

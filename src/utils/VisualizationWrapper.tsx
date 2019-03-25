@@ -15,6 +15,7 @@ export interface Props {
 class VisualizationWrapper extends React.Component<Props, {}> {
   private containerNode!: HTMLDivElement;
   private viz!: any;
+  private timerId: number | null = null;
 
   public render() {
     return (
@@ -30,13 +31,17 @@ class VisualizationWrapper extends React.Component<Props, {}> {
 
   public componentDidMount() {
     this.viz = new this.props.facade(this.containerNode);
-    this.updateViz();
-    this.viz.draw();
+    this.timerId = window.setTimeout(() => {
+      this.updateViz();
+      this.viz.draw();
+    }, 0);
   }
 
   public componentDidUpdate() {
-    this.updateViz();
-    this.viz.draw();
+    this.timerId = window.setTimeout(() => {
+      this.updateViz();
+      this.viz.draw();
+    }, 0);
   }
 
   public updateViz() {
@@ -51,6 +56,9 @@ class VisualizationWrapper extends React.Component<Props, {}> {
   }
 
   public componentWillUnmount() {
+    if (this.timerId) {
+      clearTimeout(this.timerId);
+    }
     this.viz.close();
   }
 }
