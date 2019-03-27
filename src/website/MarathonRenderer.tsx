@@ -1,6 +1,7 @@
 import { OperationalStyleConstants, ProgressPanel, styled } from "@operational/components";
 import * as React from "react";
 import { MarathonRenderer } from "./Marathon";
+import Clock from "./Clock";
 
 const Content = styled("div")(
   {
@@ -15,25 +16,29 @@ const Content = styled("div")(
 
 type Status = "waiting" | "todo" | "running" | "success" | "failure" | "done" | "failed";
 
-const MarathonRendererComponent = ({ results, ref }: MarathonRenderer) => (
-  <>
-    <ProgressPanel
-      items={results.map((result, index) => ({
-        title: result.description,
-        status: ((): Status => {
-          if (!result.isCompleted) {
-            return index === 0 || results[index - 1].isCompleted ? "running" : "waiting";
-          }
-          if (result.errors.length > 0) {
-            return "failure";
-          }
-          return "success";
-        })(),
-        error: result.errors.length > 0 ? result.errors.join(" ") : undefined,
-      }))}
-    />
-    <Content innerRef={ref} />
-  </>
-);
+const MarathonRendererComponent = ({ results, ref }: MarathonRenderer) => {
+  const showClock = false;
+  return (
+    <>
+      {showClock && <Clock />}
+      <ProgressPanel
+        items={results.map((result, index) => ({
+          title: result.description,
+          status: ((): Status => {
+            if (!result.isCompleted) {
+              return index === 0 || results[index - 1].isCompleted ? "running" : "waiting";
+            }
+            if (result.errors.length > 0) {
+              return "failure";
+            }
+            return "success";
+          })(),
+          error: result.errors.length > 0 ? result.errors.join(" ") : undefined,
+        }))}
+      />
+      <Content innerRef={ref} />
+    </>
+  );
+};
 
 export default MarathonRendererComponent;
