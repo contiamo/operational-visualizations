@@ -2,6 +2,8 @@ import { Chart } from "../../../";
 import { Data, SeriesData } from "../../../Chart/typings";
 import { MarathonEnvironment } from "../../Marathon";
 
+const numberOfCharts = 10;
+
 const StackedRenderer = {
   type: "stacked",
   stackAxis: "y",
@@ -64,7 +66,7 @@ export const marathon = ({ test, afterAll, container }: MarathonEnvironment): vo
       ),
   );
 
-  test("Render 10 charts", () => {
+  test(`Render ${numberOfCharts} charts`, () => {
     charts.forEach(chart => {
       setTimeout(() => {
         chart.data(createData(10));
@@ -73,7 +75,7 @@ export const marathon = ({ test, afterAll, container }: MarathonEnvironment): vo
     });
   });
 
-  test("Transition 10 charts", () => {
+  test(`Transition ${numberOfCharts} charts`, () => {
     charts.forEach(chart => {
       setTimeout(() => {
         chart.data(createData(10));
@@ -89,7 +91,7 @@ export const marathon = ({ test, afterAll, container }: MarathonEnvironment): vo
   });
 };
 
-export const title: string = "10 charts";
+export const title: string = `${numberOfCharts} charts`;
 
 // Must match the file name so we can link to the code on GitHub
 export const slug = "bars-7";
