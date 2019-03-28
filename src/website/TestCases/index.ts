@@ -1,4 +1,5 @@
 import chartTestCases from "./Chart";
+import gridTestCases from "./Grid";
 import pieChartTestCases from "./PieChart";
 import processFlowTestCases from "./ProcessFlow";
 import sunburstTestCases from "./Sunburst";
@@ -10,6 +11,7 @@ const testGroups: TestSuiteGroup[] = [
   { folder: "PieChart", title: "Pie Charts", slug: "pie-charts", children: pieChartTestCases },
   { folder: "ProcessFlow", title: "Process Flow", slug: "process-flow-charts", children: processFlowTestCases },
   { folder: "Sunburst", title: "Sunburst charts", slug: "sunburst", children: sunburstTestCases },
+  { folder: "Grid", title: "Grid", slug: "grid", children: gridTestCases },
 ];
 
 export default testGroups;
