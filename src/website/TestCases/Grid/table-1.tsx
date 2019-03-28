@@ -85,7 +85,7 @@ const rawData = {
 };
 
 export const marathon = ({ test, container }: MarathonEnvironment) => {
-  test("Basic grid", () => {
+  test("Row measures", () => {
     const data = new MultidimensionalDataset(rawData as any).transform(cell => () => cell.value().toString());
     const accessors = gridConfigToAccessors(defaultGridConfig);
     ReactDOM.render(
@@ -97,7 +97,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
   });
 };
 
-export const title: string = "Basic grid";
+export const title: string = "Row measures";
 
 // Must match the file name so we can link to the code on GitHub
 export const slug = "table-1";
