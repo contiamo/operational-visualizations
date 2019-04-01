@@ -4,7 +4,7 @@ This data structure is similar to a "dataframe" as known from R or pandas. It as
 
 The MDD is very helpful to prepare multidimensional data returned from an API so that it can be displayed by visualizations. The MDD allows fine-grained control over how tabular multi-dimensional data is mapped to one or multiple visualizations. Internally, the MDD stores and accesses row-based data but does not expose this fact or require any special effort from the user when working with columns.
 
-## Important concepts / objects used in the MDD
+## Important concepts / types used in the MDD
 
 #### Dimension
 
@@ -60,3 +60,33 @@ A cell contains the value for a specific combination of Dimension Values (along 
 #### Predicate
 
 A matcher against one or multiple Dimensions and one or multiple of their Values along the `x` or `y` axis. An example would be "All rows where Country is Germany".
+
+## Creating an MDD
+
+@todo: Add spec of raw dataset here.
+
+## Important methods to work with an MDD
+
+### isEmpty
+
+### rowDimensions
+
+### columnDimensions
+
+### rows
+
+### columns
+
+### serialize
+
+### slice
+
+### aggregate
+
+### transpose
+
+### transform
+
+### readonly
+
+@todo: this functionality can be removed
