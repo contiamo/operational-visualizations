@@ -1,8 +1,8 @@
 # Multi Dimensional Dataset (MDD)
 
-This data structure is similar to a "dataframe" as known from R or pandas. It assumes that data is tabular and may be split by dimensions along columns (`x` axis) and rows (`y` axis). MDD is an **immutable data structure**. All methods return new MDDs and do not change the source MDD.
+This data structure is similar to a "dataframe" as known from R or pandas. It supports multi-dimensional datasets that may be split by dimensions along columns (`x` axis) and rows (`y` axis). MDD is an **immutable data structure**. All methods return new MDDs and do not change the source MDD.
 
-The MDD is very helpful to prepare multidimensional data returned from an API so that it can be displayed by visualizations. The MDD allows fine-grained control over how tabular multi-dimensional data is mapped to one or multiple visualizations. Internally, the MDD stores and accesses row-based data but does not expose this fact or require any special effort from the user when working with columns.
+The MDD is a very helpful tool to prepare multi-dimensional data returned from an API so that it can be displayed by visualizations. The MDD allows fine-grained control over how multi-dimensional data is mapped to one or multiple visualizations. Internally, the MDD stores and accesses row-based data but does not expose this fact or require any special effort from the user when working with columns.
 
 ## Important concepts / types used in the MDD
 
