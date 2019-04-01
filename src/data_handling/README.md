@@ -23,7 +23,7 @@ const CountryDimension: Dimension = { key: "Country" };
 
 ### Dimension Value
 
-A specific value of a Dimension. E.g. _"Germany"_ would be a Dimension Value for the Dimension _"Country"_.
+A specific value of a Dimension. E.g. _"France"_ would be a Dimension Value for the Dimension _"Country"_.
 
 A Dimension Value is a `string` or a `number`.
 
@@ -59,7 +59,21 @@ A cell contains the value for a specific combination of Dimension Values (along 
 
 ### Predicate
 
-A matcher against one or multiple Dimensions and one or multiple of their Values along the `x` or `y` axis. An example would be "All rows where Country is Germany".
+A matcher against one or multiple Dimensions and one or multiple of their Values along the `x` or `y` axis. An example would be "All rows where Country is France".
+
+```typescript
+type Predicate = Dimension & {
+  type: "include" | "exclude";
+  values: DimensionValue[];
+};
+
+// Example predicate
+const MyPredicate: Predicate = {
+  key: "Country",
+  type: "include",
+  values: ["France"],
+};
+```
 
 ### Slice
 
