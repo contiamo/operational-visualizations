@@ -1,3 +1,4 @@
+import { read } from "fs";
 import { Dataset } from "./multidimensional_dataset";
 
 type Matrix<T> = T[][];
@@ -111,8 +112,15 @@ export const visualiseDataset = <T>(dataset: Dataset<T>): Matrix<T | string | nu
 
 /**
  * Converts Dataset to tabular (list of tuples) represenatation
+ *
+ * You can use it with Pandas DataFrame like this
+ *
+ * import pandas as pd
+ * data = pd.DataFrame(data=<put here output of console.log(toTabular(X).data)>,
+ *   columns=<put here output of console.log(toTabular(X).header)>)
+ *
  */
-export const toTabular = <T>(dataset: Dataset<T>): ListOfTuples<T | string | null> => {
+export const toTabular = <T>(dataset: Dataset<T>) => {
   const raw = dataset.serialize();
   const height = raw.rows.length;
 
@@ -121,11 +129,17 @@ export const toTabular = <T>(dataset: Dataset<T>): ListOfTuples<T | string | nul
   const measures = unique(getColumn(raw.columns, raw.columns[0].length - 1));
   const width = raw.rows[0].length + raw.columns[0].length - 1 + measures.length;
 
-  const result = matrix((height * raw.columns.length) / measures.length, width);
+  const header = [
+    ...raw.rowDimensions.map(x => x.key),
+    ...raw.columnDimensions.slice(0, -1).map(x => x.key),
+    ...measures,
+  ];
+
+  const data = matrix((height * raw.columns.length) / measures.length, width);
 
   for (let supRowIndex = 0; supRowIndex < raw.columns.length / measures.length; supRowIndex++) {
     copy({
-      destination: result,
+      destination: data,
       source: raw.rows,
       start: [supRowIndex * height, 0],
       end: [(supRowIndex + 1) * height - 1, raw.rows[0].length - 1],
@@ -133,15 +147,15 @@ export const toTabular = <T>(dataset: Dataset<T>): ListOfTuples<T | string | nul
 
     for (let rowIndex = 0; rowIndex < height; rowIndex++) {
       for (let columnIndex = 0; columnIndex < raw.columns[0].length - 1; columnIndex++) {
-        result[rowIndex + supRowIndex * height][raw.rows[0].length + columnIndex] =
+        data[rowIndex + supRowIndex * height][raw.rows[0].length + columnIndex] =
           raw.columns[supRowIndex * measures.length][columnIndex];
       }
       for (let measureIndex = 0; measureIndex < measures.length; measureIndex++) {
-        result[rowIndex + supRowIndex * height][raw.rows[0].length + measureIndex + raw.columns[0].length - 1] =
+        data[rowIndex + supRowIndex * height][raw.rows[0].length + measureIndex + raw.columns[0].length - 1] =
           raw.data[rowIndex][measureIndex + supRowIndex];
       }
     }
   }
 
-  return result;
+  return { data, header };
 };
