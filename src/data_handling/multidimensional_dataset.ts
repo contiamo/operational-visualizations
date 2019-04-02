@@ -92,7 +92,7 @@ export interface RawDataset<T = any> {
   data: T[][];
 }
 
-export interface ReadonlyDataset<T = any> {
+export interface Dataset<T = any> {
   /**
    * Returns true if the dataset contains no data
    */
@@ -118,9 +118,6 @@ export interface ReadonlyDataset<T = any> {
    * The returned raw dataset should not be modified in place.
    */
   serialize: () => RawDataset<T>;
-}
-
-export interface Dataset<T = any> extends ReadonlyDataset<T> {
   /**
    * Returns a new dataset which is a subset matching the provided predicates.
    * @param options Predicates for columns (x) and rows (y)
@@ -141,10 +138,6 @@ export interface Dataset<T = any> extends ReadonlyDataset<T> {
    * @param transform Function that takes the current cell value as input and returns the desired cell value
    */
   transform: <U = any>(transform: TransformFunction<T, U>) => Dataset<U>;
-  /**
-   * Returns the dataset without slice or aggregate methods.
-   */
-  readonly: () => ReadonlyDataset<T>;
 }
 
 /*
@@ -535,17 +528,6 @@ class MultidimensionalDataset<T> implements Dataset<T> {
 
   public serialize(): RawDataset<T> {
     return this.data;
-  }
-
-  public readonly(): ReadonlyDataset<T> {
-    return {
-      isEmpty: this.isEmpty.bind(this),
-      columns: this.columns.bind(this),
-      rows: this.rows.bind(this),
-      columnDimensions: this.columnDimensions.bind(this),
-      rowDimensions: this.rowDimensions.bind(this),
-      serialize: this.serialize.bind(this),
-    };
   }
 }
 

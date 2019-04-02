@@ -1264,37 +1264,6 @@ describe("MultidimensionalDataset", () => {
     });
   });
 
-  describe("#readonly", () => {
-    it("returns a dataset with only specific methods", () => {
-      expect(dataset.readonly()).toHaveProperty("columns");
-      expect(dataset.readonly()).toHaveProperty("rows");
-      expect(dataset.readonly()).toHaveProperty("columnDimensions");
-      expect(dataset.readonly()).toHaveProperty("rowDimensions");
-      expect(dataset.readonly()).toHaveProperty("serialize");
-      expect(dataset.readonly()).not.toHaveProperty("slice");
-      expect(dataset.readonly()).not.toHaveProperty("aggregate");
-      expect(dataset.readonly()).not.toHaveProperty("readonly");
-    });
-
-    it("#columns works as expected", () => {
-      expect(
-        dataset
-          .readonly()
-          .columns()
-          .map(column => column.dimensionValues().map(x => x.value)),
-      ).toEqual([
-        ["<50", "Female", "sales"],
-        ["<50", "Female", "revenue"],
-        ["<50", "Male", "sales"],
-        ["<50", "Male", "revenue"],
-        [">=50", "Female", "sales"],
-        [">=50", "Female", "revenue"],
-        [">=50", "Male", "sales"],
-        [">=50", "Male", "revenue"],
-      ]);
-    });
-  });
-
   describe("Special multidimensional datasets", () => {
     describe("Empty dataset", () => {
       const datasetEmpty = new MultidimensionalDataset({
