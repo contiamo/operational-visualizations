@@ -1,8 +1,6 @@
-import { read } from "fs";
 import { Dataset } from "./multidimensional_dataset";
 
 type Matrix<T> = T[][];
-type ListOfTuples<T> = T[][];
 
 /**
  * Copy one matrix over another with mutation
@@ -112,13 +110,6 @@ export const visualiseDataset = <T>(dataset: Dataset<T>): Matrix<T | string | nu
 
 /**
  * Converts Dataset to tabular (list of tuples) represenatation
- *
- * You can use it with Pandas DataFrame like this
- *
- * import pandas as pd
- * data = pd.DataFrame(data=<put here output of console.log(toTabular(X).data)>,
- *   columns=<put here output of console.log(toTabular(X).header)>)
- *
  */
 export const toTabular = <T>(dataset: Dataset<T>) => {
   const raw = dataset.serialize();
@@ -129,7 +120,7 @@ export const toTabular = <T>(dataset: Dataset<T>) => {
   const measures = unique(getColumn(raw.columns, raw.columns[0].length - 1));
   const width = raw.rows[0].length + raw.columns[0].length - 1 + measures.length;
 
-  const header = [
+  const columns = [
     ...raw.rowDimensions.map(x => x.key),
     ...raw.columnDimensions.slice(0, -1).map(x => x.key),
     ...measures,
@@ -157,5 +148,45 @@ export const toTabular = <T>(dataset: Dataset<T>) => {
     }
   }
 
-  return { data, header };
+  return { data, columns };
+};
+
+/**
+ * usage:
+ *
+ * ```python
+ * import pandas as pd
+ * # <output of toPapndasDataFrame>
+ * ```
+ */
+export const toPapndasDataFrame = <T>(dataset: Dataset<T>): string => {
+  const { data, columns } = toTabular(dataset);
+  return `data = pd.DataFrame(data=${JSON.stringify(data)}, columns=${JSON.stringify(columns)})`;
+};
+
+/**
+ * This function will produce result similar to (but not the same)
+ * visualiseDataset output in pandas
+ *
+ * usage:
+ *
+ * ```python
+ * import pandas as pd
+ * # <output of toPapndasDataFrame>
+ * # <output of toPapndasPivotal>
+ * ```
+ */
+export const toPapndasPivotal = <T>(dataset: Dataset<T>): string => {
+  const raw = dataset.serialize();
+
+  // Let's assume measures are always in columns - the last one
+  // We can check if measures are in columns, if not we can transpose dataset
+  const measures = unique(getColumn(raw.columns, raw.columns[0].length - 1));
+
+  const rows = raw.rowDimensions.map(x => x.key);
+  const columns = raw.columnDimensions.slice(0, -1).map(x => x.key);
+
+  return `pd.pivot_table(data, values=${JSON.stringify(measures)}, index=${JSON.stringify(
+    rows,
+  )}, columns=${JSON.stringify(columns)})`;
 };
