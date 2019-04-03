@@ -1,4 +1,4 @@
-import { Dataset } from "./multidimensional_dataset";
+import { Dataset, RawDataset } from "./multidimensional_dataset";
 
 type Matrix<T> = T[][];
 
@@ -66,6 +66,11 @@ const matrix = (rows: number, columns: number): Matrix<any> =>
   Array.from({ length: rows }, () => Array.from({ length: columns }, () => null));
 
 /**
+ * map function for matrix
+ */
+export const map = <I, O>(m: Matrix<I>, f: (x: I) => O) => m.map(x => x.map(y => f(y)));
+
+/**
  * helper function to visually debug Dataset
  *
  * returns matrix
@@ -78,8 +83,13 @@ const matrix = (rows: number, columns: number): Matrix<any> =>
  *
  * use it in conjunction with console.table
  */
-export const visualiseDataset = <T>(dataset: Dataset<T>): Matrix<T | string | null> => {
-  const raw = dataset.serialize();
+export const visualiseDataset = <T>(dataset: Dataset<T> | RawDataset<T>) => {
+  let raw;
+  if (typeof dataset.rows === "function") {
+    raw = (dataset as Dataset<T>).serialize();
+  } else {
+    raw = dataset as RawDataset<T>;
+  }
   const height = raw.rows.length + raw.columns[0].length;
   const width = raw.rows[0].length + raw.data[0].length;
   const result = matrix(height, width);
@@ -111,8 +121,13 @@ export const visualiseDataset = <T>(dataset: Dataset<T>): Matrix<T | string | nu
 /**
  * Converts Dataset to tabular (list of tuples) represenatation
  */
-export const toTabular = <T>(dataset: Dataset<T>) => {
-  const raw = dataset.serialize();
+export const toTabular = <T>(dataset: Dataset<T> | RawDataset<T>) => {
+  let raw;
+  if (typeof dataset.rows === "function") {
+    raw = (dataset as Dataset<T>).serialize();
+  } else {
+    raw = dataset as RawDataset<T>;
+  }
   const height = raw.rows.length;
 
   // Let's assume measures are always in columns - the last one
