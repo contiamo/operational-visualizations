@@ -2,12 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { MarathonEnvironment } from "../../Marathon";
 
-import MultidimensionalDataset from "../../../data_handling/multidimensional_dataset";
+import MultidimensionalDataset, { RawDataset } from "../../../data_handling/multidimensional_dataset";
 import Grid from "../../../Grid/Grid";
 import defaultGridConfig from "../../../Grid/gridConfig";
 import gridConfigToAccessors from "../../../Grid/gridConfigToAccessors";
 
-const rawData = {
+const rawData: RawDataset<number> = {
   rowDimensions: [
     {
       key: "Customer.Continent",
@@ -91,7 +91,7 @@ const rawData = {
 
 export const marathon = ({ test, container }: MarathonEnvironment) => {
   test("Column measures", () => {
-    const data = new MultidimensionalDataset(rawData as any).transform(cell => () => cell.value().toString());
+    const data = new MultidimensionalDataset(rawData).transform(cell => () => cell.value().toString());
     const accessors = gridConfigToAccessors(defaultGridConfig);
     ReactDOM.render(
       <div style={{ display: "inline-block" }}>
