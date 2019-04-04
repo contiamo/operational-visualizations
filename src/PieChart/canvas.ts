@@ -1,19 +1,19 @@
 import * as d3 from "d3-selection";
 import Events from "../shared/event_catalog";
 import * as styles from "../shared/styles";
-import { Canvas, D3Selection, Dimensions, EventBus, State, StateWriter } from "./typings";
+import { Canvas, D3Selection, Dimensions, EventEmitter, State, StateWriter } from "./typings";
 
 class PieChartCanvas implements Canvas {
   private drawingContainer: D3Selection;
   private elements: { [key: string]: D3Selection } = {};
   private chartContainer: D3Selection;
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   private state: State;
   private elMap: { [key: string]: D3Selection } = {};
   private stateWriter: StateWriter;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventBus, context: Element) {
+  constructor(state: State, stateWriter: StateWriter, events: EventEmitter, context: Element) {
     this.state = state;
     this.stateWriter = stateWriter;
     this.events = events;

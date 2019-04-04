@@ -5,7 +5,16 @@ import computeTimeAxes, { ticksInDomain } from "../axis_utils/compute_time_axes"
 import { computeBarPositions } from "../axis_utils/discrete_axis_utils";
 import Axis from "./axes/axis";
 import Rules from "./axes/rules";
-import { AxisOptions, AxisPosition, AxisType, D3Selection, EventBus, State, StateWriter, WithConvert } from "./typings";
+import {
+  AxisOptions,
+  AxisPosition,
+  AxisType,
+  D3Selection,
+  EventEmitter,
+  State,
+  StateWriter,
+  WithConvert,
+} from "./typings";
 
 import {
   AxisComputed,
@@ -42,13 +51,13 @@ type Axes = AxisRecord<Axis>;
 class AxesManager {
   private axes: Axes = {};
   private els: { [key: string]: D3Selection };
-  private events: EventBus;
+  private events: EventEmitter;
   private oldAxes: Axes = {};
   private rules: { [key: string]: Rules } = {};
   private state: State;
   private stateWriter: StateWriter;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventBus, els: { [key: string]: D3Selection }) {
+  constructor(state: State, stateWriter: StateWriter, events: EventEmitter, els: { [key: string]: D3Selection }) {
     this.state = state;
     this.stateWriter = stateWriter;
     this.events = events;

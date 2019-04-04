@@ -9,7 +9,7 @@ import {
   ComponentConfigInfo,
   ComponentHoverPayload,
   D3Selection,
-  EventBus,
+  EventEmitter,
   Legend,
   LegendDatum,
   State,
@@ -17,11 +17,11 @@ import {
 
 class ChartLegend implements Legend {
   private data!: LegendDatum[];
-  private events: EventBus;
+  private events: EventEmitter;
   private state: State;
   public el: D3Selection;
 
-  constructor(state: State, _: StateWriter, events: EventBus, el: D3Selection) {
+  constructor(state: State, _: StateWriter, events: EventEmitter, el: D3Selection) {
     this.state = state;
     this.events = events;
     this.el = el;

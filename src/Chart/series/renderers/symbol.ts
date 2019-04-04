@@ -18,7 +18,7 @@ import {
   AxisOrientation,
   D3Selection,
   Datum,
-  EventBus,
+  EventEmitter,
   RendererClass,
   RendererType,
   SingleRendererOptions,
@@ -64,7 +64,7 @@ export type Options = SingleRendererOptions<SymbolRendererAccessors>;
 class Symbol implements RendererClass<SymbolRendererAccessors> {
   private data!: Datum[];
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   public options!: Options;
   private series: Series;
   private state: any;
@@ -82,7 +82,7 @@ class Symbol implements RendererClass<SymbolRendererAccessors> {
   private x!: (d: Datum) => any;
   private y!: (d: Datum) => any;
 
-  constructor(state: State, el: D3Selection, data: Datum[], options: Options, series: Series, events: EventBus) {
+  constructor(state: State, el: D3Selection, data: Datum[], options: Options, series: Series, events: EventEmitter) {
     this.state = state;
     this.events = events;
     this.series = series;

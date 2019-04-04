@@ -21,7 +21,7 @@ import {
   D3Selection,
   DateToFocus,
   Datum,
-  EventBus,
+  EventEmitter,
   LegendDatum,
   LegendFloat,
   LegendPosition,
@@ -44,7 +44,7 @@ const defaultDatumAccessors = {
 
 class ChartSeries {
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   private oldRenderers!: RendererClass[];
   public options!: { [key: string]: any };
   public renderers: RendererClass[] = [];
@@ -63,7 +63,7 @@ class ChartSeries {
   public x!: (d: Datum) => number | string | Date;
   public y!: (d: Datum) => number | string | Date;
 
-  constructor(state: State, events: EventBus, el: D3Selection, options: any) {
+  constructor(state: State, events: EventEmitter, el: D3Selection, options: any) {
     this.state = state;
     this.events = events;
     this.el = el;

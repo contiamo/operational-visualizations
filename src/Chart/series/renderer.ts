@@ -1,4 +1,4 @@
-import { D3Selection, Datum, EventBus, SingleRendererOptions, State } from "../typings";
+import { D3Selection, Datum, EventEmitter, SingleRendererOptions, State } from "../typings";
 import Area from "./renderers/area";
 import Bars from "./renderers/bars";
 import Flag from "./renderers/flag";
@@ -9,7 +9,7 @@ import Text from "./renderers/text";
 class Renderer {
   constructor(
     state: State,
-    events: EventBus,
+    events: EventEmitter,
     el: D3Selection,
     data: Datum[],
     options: SingleRendererOptions<any>,

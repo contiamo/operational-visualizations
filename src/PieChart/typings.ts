@@ -20,7 +20,7 @@ export {
   ComponentHoverPayload,
   D3Selection,
   Dimensions,
-  EventBus,
+  EventEmitter,
   Focus,
   Legend,
   Point,

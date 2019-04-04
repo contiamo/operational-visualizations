@@ -3,7 +3,7 @@ import Renderer from "./renderers/renderer";
 
 import {
   D3Selection,
-  EventBus,
+  EventEmitter,
   InputData,
   InputDatum,
   Renderer as RendererInterface,
@@ -17,13 +17,13 @@ class Series {
   private attributes: any;
   private data!: InputData;
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   private renderAs!: () => RendererOptions[];
   private renderer!: RendererInterface;
   private state: State;
   private stateWriter: StateWriter;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventBus, el: D3Selection) {
+  constructor(state: State, stateWriter: StateWriter, events: EventEmitter, el: D3Selection) {
     this.state = state;
     this.stateWriter = stateWriter;
     this.events = events;

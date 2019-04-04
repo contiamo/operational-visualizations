@@ -11,7 +11,7 @@ import {
   AxisPosition,
   D3Selection,
   Datum,
-  EventBus,
+  EventEmitter,
   FlagRendererAccessors,
   FlagRendererConfig,
   RendererClass,
@@ -34,7 +34,7 @@ export type Options = SingleRendererOptions<FlagRendererAccessors>;
 class Flag implements RendererClass<FlagRendererAccessors> {
   private data!: Datum[];
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   public options!: Options;
   private position!: AxisOrientation;
   private scale: any;
@@ -56,7 +56,7 @@ class Flag implements RendererClass<FlagRendererAccessors> {
   private flagHeight: number = 10;
   private flagWidth: number = 8;
 
-  constructor(state: State, el: D3Selection, data: Datum[], options: Options, series: Series, events: EventBus) {
+  constructor(state: State, el: D3Selection, data: Datum[], options: Options, series: Series, events: EventEmitter) {
     this.state = state;
     this.events = events;
     this.series = series;

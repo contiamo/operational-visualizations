@@ -9,7 +9,7 @@ export {
   Canvas,
   D3Selection,
   Dimensions,
-  EventBus,
+  EventEmitter,
   Focus,
   Position,
   StateWriter,

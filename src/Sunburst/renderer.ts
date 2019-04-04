@@ -6,7 +6,7 @@ import * as styles from "./styles";
 import {
   ClickPayload,
   D3Selection,
-  EventBus,
+  EventEmitter,
   HierarchyDatum,
   ProcessedData,
   State,
@@ -32,7 +32,7 @@ class Renderer {
   private data!: HierarchyDatum[];
   private dataHandler: DataHandler;
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   private mouseOverDatum?: HierarchyDatum;
   private previous!: HierarchyDatum[];
   private radiusScale: any;
@@ -42,7 +42,7 @@ class Renderer {
   private total!: number;
   private zoomNode!: HierarchyDatum;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventBus, el: D3Selection) {
+  constructor(state: State, stateWriter: StateWriter, events: EventEmitter, el: D3Selection) {
     this.state = state;
     this.stateWriter = stateWriter;
     this.events = events;

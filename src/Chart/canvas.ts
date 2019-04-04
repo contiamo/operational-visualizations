@@ -3,12 +3,13 @@ import { forEach, get, reduce } from "lodash/fp";
 import Events from "../shared/event_catalog";
 import * as styles from "../shared/styles";
 import * as localStyles from "./styles";
+
 import {
   AxisPosition,
   Canvas,
   D3Selection,
   Dimensions,
-  EventBus,
+  EventEmitter,
   LegendFloat,
   LegendPosition,
   SeriesElements,
@@ -39,11 +40,11 @@ class ChartCanvas implements Canvas {
   private drawingGroup: D3Selection;
   private el: D3Selection;
   private elMap: { [key: string]: D3Selection } = {};
-  private events: EventBus;
+  private events: EventEmitter;
   private state: State;
   private stateWriter: StateWriter;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventBus, context: Element) {
+  constructor(state: State, stateWriter: StateWriter, events: EventEmitter, context: Element) {
     this.state = state;
     this.stateWriter = stateWriter;
     this.events = events;

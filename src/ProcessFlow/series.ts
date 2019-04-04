@@ -1,6 +1,6 @@
 import DataHandler from "./data_handler";
 import Renderer from "./renderer";
-import { D3Selection, Data, EventBus, State, StateWriter } from "./typings";
+import { D3Selection, Data, EventEmitter, State, StateWriter } from "./typings";
 
 class Series {
   private data!: Data;
@@ -10,7 +10,7 @@ class Series {
   private state: State;
   private stateWriter: StateWriter;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventBus, el: D3Selection) {
+  constructor(state: State, stateWriter: StateWriter, events: EventEmitter, el: D3Selection) {
     this.state = state;
     this.stateWriter = stateWriter;
     this.el = el;

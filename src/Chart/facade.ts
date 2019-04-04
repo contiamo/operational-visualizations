@@ -1,7 +1,7 @@
 import { has, isEmpty, uniqueId } from "lodash/fp";
 import { defaultMargins } from "../axis_utils/axis_config";
-import EventEmitter from "../shared/event_bus";
 import Events from "../shared/event_catalog";
+import EventEmitter from "../shared/event_emitter";
 import StateHandler from "../shared/state_handler";
 import { colorAssigner } from "../utils/colorAssigner";
 import theme from "../utils/constants";

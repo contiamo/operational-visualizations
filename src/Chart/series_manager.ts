@@ -31,7 +31,7 @@ import {
   DatesToFocus,
   DateToFocus,
   Datum,
-  EventBus,
+  EventEmitter,
   GroupedRendererOptions,
   LegendFloat,
   LegendPosition,
@@ -51,7 +51,7 @@ type GroupCalculation = (group: { [key: string]: any }, index: number) => void;
 
 class ChartSeriesManager implements SeriesManager {
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   private key!: SeriesAccessor<string>;
   private oldSeries: Series[] = [];
   private renderAs!: SeriesAccessor<RendererOptions[]>;
@@ -59,7 +59,7 @@ class ChartSeriesManager implements SeriesManager {
   private state: State;
   private stateWriter: StateWriter;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventBus, el: D3Selection) {
+  constructor(state: State, stateWriter: StateWriter, events: EventEmitter, el: D3Selection) {
     this.state = state;
     this.stateWriter = stateWriter;
     this.events = events;

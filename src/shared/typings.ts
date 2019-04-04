@@ -6,10 +6,9 @@ import { Selection } from "d3-selection";
 
 export type D3Selection<TDatum = any> = Selection<any, TDatum, any, any>;
 
-// Event bus
-import EventEmitter from "./event_bus";
+import EventEmitter from "./event_emitter";
 
-export type EventBus = EventEmitter;
+export type EventEmitter = EventEmitter;
 
 // Accessors
 export type Accessor<D, T> = (d: D) => T;

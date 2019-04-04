@@ -1,5 +1,5 @@
 import { has, uniqueId } from "lodash/fp";
-import EventEmitter from "../shared/event_bus";
+import EventEmitter from "../shared/event_emitter";
 import StateHandler from "../shared/state_handler";
 import { colorAssigner } from "../utils/colorAssigner";
 import theme from "../utils/constants";

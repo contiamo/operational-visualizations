@@ -1,22 +1,22 @@
-import Donut from "./donut"
-import Polar from "./polar"
-import Gauge from "./gauge"
-import { D3Selection, EventBus, RendererOptions, State } from "../typings"
+import { D3Selection, EventEmitter, RendererOptions, State } from "../typings";
+import Donut from "./donut";
+import Gauge from "./gauge";
+import Polar from "./polar";
 
 // Factory Class
 class Renderer {
-  constructor(state: State, events: EventBus, el: D3Selection, options: RendererOptions) {
+  constructor(state: State, events: EventEmitter, el: D3Selection, options: RendererOptions) {
     switch (options.type) {
       case "donut":
-        return new Donut(state, events, el, options)
+        return new Donut(state, events, el, options);
       case "polar":
-        return new Polar(state, events, el, options)
+        return new Polar(state, events, el, options);
       case "gauge":
-        return new Gauge(state, events, el, options)
+        return new Gauge(state, events, el, options);
       default:
-        throw new Error(`invalid render type '${options.type}' specified`)
+        throw new Error(`invalid render type '${options.type}' specified`);
     }
   }
 }
 
-export default Renderer
+export default Renderer;

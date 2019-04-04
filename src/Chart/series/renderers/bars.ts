@@ -10,7 +10,7 @@ import {
   BarsRendererAccessors,
   D3Selection,
   Datum,
-  EventBus,
+  EventEmitter,
   RendererClass,
   RendererType,
   SingleRendererOptions,
@@ -28,7 +28,7 @@ const defaultAccessors: BarsRendererAccessors = {
 class Bars implements RendererClass<BarsRendererAccessors> {
   private data!: Datum[];
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   private isRange!: boolean;
   public options!: Options;
   private series: Series;
@@ -49,7 +49,7 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   private y0!: (d: Datum) => number;
   private y1!: (d: Datum) => number;
 
-  constructor(state: State, el: D3Selection, data: Datum[], options: Options, series: Series, events: EventBus) {
+  constructor(state: State, el: D3Selection, data: Datum[], options: Options, series: Series, events: EventEmitter) {
     this.state = state;
     this.events = events;
     this.series = series;

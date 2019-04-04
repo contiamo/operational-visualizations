@@ -9,7 +9,7 @@ import {
   AxisPosition,
   D3Selection,
   DatesToFocus,
-  EventBus,
+  EventEmitter,
   FocusDatum,
   MousePosition,
   State,
@@ -21,10 +21,10 @@ class DateFocus {
   private el: D3Selection;
   private els: { [key: string]: D3Selection };
   private elGroup: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   private state: State;
 
-  constructor(state: State, els: { [key: string]: D3Selection }, events: EventBus) {
+  constructor(state: State, els: { [key: string]: D3Selection }, events: EventEmitter) {
     this.state = state;
     this.els = els;
     this.el = els.main;

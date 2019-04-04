@@ -2,15 +2,15 @@ import { forEach, initial, tail, zip } from "lodash/fp";
 import Events from "../shared/event_catalog";
 import Links from "./renderers/links";
 import Nodes from "./renderers/nodes";
-import { D3Selection, Data, EventBus, FocusElement, PathFocusElement, State } from "./typings";
+import { D3Selection, Data, EventEmitter, FocusElement, PathFocusElement, State } from "./typings";
 
 class Renderer {
   private links: Links;
   private nodes: Nodes;
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
 
-  constructor(state: State, events: EventBus, el: D3Selection) {
+  constructor(state: State, events: EventEmitter, el: D3Selection) {
     this.events = events;
     this.el = el;
     this.links = new Links(state, events, el);

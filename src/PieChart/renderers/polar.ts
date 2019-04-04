@@ -16,7 +16,7 @@ import {
   D3Selection,
   Datum,
   Dimensions,
-  EventBus,
+  EventEmitter,
   HoverPayload,
   InputData,
   InputDatum,
@@ -38,7 +38,7 @@ class Polar implements Renderer {
   private data!: Datum[];
   private drawn: boolean = false;
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   private inputData!: InputData;
   private minSegmentWidth!: number;
   private previousComputed!: Partial<ComputedData>;
@@ -47,7 +47,7 @@ class Polar implements Renderer {
   public type: RendererType = "polar";
   public value!: RendererAccessor<number>;
 
-  constructor(state: State, events: EventBus, el: D3Selection, options: { [key: string]: any }) {
+  constructor(state: State, events: EventEmitter, el: D3Selection, options: { [key: string]: any }) {
     this.state = state;
     this.events = events;
     this.el = el;

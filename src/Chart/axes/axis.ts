@@ -2,8 +2,15 @@ import { cloneDeep } from "lodash/fp";
 import defaultOptions from "../../axis_utils/axis_config";
 import Events from "../../shared/event_catalog";
 import * as styles from "../../shared/styles";
-import { ComponentConfigInfo, ComponentHoverPayload, D3Selection, EventBus, StateWriter } from "../../shared/typings";
+import {
+  ComponentConfigInfo,
+  ComponentHoverPayload,
+  D3Selection,
+  EventEmitter,
+  StateWriter,
+} from "../../shared/typings";
 import { setLineAttributes, setRectAttributes, setTextAttributes } from "../../utils/d3_utils";
+
 import {
   AxisAttributes,
   AxisComputed,
@@ -34,7 +41,7 @@ class Axis {
   private computed!: AxisComputed;
   public preComputed!: AxisComputed | false;
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   public isXAxis: boolean;
   public options!: FullAxisOptions;
   public position: AxisPosition;
@@ -43,7 +50,7 @@ class Axis {
   private ticks!: Tick[];
   public type!: AxisType;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventBus, el: D3Selection, position: AxisPosition) {
+  constructor(state: State, stateWriter: StateWriter, events: EventEmitter, el: D3Selection, position: AxisPosition) {
     this.state = state;
     this.stateWriter = stateWriter;
     this.events = events;

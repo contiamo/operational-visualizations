@@ -2,17 +2,17 @@ import { clone, defaults } from "lodash/fp";
 import Events from "../shared/event_catalog";
 import { readableTextColor } from "../utils/color";
 import * as styles from "./styles";
-import { ClickPayload, D3Selection, EventBus, HierarchyDatum, HoverPayload, State, StateWriter } from "./typings";
+import { ClickPayload, D3Selection, EventEmitter, HierarchyDatum, HoverPayload, State, StateWriter } from "./typings";
 
 const ARROW_WIDTH: number = 7;
 const HOPS_WIDTH: number = 40;
 
 class Breadcrumb {
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   private state: State;
 
-  constructor(state: State, _: StateWriter, events: EventBus, el: D3Selection) {
+  constructor(state: State, _: StateWriter, events: EventEmitter, el: D3Selection) {
     this.state = state;
     this.events = events;
     this.el = el;

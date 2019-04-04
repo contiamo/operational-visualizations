@@ -16,7 +16,7 @@ import {
   Datum,
   DatumInfo,
   Dimensions,
-  EventBus,
+  EventEmitter,
   HoverPayload,
   InputData,
   InputDatum,
@@ -36,7 +36,7 @@ class Gauge implements Renderer {
   private data!: Datum[];
   private drawn: boolean = false;
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   private extent!: "semi" | "full";
   private inputData!: InputData;
   private previousComputed!: Partial<ComputedData>;
@@ -47,7 +47,7 @@ class Gauge implements Renderer {
   public type: RendererType = "gauge";
   public value!: RendererAccessor<number>;
 
-  constructor(state: State, events: EventBus, el: D3Selection, options: { [key: string]: any }) {
+  constructor(state: State, events: EventEmitter, el: D3Selection, options: { [key: string]: any }) {
     this.state = state;
     this.events = events;
     this.el = el;

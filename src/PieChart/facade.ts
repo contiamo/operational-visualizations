@@ -1,7 +1,7 @@
 import * as d3 from "d3-selection";
 import { isEmpty, uniqueId } from "lodash/fp";
-import EventEmitter from "../shared/event_bus";
 import Events from "../shared/event_catalog";
+import EventEmitter from "../shared/event_emitter";
 import StateHandler from "../shared/state_handler";
 import theme from "../utils/constants";
 import PieChartCanvas from "./canvas";

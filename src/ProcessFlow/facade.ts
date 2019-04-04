@@ -1,6 +1,6 @@
 import { uniqueId } from "lodash/fp";
-import EventEmitter from "../shared/event_bus";
 import Events from "../shared/event_catalog";
+import EventEmitter from "../shared/event_emitter";
 import StateHandler from "../shared/state_handler";
 import theme from "../utils/constants";
 import defaultNumberFormatter from "../utils/number_formatter";

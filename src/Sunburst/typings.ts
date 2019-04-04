@@ -11,7 +11,7 @@ export {
   Canvas,
   D3Selection,
   Dimensions,
-  EventBus,
+  EventEmitter,
   Point,
   Position,
   StateWriter,
