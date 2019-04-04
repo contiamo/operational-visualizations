@@ -175,6 +175,12 @@ export const AXIS_ORIENTATIONS = tuple("x", "y");
 
 export type AxisOrientation = typeof AXIS_ORIENTATIONS[number];
 
+/**
+ * x1 is the bottom x-axis
+ * x2 is the top x-axis
+ * y1 is the left y-axis
+ * y2 is the right y-axis
+ */
 export const AXIS_POSITIONS = tuple("x1", "x2", "y1", "y2");
 
 export type AxisPosition = typeof AXIS_POSITIONS[number];
