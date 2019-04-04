@@ -80,7 +80,7 @@ export default class StateHandler<Data, Config, AccessorsObject, Computed> {
   }
 
   // Computed
-  public computedWriter(namespace: Path): StateWriter {
+  public getStateWriter(namespace: Path): StateWriter {
     return (path: Path, value: any) => {
       this.state.current.set(["computed"].concat(namespace).concat(path), value);
     };

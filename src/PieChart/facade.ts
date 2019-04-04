@@ -106,18 +106,18 @@ class PieChartFacade implements Facade {
   }
 
   private initializeCanvas(): PieChartCanvas {
-    return new PieChartCanvas(this.state.readOnly(), this.state.computedWriter(["canvas"]), this.events, this.context);
+    return new PieChartCanvas(this.state.readOnly(), this.state.getStateWriter(["canvas"]), this.events, this.context);
   }
 
   private initializeComponents(): Components {
     return {
       legend: new PieChartLegend(
         this.state.readOnly(),
-        this.state.computedWriter(["legend"]),
+        this.state.getStateWriter(["legend"]),
         this.events,
         this.canvas.elementFor("legend"),
       ),
-      focus: new PieChartFocus(this.state.readOnly(), this.state.computedWriter(["focus"]), this.events, {
+      focus: new PieChartFocus(this.state.readOnly(), this.state.getStateWriter(["focus"]), this.events, {
         main: this.canvas.elementFor("focus"),
         component: this.canvas.elementFor("componentFocus"),
       }),
@@ -127,7 +127,7 @@ class PieChartFacade implements Facade {
   private initializeSeries(): Series {
     return new Series(
       this.state.readOnly(),
-      this.state.computedWriter(["series"]),
+      this.state.getStateWriter(["series"]),
       this.events,
       this.canvas.elementFor("series"),
     );

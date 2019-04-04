@@ -130,7 +130,7 @@ class ProcessFlowFacade implements Facade {
   private initializeCanvas(): ProcessFlowCanvas {
     return new ProcessFlowCanvas(
       this.state.readOnly(),
-      this.state.computedWriter(["canvas"]),
+      this.state.getStateWriter(["canvas"]),
       this.events,
       this.context,
     );
@@ -140,7 +140,7 @@ class ProcessFlowFacade implements Facade {
     return {
       focus: new ProcessFlowFocus(
         this.state.readOnly(),
-        this.state.computedWriter(["focus"]),
+        this.state.getStateWriter(["focus"]),
         this.events,
         this.canvas.elementFor("focus"),
       ),
@@ -150,7 +150,7 @@ class ProcessFlowFacade implements Facade {
   private initializeSeries(): Series {
     return new Series(
       this.state.readOnly(),
-      this.state.computedWriter(["series"]),
+      this.state.getStateWriter(["series"]),
       this.events,
       this.canvas.elementFor("series"),
     );
