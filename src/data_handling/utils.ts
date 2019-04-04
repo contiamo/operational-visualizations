@@ -174,7 +174,7 @@ export const toTabular = <T>(dataset: Dataset<T> | RawDataset<T>) => {
  * # <output of toPapndasDataFrame>
  * ```
  */
-export const toPapndasDataFrame = <T>(dataset: Dataset<T>): string => {
+export const toPandasDataFrame = <T>(dataset: Dataset<T>): string => {
   const { data, columns } = toTabular(dataset);
   return `data = pd.DataFrame(data=${JSON.stringify(data)}, columns=${JSON.stringify(columns)})`;
 };
@@ -191,7 +191,7 @@ export const toPapndasDataFrame = <T>(dataset: Dataset<T>): string => {
  * # <output of toPapndasPivotal>
  * ```
  */
-export const toPapndasPivotal = <T>(dataset: Dataset<T>): string => {
+export const toPandasPivotal = <T>(dataset: Dataset<T>): string => {
   const raw = dataset.serialize();
 
   // Let's assume measures are always in columns - the last one
