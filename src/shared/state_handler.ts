@@ -12,7 +12,7 @@ export interface ChartStateReadOnly<Data, Config, AccessorsObject, Computed> {
   previous: ReadOnlyState<Data, Config, AccessorsObject, Computed>;
 }
 
-export type StateWriter = (propertyPath: string | string[], value: any) => void;
+export type StateWriter = <T>(propertyPath: string | string[], value: T) => void;
 
 export default class StateHandler<Data, Config, AccessorsObject, Computed> {
   private state: ChartState<Data, Config, AccessorsObject, Computed>;

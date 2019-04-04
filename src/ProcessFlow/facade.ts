@@ -156,7 +156,7 @@ class ProcessFlowFacade implements Facade {
     );
   }
 
-  public data(data?: any): any {
+  public data<T>(data?: T) {
     return this.state.data(data);
   }
 
@@ -168,11 +168,11 @@ class ProcessFlowFacade implements Facade {
     return this.state.accessors(type, accessors);
   }
 
-  public on(event: string, handler: any) {
+  public on(event: string, handler: (e: any) => void) {
     this.events.on(event, handler);
   }
 
-  public off(event: string, handler: any) {
+  public off(event: string, handler: (e: any) => void) {
     this.events.removeListener(event, handler);
   }
 

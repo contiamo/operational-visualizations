@@ -15,7 +15,7 @@ const labelStyle = (options: FullAxisOptions, axis: AxisPosition): React.CSSProp
   textAnchor: ["x1", "x2"].includes(axis) ? "middle" : axis === "y1" ? "end" : "start",
 });
 
-const tickPosition = (tick: Tick<any>, { position, data, width }: AxisProps) => {
+function tickPosition<T>(tick: Tick<T>, { position, data, width }: AxisProps) {
   switch (position) {
     case "x1":
       return {
@@ -46,7 +46,7 @@ const tickPosition = (tick: Tick<any>, { position, data, width }: AxisProps) => 
         y2: tick.position - data.range[1],
       };
   }
-};
+}
 
 const borderWidth = (position: AxisProps["position"]) => {
   switch (position) {
@@ -61,7 +61,7 @@ const borderWidth = (position: AxisProps["position"]) => {
   }
 };
 
-const labelPosition = (tick: Tick<any>, { position, data, width }: AxisProps) => {
+function labelPosition<T>(tick: Tick<T>, { position, data, width }: AxisProps) {
   switch (position) {
     case "x1":
       return {
@@ -88,7 +88,7 @@ const labelPosition = (tick: Tick<any>, { position, data, width }: AxisProps) =>
         dy: data.options.fontSize * 0.35,
       };
   }
-};
+}
 
 const containerStyle = ({ position, margins, data, width }: AxisProps) => ({
   borderStyle: "solid",

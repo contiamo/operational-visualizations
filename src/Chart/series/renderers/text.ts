@@ -151,12 +151,12 @@ class Text implements RendererClass<TextRendererAccessors> {
     const offset = barWidth ? barWidth(this.series.key()) / 2 : 0;
     const rotate = this.tilt ? (this.xIsBaseline ? verticalTiltAngle : horizontalTiltAngle) : 0;
 
-    const attrs: any = {
+    const attrs = {
       x: (d: Datum) => this.xScale(this.xIsBaseline ? this.x(d) : 0) - (this.xIsBaseline ? offset : 0),
       y: (d: Datum) => this.yScale(this.xIsBaseline ? 0 : this.y(d)) - (this.xIsBaseline ? 0 : offset),
       text: (d: Datum) => (this.xIsBaseline ? this.y(d) : this.x(d)).toString(),
+      transform: (d: Datum) => `rotate(${rotate}, ${attrs.x(d)}, ${attrs.y(d)})`,
     };
-    attrs.transform = (d: Datum) => `rotate(${rotate}, ${attrs.x(d)}, ${attrs.y(d)})`;
     return attrs;
   }
 
@@ -172,14 +172,14 @@ class Text implements RendererClass<TextRendererAccessors> {
     const y = (d: Datum) => d.y1 || this.y(d);
     const isPositive = (d: Datum) => (this.xIsBaseline ? y(d) >= 0 : x(d) >= 0);
 
-    const attrs: any = {
+    const attrs = {
       x: (d: Datum) => this.xScale(x(d)) + (this.xIsBaseline ? offset : symbolOffset(d) * (isPositive(d) ? 1 : -1)),
       y: (d: Datum) => this.yScale(y(d)) + (this.xIsBaseline ? symbolOffset(d) * (isPositive(d) ? -1 : 1) : offset),
       text: (d: Datum) => (this.xIsBaseline ? this.y(d) : this.x(d)).toString(),
       anchor: (d: Datum) => (this.xIsBaseline && !this.tilt ? "middle" : isPositive(d) ? "start" : "end"),
       baseline: this.xIsBaseline ? "initial" : "central",
+      transform: (d: Datum) => `rotate(${rotate}, ${attrs.x(d)}, ${attrs.y(d)})`,
     };
-    attrs.transform = (d: Datum) => `rotate(${rotate}, ${attrs.x(d)}, ${attrs.y(d)})`;
     return attrs;
   }
 }

@@ -19,7 +19,7 @@ class PieChartFocus implements Focus {
     this.events.on(Events.FOCUS.ELEMENT.HOVER, this.onElementHover.bind(this));
     this.events.on(Events.FOCUS.ELEMENT.OUT, this.onElementOut.bind(this));
     this.events.on(Events.CHART.OUT, this.onMouseLeave.bind(this));
-    this.events.on(Events.FOCUS.CLEAR, this.remove());
+    this.events.on(Events.FOCUS.CLEAR, this.remove.bind(this));
   }
 
   private onElementHover(payload: HoverPayload) {

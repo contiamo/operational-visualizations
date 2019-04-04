@@ -2,7 +2,7 @@ import { scaleTime, ScaleTime } from "d3-scale";
 import { timeMonday } from "d3-time";
 import { timeFormat } from "d3-time-format";
 import { forEach, keys, last, LodashMapValues, mapValues, times, values } from "lodash/fp";
-import * as Moment from "moment";
+import Moment from "moment";
 import { extendMoment } from "moment-range";
 import { WithConvert } from "../shared/typings";
 import defaultOptions from "./axis_config";
@@ -20,7 +20,7 @@ import {
   TimeIntervals,
 } from "./typings";
 
-const moment: any = extendMoment(Moment as any);
+const moment = extendMoment(Moment);
 
 type Datum = DiscreteInputDatum<Date, TimeAxisOptions>;
 type Data = DiscreteInputData<Date, TimeAxisOptions>;
@@ -112,7 +112,7 @@ const alignAxes = (axes: Data) => {
 };
 
 export const ticksInDomain = (options: TimeAxisOptions): Date[] =>
-  Array.from(moment.range(options.start, options.end).by(options.interval)).map((d: any) => d.toDate());
+  Array.from(moment.range(options.start, options.end).by(options.interval)).map(d => d.toDate());
 
 export const adjustRange = (datum: Datum): Extent => {
   const tickWidth = computeTickWidth(datum.range, datum.values.length, datum.hasBars);
