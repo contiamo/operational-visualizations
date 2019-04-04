@@ -42,7 +42,7 @@ export default class State<Data, Config, AccessorsObject, Computed> {
     return cloneDeep(this.state.computed);
   }
 
-  public set(path: Path, value: any) {
+  public set<T>(path: Path, value: T) {
     this.state = set(path)(value)(this.state);
     return value;
   }

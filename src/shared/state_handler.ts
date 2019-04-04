@@ -35,7 +35,7 @@ export default class StateHandler<Data, Config, AccessorsObject, Computed> {
 
   // Data
   public data(data?: Data) {
-    return arguments.length ? this.state.current.set("data", data) : this.state.current.getData();
+    return data !== undefined ? this.state.current.set("data", data) : this.state.current.getData();
   }
 
   public hasData() {
@@ -81,7 +81,7 @@ export default class StateHandler<Data, Config, AccessorsObject, Computed> {
 
   // Computed
   public getStateWriter(namespace: Path): StateWriter {
-    return (path: Path, value: any) => {
+    return <T>(path: Path, value: T) => {
       this.state.current.set(["computed"].concat(namespace).concat(path), value);
     };
   }
