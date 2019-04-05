@@ -1,13 +1,13 @@
 import Events from "../shared/event_catalog";
 import { approxZero, stepFunction } from "../utils/font_sizing_utils";
-import { D3Selection, EventEmitter, State, StateWriter } from "./typings";
+import { ComputedWriter, D3Selection, EventEmitter, State } from "./typings";
 
 class RootLabel {
   private el: D3Selection;
   private events: EventEmitter;
   private state: State;
 
-  constructor(state: State, _: StateWriter, events: EventEmitter, el: D3Selection) {
+  constructor(state: State, _: ComputedWriter, events: EventEmitter, el: D3Selection) {
     this.state = state;
     this.events = events;
     this.el = el;

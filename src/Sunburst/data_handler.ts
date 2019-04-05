@@ -3,12 +3,12 @@ import { filter, flow, forEach, isEmpty, LodashForEach, map, reduce } from "loda
 
 import {
   Accessor,
+  ComputedWriter,
   Data,
   HierarchyDatum,
   ProcessedData,
   SeriesAccessors,
   State,
-  StateWriter,
   WithConvert,
 } from "./typings";
 
@@ -18,13 +18,13 @@ class DataHandler {
   private id!: (d: Data) => string;
   private name!: (d: Data) => string;
   private state: State;
-  private stateWriter: StateWriter;
+  private computedWriter: ComputedWriter;
   private value!: (d: Data) => number;
   public topNode!: HierarchyDatum;
 
-  constructor(state: State, stateWriter: StateWriter) {
+  constructor(state: State, computedWriter: ComputedWriter) {
     this.state = state;
-    this.stateWriter = stateWriter;
+    this.computedWriter = computedWriter;
   }
 
   private assignAccessors() {
@@ -68,7 +68,7 @@ class DataHandler {
       .descendants()
       .find(d => d.depth === 0) as HierarchyDatum;
 
-    this.stateWriter("topNode", this.topNode);
+    this.computedWriter("topNode", this.topNode);
 
     this.data = d3Partition<ProcessedData>()(hierarchyData)
       .descendants()
@@ -76,7 +76,7 @@ class DataHandler {
 
     this.checkDataValidity();
 
-    this.stateWriter("data", this.data);
+    this.computedWriter("data", this.data);
     return this.data;
   }
 

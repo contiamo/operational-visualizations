@@ -2,19 +2,19 @@ import { extend, find, flow, forEach, get, groupBy, LodashExtend, map, sortBy, t
 import Layout from "./layout";
 import Link from "./link";
 import Node from "./node";
-import { Data, Journey, LinkAttrs, NodeAttrs, State, StateWriter, TLink, TNode, WithConvert } from "./typings";
+import { ComputedWriter, Data, Journey, LinkAttrs, NodeAttrs, State, TLink, TNode, WithConvert } from "./typings";
 
 class DataHandler {
   private journeys!: Journey[];
   private nodes!: TNode[];
   private links!: TLink[];
   private state: State;
-  private stateWriter: StateWriter;
+  private computedWriter: ComputedWriter;
   private layout: Layout;
 
-  constructor(state: State, stateWriter: StateWriter) {
+  constructor(state: State, computedWriter: ComputedWriter) {
     this.state = state;
-    this.stateWriter = stateWriter;
+    this.computedWriter = computedWriter;
     this.layout = new Layout();
   }
 
@@ -128,8 +128,8 @@ class DataHandler {
       ? Math.min(config.width / (maxX + 1), config.horizontalNodeSpacing)
       : config.horizontalNodeSpacing;
 
-    this.stateWriter("horizontalNodeSpacing", spacing);
-    this.stateWriter("width", finiteWidth ? config.width : spacing * (maxX + 1));
+    this.computedWriter("horizontalNodeSpacing", spacing);
+    this.computedWriter("width", finiteWidth ? config.width : spacing * (maxX + 1));
     return spacing;
   }
 
@@ -140,7 +140,7 @@ class DataHandler {
       ? Math.min(config.height / (nRows + 1), config.verticalNodeSpacing)
       : config.verticalNodeSpacing;
 
-    this.stateWriter("height", finiteHeight ? config.height : spacing * (nRows + 1));
+    this.computedWriter("height", finiteHeight ? config.height : spacing * (nRows + 1));
     return spacing;
   }
 

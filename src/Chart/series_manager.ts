@@ -26,6 +26,7 @@ import {
 import {
   AxisOrientation,
   BarSeriesInfo,
+  ComputedWriter,
   D3Selection,
   DataForLegends,
   DatesToFocus,
@@ -41,7 +42,6 @@ import {
   SeriesDatum,
   SeriesManager,
   State,
-  StateWriter,
   WithConvert,
 } from "./typings";
 
@@ -57,11 +57,11 @@ class ChartSeriesManager implements SeriesManager {
   private renderAs!: SeriesAccessor<RendererOptions[]>;
   private series: Series[] = [];
   private state: State;
-  private stateWriter: StateWriter;
+  private computedWriter: ComputedWriter;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventEmitter, el: D3Selection) {
+  constructor(state: State, computedWriter: ComputedWriter, events: EventEmitter, el: D3Selection) {
     this.state = state;
-    this.stateWriter = stateWriter;
+    this.computedWriter = computedWriter;
     this.events = events;
     this.el = el;
   }
@@ -80,11 +80,11 @@ class ChartSeriesManager implements SeriesManager {
     this.key = accessors.key;
     this.renderAs = accessors.renderAs;
     this.prepareData();
-    this.stateWriter("dataForLegends", this.dataForLegends());
-    this.stateWriter("dataForAxes", this.dataForAxes());
-    this.stateWriter("barSeries", this.computeBarSeries());
-    this.stateWriter("axesWithFlags", this.axesWithFlags());
-    this.stateWriter("dataForFocus", this.dataForFocus.bind(this));
+    this.computedWriter("dataForLegends", this.dataForLegends());
+    this.computedWriter("dataForAxes", this.dataForAxes());
+    this.computedWriter("barSeries", this.computeBarSeries());
+    this.computedWriter("axesWithFlags", this.axesWithFlags());
+    this.computedWriter("dataForFocus", this.dataForFocus.bind(this));
   }
 
   /**

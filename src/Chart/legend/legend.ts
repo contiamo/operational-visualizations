@@ -2,7 +2,7 @@ import * as d3 from "d3-selection";
 import { get } from "lodash/fp";
 import Events from "../../shared/event_catalog";
 import * as styles from "../../shared/styles";
-import { StateWriter } from "../../shared/typings";
+import { ComputedWriter } from "../../shared/typings";
 import { withD3Element } from "../../utils/d3_utils";
 
 import {
@@ -21,7 +21,7 @@ class ChartLegend implements Legend {
   private state: State;
   public el: D3Selection;
 
-  constructor(state: State, _: StateWriter, events: EventEmitter, el: D3Selection) {
+  constructor(state: State, _: ComputedWriter, events: EventEmitter, el: D3Selection) {
     this.state = state;
     this.events = events;
     this.el = el;

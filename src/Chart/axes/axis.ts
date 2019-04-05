@@ -2,13 +2,15 @@ import { cloneDeep } from "lodash/fp";
 import defaultOptions from "../../axis_utils/axis_config";
 import Events from "../../shared/event_catalog";
 import * as styles from "../../shared/styles";
+
 import {
   ComponentConfigInfo,
   ComponentHoverPayload,
+  ComputedWriter,
   D3Selection,
   EventEmitter,
-  StateWriter,
 } from "../../shared/typings";
+
 import { setLineAttributes, setRectAttributes, setTextAttributes } from "../../utils/d3_utils";
 
 import {
@@ -46,13 +48,19 @@ class Axis {
   public options!: FullAxisOptions;
   public position: AxisPosition;
   private state: State;
-  private stateWriter: StateWriter;
+  private computedWriter: ComputedWriter;
   private ticks!: Tick[];
   public type!: AxisType;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventEmitter, el: D3Selection, position: AxisPosition) {
+  constructor(
+    state: State,
+    computedWriter: ComputedWriter,
+    events: EventEmitter,
+    el: D3Selection,
+    position: AxisPosition,
+  ) {
     this.state = state;
-    this.stateWriter = stateWriter;
+    this.computedWriter = computedWriter;
     this.events = events;
     this.position = position;
     this.isXAxis = position[0] === "x";
@@ -104,7 +112,7 @@ class Axis {
       return;
     }
     computedMargins[this.position] = requiredMargin;
-    this.stateWriter("margins", computedMargins);
+    this.computedWriter("margins", computedMargins);
     this.translateAxis();
   }
 

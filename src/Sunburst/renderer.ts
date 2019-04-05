@@ -5,12 +5,12 @@ import * as styles from "./styles";
 
 import {
   ClickPayload,
+  ComputedWriter,
   D3Selection,
   EventEmitter,
   HierarchyDatum,
   ProcessedData,
   State,
-  StateWriter,
   WithConvert,
 } from "./typings";
 
@@ -38,16 +38,16 @@ class Renderer {
   private radiusScale: any;
   private radius!: number;
   private state: State;
-  private stateWriter: StateWriter;
+  private computedWriter: ComputedWriter;
   private total!: number;
   private zoomNode!: HierarchyDatum;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventEmitter, el: D3Selection) {
+  constructor(state: State, computedWriter: ComputedWriter, events: EventEmitter, el: D3Selection) {
     this.state = state;
-    this.stateWriter = stateWriter;
+    this.computedWriter = computedWriter;
     this.events = events;
     this.el = el;
-    this.dataHandler = new DataHandler(state, stateWriter);
+    this.dataHandler = new DataHandler(state, computedWriter);
     this.events.on(Events.FOCUS.ELEMENT.CLICK, this.onClick.bind(this));
   }
 
@@ -331,7 +331,7 @@ class Renderer {
     // Save new inner radius to facilitate sizing and positioning of root label
     this.radiusScale.domain(radiusDomain(1));
     const innerRadius = this.radiusScale(zoomNode.y1);
-    this.stateWriter("innerRadius", innerRadius);
+    this.computedWriter("innerRadius", innerRadius);
 
     // If the sunburst is not zoomed in and the root node is fully surrounded by children,
     // make the radius of the central white circle equal to the inner radius of the first ring,
@@ -359,7 +359,7 @@ class Renderer {
     }
 
     this.zoomNode = zoomNode;
-    this.stateWriter("zoomNode", this.zoomNode);
+    this.computedWriter("zoomNode", this.zoomNode);
 
     this.removeTruncationArrows();
 

@@ -17,7 +17,7 @@ export {
   Legend,
   Point,
   Position,
-  StateWriter,
+  ComputedWriter,
   WithConvert,
 } from "../shared/typings";
 

@@ -12,7 +12,7 @@ export {
   EventEmitter,
   Focus,
   Position,
-  StateWriter,
+  ComputedWriter,
   WithConvert,
 } from "../shared/typings";
 

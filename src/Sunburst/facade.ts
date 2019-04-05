@@ -101,32 +101,37 @@ class SunburstFacade implements Facade {
   }
 
   private initializeCanvas(): SunburstCanvas {
-    return new SunburstCanvas(this.state.readOnly(), this.state.getStateWriter(["canvas"]), this.events, this.context);
+    return new SunburstCanvas(
+      this.state.readOnly(),
+      this.state.getComputedWriter(["canvas"]),
+      this.events,
+      this.context,
+    );
   }
 
   private initializeComponents(): Components {
     return {
       breadcrumb: new Breadcrumb(
         this.state.readOnly(),
-        this.state.getStateWriter(["breadcrumb"]),
+        this.state.getComputedWriter(["breadcrumb"]),
         this.events,
         this.canvas.elementFor("breadcrumb"),
       ),
       focus: new SunburstFocus(
         this.state.readOnly(),
-        this.state.getStateWriter(["focus"]),
+        this.state.getComputedWriter(["focus"]),
         this.events,
         this.canvas.elementFor("focus"),
       ),
       renderer: new Renderer(
         this.state.readOnly(),
-        this.state.getStateWriter(["renderer"]),
+        this.state.getComputedWriter(["renderer"]),
         this.events,
         this.canvas.elementFor("series"),
       ),
       rootLabel: new RootLabel(
         this.state.readOnly(),
-        this.state.getStateWriter(["rootLabel"]),
+        this.state.getComputedWriter(["rootLabel"]),
         this.events,
         this.canvas.elementFor("rootLabel"),
       ),

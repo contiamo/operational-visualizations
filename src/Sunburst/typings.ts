@@ -14,7 +14,7 @@ export {
   EventEmitter,
   Point,
   Position,
-  StateWriter,
+  ComputedWriter,
   WithConvert,
 } from "../shared/typings";
 

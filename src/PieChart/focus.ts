@@ -1,7 +1,7 @@
 import ComponentFocus from "../shared/component_focus";
 import Events from "../shared/event_catalog";
 import { drawHidden, labelDimensions, positionLabel } from "../utils/focus_utils";
-import { D3Selection, EventEmitter, Focus, HoverPayload, State, StateWriter } from "./typings";
+import { ComputedWriter, D3Selection, EventEmitter, Focus, HoverPayload, State } from "./typings";
 
 const percentageString = (percentage: number): string => percentage.toFixed(1) + "%";
 
@@ -11,7 +11,7 @@ class PieChartFocus implements Focus {
   private state: State;
   private events: EventEmitter;
 
-  constructor(state: State, _: StateWriter, events: EventEmitter, els: { [key: string]: D3Selection }) {
+  constructor(state: State, _: ComputedWriter, events: EventEmitter, els: { [key: string]: D3Selection }) {
     this.state = state;
     this.events = events;
     this.el = els.main;

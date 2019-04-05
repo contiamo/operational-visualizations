@@ -18,7 +18,7 @@ export interface Accessors<D> {
 }
 
 // State
-export { ChartStateReadOnly, StateWriter } from "./state_handler";
+export { ChartStateReadOnly, ComputedWriter } from "./state_handler";
 
 export interface ChartStateObject<Data, Config, AccessorsObject, Computed> {
   data: Data;

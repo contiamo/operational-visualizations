@@ -1,7 +1,7 @@
 import { forEach, get, reduce } from "lodash/fp";
 import * as styles from "../shared/styles";
 import ChartLegend from "./legend/legend";
-import { D3Selection, EventEmitter, LegendDatum, LegendFloat, LegendPosition, State, StateWriter } from "./typings";
+import { ComputedWriter, D3Selection, EventEmitter, LegendDatum, LegendFloat, LegendPosition, State } from "./typings";
 
 interface LegendOption {
   position: LegendPosition;
@@ -20,7 +20,7 @@ class LegendManager {
 
   constructor(
     state: State,
-    stateWriter: StateWriter,
+    computedWriter: ComputedWriter,
     events: EventEmitter,
     els: { [key: string]: { [key: string]: D3Selection } },
   ) {
@@ -28,7 +28,7 @@ class LegendManager {
 
     forEach((option: LegendOption) => {
       const el: D3Selection = els[option.position][option.float];
-      this.legends[option.position][option.float] = new ChartLegend(state, stateWriter, events, el);
+      this.legends[option.position][option.float] = new ChartLegend(state, computedWriter, events, el);
     })(legendOptions);
   }
 

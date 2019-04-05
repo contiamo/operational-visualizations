@@ -2,7 +2,7 @@ import * as d3 from "d3-selection";
 import Events from "../shared/event_catalog";
 import * as styles from "../shared/styles";
 import * as localStyles from "./styles";
-import { Canvas, D3Selection, Dimensions, EventEmitter, State, StateWriter } from "./typings";
+import { Canvas, ComputedWriter, D3Selection, Dimensions, EventEmitter, State } from "./typings";
 
 class SunburstCanvas implements Canvas {
   private breadcrumb: D3Selection;
@@ -11,11 +11,11 @@ class SunburstCanvas implements Canvas {
   private elMap: { [key: string]: D3Selection } = {};
   private events: EventEmitter;
   private state: State;
-  private stateWriter: StateWriter;
+  private computedWriter: ComputedWriter;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventEmitter, context: Element) {
+  constructor(state: State, computedWriter: ComputedWriter, events: EventEmitter, context: Element) {
     this.state = state;
-    this.stateWriter = stateWriter;
+    this.computedWriter = computedWriter;
     this.events = events;
     this.chartContainer = this.renderChartContainer(context);
     this.breadcrumb = this.renderBreadcrumb();
@@ -103,7 +103,7 @@ class SunburstCanvas implements Canvas {
   public draw() {
     const config = this.state.current.getConfig();
     const drawingDims = this.drawingDims();
-    this.stateWriter("drawingDims", drawingDims);
+    this.computedWriter("drawingDims", drawingDims);
 
     this.chartContainer
       .style("visibility", this.state.current.getConfig().hidden ? "hidden" : "visible")
@@ -115,7 +115,7 @@ class SunburstCanvas implements Canvas {
       .attr("cx", drawingDims.width / 2)
       .attr("cy", drawingDims.height / 2);
 
-    this.stateWriter(["containerRect"], this.chartContainer.node().getBoundingClientRect());
+    this.computedWriter(["containerRect"], this.chartContainer.node().getBoundingClientRect());
   }
 
   public remove() {

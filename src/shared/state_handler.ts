@@ -12,7 +12,7 @@ export interface ChartStateReadOnly<Data, Config, AccessorsObject, Computed> {
   previous: ReadOnlyState<Data, Config, AccessorsObject, Computed>;
 }
 
-export type StateWriter = <T>(propertyPath: string | string[], value: T) => void;
+export type ComputedWriter = <T>(propertyPath: string | string[], value: T) => void;
 
 export default class StateHandler<Data, Config, AccessorsObject, Computed> {
   private state: ChartState<Data, Config, AccessorsObject, Computed>;
@@ -80,7 +80,7 @@ export default class StateHandler<Data, Config, AccessorsObject, Computed> {
   }
 
   // Computed
-  public getStateWriter(namespace: Path): StateWriter {
+  public getComputedWriter(namespace: Path): ComputedWriter {
     return <T>(path: Path, value: T) => {
       this.state.current.set(["computed"].concat(namespace).concat(path), value);
     };

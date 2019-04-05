@@ -1,6 +1,4 @@
-type EventData = any;
-
-class EventEmitter {
+class EventEmitter<EventData = any> {
   private subscribers: Record<string, Array<(e: EventData) => void>> = {};
 
   public on(eventName: string, callback: (e: EventData) => void) {
@@ -19,7 +17,7 @@ class EventEmitter {
     this.subscribers[eventName] = [];
   }
 
-  public emit(eventName: string, eventData: EventData = {}) {
+  public emit(eventName: string, eventData: EventData = {} as any) {
     if (!this.subscribers[eventName]) {
       return;
     }

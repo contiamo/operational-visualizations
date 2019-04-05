@@ -2,6 +2,7 @@ import { filter, forEach, LodashForEach } from "lodash/fp";
 import Renderer from "./renderers/renderer";
 
 import {
+  ComputedWriter,
   D3Selection,
   EventEmitter,
   InputData,
@@ -9,7 +10,6 @@ import {
   Renderer as RendererInterface,
   RendererOptions,
   State,
-  StateWriter,
   WithConvert,
 } from "./typings";
 
@@ -21,11 +21,11 @@ class Series {
   private renderAs!: () => RendererOptions[];
   private renderer!: RendererInterface;
   private state: State;
-  private stateWriter: StateWriter;
+  private computedWriter: ComputedWriter;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventEmitter, el: D3Selection) {
+  constructor(state: State, computedWriter: ComputedWriter, events: EventEmitter, el: D3Selection) {
     this.state = state;
-    this.stateWriter = stateWriter;
+    this.computedWriter = computedWriter;
     this.events = events;
     this.el = el;
   }
@@ -35,7 +35,7 @@ class Series {
     this.assignAccessors();
     this.updateRenderer();
     this.prepareData();
-    this.stateWriter("dataForLegend", this.renderer.dataForLegend());
+    this.computedWriter("dataForLegend", this.renderer.dataForLegend());
   }
 
   private prepareData() {
@@ -44,7 +44,7 @@ class Series {
         !!this.renderer.key(datum) && this.renderer.key(datum).length > 0 && this.renderer.value(datum) > 0,
     )(this.state.current.getAccessors().data.data(this.attributes));
     this.renderer.setData(this.data);
-    this.stateWriter("data", this.data);
+    this.computedWriter("data", this.data);
   }
 
   private assignAccessors() {

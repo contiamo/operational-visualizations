@@ -149,18 +149,18 @@ class ChartFacade implements Facade {
   }
 
   private initializeCanvas(): ChartCanvas {
-    return new ChartCanvas(this.state.readOnly(), this.state.getStateWriter(["canvas"]), this.events, this.context);
+    return new ChartCanvas(this.state.readOnly(), this.state.getComputedWriter(["canvas"]), this.events, this.context);
   }
 
   private initializeComponents(): any {
     return {
-      axes: new AxesManager(this.state.readOnly(), this.state.getStateWriter("axes"), this.events, {
+      axes: new AxesManager(this.state.readOnly(), this.state.getComputedWriter("axes"), this.events, {
         xAxes: this.canvas.elementFor("xAxes"),
         xRules: this.canvas.elementFor("xRules"),
         yAxes: this.canvas.elementFor("yAxes"),
         yRules: this.canvas.elementFor("yRules"),
       }),
-      legends: new LegendManager(this.state.readOnly(), this.state.getStateWriter(["legend"]), this.events, {
+      legends: new LegendManager(this.state.readOnly(), this.state.getComputedWriter(["legend"]), this.events, {
         top: {
           left: this.canvas.elementFor("legend-top-left"),
           right: this.canvas.elementFor("legend-top-right"),
@@ -169,7 +169,7 @@ class ChartFacade implements Facade {
           left: this.canvas.elementFor("legend-bottom-left"),
         },
       }),
-      focus: new ChartFocus(this.state.readOnly(), this.state.getStateWriter(["focus"]), this.events, {
+      focus: new ChartFocus(this.state.readOnly(), this.state.getComputedWriter(["focus"]), this.events, {
         main: this.canvas.elementFor("focus"),
         component: this.canvas.elementFor("componentFocus"),
         group: this.canvas.elementFor("focusGroup"),
@@ -180,7 +180,7 @@ class ChartFacade implements Facade {
   private initializeSeries(): ChartSeriesManager {
     return new ChartSeriesManager(
       this.state.readOnly(),
-      this.state.getStateWriter(["series"]),
+      this.state.getComputedWriter(["series"]),
       this.events,
       this.canvas.elementFor("series"),
     );
