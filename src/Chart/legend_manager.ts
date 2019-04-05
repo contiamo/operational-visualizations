@@ -43,6 +43,12 @@ class LegendManager {
     this.arrangeTopLegends();
   }
 
+  public remove() {
+    forEach((option: LegendOption) => {
+      this.legends[option.position][option.float].remove();
+    })(legendOptions);
+  }
+
   // Ensure the 2 top legends (left/right) make sensible use of the available space.
   private arrangeTopLegends() {
     const drawingWidth = this.state.current.getConfig().width;

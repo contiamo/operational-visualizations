@@ -135,7 +135,7 @@ class ChartFacade implements Facade {
     this.series = this.initializeSeries();
   }
 
-  private initializeEvents(): EventEmitter {
+  private initializeEvents() {
     return new EventEmitter();
   }
 
@@ -148,11 +148,11 @@ class ChartFacade implements Facade {
     });
   }
 
-  private initializeCanvas(): ChartCanvas {
+  private initializeCanvas() {
     return new ChartCanvas(this.state.readOnly(), this.state.getComputedWriter(["canvas"]), this.events, this.context);
   }
 
-  private initializeComponents(): any {
+  private initializeComponents() {
     return {
       axes: new AxesManager(this.state.readOnly(), this.state.getComputedWriter("axes"), this.events, {
         xAxes: this.canvas.elementFor("xAxes"),
@@ -177,7 +177,7 @@ class ChartFacade implements Facade {
     };
   }
 
-  private initializeSeries(): ChartSeriesManager {
+  private initializeSeries() {
     return new ChartSeriesManager(
       this.state.readOnly(),
       this.state.getComputedWriter(["series"]),
@@ -186,11 +186,11 @@ class ChartFacade implements Facade {
     );
   }
 
-  public data(data?: Data): Data {
+  public data(data?: Data) {
     return this.state.data(data);
   }
 
-  public config(config?: Partial<ChartConfig>): ChartConfig {
+  public config(config?: Partial<ChartConfig>) {
     /**
      * Changing the palette config only updates the legendColor accessor if the default is still be used.
      * It will not overwrite a user-defined legendColor accessor.
@@ -198,22 +198,22 @@ class ChartFacade implements Facade {
     if (config && config.palette && !this.customColorAccessor) {
       this.state.accessors("series", { legendColor: defaultColorAssigner(config.palette) });
     }
-    return this.state.config(config);
+    return this.state.config(config) as ChartConfig;
   }
 
-  public accessors(type: string, accessors: Accessors<any>): Accessors<any> {
+  public accessors(type: string, accessors: Accessors<any>) {
     // If a custom legendColor accessor is specified, this must not be overwritten if the palette config changes.
     if (type === "series" && has("legendColor")(accessors)) {
       this.customColorAccessor = true;
     }
-    return this.state.accessors(type, accessors);
+    return this.state.accessors(type, accessors) as Accessors<any>;
   }
 
-  public on(event: string, handler: any) {
+  public on(event: string, handler: (e: any) => void) {
     this.events.on(event, handler);
   }
 
-  public off(event: string, handler: any) {
+  public off(event: string, handler: (e: any) => void) {
     this.events.removeListener(event, handler);
   }
 
