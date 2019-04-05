@@ -102,7 +102,7 @@ class ProcessFlowFacade implements Facade {
   private canvas: ProcessFlowCanvas;
   private context: Element;
   private events: EventEmitter;
-  private series: Series;
+  private seriesManager: Series;
   private state: StateHandler<InputData, ProcessFlowConfig, AccessorsObject, Computed>;
 
   constructor(context: Element) {
@@ -111,7 +111,7 @@ class ProcessFlowFacade implements Facade {
     this.state = this.initializeState();
     this.canvas = this.initializeCanvas();
     this.initializeComponents();
-    this.series = this.initializeSeries();
+    this.seriesManager = this.initializeSeries();
   }
 
   private initializeEvents(): EventEmitter {
@@ -178,9 +178,9 @@ class ProcessFlowFacade implements Facade {
 
   public draw() {
     this.state.captureState();
-    this.series.prepareData();
+    this.seriesManager.prepareData();
     this.canvas.draw();
-    this.series.draw();
+    this.seriesManager.draw();
 
     // Focus behaviour is applied through events only - there is no focus.draw() method.
     const focusElement: FocusElement = this.state.config().focusElement;

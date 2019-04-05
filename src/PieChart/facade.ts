@@ -80,7 +80,7 @@ class PieChartFacade implements Facade {
   private components: Components;
   private context: Element;
   private events: EventEmitter;
-  private series: Series;
+  private seriesManager: Series;
   private state: StateHandler<Data, PieChartConfig, AccessorsObject, Computed>;
 
   constructor(context: Element) {
@@ -89,7 +89,7 @@ class PieChartFacade implements Facade {
     this.state = this.initializeState();
     this.canvas = this.initializeCanvas();
     this.components = this.initializeComponents();
-    this.series = this.initializeSeries();
+    this.seriesManager = this.initializeSeries();
   }
 
   private initializeEvents(): EventEmitter {
@@ -160,10 +160,10 @@ class PieChartFacade implements Facade {
 
   public draw() {
     this.state.captureState();
-    this.series.assignData();
+    this.seriesManager.assignData();
     this.components.legend.draw();
     this.canvas.draw();
-    this.series.draw();
+    this.seriesManager.draw();
 
     // Focus behaviour is applied through events only - there is no focus.draw() method.
     const focusElement: FocusElement = this.state.config().focusElement;

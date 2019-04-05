@@ -123,7 +123,7 @@ class ChartFacade implements Facade {
   private context: Element;
   private customColorAccessor: boolean = false;
   private events: EventEmitter;
-  private series: ChartSeriesManager;
+  private seriesManager: ChartSeriesManager;
   private state: StateHandler<Data, ChartConfig, AccessorsObject, Computed>;
 
   constructor(context: Element) {
@@ -132,7 +132,7 @@ class ChartFacade implements Facade {
     this.state = this.initializeState();
     this.canvas = this.initializeCanvas();
     this.components = this.initializeComponents();
-    this.series = this.initializeSeries();
+    this.seriesManager = this.initializeSeries();
   }
 
   private initializeEvents() {
@@ -219,12 +219,12 @@ class ChartFacade implements Facade {
 
   public draw() {
     this.state.captureState();
-    this.series.assignData();
+    this.seriesManager.assignData();
     this.components.legends.draw();
     this.components.axes.updateMargins();
     this.canvas.draw();
     this.components.axes.draw();
-    this.series.draw();
+    this.seriesManager.draw();
 
     // Focus behaviour is applied through events only - there is no focus.draw() method.
     const focus: FocusElement = this.state.config().focus;
