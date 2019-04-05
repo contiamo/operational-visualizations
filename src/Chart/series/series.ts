@@ -1,20 +1,8 @@
 import Renderer from "./renderer";
 
-import {
-  compact,
-  filter,
-  find,
-  flatten,
-  flow,
-  forEach,
-  get,
-  includes,
-  invoke,
-  isNil,
-  LodashForEach,
-  map,
-  uniqBy,
-} from "lodash/fp";
+import { compact, filter, find, flatten, flow, forEach, get, includes, invoke, isNil, map, uniqBy } from "lodash/fp";
+
+import { WithConvertLodashForEach } from "../../shared/typings";
 
 import {
   AxisOrientation,
@@ -27,10 +15,9 @@ import {
   LegendPosition,
   RendererClass,
   RendererType,
-  SeriesAccessor,
+  SeriesAccessors,
   SingleRendererOptions,
   State,
-  WithConvert,
 } from "../typings";
 
 const hasValue = (d: any): boolean => {
@@ -48,7 +35,7 @@ class ChartSeries {
   private oldRenderers!: RendererClass[];
   public options!: { [key: string]: any };
   public renderers: RendererClass[] = [];
-  private state: any;
+  private state: State;
   // Accessors
   private data!: () => Datum[] | Array<{ [key: string]: any }>;
   public hide!: () => boolean;
@@ -62,6 +49,8 @@ class ChartSeries {
   public yAxis!: () => "y1" | "y2";
   public x!: (d: Datum) => number | string | Date;
   public y!: (d: Datum) => number | string | Date;
+  // @ts-ignore required to pass typecheck of assignAccessors, but not used
+  private axis: any;
 
   constructor(state: State, events: EventEmitter, el: D3Selection, options: any) {
     this.state = state;
@@ -78,8 +67,8 @@ class ChartSeries {
 
   public assignAccessors(datumAccessors: any) {
     // Assign series accessors
-    (forEach as WithConvert<LodashForEach>).convert({ cap: false })((accessor: SeriesAccessor<any>, key: string) => {
-      (this as any)[key] = () => accessor(this.options);
+    (forEach as WithConvertLodashForEach).convert<SeriesAccessors>({ cap: false })((accessor, key) => {
+      this[key] = () => accessor(this.options);
     })(this.state.current.getAccessors().series);
     // Assign series-specific datum accessors
     this.x = (datumAccessors && datumAccessors.x) || defaultDatumAccessors.x;
@@ -173,7 +162,9 @@ class ChartSeries {
     const valueAccessor = xIsBaseline ? this.y : this.x;
     const positionAccessor = (d: Datum) =>
       xIsBaseline ? (hasValue(d.y1) ? d.y1 : this.y(d)) : hasValue(d.x1) ? d.x1 : this.x(d);
-    const valueScale = this.state.current.getComputed().axes.computed[xIsBaseline ? this.yAxis() : this.xAxis()].scale;
+    // @todo fix type here
+    const valueScale = this.state.current.getComputed().axes.computed[xIsBaseline ? this.yAxis() : this.xAxis()]!
+      .scale as any;
     const datum = find(
       (d: Datum): boolean => {
         return baselineAccessor(d).toString() === focus.date.toString();
