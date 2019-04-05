@@ -8,15 +8,14 @@ import {
   D3Selection,
   Datum,
   RendererClass,
-  RendererType,
-  SingleRendererOptions,
+  SingleRendererOptionsParam,
   State,
   TextRendererAccessors,
   TextRendererConfig,
   WithConvert,
 } from "../../typings";
 
-export type Options = SingleRendererOptions<TextRendererAccessors>;
+export type Options = SingleRendererOptionsParam<TextRendererAccessors, "text">;
 
 const defaultAccessors: TextRendererAccessors = {
   size: () => 10,
@@ -26,13 +25,13 @@ const defaultAccessors: TextRendererAccessors = {
 const verticalTiltAngle = -60;
 const horizontalTiltAngle = -30;
 
-class Text implements RendererClass<TextRendererAccessors> {
+class Text implements RendererClass<TextRendererAccessors, "text"> {
   private data!: Datum[];
   private el: D3Selection;
   public options!: Options;
   private series: Series;
   private state: State;
-  public type: RendererType = "text";
+  public type: "text" = "text";
   private xIsBaseline!: boolean;
   // Accessors
   private size!: (d: Datum) => number;

@@ -15,8 +15,7 @@ import {
   FlagRendererAccessors,
   FlagRendererConfig,
   RendererClass,
-  RendererType,
-  SingleRendererOptions,
+  SingleRendererOptionsParam,
   State,
   WithConvert,
 } from "../../typings";
@@ -29,9 +28,9 @@ const defaultAccessors: FlagRendererAccessors = {
   opacity: () => 1,
 };
 
-export type Options = SingleRendererOptions<FlagRendererAccessors>;
+export type Options = SingleRendererOptionsParam<FlagRendererAccessors, "flag">;
 
-class Flag implements RendererClass<FlagRendererAccessors> {
+class Flag implements RendererClass<FlagRendererAccessors, "flag"> {
   private data!: Datum[];
   private el: D3Selection;
   private events: EventEmitter;
@@ -40,7 +39,7 @@ class Flag implements RendererClass<FlagRendererAccessors> {
   private scale: any;
   private series: Series;
   private state: State;
-  public type: RendererType = "flag";
+  public type: "flag" = "flag";
   // Accessors
   private color!: (d: Datum) => string;
   private description!: (d: Datum) => string;

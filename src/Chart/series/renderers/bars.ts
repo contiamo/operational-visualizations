@@ -12,12 +12,11 @@ import {
   Datum,
   EventEmitter,
   RendererClass,
-  RendererType,
-  SingleRendererOptions,
+  SingleRendererOptionsParam,
   State,
 } from "../../typings";
 
-export type Options = SingleRendererOptions<BarsRendererAccessors>;
+export type Options = SingleRendererOptionsParam<BarsRendererAccessors, "bars">;
 
 const defaultAccessors: BarsRendererAccessors = {
   color: (series: Series) => series.legendColor(),
@@ -25,7 +24,7 @@ const defaultAccessors: BarsRendererAccessors = {
   opacity: () => 0.8,
 };
 
-class Bars implements RendererClass<BarsRendererAccessors> {
+class Bars implements RendererClass<BarsRendererAccessors, "bars"> {
   private data!: Datum[];
   private el: D3Selection;
   private events: EventEmitter;
@@ -33,7 +32,7 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   public options!: Options;
   private series: Series;
   private state: any;
-  public type: RendererType = "bars";
+  public type: "bars" = "bars";
   private xIsBaseline!: boolean;
   private xScale: any;
   private yScale: any;

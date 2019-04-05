@@ -1,6 +1,6 @@
 import { stack as d3Stack } from "d3-shape";
 import { AxisPosition } from "../axis_utils/typings";
-import Series from "./series/series";
+import Series, { ChartSeriesOptions } from "./series/series";
 
 import {
   cloneDeep,
@@ -104,7 +104,7 @@ class ChartSeriesManager implements SeriesManager {
     forEach(this.updateOrCreate.bind(this))(data);
   }
 
-  private updateOrCreate(options: any) {
+  private updateOrCreate(options: ChartSeriesOptions) {
     const series = this.get(this.key(options));
     series ? series.update(options) : this.create(options);
   }
@@ -294,7 +294,7 @@ class ChartSeriesManager implements SeriesManager {
     )(seriesWithoutFlags);
   }
 
-  private create(options: { [key: string]: any }) {
+  private create(options: ChartSeriesOptions) {
     this.series.push(new Series(this.state, this.events, this.el, options));
   }
 

@@ -1,4 +1,4 @@
-import Renderer from "./renderer";
+import rendererFactory from "./rendererFactory";
 
 import { compact, filter, find, flatten, flow, forEach, get, includes, invoke, isNil, map, uniqBy } from "lodash/fp";
 
@@ -29,11 +29,19 @@ const defaultDatumAccessors = {
   y: (d: Datum) => d.y,
 };
 
+export interface ChartSeriesOptions {
+  datumAccessors: {
+    x?: (d: Datum) => number | string | Date;
+    y?: (d: Datum) => number | string | Date;
+  };
+  [key: string]: any;
+}
+
 class ChartSeries {
   private el: D3Selection;
   private events: EventEmitter;
   private oldRenderers!: RendererClass[];
-  public options!: { [key: string]: any };
+  public options!: ChartSeriesOptions;
   public renderers: RendererClass[] = [];
   private state: State;
   // Accessors
@@ -43,7 +51,7 @@ class ChartSeries {
   public key!: () => string;
   public legendColor!: () => string;
   public legendName!: () => string;
-  public renderAs!: () => Array<SingleRendererOptions<any>>;
+  public renderAs!: () => SingleRendererOptions[];
   public symbolOffset!: (d: Datum) => number;
   public xAxis!: () => "x1" | "x2";
   public yAxis!: () => "y1" | "y2";
@@ -52,14 +60,14 @@ class ChartSeries {
   // @ts-ignore required to pass typecheck of assignAccessors, but not used
   private axis: any;
 
-  constructor(state: State, events: EventEmitter, el: D3Selection, options: any) {
+  constructor(state: State, events: EventEmitter, el: D3Selection, options: ChartSeriesOptions) {
     this.state = state;
     this.events = events;
     this.el = el;
     this.update(options);
   }
 
-  public update(options: any) {
+  public update(options: ChartSeriesOptions) {
     this.assignAccessors(options.datumAccessors);
     this.options = options;
     this.updateRenderers();
@@ -79,7 +87,7 @@ class ChartSeries {
     this.oldRenderers = [];
     const rendererTypes = map(get("type"))(this.renderAs());
     this.removeAllExcept(rendererTypes);
-    forEach((options: SingleRendererOptions<any>) => {
+    forEach((options: SingleRendererOptions) => {
       const renderer = this.get(options.type);
       renderer ? renderer.update(this.options.data, options) : this.addRenderer(options);
       if (options.type === "symbol") {
@@ -99,8 +107,8 @@ class ChartSeries {
     return find((renderer: RendererClass) => renderer.type === type)(this.renderers);
   }
 
-  private addRenderer(options: SingleRendererOptions<any>) {
-    this.renderers.push(new Renderer(
+  private addRenderer(options: SingleRendererOptions) {
+    this.renderers.push(rendererFactory(
       this.state,
       this.events,
       this.el,

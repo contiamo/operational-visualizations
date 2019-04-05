@@ -20,8 +20,7 @@ import {
   Datum,
   EventEmitter,
   RendererClass,
-  RendererType,
-  SingleRendererOptions,
+  SingleRendererOptionsParam,
   State,
   SymbolRendererAccessors,
 } from "../../typings";
@@ -59,16 +58,16 @@ const symbolOptions: { [key: string]: any } = {
   },
 };
 
-export type Options = SingleRendererOptions<SymbolRendererAccessors>;
+export type Options = SingleRendererOptionsParam<SymbolRendererAccessors, "symbol">;
 
-class Symbol implements RendererClass<SymbolRendererAccessors> {
+class Symbol implements RendererClass<SymbolRendererAccessors, "symbol"> {
   private data!: Datum[];
   private el: D3Selection;
   private events: EventEmitter;
   public options!: Options;
   private series: Series;
   private state: any;
-  public type: RendererType = "symbol";
+  public type: "symbol" = "symbol";
   private xIsBaseline!: boolean;
   private xScale: any;
   private yScale: any;
