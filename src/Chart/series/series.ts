@@ -30,7 +30,7 @@ const defaultDatumAccessors = {
 };
 
 export interface ChartSeriesOptions {
-  datumAccessors: {
+  datumAccessors?: {
     x?: (d: Datum) => number | string | Date;
     y?: (d: Datum) => number | string | Date;
   };
@@ -55,8 +55,8 @@ class ChartSeries {
   public symbolOffset!: (d: Datum) => number;
   public xAxis!: () => "x1" | "x2";
   public yAxis!: () => "y1" | "y2";
-  public x!: (d: Datum) => number | string | Date;
-  public y!: (d: Datum) => number | string | Date;
+  public x!: (d: Datum) => number | string | Date | undefined;
+  public y!: (d: Datum) => number | string | Date | undefined;
   // @ts-ignore required to pass typecheck of assignAccessors, but not used
   private axis: any;
 
@@ -73,7 +73,7 @@ class ChartSeries {
     this.updateRenderers();
   }
 
-  public assignAccessors(datumAccessors: any) {
+  public assignAccessors(datumAccessors: ChartSeriesOptions["datumAccessors"]) {
     // Assign series accessors
     (forEach as WithConvertLodashForEach).convert<SeriesAccessors>({ cap: false })((accessor, key) => {
       this[key] = () => accessor(this.options);
@@ -89,8 +89,13 @@ class ChartSeries {
     this.removeAllExcept(rendererTypes);
     forEach((options: SingleRendererOptions) => {
       const renderer = this.get(options.type);
-      renderer ? renderer.update(this.options.data, options) : this.addRenderer(options);
+      if (renderer) {
+        renderer.update(this.options.data, options);
+      } else {
+        this.addRenderer(options);
+      }
       if (options.type === "symbol") {
+        // any = RendererClass<SymbolRendererAccessors, "symbol">
         this.symbolOffset = (d: Datum) => Math.ceil(Math.sqrt(((renderer || this.get(options.type)) as any).size(d)));
       }
     })(this.renderAs());
@@ -98,12 +103,12 @@ class ChartSeries {
 
   private removeAllExcept(types: RendererType[]) {
     flow(
-      filter((renderer: RendererClass): boolean => !includes(renderer.type)(types)),
+      filter((renderer: RendererClass) => !includes(renderer.type)(types)),
       forEach(this.remove.bind(this)),
     )(this.renderers);
   }
 
-  public get(type: string) {
+  public get(type: RendererType) {
     return find((renderer: RendererClass) => renderer.type === type)(this.renderers);
   }
 
@@ -145,7 +150,7 @@ class ChartSeries {
     return this.legendPosition() === "top" && this.yAxis() === "y2" ? "right" : "left";
   }
 
-  public displayFocusPoint(): boolean {
+  public displayFocusPoint() {
     return (
       filter(
         (renderer: RendererClass): boolean => {
@@ -155,15 +160,15 @@ class ChartSeries {
     );
   }
 
-  public hasFlags(): boolean {
+  public hasFlags() {
     return !!this.get("flag");
   }
 
-  public hasData(): boolean {
+  public hasData() {
     return !!this.data() && this.data().length > 0;
   }
 
-  public valueAtFocus(focus: DateToFocus): any {
+  public valueAtFocus(focus: DateToFocus) {
     const xIsBaseline = this.state.current.getComputed().axes.baseline === "x";
     const baselineAccessor = (d: Datum) =>
       xIsBaseline ? this.x(d) || d.injectedX || 0 : this.y(d) || d.injectedY || 0;

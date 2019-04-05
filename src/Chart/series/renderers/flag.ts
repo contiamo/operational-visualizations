@@ -46,8 +46,8 @@ class Flag implements RendererClass<FlagRendererAccessors, "flag"> {
   private direction!: (d: Datum) => "up" | "down";
   private label!: (d: Datum) => string;
   private opacity!: (d: Datum) => number;
-  private x!: (d: Datum) => number | Date | string;
-  private y!: (d: Datum) => number | Date | string;
+  private x!: (d: Datum) => number | Date | string | undefined;
+  private y!: (d: Datum) => number | Date | string | undefined;
   // Config
   private axis: AxisPosition = "x1";
   private axisOffset: number = 10;
@@ -154,7 +154,7 @@ class Flag implements RendererClass<FlagRendererAccessors, "flag"> {
   }
 
   // Private methods
-  private validate(d: string | number | Date): boolean {
+  private validate(d: string | number | Date | undefined): boolean {
     return !!d || d === 0;
   }
 
