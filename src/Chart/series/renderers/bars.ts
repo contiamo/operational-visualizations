@@ -2,7 +2,7 @@ import { area as d3Area, curveStepAfter } from "d3-shape";
 import { clone, compact, defaults, filter, findKey, get, isFinite, last, map } from "lodash/fp";
 import Events from "../../../shared/event_catalog";
 import { setRectAttributes, withD3Element } from "../../../utils/d3_utils";
-import Series from "../series";
+import Series from "../chart_series";
 import * as styles from "./styles";
 
 import {

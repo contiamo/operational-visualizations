@@ -1,6 +1,6 @@
 import { stack as d3Stack } from "d3-shape";
 import { AxisPosition } from "../axis_utils/typings";
-import Series, { ChartSeriesOptions } from "./series/series";
+import ChartSeries, { ChartSeriesOptions } from "./series/chart_series";
 
 import {
   cloneDeep,
@@ -53,9 +53,9 @@ class ChartSeriesManager implements SeriesManager {
   private el: D3Selection;
   private events: EventEmitter;
   private key!: SeriesAccessor<string>;
-  private oldSeries: Series[] = [];
+  private oldSeries: ChartSeries[] = [];
   private renderAs!: SeriesAccessor<RendererOptions[]>;
-  private series: Series[] = [];
+  private series: ChartSeries[] = [];
   private state: State;
   private computedWriter: ComputedWriter;
 
@@ -71,7 +71,7 @@ class ChartSeriesManager implements SeriesManager {
     return !this.state.current.getAccessors().series.hide(series);
   }
 
-  private findBarsRenderer(series: Series) {
+  private findBarsRenderer(series: ChartSeries) {
     return find({ type: "bars" })(series.renderers);
   }
 
@@ -221,7 +221,7 @@ class ChartSeriesManager implements SeriesManager {
   }
 
   private get(key: string) {
-    return find((series: Series) => this.key(series.options) === key)(this.series);
+    return find((series: ChartSeries) => this.key(series.options) === key)(this.series);
   }
 
   private remove(key: string) {
@@ -230,19 +230,19 @@ class ChartSeriesManager implements SeriesManager {
       return;
     }
     this.oldSeries.push(series);
-    remove((s: Series) => this.key(s.options) === key)(this.series);
+    remove((s: ChartSeries) => this.key(s.options) === key)(this.series);
   }
 
   private removeAllExcept(keys: string[]) {
     flow(
-      filter((series: Series): boolean => !includes(this.key(series.options))(keys)),
-      map((series: Series): string => this.key(series.options)),
+      filter((series: ChartSeries): boolean => !includes(this.key(series.options))(keys)),
+      map((series: ChartSeries): string => this.key(series.options)),
       forEach(this.remove.bind(this)),
     )(this.series);
   }
 
   private dataForLegends() {
-    return reduce((memo: Partial<DataForLegends>, series: Series) => {
+    return reduce((memo: Partial<DataForLegends>, series: ChartSeries) => {
       if (series.hideInLegend()) {
         return memo;
       }
@@ -253,7 +253,7 @@ class ChartSeriesManager implements SeriesManager {
   }
 
   private dataForAxes() {
-    return reduce((memo: Partial<Record<AxisPosition, any>>, series: Series) => {
+    return reduce((memo: Partial<Record<AxisPosition, any>>, series: ChartSeries) => {
       const xAxis = series.xAxis();
       const yAxis = series.yAxis();
       memo[xAxis] = uniqBy(String)((memo[xAxis] || []).concat(series.dataForAxis("x")));
@@ -263,7 +263,7 @@ class ChartSeriesManager implements SeriesManager {
   }
 
   private axesWithFlags() {
-    return reduce((axes: Record<string, any>, series: Series) => {
+    return reduce((axes: Record<string, any>, series: ChartSeries) => {
       if (series.hasFlags()) {
         const flag: any = series.get("flag");
         axes[flag.axis] = axes[flag.axis] || { axisPadding: 0 };
@@ -274,10 +274,10 @@ class ChartSeriesManager implements SeriesManager {
   }
 
   private dataForFocus(focusDates: DatesToFocus) {
-    const seriesWithoutFlags = filter((series: Series) => !series.get("flag"))(this.series);
+    const seriesWithoutFlags = filter((series: ChartSeries) => !series.get("flag"))(this.series);
 
     return map(
-      (series: Series): { [key: string]: any } => {
+      (series: ChartSeries): { [key: string]: any } => {
         const isMainAxis: boolean = includes(focusDates.main.axis)([series.xAxis(), series.yAxis()]);
         const axisPriority: keyof DatesToFocus = isMainAxis ? "main" : "comparison";
         const focusDate = focusDates[axisPriority] as DateToFocus;
@@ -295,7 +295,7 @@ class ChartSeriesManager implements SeriesManager {
   }
 
   private create(options: ChartSeriesOptions) {
-    this.series.push(new Series(this.state, this.events, this.el, options));
+    this.series.push(new ChartSeries(this.state, this.events, this.el, options));
   }
 
   public draw() {

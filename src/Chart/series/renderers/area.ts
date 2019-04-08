@@ -1,6 +1,6 @@
 import { compact, defaults, find, forEach, get, map, sortBy } from "lodash/fp";
 import { AxisComputed, Tick } from "../../../axis_utils/typings";
-import Series from "../series";
+import Series from "../chart_series";
 
 import {
   area as d3Area,

@@ -3,7 +3,7 @@ import { assign, compact, defaults, filter, forEach, LodashForEach, map } from "
 import { AxisComputed } from "../../../axis_utils/typings";
 import Events from "../../../shared/event_catalog";
 import { setLineAttributes, setPathAttributes, withD3Element } from "../../../utils/d3_utils";
-import Series from "../series";
+import Series from "../chart_series";
 import * as styles from "./styles";
 
 import {

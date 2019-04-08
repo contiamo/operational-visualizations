@@ -1,6 +1,6 @@
 import { AxesData, AxisComputed, AxisOrientation, AxisPosition, BarSeries, Tick } from "../axis_utils/typings";
 import { Accessor, BaseConfig, ChartStateReadOnly, Dimensions, Facade, Focus, Legend } from "../shared/typings";
-import Series from "./series/series";
+import Series from "./series/chart_series";
 
 export * from "../axis_utils/typings";
 

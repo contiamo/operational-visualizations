@@ -1,6 +1,6 @@
 import { compact, defaults, find, forEach, get, map, sortBy } from "lodash/fp";
 import { AxisComputed } from "../../../axis_utils/typings";
-import Series from "../series";
+import Series from "../chart_series";
 import * as styles from "./styles";
 
 import {

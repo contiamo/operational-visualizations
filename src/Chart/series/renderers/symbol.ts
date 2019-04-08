@@ -1,7 +1,7 @@
 import { compact, defaults, filter, get, map } from "lodash/fp";
 import Events from "../../../shared/event_catalog";
 import { withD3Element } from "../../../utils/d3_utils";
-import Series from "../series";
+import Series from "../chart_series";
 import * as styles from "./styles";
 
 import {
