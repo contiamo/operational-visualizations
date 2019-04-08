@@ -16,7 +16,7 @@ import {
   State,
 } from "../../typings";
 
-export type Options = SingleRendererOptionsParam<BarsRendererAccessors, "bars">;
+type Options = SingleRendererOptionsParam<BarsRendererAccessors, "bars">;
 
 const defaultAccessors: BarsRendererAccessors = {
   color: (series: Series) => series.legendColor(),

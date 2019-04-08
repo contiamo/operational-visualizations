@@ -58,7 +58,7 @@ const symbolOptions: { [key: string]: any } = {
   },
 };
 
-export type Options = SingleRendererOptionsParam<SymbolRendererAccessors, "symbol">;
+type Options = SingleRendererOptionsParam<SymbolRendererAccessors, "symbol">;
 
 class Symbol implements RendererClass<SymbolRendererAccessors, "symbol"> {
   private data!: Datum[];

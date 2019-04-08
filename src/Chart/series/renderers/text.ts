@@ -15,7 +15,7 @@ import {
   WithConvert,
 } from "../../typings";
 
-export type Options = SingleRendererOptionsParam<TextRendererAccessors, "text">;
+type Options = SingleRendererOptionsParam<TextRendererAccessors, "text">;
 
 const defaultAccessors: TextRendererAccessors = {
   size: () => 10,

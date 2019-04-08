@@ -28,7 +28,7 @@ const defaultAccessors: FlagRendererAccessors = {
   opacity: () => 1,
 };
 
-export type Options = SingleRendererOptionsParam<FlagRendererAccessors, "flag">;
+type Options = SingleRendererOptionsParam<FlagRendererAccessors, "flag">;
 
 class Flag implements RendererClass<FlagRendererAccessors, "flag"> {
   private data!: Datum[];

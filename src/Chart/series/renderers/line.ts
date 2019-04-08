@@ -24,7 +24,7 @@ import {
   State,
 } from "../../typings";
 
-export type Options = SingleRendererOptionsParam<LineRendererAccessors, "line">;
+type Options = SingleRendererOptionsParam<LineRendererAccessors, "line">;
 
 const defaultAccessors: LineRendererAccessors = {
   color: (series: Series) => series.legendColor(),

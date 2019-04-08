@@ -25,7 +25,7 @@ import {
   State,
 } from "../../typings";
 
-export type Options = SingleRendererOptionsParam<AreaRendererAccessors, "area">;
+type Options = SingleRendererOptionsParam<AreaRendererAccessors, "area">;
 
 const interpolator = {
   cardinal: curveCardinal,
