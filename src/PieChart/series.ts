@@ -1,27 +1,33 @@
-import { filter, forEach, LodashForEach } from "lodash/fp";
-import Renderer from "./renderers/renderer";
+import { filter, forEach } from "lodash/fp";
+import rendererFactory from "./renderers/rendererFactory";
+
+import { WithConvertLodashForEach } from "../shared/typings";
 
 import {
   ComputedWriter,
   D3Selection,
+  Data,
   EventEmitter,
   InputData,
   InputDatum,
   Renderer as RendererInterface,
   RendererOptions,
+  SeriesAccessors,
   State,
-  WithConvert,
 } from "./typings";
 
 class Series {
-  private attributes: any;
-  private data!: InputData;
   private el: D3Selection;
   private events: EventEmitter;
-  private renderAs!: () => RendererOptions[];
-  private renderer!: RendererInterface;
   private state: State;
   private computedWriter: ComputedWriter;
+
+  private renderer!: RendererInterface;
+  private attributes!: Data;
+  private data!: InputData;
+  private renderAs!: () => RendererOptions[];
+  // @ts-ignore required to pass typecheck of assignAccessors, but not used
+  private name!: () => string;
 
   constructor(state: State, computedWriter: ComputedWriter, events: EventEmitter, el: D3Selection) {
     this.state = state;
@@ -48,10 +54,10 @@ class Series {
   }
 
   private assignAccessors() {
-    const accessors = this.state.current.getAccessors().series;
-    (forEach as WithConvert<LodashForEach>).convert({ cap: false })((accessor: any, key: string) => {
-      (this as any)[key] = () => accessor(this.attributes);
-    })(accessors);
+    (forEach as WithConvertLodashForEach).convert<SeriesAccessors>({ cap: false })((accessor, key) => {
+      // this doesn't type check, this.attributes has wrong type
+      this[key] = () => accessor(this.attributes as any);
+    })(this.state.current.getAccessors().series);
   }
 
   private updateRenderer() {
@@ -70,8 +76,8 @@ class Series {
     }
   }
 
-  private createRenderer(options: RendererOptions): any {
-    return new Renderer(this.state, this.events, this.el.select("g.drawing"), options);
+  private createRenderer(options: RendererOptions) {
+    return rendererFactory(this.state, this.events, this.el.select("g.drawing"), options);
   }
 
   public draw() {
