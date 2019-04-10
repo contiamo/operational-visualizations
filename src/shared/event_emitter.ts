@@ -1,12 +1,12 @@
-class EventEmitter {
-  private subscribers: Record<string, any[]> = {};
+class EventEmitter<EventData = any> {
+  private subscribers: Record<string, Array<(e: EventData) => void>> = {};
 
-  public on(eventName: string, callback: any) {
+  public on(eventName: string, callback: (e: EventData) => void) {
     this.subscribers[eventName] = this.subscribers[eventName] || [];
     this.subscribers[eventName].push(callback);
   }
 
-  public removeListener(eventName: string, callback: any) {
+  public removeListener(eventName: string, callback: (e: EventData) => void) {
     if (!this.subscribers[eventName]) {
       return;
     }
@@ -17,7 +17,7 @@ class EventEmitter {
     this.subscribers[eventName] = [];
   }
 
-  public emit(eventName: string, eventData: any = {}) {
+  public emit(eventName: string, eventData: EventData = {} as any) {
     if (!this.subscribers[eventName]) {
       return;
     }

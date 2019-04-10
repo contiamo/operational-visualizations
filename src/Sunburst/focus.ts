@@ -1,6 +1,6 @@
 import Events from "../shared/event_catalog";
 import { drawHidden, labelDimensions, positionLabel } from "../utils/focus_utils";
-import { D3Selection, EventBus, Focus, HierarchyDatum, HoverPayload, State, StateWriter } from "./typings";
+import { ComputedWriter, D3Selection, EventEmitter, Focus, HierarchyDatum, HoverPayload, State } from "./typings";
 
 const dataName = (d: HierarchyDatum) => d.data.name || "";
 const dataValue = (d: HierarchyDatum) => d.data.value;
@@ -8,9 +8,9 @@ const dataValue = (d: HierarchyDatum) => d.data.value;
 class SunburstFocus implements Focus {
   private el: D3Selection;
   private state: State;
-  private events: EventBus;
+  private events: EventEmitter;
 
-  constructor(state: State, _: StateWriter, events: EventBus, el: D3Selection) {
+  constructor(state: State, _: ComputedWriter, events: EventEmitter, el: D3Selection) {
     this.state = state;
     this.events = events;
     this.el = el;

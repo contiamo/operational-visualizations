@@ -11,10 +11,10 @@ export {
   Canvas,
   D3Selection,
   Dimensions,
-  EventBus,
+  EventEmitter,
   Point,
   Position,
-  StateWriter,
+  ComputedWriter,
   WithConvert,
 } from "../shared/typings";
 

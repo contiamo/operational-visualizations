@@ -1,6 +1,6 @@
 import { uniqueId } from "lodash/fp";
-import EventEmitter from "../shared/event_bus";
 import Events from "../shared/event_catalog";
+import EventEmitter from "../shared/event_emitter";
 import StateHandler from "../shared/state_handler";
 import theme from "../utils/constants";
 import defaultNumberFormatter from "../utils/number_formatter";
@@ -102,7 +102,7 @@ class ProcessFlowFacade implements Facade {
   private canvas: ProcessFlowCanvas;
   private context: Element;
   private events: EventEmitter;
-  private series: Series;
+  private seriesManager: Series;
   private state: StateHandler<InputData, ProcessFlowConfig, AccessorsObject, Computed>;
 
   constructor(context: Element) {
@@ -111,7 +111,7 @@ class ProcessFlowFacade implements Facade {
     this.state = this.initializeState();
     this.canvas = this.initializeCanvas();
     this.initializeComponents();
-    this.series = this.initializeSeries();
+    this.seriesManager = this.initializeSeries();
   }
 
   private initializeEvents(): EventEmitter {
@@ -130,7 +130,7 @@ class ProcessFlowFacade implements Facade {
   private initializeCanvas(): ProcessFlowCanvas {
     return new ProcessFlowCanvas(
       this.state.readOnly(),
-      this.state.computedWriter(["canvas"]),
+      this.state.getComputedWriter(["canvas"]),
       this.events,
       this.context,
     );
@@ -140,7 +140,7 @@ class ProcessFlowFacade implements Facade {
     return {
       focus: new ProcessFlowFocus(
         this.state.readOnly(),
-        this.state.computedWriter(["focus"]),
+        this.state.getComputedWriter(["focus"]),
         this.events,
         this.canvas.elementFor("focus"),
       ),
@@ -150,13 +150,13 @@ class ProcessFlowFacade implements Facade {
   private initializeSeries(): Series {
     return new Series(
       this.state.readOnly(),
-      this.state.computedWriter(["series"]),
+      this.state.getComputedWriter(["series"]),
       this.events,
       this.canvas.elementFor("series"),
     );
   }
 
-  public data(data?: any): any {
+  public data<T>(data?: T) {
     return this.state.data(data);
   }
 
@@ -168,19 +168,19 @@ class ProcessFlowFacade implements Facade {
     return this.state.accessors(type, accessors);
   }
 
-  public on(event: string, handler: any) {
+  public on(event: string, handler: (e: any) => void) {
     this.events.on(event, handler);
   }
 
-  public off(event: string, handler: any) {
+  public off(event: string, handler: (e: any) => void) {
     this.events.removeListener(event, handler);
   }
 
   public draw() {
     this.state.captureState();
-    this.series.prepareData();
+    this.seriesManager.prepareData();
     this.canvas.draw();
-    this.series.draw();
+    this.seriesManager.draw();
 
     // Focus behaviour is applied through events only - there is no focus.draw() method.
     const focusElement: FocusElement = this.state.config().focusElement;

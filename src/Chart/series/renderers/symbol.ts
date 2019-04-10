@@ -1,7 +1,7 @@
 import { compact, defaults, filter, get, map } from "lodash/fp";
 import Events from "../../../shared/event_catalog";
 import { withD3Element } from "../../../utils/d3_utils";
-import Series from "../series";
+import Series from "../chart_series";
 import * as styles from "./styles";
 
 import {
@@ -18,10 +18,9 @@ import {
   AxisOrientation,
   D3Selection,
   Datum,
-  EventBus,
+  EventEmitter,
   RendererClass,
-  RendererType,
-  SingleRendererOptions,
+  SingleRendererOptionsParam,
   State,
   SymbolRendererAccessors,
 } from "../../typings";
@@ -59,16 +58,16 @@ const symbolOptions: { [key: string]: any } = {
   },
 };
 
-export type Options = SingleRendererOptions<SymbolRendererAccessors>;
+type Options = SingleRendererOptionsParam<SymbolRendererAccessors, "symbol">;
 
-class Symbol implements RendererClass<SymbolRendererAccessors> {
+class Symbol implements RendererClass<SymbolRendererAccessors, "symbol"> {
   private data!: Datum[];
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   public options!: Options;
   private series: Series;
   private state: any;
-  public type: RendererType = "symbol";
+  public type: "symbol" = "symbol";
   private xIsBaseline!: boolean;
   private xScale: any;
   private yScale: any;
@@ -82,7 +81,7 @@ class Symbol implements RendererClass<SymbolRendererAccessors> {
   private x!: (d: Datum) => any;
   private y!: (d: Datum) => any;
 
-  constructor(state: State, el: D3Selection, data: Datum[], options: Options, series: Series, events: EventBus) {
+  constructor(state: State, el: D3Selection, data: Datum[], options: Options, series: Series, events: EventEmitter) {
     this.state = state;
     this.events = events;
     this.series = series;

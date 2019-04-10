@@ -1,14 +1,14 @@
 import Events from "../../shared/event_catalog";
 import { drawHidden, drawVisible, labelDimensions } from "../../utils/focus_utils";
-import { AxisPosition, D3Selection, EventBus, State } from "../typings";
+import { AxisPosition, D3Selection, EventEmitter, State } from "../typings";
 import * as styles from "./styles";
 
 class FlagFocus {
-  private events: EventBus;
+  private events: EventEmitter;
   private state: State;
   private el: D3Selection;
 
-  constructor(state: State, el: D3Selection, events: EventBus) {
+  constructor(state: State, el: D3Selection, events: EventEmitter) {
     this.state = state;
     this.el = el;
     this.events = events;

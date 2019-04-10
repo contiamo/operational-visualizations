@@ -1,6 +1,6 @@
 import { compact, defaults, find, forEach, get, map, sortBy } from "lodash/fp";
 import { AxisComputed } from "../../../axis_utils/typings";
-import Series from "../series";
+import Series from "../chart_series";
 import * as styles from "./styles";
 
 import {
@@ -20,12 +20,11 @@ import {
   Datum,
   LineRendererAccessors,
   RendererClass,
-  RendererType,
-  SingleRendererOptions,
+  SingleRendererOptionsParam,
   State,
 } from "../../typings";
 
-export type Options = SingleRendererOptions<LineRendererAccessors>;
+type Options = SingleRendererOptionsParam<LineRendererAccessors, "line">;
 
 const defaultAccessors: LineRendererAccessors = {
   color: (series: Series) => series.legendColor(),
@@ -49,13 +48,13 @@ const hasValue = (d: any): boolean => {
   return !!d || d === 0;
 };
 
-class Line implements RendererClass<LineRendererAccessors> {
+class Line implements RendererClass<LineRendererAccessors, "line"> {
   private data!: Datum[];
   private el: D3Selection;
   public options!: Options;
   private series: Series;
   private state: State;
-  public type: RendererType = "line";
+  public type: "line" = "line";
   private xIsBaseline!: boolean;
   // Accessors
   private closeGaps!: () => boolean;

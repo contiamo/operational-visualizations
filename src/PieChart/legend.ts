@@ -8,20 +8,20 @@ import * as localStyles from "./styles";
 import {
   ComponentConfigInfo,
   ComponentHoverPayload,
+  ComputedWriter,
   D3Selection,
-  EventBus,
+  EventEmitter,
   Legend,
   LegendDatum,
   State,
-  StateWriter,
 } from "./typings";
 
 class PieChartLegend implements Legend {
-  private events: EventBus;
+  private events: EventEmitter;
   private legend: D3Selection;
   private state: State;
 
-  constructor(state: State, _: StateWriter, events: EventBus, el: D3Selection) {
+  constructor(state: State, _: ComputedWriter, events: EventEmitter, el: D3Selection) {
     this.state = state;
     this.events = events;
     this.legend = el;

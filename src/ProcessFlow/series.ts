@@ -1,6 +1,6 @@
 import DataHandler from "./data_handler";
 import Renderer from "./renderer";
-import { D3Selection, Data, EventBus, State, StateWriter } from "./typings";
+import { ComputedWriter, D3Selection, Data, EventEmitter, State } from "./typings";
 
 class Series {
   private data!: Data;
@@ -8,19 +8,19 @@ class Series {
   private el: D3Selection;
   private renderer: Renderer;
   private state: State;
-  private stateWriter: StateWriter;
+  private computedWriter: ComputedWriter;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventBus, el: D3Selection) {
+  constructor(state: State, computedWriter: ComputedWriter, events: EventEmitter, el: D3Selection) {
     this.state = state;
-    this.stateWriter = stateWriter;
+    this.computedWriter = computedWriter;
     this.el = el;
-    this.dataHandler = new DataHandler(state, stateWriter);
+    this.dataHandler = new DataHandler(state, computedWriter);
     this.renderer = new Renderer(state, events, el);
   }
 
   public prepareData() {
     this.data = this.dataHandler.prepareData();
-    this.stateWriter("data", this.data);
+    this.computedWriter("data", this.data);
   }
 
   public draw() {

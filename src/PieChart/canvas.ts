@@ -1,21 +1,21 @@
 import * as d3 from "d3-selection";
 import Events from "../shared/event_catalog";
 import * as styles from "../shared/styles";
-import { Canvas, D3Selection, Dimensions, EventBus, State, StateWriter } from "./typings";
+import { Canvas, ComputedWriter, D3Selection, Dimensions, EventEmitter, State } from "./typings";
 
 class PieChartCanvas implements Canvas {
   private drawingContainer: D3Selection;
   private elements: { [key: string]: D3Selection } = {};
   private chartContainer: D3Selection;
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   private state: State;
   private elMap: { [key: string]: D3Selection } = {};
-  private stateWriter: StateWriter;
+  private computedWriter: ComputedWriter;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventBus, context: Element) {
+  constructor(state: State, computedWriter: ComputedWriter, events: EventEmitter, context: Element) {
     this.state = state;
-    this.stateWriter = stateWriter;
+    this.computedWriter = computedWriter;
     this.events = events;
     this.chartContainer = this.renderChartContainer(context);
     this.renderLegend();
@@ -23,7 +23,7 @@ class PieChartCanvas implements Canvas {
     this.el = this.renderEl();
     this.renderDrawingGroup();
     this.renderFocusElements();
-    this.stateWriter("elements", this.elements);
+    this.computedWriter("elements", this.elements);
   }
 
   // Chart container
@@ -62,7 +62,7 @@ class PieChartCanvas implements Canvas {
       .style("float", "left");
 
     this.elMap.legend = legend;
-    this.stateWriter("legend", legend);
+    this.computedWriter("legend", legend);
   }
 
   // Drawing container
@@ -118,16 +118,16 @@ class PieChartCanvas implements Canvas {
   // Lifecycle
   public draw() {
     this.chartContainer.classed("hidden", this.state.current.getConfig().hidden);
-    this.stateWriter(["containerRect"], this.chartContainer.node().getBoundingClientRect());
+    this.computedWriter(["containerRect"], this.chartContainer.node().getBoundingClientRect());
 
     const config = this.state.current.getConfig();
     const dims = this.drawingContainerDims();
-    this.stateWriter("drawingContainerDims", dims);
+    this.computedWriter("drawingContainerDims", dims);
 
     this.chartContainer.style("width", `${config.width}px`).style("height", `${config.height}px`);
     this.drawingContainer.style("width", `${dims.width}px`).style("height", `${dims.height}px`);
     this.el.style("width", `${dims.width}px`).style("height", `${dims.height}px`);
-    this.stateWriter("drawingContainerRect", this.drawingContainer.node().getBoundingClientRect());
+    this.computedWriter("drawingContainerRect", this.drawingContainer.node().getBoundingClientRect());
   }
 
   public remove() {

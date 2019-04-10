@@ -2,16 +2,16 @@ import { forEach } from "lodash/fp";
 import Events from "../../shared/event_catalog";
 import * as globalStyles from "../../shared/styles";
 import { drawHidden, labelDimensions, positionLabel } from "../../utils/focus_utils";
-import { D3Selection, EventBus, HoverPayload, State } from "../typings";
+import { D3Selection, EventEmitter, HoverPayload, State } from "../typings";
 import * as styles from "./styles";
 
 class ElementFocus {
   private el: D3Selection;
   private els: { [key: string]: D3Selection };
-  private events: EventBus;
+  private events: EventEmitter;
   private state: State;
 
-  constructor(state: State, els: { [key: string]: D3Selection }, events: EventBus) {
+  constructor(state: State, els: { [key: string]: D3Selection }, events: EventEmitter) {
     this.state = state;
     this.el = els.main;
     this.els = els;

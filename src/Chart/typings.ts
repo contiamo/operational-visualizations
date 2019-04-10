@@ -1,6 +1,6 @@
 import { AxesData, AxisComputed, AxisOrientation, AxisPosition, BarSeries, Tick } from "../axis_utils/typings";
 import { Accessor, BaseConfig, ChartStateReadOnly, Dimensions, Facade, Focus, Legend } from "../shared/typings";
-import Series from "./series/series";
+import Series from "./series/chart_series";
 
 export * from "../axis_utils/typings";
 
@@ -12,12 +12,12 @@ export {
   ComponentHoverPayload,
   D3Selection,
   Dimensions,
-  EventBus,
+  EventEmitter,
   Focus,
   Legend,
   Point,
   Position,
-  StateWriter,
+  ComputedWriter,
   WithConvert,
 } from "../shared/typings";
 
@@ -125,25 +125,47 @@ export interface TextRendererConfig {
   tilt: boolean;
 }
 
-export interface SingleRendererOptions<RendererAccessors> {
-  type: RendererType;
-  accessors?: Partial<RendererAccessors>;
+type RendererAccessors =
+  | AreaRendererAccessors
+  | BarsRendererAccessors
+  | FlagRendererAccessors
+  | LineRendererAccessors
+  | SymbolRendererAccessors
+  | TextRendererAccessors;
+
+export interface SingleRendererOptionsParam<
+  Accessors extends RendererAccessors = RendererAccessors,
+  Type extends RendererType = RendererType
+> {
+  type: Type;
+  accessors?: Partial<Accessors>;
   config?: { [key: string]: any };
 }
+
+export type SingleRendererOptions =
+  | SingleRendererOptionsParam<AreaRendererAccessors, "area">
+  | SingleRendererOptionsParam<BarsRendererAccessors, "bars">
+  | SingleRendererOptionsParam<FlagRendererAccessors, "flag">
+  | SingleRendererOptionsParam<LineRendererAccessors, "line">
+  | SingleRendererOptionsParam<SymbolRendererAccessors, "symbol">
+  | SingleRendererOptionsParam<TextRendererAccessors, "text">;
 
 export interface GroupedRendererOptions {
   type: "range" | "stacked";
   stackAxis?: AxisOrientation;
-  renderAs: Array<SingleRendererOptions<any>>;
+  renderAs: SingleRendererOptions[];
 }
 
-export type RendererOptions = SingleRendererOptions<any> | GroupedRendererOptions;
+export type RendererOptions = SingleRendererOptions | GroupedRendererOptions;
 
-export interface RendererClass<RendererAccessors = any> {
+export interface RendererClass<
+  Accessors extends RendererAccessors = RendererAccessors,
+  Type extends RendererType = RendererType
+> {
   dataForAxis: (axis: AxisOrientation) => Array<string | number | Date>;
   draw: () => void;
-  type: RendererType;
-  update: (data: Datum[], options: SingleRendererOptions<RendererAccessors>) => void;
+  type: Type;
+  update: (data: Datum[], options: SingleRendererOptionsParam<Accessors, Type>) => void;
   close: () => void;
 }
 

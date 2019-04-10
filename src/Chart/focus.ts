@@ -3,7 +3,7 @@ import Events from "../shared/event_catalog";
 import DateFocus from "./focus/date_focus";
 import ElementFocus from "./focus/element_focus";
 import FlagFocus from "./focus/flag_focus";
-import { D3Selection, EventBus, Focus, State, StateWriter } from "./typings";
+import { ComputedWriter, D3Selection, EventEmitter, Focus, State } from "./typings";
 
 class ChartFocus implements Focus {
   private componentFocus: ComponentFocus;
@@ -11,9 +11,9 @@ class ChartFocus implements Focus {
   private elementFocus: ElementFocus;
   private flagFocus: FlagFocus;
   private state: State;
-  private events: EventBus;
+  private events: EventEmitter;
 
-  constructor(state: State, _: StateWriter, events: EventBus, els: { [key: string]: D3Selection }) {
+  constructor(state: State, _: ComputedWriter, events: EventEmitter, els: { [key: string]: D3Selection }) {
     this.state = state;
     this.events = events;
     this.componentFocus = new ComponentFocus(this.state, els.component, this.events);

@@ -3,7 +3,7 @@ import { assign, compact, defaults, filter, forEach, LodashForEach, map } from "
 import { AxisComputed } from "../../../axis_utils/typings";
 import Events from "../../../shared/event_catalog";
 import { setLineAttributes, setPathAttributes, withD3Element } from "../../../utils/d3_utils";
-import Series from "../series";
+import Series from "../chart_series";
 import * as styles from "./styles";
 
 import {
@@ -11,12 +11,11 @@ import {
   AxisPosition,
   D3Selection,
   Datum,
-  EventBus,
+  EventEmitter,
   FlagRendererAccessors,
   FlagRendererConfig,
   RendererClass,
-  RendererType,
-  SingleRendererOptions,
+  SingleRendererOptionsParam,
   State,
   WithConvert,
 } from "../../typings";
@@ -29,26 +28,26 @@ const defaultAccessors: FlagRendererAccessors = {
   opacity: () => 1,
 };
 
-export type Options = SingleRendererOptions<FlagRendererAccessors>;
+type Options = SingleRendererOptionsParam<FlagRendererAccessors, "flag">;
 
-class Flag implements RendererClass<FlagRendererAccessors> {
+class Flag implements RendererClass<FlagRendererAccessors, "flag"> {
   private data!: Datum[];
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   public options!: Options;
   private position!: AxisOrientation;
   private scale: any;
   private series: Series;
   private state: State;
-  public type: RendererType = "flag";
+  public type: "flag" = "flag";
   // Accessors
   private color!: (d: Datum) => string;
   private description!: (d: Datum) => string;
   private direction!: (d: Datum) => "up" | "down";
   private label!: (d: Datum) => string;
   private opacity!: (d: Datum) => number;
-  private x!: (d: Datum) => number | Date | string;
-  private y!: (d: Datum) => number | Date | string;
+  private x!: (d: Datum) => number | Date | string | undefined;
+  private y!: (d: Datum) => number | Date | string | undefined;
   // Config
   private axis: AxisPosition = "x1";
   private axisOffset: number = 10;
@@ -56,7 +55,7 @@ class Flag implements RendererClass<FlagRendererAccessors> {
   private flagHeight: number = 10;
   private flagWidth: number = 8;
 
-  constructor(state: State, el: D3Selection, data: Datum[], options: Options, series: Series, events: EventBus) {
+  constructor(state: State, el: D3Selection, data: Datum[], options: Options, series: Series, events: EventEmitter) {
     this.state = state;
     this.events = events;
     this.series = series;
@@ -155,7 +154,7 @@ class Flag implements RendererClass<FlagRendererAccessors> {
   }
 
   // Private methods
-  private validate(d: string | number | Date): boolean {
+  private validate(d: string | number | Date | undefined): boolean {
     return !!d || d === 0;
   }
 

@@ -1,20 +1,21 @@
 import Events from "./event_catalog";
 import * as styles from "./styles";
+
 import {
   BaseConfig,
   ChartStateReadOnly,
   ComponentConfigInfo,
   ComponentHoverPayload,
   D3Selection,
-  EventBus,
+  EventEmitter,
 } from "./typings";
 
 class ComponentFocus {
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   private state: ChartStateReadOnly<any, any, any, any>; // @TODO
 
-  constructor(state: ChartStateReadOnly<any, any, any, any>, el: D3Selection, events: EventBus) {
+  constructor(state: ChartStateReadOnly<any, any, any, any>, el: D3Selection, events: EventEmitter) {
     this.state = state;
     this.el = el.append("xhtml:div").attr("class", `${styles.focusLegend} ${styles.componentFocus}`);
     this.events = events;

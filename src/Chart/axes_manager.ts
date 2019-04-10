@@ -5,7 +5,17 @@ import computeTimeAxes, { ticksInDomain } from "../axis_utils/compute_time_axes"
 import { computeBarPositions } from "../axis_utils/discrete_axis_utils";
 import Axis from "./axes/axis";
 import Rules from "./axes/rules";
-import { AxisOptions, AxisPosition, AxisType, D3Selection, EventBus, State, StateWriter, WithConvert } from "./typings";
+
+import {
+  AxisOptions,
+  AxisPosition,
+  AxisType,
+  ComputedWriter,
+  D3Selection,
+  EventEmitter,
+  State,
+  WithConvert,
+} from "./typings";
 
 import {
   AxisComputed,
@@ -42,15 +52,15 @@ type Axes = AxisRecord<Axis>;
 class AxesManager {
   private axes: Axes = {};
   private els: { [key: string]: D3Selection };
-  private events: EventBus;
+  private events: EventEmitter;
   private oldAxes: Axes = {};
   private rules: { [key: string]: Rules } = {};
   private state: State;
-  private stateWriter: StateWriter;
+  private computedWriter: ComputedWriter;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventBus, els: { [key: string]: D3Selection }) {
+  constructor(state: State, computedWriter: ComputedWriter, events: EventEmitter, els: { [key: string]: D3Selection }) {
     this.state = state;
-    this.stateWriter = stateWriter;
+    this.computedWriter = computedWriter;
     this.events = events;
     this.els = els;
   }
@@ -69,12 +79,12 @@ class AxesManager {
       ...defaultMargins(this.state.current.getConfig().noAxisMargin),
       ...(get(["axes", "margins"])(this.state.current.getComputed().axes) || {}),
     };
-    this.stateWriter("margins", computedMargins);
+    this.computedWriter("margins", computedMargins);
   }
 
   private updateAxes() {
-    this.stateWriter("previous", {});
-    this.stateWriter("computed", {});
+    this.computedWriter("previous", {});
+    this.computedWriter("computed", {});
 
     // Check all required axes have been configured
     const requiredAxes = keys(this.state.current.getComputed().series.dataForAxes);
@@ -84,7 +94,7 @@ class AxesManager {
     if (undefinedAxes.length) {
       throw new Error(`The following axes have not been configured: ${undefinedAxes.join(", ")}`);
     }
-    this.stateWriter("requiredAxes", requiredAxes);
+    this.computedWriter("requiredAxes", requiredAxes);
 
     // Remove axes that are no longer needed, or whose type has changed
     const axesToRemove = omitBy((axis: Axis, key: string) => {
@@ -96,7 +106,7 @@ class AxesManager {
     // Create or update currently required axes
     (forEach as WithConvert<LodashForEach>).convert({ cap: false })(this.createOrUpdate.bind(this))(configuredAxes);
     this.setBaselines();
-    this.stateWriter("priorityTimeAxis", this.priorityTimeAxis());
+    this.computedWriter("priorityTimeAxis", this.priorityTimeAxis());
   }
 
   private createOrUpdate(options: AxisOptions | ComputedAxisInput, position: AxisPosition) {
@@ -106,7 +116,7 @@ class AxesManager {
 
   private create(position: AxisPosition, options: AxisOptions | ComputedAxisInput) {
     const el = this.els[`${position[0]}Axes`];
-    const axis = new Axis(this.state, this.stateWriter, this.events, el, position);
+    const axis = new Axis(this.state, this.computedWriter, this.events, el, position);
     this.axes[position] = axis;
     axis.update(options);
   }
@@ -120,7 +130,7 @@ class AxesManager {
       const xType = xAxis.options.type;
       const yType = yAxis.options.type;
       const baseline: AxisOrientation = xType === "quant" && yType !== "quant" ? "y" : "x";
-      this.stateWriter("baseline", baseline);
+      this.computedWriter("baseline", baseline);
     }
   }
 
@@ -143,8 +153,11 @@ class AxesManager {
     const computedAxes = this.computeAxes(axes, orientation);
 
     forEach((axis: AxisPosition) => {
-      this.stateWriter(["previous", axis], this.state.current.getComputed().axes.computed[axis] || computedAxes[axis]);
-      this.stateWriter(["computed", axis], computedAxes[axis]);
+      this.computedWriter(
+        ["previous", axis],
+        this.state.current.getComputed().axes.computed[axis] || computedAxes[axis],
+      );
+      this.computedWriter(["computed", axis], computedAxes[axis]);
     })(keys(computedAxes));
 
     // Update rules
@@ -223,7 +236,7 @@ class AxesManager {
     if (hasBars) {
       const nTicks = this.getNTicks(axes);
       const barPositions = computeBarPositions(range, nTicks, this.state.current.getConfig(), computedSeries.barSeries);
-      this.stateWriter("barPositions", barPositions);
+      this.computedWriter("barPositions", barPositions);
       const config = this.state.current.getConfig();
 
       const tickWidth = (uniqBy(barPositions.offset)(keys(computedSeries.barSeries)) as string[]).reduce<number>(

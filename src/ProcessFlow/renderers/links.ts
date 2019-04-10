@@ -9,7 +9,7 @@ import * as styles from "./styles";
 
 import {
   D3Selection,
-  EventBus,
+  EventEmitter,
   LinkFocusElement,
   ProcessFlowConfig,
   Renderer,
@@ -36,10 +36,10 @@ class Links implements Renderer<TLink, LinkFocusElement> {
   private config!: ProcessFlowConfig;
   private data!: TLink[];
   public el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   private state: State;
 
-  constructor(state: State, events: EventBus, el: D3Selection) {
+  constructor(state: State, events: EventEmitter, el: D3Selection) {
     this.state = state;
     this.events = events;
     this.el = el;

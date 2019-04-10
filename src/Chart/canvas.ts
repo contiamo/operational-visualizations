@@ -3,17 +3,18 @@ import { forEach, get, reduce } from "lodash/fp";
 import Events from "../shared/event_catalog";
 import * as styles from "../shared/styles";
 import * as localStyles from "./styles";
+
 import {
   AxisPosition,
   Canvas,
+  ComputedWriter,
   D3Selection,
   Dimensions,
-  EventBus,
+  EventEmitter,
   LegendFloat,
   LegendPosition,
   SeriesElements,
   State,
-  StateWriter,
 } from "./typings";
 
 const seriesElements: SeriesElements = [
@@ -39,13 +40,13 @@ class ChartCanvas implements Canvas {
   private drawingGroup: D3Selection;
   private el: D3Selection;
   private elMap: { [key: string]: D3Selection } = {};
-  private events: EventBus;
+  private events: EventEmitter;
   private state: State;
-  private stateWriter: StateWriter;
+  private computedWriter: ComputedWriter;
 
-  constructor(state: State, stateWriter: StateWriter, events: EventBus, context: Element) {
+  constructor(state: State, computedWriter: ComputedWriter, events: EventEmitter, context: Element) {
     this.state = state;
-    this.stateWriter = stateWriter;
+    this.computedWriter = computedWriter;
     this.events = events;
     this.chartContainer = this.renderChartContainer(context);
     this.drawingContainer = this.renderDrawingContainer();
@@ -64,7 +65,7 @@ class ChartCanvas implements Canvas {
   public draw() {
     const config = this.state.current.getConfig();
     const dims = this.calculateDrawingContainerDims();
-    this.stateWriter("drawingContainerDims", dims);
+    this.computedWriter("drawingContainerDims", dims);
 
     // Resize elements
     this.chartContainer
@@ -74,7 +75,7 @@ class ChartCanvas implements Canvas {
       .style("height", `${config.height}px`)
       .style("background-color", config.backgroundColor);
 
-    this.stateWriter("containerRect", this.chartContainer.node().getBoundingClientRect());
+    this.computedWriter("containerRect", this.chartContainer.node().getBoundingClientRect());
 
     this.drawingContainer.style("width", `${dims.width}px`).style("height", `${dims.height}px`);
 
@@ -83,7 +84,7 @@ class ChartCanvas implements Canvas {
     this.drawingGroup.attr("transform", `translate(${this.margin("y1")}, ${this.margin("x2")})`);
 
     const drawingDims = this.calculateDrawingDims();
-    this.stateWriter("drawingDims", drawingDims);
+    this.computedWriter("drawingDims", drawingDims);
 
     this.updateClipPaths(dims, drawingDims);
     this.el.on("mousemove", this.onMouseMove.bind(this));

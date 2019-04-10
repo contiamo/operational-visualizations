@@ -1,6 +1,6 @@
 import { compact, defaults, filter, forEach, get, isBoolean, LodashForEach, map } from "lodash/fp";
 import { AxisComputed } from "../../../axis_utils/typings";
-import Series from "../series";
+import Series from "../chart_series";
 import * as styles from "./styles";
 
 import {
@@ -8,15 +8,14 @@ import {
   D3Selection,
   Datum,
   RendererClass,
-  RendererType,
-  SingleRendererOptions,
+  SingleRendererOptionsParam,
   State,
   TextRendererAccessors,
   TextRendererConfig,
   WithConvert,
 } from "../../typings";
 
-export type Options = SingleRendererOptions<TextRendererAccessors>;
+type Options = SingleRendererOptionsParam<TextRendererAccessors, "text">;
 
 const defaultAccessors: TextRendererAccessors = {
   size: () => 10,
@@ -26,13 +25,13 @@ const defaultAccessors: TextRendererAccessors = {
 const verticalTiltAngle = -60;
 const horizontalTiltAngle = -30;
 
-class Text implements RendererClass<TextRendererAccessors> {
+class Text implements RendererClass<TextRendererAccessors, "text"> {
   private data!: Datum[];
   private el: D3Selection;
   public options!: Options;
   private series: Series;
   private state: State;
-  public type: RendererType = "text";
+  public type: "text" = "text";
   private xIsBaseline!: boolean;
   // Accessors
   private size!: (d: Datum) => number;
@@ -151,12 +150,12 @@ class Text implements RendererClass<TextRendererAccessors> {
     const offset = barWidth ? barWidth(this.series.key()) / 2 : 0;
     const rotate = this.tilt ? (this.xIsBaseline ? verticalTiltAngle : horizontalTiltAngle) : 0;
 
-    const attrs: any = {
+    const attrs = {
       x: (d: Datum) => this.xScale(this.xIsBaseline ? this.x(d) : 0) - (this.xIsBaseline ? offset : 0),
       y: (d: Datum) => this.yScale(this.xIsBaseline ? 0 : this.y(d)) - (this.xIsBaseline ? 0 : offset),
       text: (d: Datum) => (this.xIsBaseline ? this.y(d) : this.x(d)).toString(),
+      transform: (d: Datum) => `rotate(${rotate}, ${attrs.x(d)}, ${attrs.y(d)})`,
     };
-    attrs.transform = (d: Datum) => `rotate(${rotate}, ${attrs.x(d)}, ${attrs.y(d)})`;
     return attrs;
   }
 
@@ -172,14 +171,14 @@ class Text implements RendererClass<TextRendererAccessors> {
     const y = (d: Datum) => d.y1 || this.y(d);
     const isPositive = (d: Datum) => (this.xIsBaseline ? y(d) >= 0 : x(d) >= 0);
 
-    const attrs: any = {
+    const attrs = {
       x: (d: Datum) => this.xScale(x(d)) + (this.xIsBaseline ? offset : symbolOffset(d) * (isPositive(d) ? 1 : -1)),
       y: (d: Datum) => this.yScale(y(d)) + (this.xIsBaseline ? symbolOffset(d) * (isPositive(d) ? -1 : 1) : offset),
       text: (d: Datum) => (this.xIsBaseline ? this.y(d) : this.x(d)).toString(),
       anchor: (d: Datum) => (this.xIsBaseline && !this.tilt ? "middle" : isPositive(d) ? "start" : "end"),
       baseline: this.xIsBaseline ? "initial" : "central",
+      transform: (d: Datum) => `rotate(${rotate}, ${attrs.x(d)}, ${attrs.y(d)})`,
     };
-    attrs.transform = (d: Datum) => `rotate(${rotate}, ${attrs.x(d)}, ${attrs.y(d)})`;
     return attrs;
   }
 }

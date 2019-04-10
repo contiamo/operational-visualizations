@@ -2,7 +2,7 @@ import { flow, forEach, map, reduce, sortBy } from "lodash/fp";
 import Events from "../shared/event_catalog";
 import { drawHidden, labelDimensions, positionLabel } from "../utils/focus_utils";
 import * as styles from "./styles";
-import { D3Selection, EventBus, Focus, HoverPayload, State, StateWriter, TLink, TNode } from "./typings";
+import { ComputedWriter, D3Selection, EventEmitter, Focus, HoverPayload, State, TLink, TNode } from "./typings";
 
 interface Breakdown {
   label?: string;
@@ -21,9 +21,9 @@ interface Breakdowns {
 class ProcessFlowFocus implements Focus {
   private el: D3Selection;
   private state: State;
-  private events: EventBus;
+  private events: EventEmitter;
 
-  constructor(state: State, _: StateWriter, events: EventBus, el: D3Selection) {
+  constructor(state: State, _: ComputedWriter, events: EventEmitter, el: D3Selection) {
     this.state = state;
     this.events = events;
     this.el = el;

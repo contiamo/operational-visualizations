@@ -1,7 +1,7 @@
 import ComponentFocus from "../shared/component_focus";
 import Events from "../shared/event_catalog";
 import { drawHidden, labelDimensions, positionLabel } from "../utils/focus_utils";
-import { D3Selection, EventBus, Focus, HoverPayload, State, StateWriter } from "./typings";
+import { ComputedWriter, D3Selection, EventEmitter, Focus, HoverPayload, State } from "./typings";
 
 const percentageString = (percentage: number): string => percentage.toFixed(1) + "%";
 
@@ -9,9 +9,9 @@ class PieChartFocus implements Focus {
   private el: D3Selection;
   private componentFocus: ComponentFocus;
   private state: State;
-  private events: EventBus;
+  private events: EventEmitter;
 
-  constructor(state: State, _: StateWriter, events: EventBus, els: { [key: string]: D3Selection }) {
+  constructor(state: State, _: ComputedWriter, events: EventEmitter, els: { [key: string]: D3Selection }) {
     this.state = state;
     this.events = events;
     this.el = els.main;
@@ -19,7 +19,7 @@ class PieChartFocus implements Focus {
     this.events.on(Events.FOCUS.ELEMENT.HOVER, this.onElementHover.bind(this));
     this.events.on(Events.FOCUS.ELEMENT.OUT, this.onElementOut.bind(this));
     this.events.on(Events.CHART.OUT, this.onMouseLeave.bind(this));
-    this.events.on(Events.FOCUS.CLEAR, this.remove());
+    this.events.on(Events.FOCUS.CLEAR, this.remove.bind(this));
   }
 
   private onElementHover(payload: HoverPayload) {

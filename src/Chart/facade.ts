@@ -1,7 +1,7 @@
 import { has, isEmpty, uniqueId } from "lodash/fp";
 import { defaultMargins } from "../axis_utils/axis_config";
-import EventEmitter from "../shared/event_bus";
 import Events from "../shared/event_catalog";
+import EventEmitter from "../shared/event_emitter";
 import StateHandler from "../shared/state_handler";
 import { colorAssigner } from "../utils/colorAssigner";
 import theme from "../utils/constants";
@@ -123,7 +123,7 @@ class ChartFacade implements Facade {
   private context: Element;
   private customColorAccessor: boolean = false;
   private events: EventEmitter;
-  private series: ChartSeriesManager;
+  private seriesManager: ChartSeriesManager;
   private state: StateHandler<Data, ChartConfig, AccessorsObject, Computed>;
 
   constructor(context: Element) {
@@ -132,10 +132,10 @@ class ChartFacade implements Facade {
     this.state = this.initializeState();
     this.canvas = this.initializeCanvas();
     this.components = this.initializeComponents();
-    this.series = this.initializeSeries();
+    this.seriesManager = this.initializeSeries();
   }
 
-  private initializeEvents(): EventEmitter {
+  private initializeEvents() {
     return new EventEmitter();
   }
 
@@ -148,19 +148,19 @@ class ChartFacade implements Facade {
     });
   }
 
-  private initializeCanvas(): ChartCanvas {
-    return new ChartCanvas(this.state.readOnly(), this.state.computedWriter(["canvas"]), this.events, this.context);
+  private initializeCanvas() {
+    return new ChartCanvas(this.state.readOnly(), this.state.getComputedWriter(["canvas"]), this.events, this.context);
   }
 
-  private initializeComponents(): any {
+  private initializeComponents() {
     return {
-      axes: new AxesManager(this.state.readOnly(), this.state.computedWriter("axes"), this.events, {
+      axes: new AxesManager(this.state.readOnly(), this.state.getComputedWriter("axes"), this.events, {
         xAxes: this.canvas.elementFor("xAxes"),
         xRules: this.canvas.elementFor("xRules"),
         yAxes: this.canvas.elementFor("yAxes"),
         yRules: this.canvas.elementFor("yRules"),
       }),
-      legends: new LegendManager(this.state.readOnly(), this.state.computedWriter(["legend"]), this.events, {
+      legends: new LegendManager(this.state.readOnly(), this.state.getComputedWriter(["legend"]), this.events, {
         top: {
           left: this.canvas.elementFor("legend-top-left"),
           right: this.canvas.elementFor("legend-top-right"),
@@ -169,7 +169,7 @@ class ChartFacade implements Facade {
           left: this.canvas.elementFor("legend-bottom-left"),
         },
       }),
-      focus: new ChartFocus(this.state.readOnly(), this.state.computedWriter(["focus"]), this.events, {
+      focus: new ChartFocus(this.state.readOnly(), this.state.getComputedWriter(["focus"]), this.events, {
         main: this.canvas.elementFor("focus"),
         component: this.canvas.elementFor("componentFocus"),
         group: this.canvas.elementFor("focusGroup"),
@@ -177,20 +177,20 @@ class ChartFacade implements Facade {
     };
   }
 
-  private initializeSeries(): ChartSeriesManager {
+  private initializeSeries() {
     return new ChartSeriesManager(
       this.state.readOnly(),
-      this.state.computedWriter(["series"]),
+      this.state.getComputedWriter(["series"]),
       this.events,
       this.canvas.elementFor("series"),
     );
   }
 
-  public data(data?: Data): Data {
+  public data(data?: Data) {
     return this.state.data(data);
   }
 
-  public config(config?: Partial<ChartConfig>): ChartConfig {
+  public config(config?: Partial<ChartConfig>) {
     /**
      * Changing the palette config only updates the legendColor accessor if the default is still be used.
      * It will not overwrite a user-defined legendColor accessor.
@@ -198,33 +198,33 @@ class ChartFacade implements Facade {
     if (config && config.palette && !this.customColorAccessor) {
       this.state.accessors("series", { legendColor: defaultColorAssigner(config.palette) });
     }
-    return this.state.config(config);
+    return this.state.config(config) as ChartConfig;
   }
 
-  public accessors(type: string, accessors: Accessors<any>): Accessors<any> {
+  public accessors(type: string, accessors: Accessors<any>) {
     // If a custom legendColor accessor is specified, this must not be overwritten if the palette config changes.
     if (type === "series" && has("legendColor")(accessors)) {
       this.customColorAccessor = true;
     }
-    return this.state.accessors(type, accessors);
+    return this.state.accessors(type, accessors) as Accessors<any>;
   }
 
-  public on(event: string, handler: any) {
+  public on(event: string, handler: (e: any) => void) {
     this.events.on(event, handler);
   }
 
-  public off(event: string, handler: any) {
+  public off(event: string, handler: (e: any) => void) {
     this.events.removeListener(event, handler);
   }
 
   public draw() {
     this.state.captureState();
-    this.series.assignData();
+    this.seriesManager.assignData();
     this.components.legends.draw();
     this.components.axes.updateMargins();
     this.canvas.draw();
     this.components.axes.draw();
-    this.series.draw();
+    this.seriesManager.draw();
 
     // Focus behaviour is applied through events only - there is no focus.draw() method.
     const focus: FocusElement = this.state.config().focus;

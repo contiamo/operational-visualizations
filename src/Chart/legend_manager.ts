@@ -1,7 +1,7 @@
 import { forEach, get, reduce } from "lodash/fp";
 import * as styles from "../shared/styles";
 import ChartLegend from "./legend/legend";
-import { D3Selection, EventBus, LegendDatum, LegendFloat, LegendPosition, State, StateWriter } from "./typings";
+import { ComputedWriter, D3Selection, EventEmitter, LegendDatum, LegendFloat, LegendPosition, State } from "./typings";
 
 interface LegendOption {
   position: LegendPosition;
@@ -20,15 +20,15 @@ class LegendManager {
 
   constructor(
     state: State,
-    stateWriter: StateWriter,
-    events: EventBus,
+    computedWriter: ComputedWriter,
+    events: EventEmitter,
     els: { [key: string]: { [key: string]: D3Selection } },
   ) {
     this.state = state;
 
     forEach((option: LegendOption) => {
       const el: D3Selection = els[option.position][option.float];
-      this.legends[option.position][option.float] = new ChartLegend(state, stateWriter, events, el);
+      this.legends[option.position][option.float] = new ChartLegend(state, computedWriter, events, el);
     })(legendOptions);
   }
 
@@ -41,6 +41,12 @@ class LegendManager {
       this.legends[option.position][option.float].draw();
     })(legendOptions);
     this.arrangeTopLegends();
+  }
+
+  public remove() {
+    forEach((option: LegendOption) => {
+      this.legends[option.position][option.float].remove();
+    })(legendOptions);
   }
 
   // Ensure the 2 top legends (left/right) make sensible use of the available space.

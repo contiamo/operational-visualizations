@@ -7,7 +7,16 @@ import { onTransitionEnd, withD3Element } from "../../utils/d3_utils";
 import { exitGroups, filterByMatchers, sizeScale } from "./renderer_utils";
 import * as styles from "./styles";
 
-import { D3Selection, EventBus, NodeFocusElement, ProcessFlowConfig, Renderer, Scale, State, TNode } from "../typings";
+import {
+  D3Selection,
+  EventEmitter,
+  NodeFocusElement,
+  ProcessFlowConfig,
+  Renderer,
+  Scale,
+  State,
+  TNode,
+} from "../typings";
 
 type Position = "top" | "bottom" | "middle" | "left" | "right";
 
@@ -69,10 +78,10 @@ class Nodes implements Renderer<TNode, NodeFocusElement> {
   private config!: ProcessFlowConfig;
   private data!: TNode[];
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   private state: State;
 
-  constructor(state: State, events: EventBus, el: D3Selection) {
+  constructor(state: State, events: EventEmitter, el: D3Selection) {
     this.state = state;
     this.events = events;
     this.el = el;

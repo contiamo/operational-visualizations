@@ -2,7 +2,7 @@ import { area as d3Area, curveStepAfter } from "d3-shape";
 import { clone, compact, defaults, filter, findKey, get, isFinite, last, map } from "lodash/fp";
 import Events from "../../../shared/event_catalog";
 import { setRectAttributes, withD3Element } from "../../../utils/d3_utils";
-import Series from "../series";
+import Series from "../chart_series";
 import * as styles from "./styles";
 
 import {
@@ -10,14 +10,13 @@ import {
   BarsRendererAccessors,
   D3Selection,
   Datum,
-  EventBus,
+  EventEmitter,
   RendererClass,
-  RendererType,
-  SingleRendererOptions,
+  SingleRendererOptionsParam,
   State,
 } from "../../typings";
 
-export type Options = SingleRendererOptions<BarsRendererAccessors>;
+type Options = SingleRendererOptionsParam<BarsRendererAccessors, "bars">;
 
 const defaultAccessors: BarsRendererAccessors = {
   color: (series: Series) => series.legendColor(),
@@ -25,15 +24,15 @@ const defaultAccessors: BarsRendererAccessors = {
   opacity: () => 0.8,
 };
 
-class Bars implements RendererClass<BarsRendererAccessors> {
+class Bars implements RendererClass<BarsRendererAccessors, "bars"> {
   private data!: Datum[];
   private el: D3Selection;
-  private events: EventBus;
+  private events: EventEmitter;
   private isRange!: boolean;
   public options!: Options;
   private series: Series;
   private state: any;
-  public type: RendererType = "bars";
+  public type: "bars" = "bars";
   private xIsBaseline!: boolean;
   private xScale: any;
   private yScale: any;
@@ -49,7 +48,7 @@ class Bars implements RendererClass<BarsRendererAccessors> {
   private y0!: (d: Datum) => number;
   private y1!: (d: Datum) => number;
 
-  constructor(state: State, el: D3Selection, data: Datum[], options: Options, series: Series, events: EventBus) {
+  constructor(state: State, el: D3Selection, data: Datum[], options: Options, series: Series, events: EventEmitter) {
     this.state = state;
     this.events = events;
     this.series = series;

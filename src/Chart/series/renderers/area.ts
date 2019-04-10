@@ -1,6 +1,6 @@
 import { compact, defaults, find, forEach, get, map, sortBy } from "lodash/fp";
 import { AxisComputed, Tick } from "../../../axis_utils/typings";
-import Series from "../series";
+import Series from "../chart_series";
 
 import {
   area as d3Area,
@@ -21,12 +21,11 @@ import {
   D3Selection,
   Datum,
   RendererClass,
-  RendererType,
-  SingleRendererOptions,
+  SingleRendererOptionsParam,
   State,
 } from "../../typings";
 
-export type Options = SingleRendererOptions<AreaRendererAccessors>;
+type Options = SingleRendererOptionsParam<AreaRendererAccessors, "area">;
 
 const interpolator = {
   cardinal: curveCardinal,
@@ -49,14 +48,14 @@ const hasValue = (d: any): boolean => {
   return !!d || d === 0;
 };
 
-class Area implements RendererClass<AreaRendererAccessors> {
+class Area implements RendererClass<AreaRendererAccessors, "area"> {
   private data!: Datum[];
   private el: D3Selection;
   private isRange!: boolean;
   public options!: Options;
   private series: Series;
   private state: State;
-  public type: RendererType = "area";
+  public type: "area" = "area";
   private xIsBaseline!: boolean;
   // Accessors
   private closeGaps!: () => boolean;

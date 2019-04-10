@@ -33,16 +33,16 @@ export default class State<Data, Config, AccessorsObject, Computed> {
     return this.state.accessors;
   }
 
-  /*
-   ** this.state.computed is generally a heavily nested object. TS Readonly<T> does not currently
-   ** support nesting. The deep clone protects against unintended changes to the computed object,
-   ** but a TS error will only be thrown if first-level properties of the computed object are modified.
-   */
   public getComputed() {
+    /**
+     * this.state.computed is generally a heavily nested object. TS Readonly<T> does not currently
+     * support nesting. The deep clone protects against unintended changes to the computed object,
+     * but a TS error will only be thrown if first-level properties of the computed object are modified.
+     */
     return cloneDeep(this.state.computed);
   }
 
-  public set(path: Path, value: any) {
+  public set<T>(path: Path, value: T) {
     this.state = set(path)(value)(this.state);
     return value;
   }

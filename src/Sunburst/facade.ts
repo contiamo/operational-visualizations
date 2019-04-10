@@ -1,5 +1,5 @@
 import { has, uniqueId } from "lodash/fp";
-import EventEmitter from "../shared/event_bus";
+import EventEmitter from "../shared/event_emitter";
 import StateHandler from "../shared/state_handler";
 import { colorAssigner } from "../utils/colorAssigner";
 import theme from "../utils/constants";
@@ -101,32 +101,37 @@ class SunburstFacade implements Facade {
   }
 
   private initializeCanvas(): SunburstCanvas {
-    return new SunburstCanvas(this.state.readOnly(), this.state.computedWriter(["canvas"]), this.events, this.context);
+    return new SunburstCanvas(
+      this.state.readOnly(),
+      this.state.getComputedWriter(["canvas"]),
+      this.events,
+      this.context,
+    );
   }
 
   private initializeComponents(): Components {
     return {
       breadcrumb: new Breadcrumb(
         this.state.readOnly(),
-        this.state.computedWriter(["breadcrumb"]),
+        this.state.getComputedWriter(["breadcrumb"]),
         this.events,
         this.canvas.elementFor("breadcrumb"),
       ),
       focus: new SunburstFocus(
         this.state.readOnly(),
-        this.state.computedWriter(["focus"]),
+        this.state.getComputedWriter(["focus"]),
         this.events,
         this.canvas.elementFor("focus"),
       ),
       renderer: new Renderer(
         this.state.readOnly(),
-        this.state.computedWriter(["renderer"]),
+        this.state.getComputedWriter(["renderer"]),
         this.events,
         this.canvas.elementFor("series"),
       ),
       rootLabel: new RootLabel(
         this.state.readOnly(),
-        this.state.computedWriter(["rootLabel"]),
+        this.state.getComputedWriter(["rootLabel"]),
         this.events,
         this.canvas.elementFor("rootLabel"),
       ),
