@@ -84,7 +84,7 @@ const getRowOrColumnValue = <T>(config: ConstantOrPredicateArray<T>, rowOrColumn
 };
 
 /** Returns a full set of grid accessors, based on provided custom config values and the default grid config. */
-export default (customConfig: RecursivePartial<GridConfig> = {}): Accessors => {
+export default <T>(customConfig: RecursivePartial<GridConfig> = {}): Accessors<T> => {
   const config = mergeConfig(defaultConfig, customConfig);
 
   const titleConfig = config.dimensionTitle;

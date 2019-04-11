@@ -187,17 +187,17 @@ export interface CellAccessors<T = any> {
   color: (cell: Cell<T>) => string;
 }
 
-export interface ColumnAccessors {
+export interface ColumnAccessors<T = any> {
   /** Width of given column */
-  width: (column: RowOrColumn, width?: number) => number;
+  width: (column: RowOrColumn<T>, width?: number) => number;
 }
 
-export interface RowAccessors {
+export interface RowAccessors<T = any> {
   /** Height of given row */
-  height: (row: RowOrColumn, height?: number) => number;
+  height: (row: RowOrColumn<T>, height?: number) => number;
 }
 
-export interface Accessors {
+export interface Accessors<T = any> {
   /** Accessors for dimension titles in row and column headers */
   dimensionTitle: DimensionTitleAccessors;
   /** Accessors for dimension values in row and column headers */
@@ -205,9 +205,9 @@ export interface Accessors {
   /** Accessors specific to row headers */
   rowHeaders: RowHeadersAccessors;
   /** Cell accessors */
-  cells: CellAccessors;
+  cells: CellAccessors<T>;
   /** Colum accessors */
-  columns: ColumnAccessors;
+  columns: ColumnAccessors<T>;
   /** Row accessors */
-  rows: RowAccessors;
+  rows: RowAccessors<T>;
 }

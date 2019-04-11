@@ -10,7 +10,7 @@ import { Accessors, Axes } from "./types";
 export interface Props<T = any> {
   data: ReadonlyDataset<T>;
   axes: Axes;
-  accessors: Accessors;
+  accessors: Accessors<T>;
   cell: (props: { cell: T; width: number; height: number }) => React.ReactNode;
 }
 
