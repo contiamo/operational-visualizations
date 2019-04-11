@@ -84,6 +84,7 @@
     "react-emotion": "^9.2.6",
     "react-test-renderer": "^16.8.1",
     "rimraf": "^2.6.2",
+    "semiotic": "^1.19.6",
     "ts-jest": "^23.10.5",
     "tslint": "^5.10.0",
     "tslint-config-airbnb": "5.8.0",
