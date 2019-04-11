@@ -86,11 +86,11 @@ const rawData: RawDataset<number> = {
 
 export const marathon = ({ test, container }: MarathonEnvironment) => {
   test("Row measures", () => {
-    const data = new MultidimensionalDataset(rawData).transform(cell => () => cell.value().toString());
+    const data = new MultidimensionalDataset(rawData);
     const accessors = gridConfigToAccessors(defaultGridConfig);
     ReactDOM.render(
       <div style={{ display: "inline-block" }}>
-        <Grid data={data} axes={{}} accessors={accessors} />
+        <Grid data={data} axes={{}} accessors={accessors} cell={({ cell }) => `${cell}`} />
       </div>,
       container,
     );

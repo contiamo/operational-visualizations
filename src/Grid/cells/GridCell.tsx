@@ -2,11 +2,12 @@ import React from "react";
 import { Cell } from "../../data_handling/multidimensional_dataset";
 import { CellAccessors } from "../types";
 
-interface Props {
-  cell: Cell;
+interface Props<T = any> {
+  cell: Cell<T>;
   width: number;
   height: number;
-  cellAccessors: CellAccessors;
+  cellAccessors: CellAccessors<T>;
+  renderer: (props: { cell: T; width: number; height: number }) => React.ReactNode;
 }
 
 const cellStyle = ({ cell, width, height, cellAccessors }: Props): React.CSSProperties => ({
@@ -22,8 +23,12 @@ const cellStyle = ({ cell, width, height, cellAccessors }: Props): React.CSSProp
   backgroundColor: cellAccessors.backgroundColor(cell),
 });
 
-const GridCell: React.SFC<Props> = props => (
-  <div style={cellStyle(props)}>{props.cell.value()({ width: props.width, height: props.height })}</div>
-);
+function GridCell<T>(props: Props<T>) {
+  return (
+    <div style={cellStyle(props)}>
+      {props.renderer({ cell: props.cell.value(), width: props.width, height: props.height })}
+    </div>
+  );
+}
 
-export default GridCell;
+export default React.memo(GridCell) as typeof GridCell;

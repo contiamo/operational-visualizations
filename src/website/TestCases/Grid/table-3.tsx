@@ -193,11 +193,11 @@ const rawData: RawDataset<number> = {
 
 export const marathon = ({ test, container }: MarathonEnvironment) => {
   test("Grid config", () => {
-    const data = new MultidimensionalDataset(rawData).transform(cell => () => cell.value().toString());
+    const data = new MultidimensionalDataset(rawData);
     const accessors = gridConfigToAccessors(gridConfig);
     ReactDOM.render(
       <div style={{ display: "inline-block" }}>
-        <Grid data={data} axes={{}} accessors={accessors} />
+        <Grid data={data} axes={{}} accessors={accessors} cell={({ cell }) => `${cell}`} />
       </div>,
       container,
     );

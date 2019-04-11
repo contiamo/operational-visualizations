@@ -176,15 +176,15 @@ export interface RowHeadersAccessors {
   columnWidths: (dim: DimensionWithPrimitiveAndMetadata) => number;
 }
 
-export interface CellAccessors {
+export interface CellAccessors<T = any> {
   /** Background color */
-  backgroundColor: (cell: Cell) => string;
+  backgroundColor: (cell: Cell<T>) => string;
   /** Border color, if borderWidth > 0 */
-  borderColor: (cell: Cell) => string;
+  borderColor: (cell: Cell<T>) => string;
   /** Border width(s) */
-  borderWidth: (cell: Cell) => string;
+  borderWidth: (cell: Cell<T>) => string;
   /** Font color */
-  color: (cell: Cell) => string;
+  color: (cell: Cell<T>) => string;
 }
 
 export interface ColumnAccessors {

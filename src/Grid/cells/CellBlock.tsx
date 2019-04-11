@@ -3,10 +3,11 @@ import { ReadonlyDataset } from "../../data_handling/multidimensional_dataset";
 import { Accessors } from "../types";
 import GridCell from "./GridCell";
 
-interface Props {
-  data: ReadonlyDataset;
+interface Props<T = any> {
+  data: ReadonlyDataset<T>;
   accessors: Accessors;
   width: number;
+  cell: (props: { cell: T; width: number; height: number }) => React.ReactNode;
 }
 
 const cellContainerStyle = (width: Props["width"]): React.CSSProperties => ({
@@ -14,24 +15,27 @@ const cellContainerStyle = (width: Props["width"]): React.CSSProperties => ({
   float: "left",
 });
 
-const CellBlock: React.SFC<Props> = ({ data, accessors, width }) => (
-  <div style={cellContainerStyle(width)}>
-    {data
-      .rows()
-      .map((row, j) =>
-        row
-          .cells()
-          .map((cell, i) => (
-            <GridCell
-              cell={cell}
-              width={accessors.columns.width(data.columns()[i])}
-              height={accessors.rows.height(row)}
-              key={`${i},${j}`}
-              cellAccessors={accessors.cells}
-            />
-          )),
-      )}
-  </div>
-);
+function CellBlock<T>({ data, accessors, width, cell: renderer }: Props<T>) {
+  return (
+    <div style={cellContainerStyle(width)}>
+      {data
+        .rows()
+        .map((row, j) =>
+          row
+            .cells()
+            .map((cell, i) => (
+              <GridCell
+                cell={cell}
+                renderer={renderer}
+                width={accessors.columns.width(data.columns()[i])}
+                height={accessors.rows.height(row)}
+                key={`${i},${j}`}
+                cellAccessors={accessors.cells}
+              />
+            )),
+        )}
+    </div>
+  );
+}
 
 export default CellBlock;

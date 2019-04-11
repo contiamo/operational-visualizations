@@ -7,10 +7,11 @@ import ColumnHeaderBlock from "./column_headers/ColumnHeaderBlock";
 import RowHeaderBlock from "./row_headers/RowHeaderBlock";
 import { Accessors, Axes } from "./types";
 
-export interface Props {
-  data: ReadonlyDataset;
+export interface Props<T = any> {
+  data: ReadonlyDataset<T>;
   axes: Axes;
   accessors: Accessors;
+  cell: (props: { cell: T; width: number; height: number }) => React.ReactNode;
 }
 
 // Helper functions
@@ -40,7 +41,7 @@ const axesWidth = (axes: Axes, position: AxisPosition) => {
   return axisSet ? Math.max(...axisSet.map(axis => axis.width)) : 0;
 };
 
-const Grid: React.SFC<Props> = props => {
+function Grid<T>(props: Props<T>) {
   const marginLeft = rowHeadersWidth(props) + axesWidth(props.axes, "y1");
   return (
     <div style={{ float: "left", width: marginLeft + cellBlockWidth(props) + axesWidth(props.axes, "y2") }}>
@@ -59,7 +60,7 @@ const Grid: React.SFC<Props> = props => {
         rowHeaderWidth={rowHeaderWidth(props.accessors)}
       />
       {props.axes.y1 && <AxisBlock axes={props.axes.y1} width={axesWidth(props.axes, "y1")} />}
-      <CellBlock data={props.data} accessors={props.accessors} width={columnsWidth(props)} />
+      <CellBlock data={props.data} accessors={props.accessors} width={columnsWidth(props)} cell={props.cell} />
       {props.axes.y2 && (
         <AxisBlock axes={props.axes.y2} backgroundColor={"transparent"} width={axesWidth(props.axes, "y2")} />
       )}
@@ -73,6 +74,6 @@ const Grid: React.SFC<Props> = props => {
       )}
     </div>
   );
-};
+}
 
 export default Grid;
