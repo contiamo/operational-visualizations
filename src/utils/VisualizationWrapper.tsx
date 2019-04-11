@@ -1,20 +1,23 @@
 import { defaults, keys } from "lodash/fp";
 import * as React from "react";
-import { Accessors } from "../shared/typings";
+import { Accessors, Class, Facade } from "../shared/typings";
 import theme from "./constants";
 
-export interface Props {
-  style?: {};
+export interface Props<Config = any, Data = any> {
+  style?: React.CSSProperties;
   className?: string;
-  facade: any;
+  facade: Class<Facade<Config, Data>>;
   accessors?: Record<string, Accessors<any>>;
-  data?: any;
-  config?: any;
+  data?: Data;
+  config?: Config;
 }
 
-class VisualizationWrapper extends React.Component<Props, {}> {
+class VisualizationWrapper<
+  Config extends Record<string, any> = Record<string, any>,
+  Data = any
+> extends React.Component<Props<Config, Data>, {}> {
   private containerNode!: HTMLDivElement;
-  private viz!: any;
+  private viz!: Facade<Config, Data>;
   private timerId: number | null = null;
 
   public render() {
@@ -45,14 +48,14 @@ class VisualizationWrapper extends React.Component<Props, {}> {
   }
 
   public updateViz() {
-    this.viz.data(this.props.data || {});
+    this.viz.data(this.props.data || ({} as Data));
     const accessors = this.props.accessors;
     if (accessors) {
       keys(accessors).forEach((key: string) => {
         this.viz.accessors(key, accessors[key]);
       });
     }
-    this.viz.config(defaults({ palette: theme.palettes.qualitative.generic })(this.props.config || {}));
+    this.viz.config(defaults({ palette: theme.palettes.qualitative.generic } as any)(this.props.config || {}));
   }
 
   public componentWillUnmount() {

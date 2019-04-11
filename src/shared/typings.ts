@@ -66,6 +66,13 @@ export interface Facade<Config, Data> {
   close: () => void;
 }
 
+/**
+ * use this to declare types for classes, for example
+ * class which implements Facade<Config, Data> interface
+ * Class<Facade<Config, Data>>
+ */
+export type Class<T> = new (...args: any[]) => T;
+
 // Component hover payload
 export interface ComponentConfigInfo {
   key: string;

@@ -38,4 +38,4 @@ function CellBlock<T>({ data, accessors, width, cell: renderer }: Props<T>) {
   );
 }
 
-export default CellBlock;
+export default React.memo(CellBlock) as typeof CellBlock;
