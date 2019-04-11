@@ -87,6 +87,9 @@ const rawData: RawDataset<number> = {
   ],
 };
 
+/**
+ * convert MDD to list of rows, where rows represented as objects
+ */
 const mddToRows = (m: Dataset<any>) => {
   const serialized = m.serialize();
   const columns = serialized.columns.map(x => x[x.length - 1]);
@@ -111,7 +114,10 @@ const color = ["#ac58e5", "#9fd0cb", "#E0488B"];
 
 const frameProps = {
   type: "clusterbar",
+  // Hardcoded this value for simplicity, but instead it should come from
+  // for example MDD.stats({colLumns: measures})
   rExtent: [undefined, 1000],
+  // using simplified color assigner function, instead it should be consistent across the graphs
   style: ({ rIndex }: { rIndex: number; rName: string }) => ({ fill: color[rIndex], stroke: "white" }),
   margin: { left: padding, bottom: padding, right: padding, top: padding },
 };
