@@ -111,16 +111,26 @@ const padding = 5;
 import OrdinalFrame from "semiotic/lib/OrdinalFrame";
 
 const color = ["#ac58e5", "#9fd0cb", "#E0488B"];
+// TODO: Hardcoded this value for simplicity, but instead it should come from,
+// for example, MDD.stats({colLumns: measures})
+const range = [0, 1000];
 
 const frameProps = {
   type: "clusterbar",
-  // Hardcoded this value for simplicity, but instead it should come from
-  // for example MDD.stats({colLumns: measures})
-  rExtent: [undefined, 1000],
+  rExtent: range,
   // using simplified color assigner function, instead it should be consistent across the graphs
   style: ({ rIndex }: { rIndex: number; rName: string }) => ({ fill: color[rIndex], stroke: "white" }),
   margin: { left: padding, bottom: padding, right: padding, top: padding },
 };
+
+// TODO: Grid needs to accept render prop for axes
+// import { scaleLinear } from "d3-scale";
+// import { Axis } from 'semiotic';
+//  <Axis
+//    size={[0, 1000]}
+//    scale={scaleLinear().domain([ 10, 1000 ]).range([ width, height ])}
+//    orient={'left'}
+// />
 
 export const marathon = ({ test, container }: MarathonEnvironment) => {
   test("Column measures", () => {
