@@ -33,17 +33,89 @@ Yet to be diecided if we want to use row/or column implementation.
 [{ name: "age", type: "number" }, { name: "gender", type: "string" }];
 ```
 
-instead of hardcoded predefined types as strings we can use validators, like in [`io-ts`](https://github.com/gcanti/io-ts):
+Types don't have to be JS specific types. We need to decide what is the best option here. It can be as simple as differentiation dimension or measure.
+
+### To static type or not?
+
+Let's assume we have a class:
+
+```ts
+class DataFrame<Schema> {
+  constructor(schema: Schema, data: InferBasedOn<Schema>);
+}
+```
+
+we want to have a nice DX, so TS will infer type of data from schema. The challenge is how to implement Schema.
+
+**Schema** - describes names of the columns and types. We need types to:
+
+1. validate shape of the input (minor reason)
+2. differentiate numeric vs categorical values. We need this to decide if we can use aggregation function, like sum or average, for this value or not. The question is do we need type or we can differentiate measures vs dimensions.
+
+**Row as an object**, Data as a list of Rows - easy to type, the most expensive representation
 
 ```ts
 import * as t from "io-ts";
 
-[{ name: "age", type: t.number }, { name: "gender", type: t.string }];
+const schema = t.type({
+  userId: t.number,
+  name: t.string
+})
+type Row = t.TypeOf<typeof schema>>
+type Data = Array<Row>
+type Schema = typeof schema
 ```
 
-this way we can make schema types easily extendable.
+**Row as a tuple**, Data as a list of Rows (Matrix)
 
-### dataframe-js
+```ts
+type Row = [A, B, C, D];
+type Data = Array<Row>;
+type Schema = ?
+```
+
+**Column as a list**, Data as a tuple of Columns (Matrix)
+
+```ts
+type Column<T> = Array<T>;
+type Data = [Column<A>, Column<B>, Column<C>, Column<D>];
+type Schema = ?
+```
+
+**Column as a list**, Data as a Record of Columns
+
+```ts
+type Column<T> = Array<T>;
+type Data = {a: Column<A>, b: Column<B>, c: Column<C>, d: Column<D>};
+
+import * as t from "io-ts";
+const schema = t.type({
+  a: t.array(t.number),
+  b: t.array((t.string)
+  //...
+})
+type Schema = typeof schema
+```
+
+**Don't check static types of the data**, but we can check runtime types
+
+```ts
+type Column<T> = Array<T>;
+type Row<T> = Array<T>;
+
+// row-oriented
+type Data = Array<Row<any>>;
+// or column-oriented
+type Data = Array<Column<any>>;
+
+type Schema = Array<{ name: string; type: t.Type<unknown, unknown, unknown> }>;
+```
+
+For our main use-case, I guess, the most pragmatic choice is "Don't check static types of the data" and use row-oriented representation.
+
+### Alternative implementations
+
+**dataframe-js**
 
 ```js
 // From a dictionnary (Hash)
@@ -56,7 +128,7 @@ const df = new DataFrame(
 );
 ```
 
-### DataModel
+**DataModel**
 
 ```js
 const data = `Name,Miles_per_Gallon,Cylinders,Displacement,Horsepower,Weight_in_lbs,Acceleration,Year,Origin
@@ -110,7 +182,7 @@ const DataModel = muze.DataModel;
 const dm = new DataModel(data, schema);
 ```
 
-### Apache Arrow in JS
+**Apache Arrow in JS**
 
 ```js
 const fields = [
