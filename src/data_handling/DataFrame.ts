@@ -1,3 +1,5 @@
+import MultidimensionalDataset, { RawDataset } from "./multidimensional_dataset";
+
 // most likely we will get data in the following format
 // where type can be number/string/boolean
 const rawData = {
@@ -27,7 +29,7 @@ const rawData = {
 
 type Matrix<T> = T[][];
 
-type Schema<Name> = Array<{ name: Name; type?: any }>;
+type Schema<Name extends string> = Array<{ name: Name; type?: any }>;
 
 /**
  * We call third type Measure by tradition, in Pandas this valie is indeed measure - something numeric,
@@ -54,7 +56,7 @@ type PivotProps<Column, Row, Measure> =
       columnsMeasures: Measure[];
     };
 
-class DataFrame<Name = any> {
+class DataFrame<Name extends string = any> {
   private readonly data: Readonly<Matrix<any>>;
   private readonly schema: Readonly<Schema<Name>>;
 
@@ -70,16 +72,136 @@ class DataFrame<Name = any> {
     // should return GroupedDataFrame<Name - typeof columns + NewColumn>
     // new column type is DataFrame<typeof columns>
     // return new GroupedDataFrame(this.schema, this.data);
-    return this;
+    throw new Error("not implemented");
+  }
+
+  public transform(column: Name, cb: (columnValue: any) => any) {
+    throw new Error("not implemented");
   }
 
   public pivot<Column extends Name, Row extends Name, Cell extends Name>(prop: PivotProps<Column, Row, Cell>) {
     // return new PivotedDataFrame(this.schema, this.data);
-    return this;
-  }
 
-  public transform(column: Name, cb: (columnValue: any) => any) {
-    return this;
+    const lastInRow = "rowsMeasures" in prop ? prop.rows.length : prop.rows.length - 1;
+    const lastInColumn = "columnsMeasures" in prop ? prop.columns.length : prop.columns.length - 1;
+    let columnCounter = 0;
+    let rowCounter = 0;
+    const columnIndex: any = {};
+    const rowIndex: any = {};
+    const columns: string[][] = [];
+    const rows: string[][] = [];
+    const resultData: any[][] = [];
+
+    const nameToIndex = this.schema.reduce(
+      (acc, columnDefinition, index) => {
+        acc[columnDefinition.name] = index;
+        return acc;
+      },
+      {} as Record<Name, number>,
+    );
+
+    this.data.forEach(dataRow => {
+      let previousRow: any = rowIndex;
+      let previousColumn: any = columnIndex;
+
+      let currentRow: number = -1;
+      let currentColumn: number = -1;
+
+      const row: string[] = [];
+      const column: string[] = [];
+
+      prop.rows.forEach((dimension, i) => {
+        const dimensionValue = dataRow[nameToIndex[dimension]];
+        row.push(dimensionValue);
+        if (previousRow[dimensionValue] === undefined) {
+          if (i === lastInRow) {
+            previousRow[dimensionValue] = rowCounter;
+            rowCounter++;
+            rows.push(row);
+          } else {
+            previousRow[dimensionValue] = {};
+          }
+        }
+        if (i === lastInRow) {
+          currentRow = previousRow[dimensionValue];
+        }
+        previousRow = previousRow[dimensionValue];
+      });
+
+      prop.columns.forEach((dimension, i) => {
+        const dimensionValue = dataRow[nameToIndex[dimension]];
+        column.push(dimensionValue);
+        if (previousColumn[dimensionValue] === undefined) {
+          if (i === lastInColumn) {
+            previousColumn[dimensionValue] = columnCounter;
+            columnCounter++;
+            columns.push(column);
+          } else {
+            previousColumn[dimensionValue] = {};
+          }
+        }
+        if (i === lastInColumn) {
+          currentColumn = previousColumn[dimensionValue];
+        }
+        previousColumn = previousColumn[dimensionValue];
+      });
+
+      if ("rowsMeasures" in prop) {
+        prop.rowsMeasures.forEach(measure => {
+          if (previousRow[measure] === undefined) {
+            previousRow[measure] = rowCounter;
+            rowCounter++;
+            row.push(measure);
+            rows.push(row);
+          }
+          currentRow = previousRow[measure];
+          if (resultData[currentRow] === undefined) {
+            resultData[currentRow] = [];
+          }
+          resultData[currentRow][currentColumn] = dataRow[nameToIndex[measure]];
+        });
+      } else {
+        prop.columnsMeasures.forEach(measure => {
+          if (previousColumn[measure] === undefined) {
+            previousColumn[measure] = columnCounter;
+            columnCounter++;
+            column.push(measure);
+            columns.push(column);
+          }
+          currentColumn = previousColumn[measure];
+          if (resultData[currentRow] === undefined) {
+            resultData[currentRow] = [];
+          }
+          resultData[currentRow][currentColumn] = dataRow[nameToIndex[measure]];
+        });
+      }
+    });
+
+    return {
+      data: resultData,
+      columns,
+      rows,
+      rowDimensions: [...prop.rows, ...("rowsMeasures" in prop ? ["measure"] : [])].map(dimension => {
+        const schema = this.schema.find(schemaDimesion => schemaDimesion.name === dimension) || {
+          name: dimension,
+          type: "string",
+        };
+        return {
+          key: schema.name,
+          type: schema.type,
+        };
+      }),
+      columnDimensions: [...prop.columns, ...("columnsMeasures" in prop ? ["measure"] : [])].map(dimension => {
+        const schema = this.schema.find(schemaDimesion => schemaDimesion.name === dimension) || {
+          name: dimension,
+          type: "string",
+        };
+        return {
+          key: schema.name,
+          type: schema.type,
+        };
+      }),
+    } as RawDataset<any>;
   }
 }
 
@@ -89,6 +211,12 @@ class DataFrame<Name = any> {
 // Lazyly evaluates pivot
 // class PivotedDataFrame extends DataFrame {}
 
-export const test = new DataFrame(rawData.columns, rawData.rows);
+export const frame = new DataFrame(rawData.columns, rawData.rows);
 
-test.groupBy(["Date.Month", "Customer.country"], "as");
+// const result = frame.pivot({
+//   columns: ["Date.Month"],
+//   rows: ["Customer.country", "Customer.province"],
+//   columnsMeasures: ["cost"],
+// });
+
+// console.log(new MultidimensionalDataset(result));

@@ -50,7 +50,8 @@ we want to have a nice DX, so TS will infer type of data from schema. The challe
 **Schema** - describes names of the columns and types. We need types to:
 
 1. validate shape of the input (minor reason)
-2. differentiate numeric vs categorical values. We need this to decide if we can use aggregation function, like sum or average, for this value or not. The question is do we need type or we can differentiate measures vs dimensions.
+2. differentiate numeric vs categorical values. We need this to decide if we can use aggregation function, like sum or average, for this value or not. The question is do we need type or differentiation measures vs dimensions is enough.
+3. detect which [scale function](https://github.com/d3/d3-scale) to use
 
 **Row as an object**, Data as a list of Rows - easy to type, the most expensive representation
 
@@ -112,6 +113,28 @@ type Schema = Array<{ name: string; type: t.Type<unknown, unknown, unknown> }>;
 ```
 
 For our main use-case, I guess, the most pragmatic choice is "Don't check static types of the data" and use row-oriented representation.
+
+**Don't check static types of the input data**, instead check it at runtime and provide static types for all sub-functions based on schema
+
+Use schema to provide types and use some additional config to map input to schema, so schema and shape of the data could be independent (in all previous tasks this wasn't a case).
+
+```ts
+import * as t from "io-ts";
+const schema = t.type({
+  a: t.array(t.number),
+  b: t.array((t.string)
+  //...
+})
+type Schema = typeof schema
+
+type Data = ... // any representation + some config to map input data to schema
+
+// for example
+class DataFrame<Schema = any> {
+  constructor(schema: Schema<Name>, data: ..., config: ...)
+  public transform<Name, T>(column: Name, cb: (columnValue: Pick<Schema, Name>) => T);
+}
+```
 
 ### Alternative implementations
 
