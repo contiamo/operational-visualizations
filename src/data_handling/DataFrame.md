@@ -242,3 +242,15 @@ const rainfall = arrow.Table.from({
   ],
 });
 ```
+
+## `pivot`
+
+Main difference in our implementation compared to other implementations we don't provide aggragate behaviour by default, because our implementation serves as medium for visualisation and cell values can contain DataFrames instead of numbers. Typical implementation uses aggregate function to collapse multiple values in one value, where is we preserve what we have in a cell. If you need (for some reason) to collapse sub-values (for example DataFrame) into single value you can use `transform` (aka `map`).
+
+For example, in pandas if you do `pivot_table` and there are duplicate values for indexes it will simply use `mean` (average) for `values` (measure, what goes into cells of the table). To customise it you can use `aggfunc` param (`aggfunc=np.sum`).
+
+We don't accept aggregate function for now, instead we check that there are no duplicate rows with the same indexes. It means that we need to use `groupBy` before `pivot` if we have any duplicates.
+
+## `groupBy`
+
+Main difference in our implementation compared to other implementations we don't provide aggragate behaviour by default, because our implementation serves as medium for visualisation and cell values can contain DataFrames instead of numbers. Typical implementation uses aggregate function to collapse multiple values in one value, where is we preserve what we have in a cell. If you need (for some reason) to collapse sub-values (for example DataFrame) into single value you can use `transform` (aka `map`).
