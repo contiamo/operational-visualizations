@@ -134,7 +134,6 @@ export default class DataFrame<Name extends string = any> {
           if (previousRow[measure] === undefined) {
             previousRow[measure] = rowCounter;
             rowCounter++;
-            row.push(measure);
             rows.push(row);
           }
           currentRow = previousRow[measure];
@@ -151,7 +150,6 @@ export default class DataFrame<Name extends string = any> {
           if (previousColumn[measure] === undefined) {
             previousColumn[measure] = columnCounter;
             columnCounter++;
-            column.push(measure);
             columns.push(column);
           }
           currentColumn = previousColumn[measure];
@@ -170,27 +168,15 @@ export default class DataFrame<Name extends string = any> {
       data: resultData,
       columns,
       rows,
-      rowDimensions: [...prop.rows, ...("rowsMeasures" in prop ? ["measure"] : [])].map(dimension => {
-        const schema = this.schema.find(schemaDimesion => schemaDimesion.name === dimension) || {
-          name: dimension,
-          type: "string",
-          metadata: {
-            measures: ("rowsMeasures" in prop ? prop.rowsMeasures : []).map(name => ({ name })),
-          },
-        };
+      rowDimensions: prop.rows.map(dimension => {
+        const schema = this.schema.find(schemaDimesion => schemaDimesion.name === dimension)!;
         return {
           key: schema.name,
           type: schema.type,
         };
       }),
-      columnDimensions: [...prop.columns, ...("columnsMeasures" in prop ? ["measure"] : [])].map(dimension => {
-        const schema = this.schema.find(schemaDimesion => schemaDimesion.name === dimension) || {
-          name: dimension,
-          type: "string",
-          metadata: {
-            measures: ("columnsMeasures" in prop ? prop.columnsMeasures : []).map(name => ({ name })),
-          },
-        };
+      columnDimensions: prop.columns.map(dimension => {
+        const schema = this.schema.find(schemaDimesion => schemaDimesion.name === dimension)!;
         return {
           key: schema.name,
           type: schema.type,

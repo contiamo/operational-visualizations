@@ -158,7 +158,7 @@ export const toTabular = <T>(dataset: Dataset<T> | RawDataset<T>) => {
       }
       for (let measureIndex = 0; measureIndex < measures.length; measureIndex++) {
         data[rowIndex + supRowIndex * height][raw.rows[0].length + measureIndex + raw.columns[0].length - 1] =
-          raw.data[rowIndex][measureIndex + supRowIndex];
+          raw.data[rowIndex][measureIndex + supRowIndex * measures.length];
       }
     }
   }
