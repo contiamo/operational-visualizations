@@ -172,7 +172,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
   });
 };
 
-export const title: string = "Custom cells";
+export const title: string = "Cell render prop with MDD";
 
 // Must match the file name so we can link to the code on GitHub
 export const slug = "table-4";

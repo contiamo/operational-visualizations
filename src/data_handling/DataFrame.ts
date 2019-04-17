@@ -1,34 +1,12 @@
-import MultidimensionalDataset, { RawDataset } from "./multidimensional_dataset";
+/**
+ * TODO:
+ * - add tests
+ * - consider implementing lazy versions of pivot and groupBy
+ */
+import { RawDataset } from "./multidimensional_dataset";
 
-// most likely we will get data in the following format
-// where type can be number/string/boolean
-const rawData = {
-  columns: [
-    { name: "Date.Month" as "Date.Month", type: "string" },
-    { name: "Customer.country" as "Customer.country", type: "string" },
-    { name: "Customer.province" as "Customer.province", type: "string" },
-    { name: "cost" as "cost", type: "number" },
-  ],
-  rows: [
-    ["April", "Canada", "BC", 3398.3977],
-    ["April", "Mexico", "DF", 2633.8854],
-    ["April", "Mexico", "Guerrero", 1084.7106],
-    ["April", "Mexico", "Jalisco", 108.2924],
-    ["April", "Mexico", "Mexico", 777.3468],
-    ["April", "Mexico", "Sinaloa", 743.2736],
-    ["April", "Mexico", "Veracruz", 1398.1592],
-    ["April", "Mexico", "Yucatan", 2474.3939],
-    ["April", "Mexico", "Zacatecas", 5856.6422],
-    ["April", "USA", "CA", 4868.3913],
-  ],
-};
-
-// task:
-// 1. convert this representation to pivot table (multi-index), so we can support simple table for the Grid: groupBy -> pivot -> transform
-// 2. conver this representation to the form suitable for the visualisation src/website/TestCases/Grid/table-4.tsx: groupBy -> pivot -> transform(toObjectList)
-
-const immutableSet = <T>(arr: T[], index: number, val: T) => {
-  if (index < arr.length) {
+const immutableReplace = <T>(arr: T[], index: number, val: T) => {
+  if (index < arr.length && index >= 0) {
     return [...arr.slice(0, index), val, ...arr.slice(index + 1)];
   } else {
     throw new Error("Out of bound");
@@ -64,7 +42,7 @@ type PivotProps<Column, Row, Measure> =
       columnsMeasures: Measure[];
     };
 
-class DataFrame<Name extends string = any> {
+export default class DataFrame<Name extends string = any> {
   private readonly data: Readonly<Matrix<any>>;
   private readonly schema: Readonly<Schema<Name>>;
 
@@ -74,8 +52,6 @@ class DataFrame<Name extends string = any> {
   }
 
   public pivot<Column extends Name, Row extends Name, Cell extends Name>(prop: PivotProps<Column, Row, Cell>) {
-    // return new PivotedDataFrame(this.schema, this.data);
-
     // check if the input params are valid
     const rowDimensions = "rowsMeasures" in prop ? prop.rows.length + prop.rowsMeasures.length : prop.rows.length;
     const columnDimensions =
@@ -198,6 +174,9 @@ class DataFrame<Name extends string = any> {
         const schema = this.schema.find(schemaDimesion => schemaDimesion.name === dimension) || {
           name: dimension,
           type: "string",
+          metadata: {
+            measures: ("rowsMeasures" in prop ? prop.rowsMeasures : []).map(name => ({ name })),
+          },
         };
         return {
           key: schema.name,
@@ -208,6 +187,9 @@ class DataFrame<Name extends string = any> {
         const schema = this.schema.find(schemaDimesion => schemaDimesion.name === dimension) || {
           name: dimension,
           type: "string",
+          metadata: {
+            measures: ("columnsMeasures" in prop ? prop.columnsMeasures : []).map(name => ({ name })),
+          },
         };
         return {
           key: schema.name,
@@ -221,10 +203,6 @@ class DataFrame<Name extends string = any> {
     columns: Column[],
     newColumn: NewColumn = "aggregate" as NewColumn,
   ) {
-    // should return GroupedDataFrame<Name - typeof columns + NewColumn>
-    // new column type is DataFrame<typeof columns>
-    // return new GroupedDataFrame(this.schema, this.data);
-
     // check if the input params are valid
     if (columns.length < 1) {
       throw new Error("Please provide at least one column to group by");
@@ -304,7 +282,7 @@ class DataFrame<Name extends string = any> {
       throw new Error(`Unknown column ${column}`);
     }
 
-    const newSchema = immutableSet(this.schema, columnIndex, {
+    const newSchema = immutableReplace(this.schema, columnIndex, {
       name: column,
       type: newType || this.schema[columnIndex].type,
     });
@@ -312,25 +290,36 @@ class DataFrame<Name extends string = any> {
     // column oriented implementation for this function would be way better
     return new DataFrame(
       newSchema,
-      this.data.map(dataRow => immutableSet(dataRow, columnIndex, cb(dataRow[columnIndex]))),
+      this.data.map(dataRow => {
+        const x = immutableReplace(dataRow, columnIndex, cb(dataRow[columnIndex]));
+        return x;
+      }),
+    );
+  }
+
+  public forEach(columns: Name | Name[], cb: (...columnValue: any[]) => void) {
+    if (!Array.isArray(columns)) {
+      columns = [columns];
+    }
+
+    const columnsIndex = columns.map(column => this.schema.findIndex(x => x.name === column));
+    if (columnsIndex.some(x => x < 0)) {
+      throw new Error(`Unknown column in ${columns}`);
+    }
+    this.data.forEach(dataRow => cb(...columnsIndex.map(columnIndex => dataRow[columnIndex])));
+  }
+
+  // we need this function for semiotic
+  public toRecordList() {
+    const columns = this.schema.map(x => x.name);
+    return this.data.map(dataRow =>
+      columns.reduce(
+        (result, column, i) => {
+          result[column] = dataRow[i];
+          return result;
+        },
+        {} as Record<Name, any>,
+      ),
     );
   }
 }
-
-// Lazyly evaluates group by
-// class GroupedDataFrame extends DataFrame {}
-
-// Lazyly evaluates pivot
-// class PivotedDataFrame extends DataFrame {}
-
-export const frame = new DataFrame(rawData.columns, rawData.rows);
-
-// const result = frame.pivot({
-//   columns: ["Date.Month"],
-//   rows: ["Customer.country", "Customer.province"],
-//   columnsMeasures: ["cost"],
-// });
-
-// console.log(new MultidimensionalDataset(result));
-
-// console.log(JSON.stringify(frame.groupBy(["Customer.country"]), null, 2));
