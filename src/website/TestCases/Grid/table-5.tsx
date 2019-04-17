@@ -103,25 +103,23 @@ const frameProps = {
   margin: { left: padding, bottom: padding, right: padding, top: padding },
 };
 
-// TODO: Grid needs to accept render prop for axes
-// import { scaleLinear } from "d3-scale";
-// import { Axis } from 'semiotic';
-//  <Axis
-//    size={[0, 1000]}
-//    scale={scaleLinear().domain([ 10, 1000 ]).range([ width, height ])}
-//    orient={'left'}
-// />
+import { scaleLinear } from "d3-scale";
+// @ts-ignore
+import { Axis } from "semiotic";
 
 export const marathon = ({ test, container }: MarathonEnvironment) => {
   test("Column measures", () => {
     const data = new MultidimensionalDataset(
       frame
-        .groupBy(["Customer.Continent", "Customer.Country", "Customer.City", "Customer.AgeGroup", "Customer.Gender"])
-        .transform("aggregate", (x: DataFrame) => x.toRecordList())
+        .groupBy(
+          ["Customer.Continent", "Customer.Country", "Customer.City", "Customer.AgeGroup", "Customer.Gender"],
+          "newCol",
+        )
+        .transform("newCol", (x: DataFrame) => x.toRecordList())
         .pivot({
           rows: ["Customer.Continent", "Customer.Country", "Customer.City"],
           columns: ["Customer.AgeGroup", "Customer.Gender"],
-          columnsMeasures: ["aggregate"],
+          columnsMeasures: ["newCol"],
         }),
     );
 
@@ -136,11 +134,40 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
         },
       },
     });
+
+    // ugliest implementation full of magic numbers
+    const axisWidth = 45;
+    const y1Axis = {
+      margins: ``,
+      width: axisWidth,
+      draw: (i: number) => (
+        <svg
+          key={i}
+          width={axisWidth}
+          height={100 + padding * 2}
+          viewBox={`-25 -${padding} ${axisWidth - 25} ${100 + 2 * padding}`}
+          style={{ overflow: "hidden", marginBottom: "-3px" }}
+        >
+          <Axis
+            size={[axisWidth, 100]}
+            ticks={4}
+            scale={scaleLinear()
+              .domain([max, 0])
+              .range([0, 100])}
+            orient="left"
+          />
+        </svg>
+      ),
+    };
+    const axes = {
+      y1: Array.from({ length: 8 }).map(_ => y1Axis),
+    };
+
     ReactDOM.render(
       <div style={{ display: "inline-block" }}>
         <Grid
           data={data}
-          axes={{}}
+          axes={axes}
           accessors={accessors}
           cell={({ cell, width, height }) => (
             <OrdinalFrame

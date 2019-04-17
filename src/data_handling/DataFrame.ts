@@ -2,6 +2,7 @@
  * TODO:
  * - add tests
  * - consider implementing lazy versions of pivot and groupBy
+ * - see if we can improve static types
  */
 import { RawDataset } from "./multidimensional_dataset";
 
@@ -18,10 +19,9 @@ type Matrix<T> = T[][];
 type Schema<Name extends string> = Array<{ name: Name; type?: any }>;
 
 /**
- * We call third type Measure by tradition, in Pandas this valie is indeed measure - something numeric,
+ * We call third type Measure by tradition, in Pandas this value is indeed measure - something numeric,
  * but in our case this can be a column with DataFrame (after groupBy).
  * Measure is what goes inside of cells in Pivot table.
- * If we have more than one Measure, names of measures will "form a virtual dimension".
  * Because of the way how Pivot table is constructed measures can go either to rows or to columns, not in both.
  *
  * +----------------+
@@ -51,6 +51,12 @@ export default class DataFrame<Name extends string = any> {
     this.data = data;
   }
 
+  /**
+   * current implementation doesn't take columnsMeasures/rowsMeasures into account,
+   * which is fine if we have one measure with one value,
+   * e.g. if we use like this .groupBy([a, b], c).pivot({rows: [a], columns: [b], columnsMeasures: [c] })
+   * but this is wrong in general case
+   */
   public pivot<Column extends Name, Row extends Name, Cell extends Name>(prop: PivotProps<Column, Row, Cell>) {
     // check if the input params are valid
     const rowDimensions = "rowsMeasures" in prop ? prop.rows.length + prop.rowsMeasures.length : prop.rows.length;
@@ -196,10 +202,10 @@ export default class DataFrame<Name extends string = any> {
     if (columns.includes(newColumn as any)) {
       throw new Error(`There is duplicate name in columns and newColumn: ${newColumn}`);
     }
-    const falttenSchema = this.schema.map(x => x.name);
-    const unkonwnColumn = columns.find(x => !falttenSchema.includes(x));
-    if (unkonwnColumn) {
-      throw new Error(`Unknown column ${unkonwnColumn}`);
+    const flattenSchema = this.schema.map(x => x.name);
+    const unknownColumn = columns.find(x => !flattenSchema.includes(x));
+    if (unknownColumn) {
+      throw new Error(`Unknown column ${unknownColumn}`);
     }
 
     // actual code
