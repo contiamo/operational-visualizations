@@ -5,6 +5,8 @@
  * - see if we can improve static types
  */
 import { RawDataset } from "./multidimensional_dataset";
+import { PivotFrame } from "./PivotFrame";
+import { IteratableFrame, Matrix, MddPivotProps, PivotProps, Schema } from "./types";
 
 const immutableReplace = <T>(arr: T[], index: number, val: T) => {
   if (index < arr.length && index >= 0) {
@@ -14,37 +16,9 @@ const immutableReplace = <T>(arr: T[], index: number, val: T) => {
   }
 };
 
-type Matrix<T> = T[][];
-
-type Schema<Name extends string> = Array<{ name: Name; type?: any }>;
-
-/**
- * We call third type Measure by tradition, in Pandas this value is indeed measure - something numeric,
- * but in our case this can be a column with DataFrame (after groupBy).
- * Measure is what goes inside of cells in Pivot table.
- * Because of the way how Pivot table is constructed measures can go either to rows or to columns, not in both.
- *
- * +----------------+
- * |      | Columns |
- * +----------------+
- * | Rows | Measure |
- * +----------------+
- */
-type PivotProps<Column, Row, Measure> =
-  | {
-      rows: Row[];
-      columns: Column[];
-      rowsMeasures: Measure[];
-    }
-  | {
-      rows: Row[];
-      columns: Column[];
-      columnsMeasures: Measure[];
-    };
-
-export default class DataFrame<Name extends string = any> {
+export default class DataFrame<Name extends string = string> implements IteratableFrame<Name> {
   private readonly data: Readonly<Matrix<any>>;
-  private readonly schema: Readonly<Schema<Name>>;
+  public readonly schema: Readonly<Schema<Name>>;
 
   constructor(schema: Schema<Name>, data: Matrix<any>) {
     this.schema = schema;
@@ -52,12 +26,14 @@ export default class DataFrame<Name extends string = any> {
   }
 
   /**
+   * mdd stands for MultidimensionalDataset. This function meant to be used with MultidimensionalDataset.
+   *
    * current implementation doesn't take columnsMeasures/rowsMeasures into account,
    * which is fine if we have one measure with one value,
-   * e.g. if we use like this .groupBy([a, b], c).pivot({rows: [a], columns: [b], columnsMeasures: [c] })
+   * e.g. if we use like this .groupBy([a, b], c).mdd({rows: [a], columns: [b], columnsMeasures: [c] })
    * but this is wrong in general case
    */
-  public pivot<Column extends Name, Row extends Name, Cell extends Name>(prop: PivotProps<Column, Row, Cell>) {
+  public mdd<Column extends Name, Row extends Name, Cell extends Name>(prop: MddPivotProps<Column, Row, Cell>) {
     // check if the input params are valid
     const rowDimensions = "rowsMeasures" in prop ? prop.rows.length + prop.rowsMeasures.length : prop.rows.length;
     const columnDimensions =
@@ -313,5 +289,19 @@ export default class DataFrame<Name extends string = any> {
         {} as Record<Name, any>,
       ),
     );
+  }
+
+  // TODO add explanation
+  public pivot<Column extends Name, Row extends Name>(prop: PivotProps<Column, Row>) {
+    // check if the input params are valid
+    const rowDimensions = prop.rows.length;
+    const columnDimensions = prop.columns.length;
+    if (rowDimensions === 0) {
+      throw new Error("Please provide at least one row or rowDimension");
+    }
+    if (columnDimensions === 0) {
+      throw new Error("Please provide at least one column or columnDimension");
+    }
+    return new PivotFrame(this.schema, this.data, prop);
   }
 }

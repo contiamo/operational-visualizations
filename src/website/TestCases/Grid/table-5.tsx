@@ -116,7 +116,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
           "newCol",
         )
         .transform("newCol", (x: DataFrame) => x.toRecordList())
-        .pivot({
+        .mdd({
           rows: ["Customer.Continent", "Customer.Country", "Customer.City"],
           columns: ["Customer.AgeGroup", "Customer.Gender"],
           columnsMeasures: ["newCol"],
