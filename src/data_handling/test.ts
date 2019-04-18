@@ -78,14 +78,6 @@ export const pivot = frame.pivot({
 
 // console.log(pivot.rows());
 // console.log(pivot.columns());
-// console.log(
-//   JSON.stringify(
-//     pivot
-//       .rows()
-//       .map(row => pivot.row(row))
-//       .map(x => getQuantitiveStats(x)),
-//     null,
-//     2,
-//   ),
-// );
+// console.log(pivot.rows().map(row => pivot.row(row)));
 // console.log(pivot.columns().map(column => pivot.column(column)));
+// console.log(getQuantitiveStats(pivot.row(pivot.rows()[0])));

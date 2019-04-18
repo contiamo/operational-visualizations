@@ -17,8 +17,8 @@ export const getQuantitiveStats = <Name extends string>(
     let min: number[] = [];
     frame.forEach(quantitiveColumns, (...values) => {
       if (max.length === 0) {
-        max = values;
-        min = values;
+        max = [...values];
+        min = [...values];
       } else {
         values.forEach((value, i) => {
           max[i] = Math.max(value, max[i]);
