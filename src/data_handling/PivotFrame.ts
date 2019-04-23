@@ -57,6 +57,7 @@ export class PivotFrame<Name extends string = string> {
 
   public cell(rowIdentifier: Name[], columnIdentifier: Name[]) {
     this.buildIndex();
+
     let row = this.rowIndex;
     rowIdentifier.forEach(i => {
       row = row[i];
