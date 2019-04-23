@@ -1,6 +1,8 @@
 import { FragmentFrame } from "./FragmentFrame";
 import { Matrix, PivotProps, Schema } from "./types";
 
+const intersect = <T>(...arr: T[][]): T[] => arr.reduce((prev, curr) => prev.filter(x => curr.includes(x)));
+
 export class PivotFrame<Name extends string = string> {
   private readonly data: Readonly<Matrix<any>>;
   private readonly schema: Readonly<Schema<Name>>;
@@ -17,40 +19,62 @@ export class PivotFrame<Name extends string = string> {
     this.prop = prop;
   }
 
-  public rows() {
+  public rowsIndex() {
     this.buildIndex();
     return this.rowsCache;
   }
 
-  public columns() {
+  public columnsIndex() {
     this.buildIndex();
     return this.columnsCache;
   }
 
   public row(rowIdentifier: Name[]) {
     this.buildIndex();
-    let previous = this.rowIndex;
+    let row = this.rowIndex;
     rowIdentifier.forEach(i => {
-      previous = previous[i];
-      if (previous === undefined) {
+      row = row[i];
+      if (row === undefined) {
         throw new Error(`no row for index: ${rowIdentifier}`);
       }
     });
 
-    return new FragmentFrame(this.schema, this.data, previous as number[]);
+    return new FragmentFrame(this.schema, this.data, row as number[]);
   }
 
   public column(columnIdentifier: Name[]) {
     this.buildIndex();
-    let previous = this.columnIndex;
+    let column = this.columnIndex;
     columnIdentifier.forEach(i => {
-      previous = previous[i];
-      if (previous === undefined) {
+      column = column[i];
+      if (column === undefined) {
         throw new Error(`no column for index: ${columnIdentifier}`);
       }
     });
 
-    return new FragmentFrame(this.schema, this.data, previous as number[]);
+    return new FragmentFrame(this.schema, this.data, column as number[]);
+  }
+
+  public cell(rowIdentifier: Name[], columnIdentifier: Name[]) {
+    this.buildIndex();
+    let row = this.rowIndex;
+    rowIdentifier.forEach(i => {
+      row = row[i];
+      if (row === undefined) {
+        throw new Error(`no row for index: ${rowIdentifier}`);
+      }
+    });
+
+    let column = this.columnIndex;
+    columnIdentifier.forEach(i => {
+      column = column[i];
+      if (column === undefined) {
+        throw new Error(`no column for index: ${columnIdentifier}`);
+      }
+    });
+
+    const cell = intersect(row as number[], column as number[]);
+    return new FragmentFrame(this.schema, this.data, cell);
   }
 
   private buildIndex() {
