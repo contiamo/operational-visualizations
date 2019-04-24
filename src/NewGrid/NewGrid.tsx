@@ -10,13 +10,6 @@ interface Props<Name extends string = string> {
   cell: (data: FragmentFrame<Name>) => React.ReactNode;
 }
 
-/**
- * TODO:
- * - support axis render prop, like in the old grid
- * - show names of dimensions, like in the old grid
- * - support multi-measures case, like in the old grid. This needs changes in PivotedFrame as well
- * - do we need all of old style accessors?
- */
 export function NewGrid<Name extends string = string>({ width, height, data, cell }: Props<Name>) {
   /**
    *        Columns

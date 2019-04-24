@@ -1,0 +1,31 @@
+# Considerations
+
+- do we want to support accessors for the NewGrid (the same way as Grid does)
+  - it is very extensible mechanism on the one side, but it is overkill from the other side
+- we need to support table display
+  - for general table display we would need some kind of aggregation or we can pick first row from the set, because we have pre-aggregated data from the server
+  - we can provide default render prop for cell, to pick current measure from frame
+    - this means that we need to differentiate measures from dimensions and we need to pass "coordinates" (row/column values) to the render prop
+  - we need to support multi-measures table
+    - this would require to support multi-measures in pivot frame
+      - but for charts display we need raw data without grouping or aggregation
+- we need to support chart dispaly
+  - we need to support render prop for the cell, to be able to render charts instead of text in cells
+  - we need to support render prop for axis, to be able to render one axis per row or column, to save space and remove noise
+    - do we want to support bottom/right axis? They can be hidden by the scroll
+    - render props probably need to get data about whole row/column to calculate statisitics for axis
+      - for categorical data we would need all unique values across the row or column
+    - render props may need to access whole data frame to calculate statisitics for axis
+      - for numerical data we would need to calculate scale across the whole frame
+- It would be nice to support virtual scrolling
+  - it would be hard to support headers with colspan, rowspan (at least in `react-window`)
+    - instead we can render blank cells for adjacent headers with same values
+      - but this way if content of the cell is bigger, it will not be able to stretch even if there is a place for it in adjacent blank cells
+      - value always will be aligned to the left and top (or right or bottom), but we would not be able to center values across "pseudo-spaned" cels
+  - it should be possible to do variable size headers with [`react-virtualised`](https://bvaughn.github.io/react-virtualized/#/components/Collection)
+- it would be nice to support fixed header, so they always would be visible even if the user scrolled the view
+  - we can have scrolls across two axis - it means that column headers would fixed vertically, but would be scrollable horizontally and vice versa for row headers
+  - we would need to fix position of white square in the top left corner, so that row- and column-headers would not slide over each other
+  - it seems, if we would use [`react-window`](https://codesandbox.io/s/0mk3qwpl4l), we would always render all headers, even not visible ones
+  - should work out of the box for [`react-virtualized`](https://bvaughn.github.io/react-virtualized/#/components/MultiGrid)
+- it would be nice to support flipping (vertical/horizontal direction of wiriting) of labels in headers to save some space
