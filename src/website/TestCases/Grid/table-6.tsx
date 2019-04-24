@@ -77,12 +77,12 @@ const frame = new DataFrame(rawData.columns, rawData.rows);
 
 export const marathon = ({ test, container }: MarathonEnvironment) => {
   test("Column measures", () => {
-    const data = frame.pivot({
+    const pivotedFrame = frame.pivot({
       rows: ["Customer.Continent", "Customer.Country", "Customer.City"],
       columns: ["Customer.AgeGroup", "Customer.Gender"],
     });
     ReactDOM.render(
-      <NewGrid data={data} cell={d => `${getQuantitiveStats(d).sum.sales}`} width={500} height={500} />,
+      <NewGrid width={500} height={500} data={pivotedFrame} measures={["sales", "revenue"]} />,
       container,
     );
   });

@@ -23,4 +23,15 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
 
     this.index.forEach(i => cb(...columnsIndex.map(columnIndex => this.data[i][columnIndex])));
   }
+
+  public peak(column: Name) {
+    const columnIndex = this.schema.findIndex(x => x.name === column);
+    if (columnIndex < 0) {
+      throw new Error(`Unknown column ${column}`);
+    }
+    if (this.index.length < 0 && this.index.length > 1) {
+      throw new Error(`Only frame with exactly one row are good for peak`);
+    }
+    return this.data[this.index[0]][columnIndex];
+  }
 }
