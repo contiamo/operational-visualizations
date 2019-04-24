@@ -15,6 +15,11 @@ type Props<Name extends string = string> = {
   width: number;
   height: number;
   data: PivotFrame<Name>;
+  cellStyle?: React.CSSProperties;
+  axes?: {
+    row?: (row: Name[]) => React.ReactNode;
+    column?: (column: Name[]) => React.ReactNode;
+  };
 } & (
   | {
       measures: Name[];
@@ -22,14 +27,13 @@ type Props<Name extends string = string> = {
       cell?: (prop: { data: FragmentFrame<Name>; measure: Name }) => React.ReactNode;
     }
   | {
-      measures: never;
-      measuresPlacement: never;
       cell: (prop: { data: FragmentFrame<Name> }) => React.ReactNode;
     });
 
 export function NewGrid<Name extends string = string>(props: Props<Name>) {
-  const { width, height, data } = props;
+  const { width, height, data, cellStyle } = props;
   const cell = props.cell || tableCell;
+  const axes = props.axes || {};
   const measures = "measures" in props ? props.measures : [];
   const measuresPlacement = ("measures" in props ? props.measuresPlacement : undefined) || "column";
 
@@ -52,7 +56,6 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
    *  columnCount = [[a,d],[a,f],[s,g],[s,h]].count + [q,s].count
    *  rowCount = [[q,e],[q,r],[w,t],[w,y]].count + [a,d].count
    */
-
   const measuresMultiplier = measures.length === 0 ? 1 : measures.length;
   const rowHeadersCount =
     (data.rowsIndex()[0] || []).length + (measuresPlacement === "row" && measuresMultiplier > 1 ? 1 : 0);
@@ -126,14 +129,14 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
       } else {
         // data cells
         item = cell({
-          data: data.cell(data.rowsIndex()[columnIndexReal], data.columnsIndex()[columnIndexReal]),
+          data: data.cell(data.rowsIndex()[rowIndexReal], data.columnsIndex()[columnIndexReal]),
           measure: measures[measuresIndex],
         });
       }
 
-      return <div style={{ padding: "10px", ...border, ...style }}>{item}</div>;
+      return <div style={{ ...cellStyle, ...border, ...style }}>{item}</div>;
     },
-    [data, measuresMultiplier, rowHeadersCount, columnHeadersCount, cell, ...measures],
+    [data, cellStyle, measuresMultiplier, rowHeadersCount, columnHeadersCount, cell, ...measures],
   );
 
   return (

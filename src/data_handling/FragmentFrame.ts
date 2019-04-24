@@ -24,6 +24,7 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
     this.index.forEach(i => cb(...columnsIndex.map(columnIndex => this.data[i][columnIndex])));
   }
 
+  // we need this function for table display
   public peak(column: Name) {
     const columnIndex = this.schema.findIndex(x => x.name === column);
     if (columnIndex < 0) {
@@ -33,5 +34,20 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
       throw new Error(`Only frame with exactly one row are good for peak`);
     }
     return this.data[this.index[0]][columnIndex];
+  }
+
+  // we need this function for semiotic
+  public toRecordList() {
+    const columns = this.schema.map((x, index) => ({ ...x, index })).filter(x => x.type === "number");
+    return this.index.map(rowNumber => {
+      const dataRow = this.data[rowNumber];
+      return columns.reduce(
+        (result, column, i) => {
+          result[column.name] = dataRow[column.index];
+          return result;
+        },
+        {} as Record<Name, any>,
+      );
+    });
   }
 }

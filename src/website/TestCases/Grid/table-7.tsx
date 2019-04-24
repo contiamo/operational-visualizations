@@ -74,26 +74,94 @@ const rawData = {
 
 const frame = new DataFrame(rawData.columns, rawData.rows);
 
+import { getQuantitiveStats } from "./../../../data_handling/stats";
+
+const stats = getQuantitiveStats(frame);
+const max: number = Math.max(stats.max.revenue, stats.max.sales);
+const range = [0, max!];
+
+// @ts-ignore
+import OrdinalFrame from "semiotic/lib/OrdinalFrame";
+
+const color = ["#ac58e5", "#9fd0cb", "#E0488B"];
+
+const padding = 0;
+
+const frameProps = {
+  type: "clusterbar",
+  rExtent: range,
+  // using simplified color assigner function, instead it should be consistent across the graphs
+  style: ({ rIndex }: { rIndex: number; rName: string }) => ({ fill: color[rIndex], stroke: "white" }),
+  margin: { left: padding, bottom: padding, right: padding, top: padding },
+};
+
+// import { scaleLinear } from "d3-scale";
+// // @ts-ignore
+// import { Axis } from "semiotic";
+
 export const marathon = ({ test, container }: MarathonEnvironment) => {
   test("Column measures", () => {
     const pivotedFrame = frame.pivot({
       rows: ["Customer.Continent", "Customer.Country", "Customer.City"],
       columns: ["Customer.AgeGroup", "Customer.Gender"],
     });
+
+    // ugliest implementation full of magic numbers
+    // const axisWidth = 45;
+    // const y1Axis = {
+    //   margins: ``,
+    //   width: axisWidth,
+    //   draw: (i: number) => (
+    //     <svg
+    //       key={i}
+    //       width={axisWidth}
+    //       height={100 + padding * 2}
+    //       viewBox={`-25 -${padding} ${axisWidth - 25} ${100 + 2 * padding}`}
+    //       style={{ overflow: "hidden", marginBottom: "-3px" }}
+    //     >
+    //       <Axis
+    //         size={[axisWidth, 100]}
+    //         ticks={4}
+    //         scale={scaleLinear()
+    //           .domain([max, 0])
+    //           .range([0, 100])}
+    //         orient="left"
+    //       />
+    //     </svg>
+    //   ),
+    // };
+    // const axes = {
+    //   y1: Array.from({ length: 8 }).map(_ => y1Axis),
+    // };
+
     ReactDOM.render(
-      <NewGrid
-        width={500}
-        height={500}
-        data={pivotedFrame}
-        measures={["sales", "revenue"]}
-        cellStyle={{ padding: "10px" }}
-      />,
+      <div style={{ display: "inline-block" }}>
+        <NewGrid
+          width={500}
+          height={500}
+          data={pivotedFrame}
+          cellStyle={{ padding: "10px 10px 0 10px" }}
+          cell={({ data }: any) => {
+            const width = 80,
+              height = 90;
+            const cell = data.toRecordList();
+            return (
+              <OrdinalFrame
+                {...frameProps}
+                data={cell}
+                size={[width, height]}
+                rAccessor={Object.keys((cell as any)[0])}
+              />
+            );
+          }}
+        />
+      </div>,
       container,
     );
   });
 };
 
-export const title: string = "New Grid";
+export const title: string = "New Grid with chart";
 
 // Must match the file name so we can link to the code on GitHub
-export const slug = "table-6";
+export const slug = "table-7";

@@ -75,25 +75,20 @@ const rawData = {
   ],
 };
 
-const padding = 5;
-
 const frame = new DataFrame(rawData.columns, rawData.rows);
 
-// TODO implement this functionality in DataFrameStats
-let max: number;
+import { getQuantitiveStats } from "./../../../data_handling/stats";
 
-frame.forEach(["sales", "revenue"], (sales, revenue) => {
-  if (max === undefined) {
-    max = sales;
-  }
-  max = Math.max(sales, revenue, max);
-});
+const stats = getQuantitiveStats(frame);
+const max: number = Math.max(stats.max.revenue, stats.max.sales);
+const range = [0, max!];
 
 // @ts-ignore
 import OrdinalFrame from "semiotic/lib/OrdinalFrame";
 
 const color = ["#ac58e5", "#9fd0cb", "#E0488B"];
-const range = [0, max!];
+
+const padding = 5;
 
 const frameProps = {
   type: "clusterbar",
