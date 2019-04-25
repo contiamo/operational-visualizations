@@ -4,7 +4,7 @@ export type Schema<Name extends string> = Array<{ name: Name; type?: any }>;
 
 export interface IteratableFrame<Name extends string> {
   forEach(columns: Name[], cb: (...values: any[]) => void): void;
-  schema: Schema<Name>;
+  readonly schema: Schema<Name>;
 }
 
 export interface PivotProps<Column, Row> {

@@ -58,9 +58,13 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
    */
   const measuresMultiplier = measures.length === 0 ? 1 : measures.length;
   const rowHeadersCount =
-    (data.rowsIndex()[0] || []).length + (measuresPlacement === "row" && measuresMultiplier > 1 ? 1 : 0);
+    (data.rowsIndex()[0] || []).length +
+    (measuresPlacement === "row" && measuresMultiplier > 1 ? 1 : 0) +
+    (axes.row ? 1 : 0);
   const columnHeadersCount =
-    (data.columnsIndex()[0] || []).length + (measuresPlacement === "column" && measuresMultiplier > 1 ? 1 : 0);
+    (data.columnsIndex()[0] || []).length +
+    (measuresPlacement === "column" && measuresMultiplier > 1 ? 1 : 0) +
+    (axes.column ? 1 : 0);
   const columnCount =
     rowHeadersCount + data.columnsIndex().length * (measuresPlacement === "column" ? measuresMultiplier : 1);
   const rowCount =
@@ -97,8 +101,12 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
         const dimension = data.rowsIndex()[rowIndexReal][columnIndex];
         const prevRow = data.rowsIndex()[rowIndexReal - 1];
         if (!dimension) {
-          // measure dimension
-          item = measures[measuresIndex];
+          if (axes.row && columnIndex === rowHeadersCount - 1) {
+            item = axes.row(data.rowsIndex()[rowIndexReal]);
+          } else {
+            // measure dimension
+            item = measures[measuresIndex];
+          }
         } else if (
           (prevRow && prevRow[columnIndex] === dimension) ||
           (measuresIndex > 0 && measuresPlacement === "row")
@@ -114,8 +122,12 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
         const dimension = data.columnsIndex()[columnIndexReal][rowIndex];
         const prevColumn = data.columnsIndex()[columnIndexReal - 1];
         if (!dimension) {
-          // measure dimension
-          item = measures[measuresIndex];
+          if (axes.column && rowIndex === columnHeadersCount - 1) {
+            item = axes.column(data.columnsIndex()[columnIndexReal]);
+          } else {
+            // measure dimension
+            item = measures[measuresIndex];
+          }
         } else if (
           (prevColumn && prevColumn[rowIndex] === dimension) ||
           (measuresIndex > 0 && measuresPlacement === "column")

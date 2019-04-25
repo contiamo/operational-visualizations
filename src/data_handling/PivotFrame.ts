@@ -4,8 +4,8 @@ import { Matrix, PivotProps, Schema } from "./types";
 const intersect = <T>(...arr: T[][]): T[] => arr.reduce((prev, curr) => prev.filter(x => curr.includes(x)));
 
 export class PivotFrame<Name extends string = string> {
-  private readonly data: Readonly<Matrix<any>>;
-  private readonly schema: Readonly<Schema<Name>>;
+  private readonly data: Matrix<any>;
+  private readonly schema: Schema<Name>;
   private readonly prop: PivotProps<Name, Name>;
 
   private columnIndex!: Record<Name, any>;

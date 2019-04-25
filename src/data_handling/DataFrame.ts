@@ -17,8 +17,8 @@ const immutableReplace = <T>(arr: T[], index: number, val: T) => {
 };
 
 export default class DataFrame<Name extends string = string> implements IteratableFrame<Name> {
-  private readonly data: Readonly<Matrix<any>>;
-  public readonly schema: Readonly<Schema<Name>>;
+  private readonly data: Matrix<any>;
+  public readonly schema: Schema<Name>;
 
   constructor(schema: Schema<Name>, data: Matrix<any>) {
     this.schema = schema;

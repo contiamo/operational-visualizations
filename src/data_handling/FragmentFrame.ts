@@ -1,8 +1,8 @@
 import { IteratableFrame, Matrix, Schema } from "./types";
 
 export class FragmentFrame<Name extends string = string> implements IteratableFrame<Name> {
-  private readonly data: Readonly<Matrix<any>>;
-  public readonly schema: Readonly<Schema<Name>>;
+  private readonly data: Matrix<any>;
+  public readonly schema: Schema<Name>;
   private readonly index: number[];
 
   constructor(schema: Schema<Name>, data: Matrix<any>, index: number[]) {
@@ -42,7 +42,7 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
     return this.index.map(rowNumber => {
       const dataRow = this.data[rowNumber];
       return columns.reduce(
-        (result, column, i) => {
+        (result, column) => {
           result[column.name] = dataRow[column.index];
           return result;
         },
