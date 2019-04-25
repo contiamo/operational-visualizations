@@ -8,10 +8,10 @@ export class PivotFrame<Name extends string = string> {
   private readonly schema: Schema<Name>;
   private readonly prop: PivotProps<Name, Name>;
 
-  private columnIndex!: Record<Name, any>;
-  private rowIndex!: Record<Name, any>;
-  private rowsCache!: Name[][];
-  private columnsCache!: Name[][];
+  private columnIndex!: Record<string, any>;
+  private rowIndex!: Record<string, any>;
+  private rowsCache!: string[][];
+  private columnsCache!: string[][];
 
   constructor(schema: Schema<Name>, data: Matrix<any>, prop: PivotProps<Name, Name>) {
     this.schema = schema;
@@ -55,7 +55,7 @@ export class PivotFrame<Name extends string = string> {
     return new FragmentFrame(this.schema, this.data, column as number[]);
   }
 
-  public cell(rowIdentifier: Name[], columnIdentifier: Name[]) {
+  public cell(rowIdentifier: string[], columnIdentifier: string[]) {
     this.buildIndex();
 
     let row = this.rowIndex;

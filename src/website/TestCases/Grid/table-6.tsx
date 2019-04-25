@@ -5,6 +5,8 @@ import { MarathonEnvironment } from "../../Marathon";
 import DataFrame from "../../../data_handling/DataFrame";
 import { NewGrid } from "../../../NewGrid/NewGrid";
 
+import AutoSizer from "react-virtualized-auto-sizer";
+
 const rawData = {
   columns: [
     {
@@ -81,13 +83,21 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
       columns: ["Customer.AgeGroup", "Customer.Gender"],
     });
     ReactDOM.render(
-      <NewGrid
-        width={500}
-        height={500}
-        data={pivotedFrame}
-        measures={["sales", "revenue"]}
-        cellStyle={{ padding: "10px" }}
-      />,
+      <AutoSizer style={{ width: "100%", minHeight: "450px", height: "100%" }}>
+        {({ width, height }) => (
+          <NewGrid
+            width={width}
+            height={height}
+            data={pivotedFrame}
+            measures={["sales", "revenue"]}
+            cellStyle={{ padding: "10px" }}
+            accessors={{
+              height: () => 35,
+              width: param => ("rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : 100),
+            }}
+          />
+        )}
+      </AutoSizer>,
       container,
     );
   });

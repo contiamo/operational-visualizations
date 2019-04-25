@@ -5,6 +5,8 @@ import { MarathonEnvironment } from "../../Marathon";
 import DataFrame from "../../../data_handling/DataFrame";
 import { NewGrid } from "../../../NewGrid/NewGrid";
 
+import AutoSizer from "react-virtualized-auto-sizer";
+
 const rawData = {
   columns: [
     {
@@ -108,11 +110,11 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
 
     // ugliest implementation full of magic numbers
     const axisWidth = 45;
-    const y1Axis = () => (
+    const rowAxis = () => (
       <svg
         width={axisWidth}
         height={80}
-        viewBox={`-25 -${padding} ${axisWidth - 25} ${80}`}
+        viewBox={`-25 0 ${axisWidth - 25} 80`}
         style={{ overflow: "hidden", marginBottom: "-3px" }}
       >
         <Axis
@@ -126,32 +128,36 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
       </svg>
     );
     const axes = {
-      row: y1Axis,
+      row: rowAxis,
     };
 
     ReactDOM.render(
-      <div style={{ display: "inline-block" }}>
-        <NewGrid
-          width={500}
-          height={500}
-          axes={axes}
-          data={pivotedFrame}
-          cellStyle={{ padding: "10px" }}
-          cell={({ data }: any) => {
-            const width = 80,
-              height = 80;
-            const cell = data.toRecordList();
-            return (
-              <OrdinalFrame
-                {...frameProps}
-                data={cell}
-                size={[width, height]}
-                rAccessor={Object.keys((cell as any)[0])}
-              />
-            );
-          }}
-        />
-      </div>,
+      <AutoSizer style={{ width: "100%", minHeight: "450px", height: "100%" }}>
+        {({ width, height }) => (
+          <NewGrid
+            width={width}
+            height={height}
+            axes={axes}
+            data={pivotedFrame}
+            cellStyle={{ padding: "10px" }}
+            accessors={{
+              height: param => ("columnIndex" in param || ("measure" in param && param.measure === true) ? 35 : 100),
+              width: param => ("rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : 100),
+            }}
+            cell={({ data }: any) => {
+              const cell = data.toRecordList();
+              return (
+                <OrdinalFrame
+                  {...frameProps}
+                  data={cell}
+                  size={[/* width */ 80, /* height */ 80]}
+                  rAccessor={Object.keys((cell as any)[0])}
+                />
+              );
+            }}
+          />
+        )}
+      </AutoSizer>,
       container,
     );
   });

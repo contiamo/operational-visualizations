@@ -2,6 +2,8 @@ import React from "react";
 import { GridChildComponentProps, VariableSizeGrid } from "react-window";
 import { FragmentFrame } from "../data_handling/FragmentFrame";
 import { PivotFrame } from "../data_handling/PivotFrame";
+import { coordinateToHeightParam, coordinateToWidthParam, exhaustiveCheck, indexToCoordinate } from "./coordinateUitls";
+import { HeightParam, WidthParam } from "./types";
 
 // Default cell render prop for table display
 const tableCell = <Name extends string = string>({ data, measure }: { data: FragmentFrame<Name>; measure: Name }) =>
@@ -17,8 +19,12 @@ type Props<Name extends string = string> = {
   data: PivotFrame<Name>;
   cellStyle?: React.CSSProperties;
   axes?: {
-    row?: (row: Name[]) => React.ReactNode;
-    column?: (column: Name[]) => React.ReactNode;
+    row?: (row: string[]) => React.ReactNode;
+    column?: (column: string[]) => React.ReactNode;
+  };
+  accessors?: {
+    width?: (p: WidthParam<Name>) => number;
+    height?: (p: HeightParam<Name>) => number;
   };
 } & (
   | {
@@ -34,28 +40,10 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
   const { width, height, data, cellStyle } = props;
   const cell = props.cell || tableCell;
   const axes = props.axes || {};
+  const accessors = props.accessors || {};
   const measures = "measures" in props ? props.measures : [];
   const measuresPlacement = ("measures" in props ? props.measuresPlacement : undefined) || "column";
 
-  /**
-   *        Columns
-   *       +---+---+
-   *       |a|a|s|s|
-   *       +-------+
-   *       |d|f|g|h|
-   *   +-----------+
-   *   |q|e|       |
-   *   |-+-+       |
-   *  R|q|r|       |
-   *  o+---+       |
-   *  w|q|t|       |
-   *  s|-+-+       |
-   *   |q|y|       |
-   *   +-----------+
-   *
-   *  columnCount = [[a,d],[a,f],[s,g],[s,h]].count + [q,s].count
-   *  rowCount = [[q,e],[q,r],[w,t],[w,y]].count + [a,d].count
-   */
   const measuresMultiplier = measures.length === 0 ? 1 : measures.length;
   const rowHeadersCount =
     (data.rowsIndex()[0] || []).length +
@@ -70,85 +58,81 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
   const rowCount =
     columnHeadersCount + data.rowsIndex().length * (measuresPlacement === "row" ? measuresMultiplier : 1);
 
+  const indexToCoordinateMemoised = React.useMemo(
+    () =>
+      indexToCoordinate({
+        rowHeadersCount,
+        measuresPlacement,
+        columnHeadersCount,
+        measuresMultiplier,
+        data,
+        axes,
+        measures,
+      }),
+    [rowHeadersCount, measuresPlacement, columnHeadersCount, measuresMultiplier, data, axes, measures],
+  );
+
   // Cell is repsonsible for rendering all kind of cells: dimensions, measure deimensions, data.
   // Because from the Grid point of view they all the same.
   // We use some math to differentiate what is what based on idexes.
   const Cell = React.useMemo(
     () => ({ columnIndex, rowIndex, style }: GridChildComponentProps) => {
+      const cellCoordinates = indexToCoordinateMemoised({ columnIndex, rowIndex });
+
       let border: React.CSSProperties = {
         borderTop: borderStyle,
         borderLeft: borderStyle,
         background: "#fff",
       };
+      let item: React.ReactNode = null;
 
-      const columnIndexReal = Math.floor(
-        (columnIndex - rowHeadersCount) / (measuresPlacement === "column" ? measuresMultiplier : 1),
-      );
-      const rowIndexReal = Math.floor(
-        (rowIndex - columnHeadersCount) / (measuresPlacement === "row" ? measuresMultiplier : 1),
-      );
-      const measuresIndex =
-        (measuresPlacement === "column" ? columnIndex - rowHeadersCount : rowIndex - columnHeadersCount) %
-        measuresMultiplier;
-
-      let item: React.ReactNode;
-      if (columnIndex < rowHeadersCount && rowIndex < columnHeadersCount) {
-        // empty cells in the left top corner
-        item = null;
-        border = {};
-      } else if (columnIndex < rowHeadersCount) {
-        // row headers
-        const dimension = data.rowsIndex()[rowIndexReal][columnIndex];
-        const prevRow = data.rowsIndex()[rowIndexReal - 1];
-        if (!dimension) {
-          if (axes.row && columnIndex === rowHeadersCount - 1) {
-            item = axes.row(data.rowsIndex()[rowIndexReal]);
+      switch (cellCoordinates.type) {
+        case "Empty":
+          border = {};
+          break;
+        case "Cell":
+          item = cell({
+            data: data.cell(cellCoordinates.row, cellCoordinates.column),
+            measure: cellCoordinates.measure!,
+          });
+          break;
+        case "RowHeader":
+          if (cellCoordinates.empty) {
+            border = { borderLeft: borderStyle, background: "#fff" };
           } else {
-            // measure dimension
-            item = measures[measuresIndex];
+            item =
+              cellCoordinates.rowIndex !== undefined
+                ? cellCoordinates.row[cellCoordinates.rowIndex]
+                : cellCoordinates.measure;
           }
-        } else if (
-          (prevRow && prevRow[columnIndex] === dimension) ||
-          (measuresIndex > 0 && measuresPlacement === "row")
-        ) {
-          // previous cell is the same, so render blank cell
-          border = { borderLeft: borderStyle, background: "#fff" };
-          item = null;
-        } else {
-          item = `${dimension}`;
-        }
-      } else if (rowIndex < columnHeadersCount) {
-        // column headers
-        const dimension = data.columnsIndex()[columnIndexReal][rowIndex];
-        const prevColumn = data.columnsIndex()[columnIndexReal - 1];
-        if (!dimension) {
-          if (axes.column && rowIndex === columnHeadersCount - 1) {
-            item = axes.column(data.columnsIndex()[columnIndexReal]);
+          break;
+        case "ColumnHeader":
+          if (cellCoordinates.empty) {
+            border = { borderTop: borderStyle, background: "#fff" };
           } else {
-            // measure dimension
-            item = measures[measuresIndex];
+            item =
+              cellCoordinates.columnIndex !== undefined
+                ? cellCoordinates.column[cellCoordinates.columnIndex]
+                : cellCoordinates.measure;
           }
-        } else if (
-          (prevColumn && prevColumn[rowIndex] === dimension) ||
-          (measuresIndex > 0 && measuresPlacement === "column")
-        ) {
-          // previous cell is the same, so render blank cell
-          border = { borderTop: borderStyle, background: "#fff" };
-          item = null;
-        } else {
-          item = `${dimension}`;
-        }
-      } else {
-        // data cells
-        item = cell({
-          data: data.cell(data.rowsIndex()[rowIndexReal], data.columnsIndex()[columnIndexReal]),
-          measure: measures[measuresIndex],
-        });
+          break;
+        case "RowAxis":
+          if (axes.row) {
+            item = axes.row(cellCoordinates.row);
+          }
+          break;
+        case "ColumnAxis":
+          if (axes.column) {
+            item = axes.column(cellCoordinates.column);
+          }
+          break;
+        default:
+          exhaustiveCheck(cellCoordinates);
       }
 
       return <div style={{ ...cellStyle, ...border, ...style }}>{item}</div>;
     },
-    [data, cellStyle, measuresMultiplier, rowHeadersCount, columnHeadersCount, cell, ...measures],
+    [indexToCoordinateMemoised, data, cell],
   );
 
   return (
@@ -157,8 +141,14 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
       width={width}
       columnCount={columnCount}
       rowCount={rowCount}
-      rowHeight={() => 100}
-      columnWidth={() => 100}
+      rowHeight={rowIndex => {
+        const param = coordinateToHeightParam(indexToCoordinateMemoised({ rowIndex, columnIndex: 0 }));
+        return accessors.height ? accessors.height(param) : 100;
+      }}
+      columnWidth={columnIndex => {
+        const param = coordinateToWidthParam(indexToCoordinateMemoised({ rowIndex: 0, columnIndex }));
+        return accessors.width ? accessors.width(param) : 100;
+      }}
     >
       {Cell}
     </VariableSizeGrid>
