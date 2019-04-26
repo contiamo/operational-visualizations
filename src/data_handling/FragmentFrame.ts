@@ -37,8 +37,13 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
   }
 
   // we need this function for semiotic
-  public toRecordList() {
-    const columns = this.schema.map((x, index) => ({ ...x, index })).filter(x => x.type === "number");
+  public toRecordList(columnsFilter?: Name[]) {
+    let columns = this.schema.map((x, index) => ({ ...x, index }));
+    if (columnsFilter) {
+      columns = columns.filter(x => columnsFilter.includes(x.name));
+    } else {
+      columns.filter(x => x.type === "number");
+    }
     return this.index.map(rowNumber => {
       const dataRow = this.data[rowNumber];
       return columns.reduce(

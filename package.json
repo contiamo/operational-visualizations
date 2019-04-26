@@ -39,7 +39,6 @@
     "moment": "^2.21.0",
     "moment-range": "^3.1.1",
     "react": "^16.8.1",
-    "react-virtualized-auto-sizer": "^1.0.2",
     "react-window": "^1.8.1",
     "tinycolor2": "^1.4.1"
   },
@@ -68,7 +67,9 @@
     "@types/react-icons": "^2.2.2",
     "@types/react-virtualized-auto-sizer": "^1.0.0",
     "@types/react-window": "^1.8.0",
+    "@types/recharts": "^1.1.16",
     "@types/tinycolor2": "1.4.0",
+    "@types/victory": "^31.0.15",
     "@types/webpack-env": "^1.13.1",
     "awesome-typescript-loader": "^5.2.0",
     "babel-polyfill": "^6.26.0",
@@ -87,6 +88,8 @@
     "react-dom": "^16.8.1",
     "react-emotion": "^9.2.6",
     "react-test-renderer": "^16.8.1",
+    "react-virtualized-auto-sizer": "^1.0.2",
+    "recharts": "^1.5.0",
     "rimraf": "^2.6.2",
     "semiotic": "^1.19.6",
     "ts-jest": "^23.10.5",
@@ -94,6 +97,7 @@
     "tslint-config-airbnb": "5.8.0",
     "tslint-config-prettier": "1.12.0",
     "tslint-plugin-blank-line": "^0.0.8",
-    "typescript": "^3.0.1"
+    "typescript": "^3.0.1",
+    "victory": "^32.2.0"
   }
 }
