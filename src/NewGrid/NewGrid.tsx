@@ -30,10 +30,10 @@ type Props<Name extends string = string> = {
   | {
       measures: Name[];
       measuresPlacement?: "row" | "column";
-      cell?: (prop: { data: FragmentFrame<Name>; measure: Name }) => React.ReactNode;
+      cell?: (prop: { data: FragmentFrame<Name>; measure: Name; row: string[]; column: string[] }) => React.ReactNode;
     }
   | {
-      cell: (prop: { data: FragmentFrame<Name> }) => React.ReactNode;
+      cell: (prop: { data: FragmentFrame<Name>; row: string[]; column: string[] }) => React.ReactNode;
     });
 
 export function NewGrid<Name extends string = string>(props: Props<Name>) {
@@ -94,6 +94,8 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
           item = cell({
             data: data.cell(cellCoordinates.row, cellCoordinates.column),
             measure: cellCoordinates.measure!,
+            row: cellCoordinates.row,
+            column: cellCoordinates.column,
           });
           break;
         case "RowHeader":

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { MarathonEnvironment } from "../../Marathon";
 
@@ -76,6 +76,37 @@ const rawData = {
 
 const frame = new DataFrame(rawData.columns, rawData.rows);
 
+import { Accessors, ChartConfig, Data } from "../../../Chart/typings";
+import { Chart as ChartFacade, VisualizationWrapper } from "../../../index";
+
+const Chart: React.FC<{
+  data: Data;
+  config?: ChartConfig;
+  accessors?: Record<string, Accessors<any>>;
+}> = React.memo(({ data, accessors, config }) => (
+  <VisualizationWrapper facade={ChartFacade} data={data} accessors={accessors} config={config} />
+));
+
+import * as d3 from "d3";
+import { PivotFrame } from "../../../data_handling/PivotFrame";
+
+const Axis: React.FC<{ orientation?: "left"; scale: any; transform: string }> = React.memo(({ scale, transform }) => {
+  const ref = useRef<SVGGElement>(null);
+  useEffect(() => {
+    if (ref.current) {
+      const axis = d3.axisLeft(scale);
+      d3.select(ref.current).call(axis);
+    }
+  }, [ref, scale]);
+  return <g transform={transform} ref={ref} />;
+});
+
+const uniqueValues = <Name extends string>(row: string[], column: Name, pivotedFrame: PivotFrame<Name>): string[] => {
+  const set = new Set<string>();
+  pivotedFrame.row(row).forEach(column, x => set.add(x));
+  return [...set];
+};
+
 export const marathon = ({ test, container }: MarathonEnvironment) => {
   test("Column measures", () => {
     const pivotedFrame = frame.pivot({
@@ -84,8 +115,18 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
     });
 
     const axes = {
-      column: () => null,
-      row: () => null,
+      row: (row: string[]) => {
+        const cities = uniqueValues(row, "Customer.City", pivotedFrame);
+        const scale = d3
+          .scaleOrdinal()
+          .domain(cities)
+          .range(cities.map((_, i) => (cities.length - 1 - i) * 35 + 15));
+        return (
+          <svg width={100} height={85} viewBox="0 0 100 100" style={{ marginTop: 15 }}>
+            <Axis scale={scale} transform={"translate(90, 0)"} />
+          </svg>
+        );
+      },
     };
 
     ReactDOM.render(
@@ -97,14 +138,53 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
             height={height}
             axes={axes}
             data={pivotedFrame}
-            cellStyle={{ padding: "0px" }}
             accessors={{
-              height: param => ("columnIndex" in param || ("measure" in param && param.measure === true) ? 35 : 100),
+              height: param => {
+                // if ("row" in param) {
+                //   const cities = uniqueValues(param.row, "Customer.City", pivotedFrame);
+                //   return cities.length * 30 + 15;
+                // }
+                return "columnIndex" in param || ("measure" in param && param.measure === true) ? 35 : 100;
+              },
               width: param => ("rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : 100),
             }}
-            cell={({ data, measure }: any) => {
+            cell={({ data, measure, row }: any) => {
+              // const cell = data.toRecordListMap({ [measure]: "x", "Customer.City": "y" });
               const cell = data.toRecordList([measure, "Customer.City"]);
-              return JSON.stringify(cell);
+              const cities = uniqueValues(row, "Customer.City", pivotedFrame);
+              return (
+                <Chart
+                  config={
+                    {
+                      width: 100,
+                      height: 100,
+                      legend: false,
+                    } as any
+                  }
+                  data={{
+                    series: [
+                      {
+                        data: cell,
+                        name: "",
+                        key: "series1",
+                        renderAs: [{ type: "bars", accessors: { barWidth: () => 18 } }],
+                        datumAccessors: { x: (r: any) => r[measure], y: (r: any) => r["Customer.City"] },
+                      },
+                    ],
+                    axes: {
+                      x1: {
+                        type: "quant",
+                        hideAxis: true,
+                      },
+                      y1: {
+                        type: "categorical",
+                        values: cities,
+                        hideAxis: true,
+                      } as any,
+                    },
+                  }}
+                />
+              );
             }}
           />
         )}
@@ -114,7 +194,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
   });
 };
 
-export const title: string = "New Grid with ...";
+export const title: string = "New Grid with @operational/visualizations";
 
 // Must match the file name so we can link to the code on GitHub
 export const slug = "table-11";

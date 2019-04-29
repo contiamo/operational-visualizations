@@ -21,11 +21,11 @@ import { Data, ChartConfig, Accessors } from "@operational/visualizations/lib/Ch
 
 const Chart: React.FC<{
   data: Data;
-  config?: Partial<ChartConfig>;
+  config?: ChartConfig;
   accessors?: Record<string, Accessors<any>>;
-}> = ({ data, accessors, config }) => (
-  <VisualizationWrapper facade={ChartFacade} data={data} accessors={accessors || {}} config={config || {}} />
-);
+}> = React.memo(({ data, accessors, config }) => (
+  <VisualizationWrapper facade={ChartFacade} data={data} accessors={accessors} config={config} />
+));
 
 const data: Data = {
   series: [

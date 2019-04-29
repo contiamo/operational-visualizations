@@ -29,7 +29,7 @@ export class PivotFrame<Name extends string = string> {
     return this.columnsCache;
   }
 
-  public row(rowIdentifier: Name[]) {
+  public row(rowIdentifier: string[]) {
     this.buildIndex();
     let row = this.rowIndex;
     rowIdentifier.forEach(i => {
@@ -42,7 +42,7 @@ export class PivotFrame<Name extends string = string> {
     return new FragmentFrame(this.schema, this.data, row as number[]);
   }
 
-  public column(columnIdentifier: Name[]) {
+  public column(columnIdentifier: string[]) {
     this.buildIndex();
     let column = this.columnIndex;
     columnIdentifier.forEach(i => {
