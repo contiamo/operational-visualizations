@@ -2,8 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { MarathonEnvironment } from "../../Marathon";
 
-import DataFrame from "../../../data_handling/DataFrame";
 import MultidimensionalDataset from "../../../data_handling/multidimensional_dataset";
+import DataFrame from "../../../DataFrame/DataFrame";
 import Grid from "../../../Grid/Grid";
 import defaultGridConfig from "../../../Grid/gridConfig";
 import gridConfigToAccessors from "../../../Grid/gridConfigToAccessors";
@@ -77,7 +77,7 @@ const rawData = {
 
 const frame = new DataFrame(rawData.columns, rawData.rows);
 
-import { getQuantitiveStats } from "./../../../data_handling/stats";
+import { getQuantitiveStats } from "../../../DataFrame/stats";
 
 const stats = getQuantitiveStats(frame);
 const max: number = Math.max(stats.max.revenue, stats.max.sales);

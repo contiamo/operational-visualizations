@@ -1,4 +1,4 @@
-import { PivotFrame } from "../data_handling/PivotFrame";
+import { PivotFrame } from "../DataFrame/PivotFrame";
 import { CellCoordinates, HeightParam, WidthParam } from "./types";
 
 export const exhaustiveCheck = (_: never) => undefined;

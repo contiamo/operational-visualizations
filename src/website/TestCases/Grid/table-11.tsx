@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { MarathonEnvironment } from "../../Marathon";
 
-import DataFrame from "../../../data_handling/DataFrame";
+import DataFrame from "../../../DataFrame/DataFrame";
 import { NewGrid } from "../../../NewGrid/NewGrid";
 
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -88,7 +88,7 @@ const Chart: React.FC<{
 ));
 
 import * as d3 from "d3";
-import { PivotFrame } from "../../../data_handling/PivotFrame";
+import { PivotFrame } from "../../../DataFrame/PivotFrame";
 
 const Axis: React.FC<{ orientation?: "left"; scale: any; transform: string }> = React.memo(({ scale, transform }) => {
   const ref = useRef<SVGGElement>(null);

@@ -4,7 +4,7 @@
  * - consider implementing lazy versions of pivot and groupBy
  * - see if we can improve static types
  */
-import { RawDataset } from "./multidimensional_dataset";
+import { RawDataset } from "../data_handling/multidimensional_dataset";
 import { PivotFrame } from "./PivotFrame";
 import { IteratableFrame, Matrix, MddPivotProps, PivotProps, Schema } from "./types";
 

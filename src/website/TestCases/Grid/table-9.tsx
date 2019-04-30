@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { MarathonEnvironment } from "../../Marathon";
 
-import DataFrame from "../../../data_handling/DataFrame";
+import DataFrame from "../../../DataFrame/DataFrame";
 import { NewGrid } from "../../../NewGrid/NewGrid";
 
 import AutoSizer from "react-virtualized-auto-sizer";

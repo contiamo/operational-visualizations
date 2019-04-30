@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from "react";
 import { GridChildComponentProps, VariableSizeGrid } from "react-window";
-import { FragmentFrame } from "../data_handling/FragmentFrame";
-import { PivotFrame } from "../data_handling/PivotFrame";
+import { FragmentFrame } from "../DataFrame/FragmentFrame";
+import { PivotFrame } from "../DataFrame/PivotFrame";
 import { coordinateToHeightParam, coordinateToWidthParam, exhaustiveCheck, indexToCoordinate } from "./coordinateUitls";
 import { HeightParam, WidthParam } from "./types";
 
