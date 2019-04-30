@@ -39,6 +39,7 @@
     "moment": "^2.21.0",
     "moment-range": "^3.1.1",
     "react": "^16.8.1",
+    "react-window": "^1.8.1",
     "tinycolor2": "^1.4.1"
   },
   "devDependencies": {
@@ -64,6 +65,8 @@
     "@types/react": "^16.8.1",
     "@types/react-dom": "^16.8.1",
     "@types/react-icons": "^2.2.2",
+    "@types/react-virtualized-auto-sizer": "^1.0.0",
+    "@types/react-window": "^1.8.0",
     "@types/tinycolor2": "1.4.0",
     "@types/webpack-env": "^1.13.1",
     "awesome-typescript-loader": "^5.2.0",
@@ -83,6 +86,7 @@
     "react-dom": "^16.8.1",
     "react-emotion": "^9.2.6",
     "react-test-renderer": "^16.8.1",
+    "react-virtualized-auto-sizer": "^1.0.2",
     "rimraf": "^2.6.2",
     "ts-jest": "^23.10.5",
     "tslint": "^5.10.0",
