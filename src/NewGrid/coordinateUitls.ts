@@ -10,9 +10,10 @@ export type IndexToCoordinate = <Name extends string = string>(prop: {
   measuresMultiplier: number;
   data: PivotFrame<Name>;
   axes: {
-    row?: (row: string[]) => React.ReactNode;
-    column?: (column: string[]) => React.ReactNode;
+    row?: (_: { row: string[]; width: number; height: number }) => React.ReactNode;
+    column?: (_: { column: string[]; width: number; height: number }) => React.ReactNode;
   };
+
   measures: Name[];
 }) => (prop: { columnIndex: number; rowIndex: number }) => CellCoordinates<Name>;
 

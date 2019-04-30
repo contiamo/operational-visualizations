@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { GridChildComponentProps, VariableSizeGrid } from "react-window";
 import { FragmentFrame } from "../data_handling/FragmentFrame";
 import { PivotFrame } from "../data_handling/PivotFrame";
@@ -19,8 +19,8 @@ type Props<Name extends string = string> = {
   data: PivotFrame<Name>;
   cellStyle?: React.CSSProperties;
   axes?: {
-    row?: (row: string[]) => React.ReactNode;
-    column?: (column: string[]) => React.ReactNode;
+    row?: (_: { row: string[]; width: number; height: number }) => React.ReactNode;
+    column?: (_: { column: string[]; width: number; height: number }) => React.ReactNode;
   };
   accessors?: {
     width?: (p: WidthParam<Name>) => number;
@@ -30,14 +30,27 @@ type Props<Name extends string = string> = {
   | {
       measures: Name[];
       measuresPlacement?: "row" | "column";
-      cell?: (prop: { data: FragmentFrame<Name>; measure: Name; row: string[]; column: string[] }) => React.ReactNode;
+      cell?: (prop: {
+        data: FragmentFrame<Name>;
+        measure: Name;
+        row: string[];
+        column: string[];
+        width: number;
+        height: number;
+      }) => React.ReactNode;
     }
   | {
-      cell: (prop: { data: FragmentFrame<Name>; row: string[]; column: string[] }) => React.ReactNode;
+      cell: (prop: {
+        data: FragmentFrame<Name>;
+        row: string[];
+        column: string[];
+        width: number;
+        height: number;
+      }) => React.ReactNode;
     });
 
 export function NewGrid<Name extends string = string>(props: Props<Name>) {
-  const { width, height, data, cellStyle } = props;
+  const { data, cellStyle } = props;
   const cell = props.cell || tableCell;
   const axes = props.axes || {};
   const accessors = props.accessors || {};
@@ -58,7 +71,7 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
   const rowCount =
     columnHeadersCount + data.rowsIndex().length * (measuresPlacement === "row" ? measuresMultiplier : 1);
 
-  const indexToCoordinateMemoised = React.useMemo(
+  const indexToCoordinateMemoised = useMemo(
     () =>
       indexToCoordinate({
         rowHeadersCount,
@@ -75,7 +88,7 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
   // Cell is repsonsible for rendering all kind of cells: dimensions, measure deimensions, data.
   // Because from the Grid point of view they all the same.
   // We use some math to differentiate what is what based on idexes.
-  const Cell = React.useMemo(
+  const Cell = useMemo(
     () => ({ columnIndex, rowIndex, style }: GridChildComponentProps) => {
       const cellCoordinates = indexToCoordinateMemoised({ columnIndex, rowIndex });
 
@@ -85,6 +98,13 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
         background: "#fff",
       };
       let item: React.ReactNode = null;
+
+      const height = accessors.height
+        ? accessors.height(coordinateToHeightParam(indexToCoordinateMemoised({ rowIndex, columnIndex: 0 })))
+        : 100;
+      const width = accessors.width
+        ? accessors.width(coordinateToWidthParam(indexToCoordinateMemoised({ rowIndex: 0, columnIndex })))
+        : 100;
 
       switch (cellCoordinates.type) {
         case "Empty":
@@ -96,6 +116,8 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
             measure: cellCoordinates.measure!,
             row: cellCoordinates.row,
             column: cellCoordinates.column,
+            height,
+            width,
           });
           break;
         case "RowHeader":
@@ -120,12 +142,12 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
           break;
         case "RowAxis":
           if (axes.row) {
-            item = axes.row(cellCoordinates.row);
+            item = axes.row({ row: cellCoordinates.row, height, width });
           }
           break;
         case "ColumnAxis":
           if (axes.column) {
-            item = axes.column(cellCoordinates.column);
+            item = axes.column({ column: cellCoordinates.column, height, width });
           }
           break;
         default:
@@ -137,20 +159,30 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
     [indexToCoordinateMemoised, data, cell],
   );
 
+  const rowHeight = useCallback(
+    (rowIndex: number) => {
+      const param = coordinateToHeightParam(indexToCoordinateMemoised({ rowIndex, columnIndex: 0 }));
+      return accessors.height ? accessors.height(param) : 100;
+    },
+    [accessors.height, indexToCoordinateMemoised],
+  );
+
+  const columnWidth = useCallback(
+    (columnIndex: number) => {
+      const param = coordinateToWidthParam(indexToCoordinateMemoised({ rowIndex: 0, columnIndex }));
+      return accessors.width ? accessors.width(param) : 100;
+    },
+    [accessors.height, indexToCoordinateMemoised],
+  );
+
   return (
     <VariableSizeGrid
-      height={height}
-      width={width}
+      height={props.height}
+      width={props.width}
       columnCount={columnCount}
       rowCount={rowCount}
-      rowHeight={rowIndex => {
-        const param = coordinateToHeightParam(indexToCoordinateMemoised({ rowIndex, columnIndex: 0 }));
-        return accessors.height ? accessors.height(param) : 100;
-      }}
-      columnWidth={columnIndex => {
-        const param = coordinateToWidthParam(indexToCoordinateMemoised({ rowIndex: 0, columnIndex }));
-        return accessors.width ? accessors.width(param) : 100;
-      }}
+      rowHeight={rowHeight}
+      columnWidth={columnWidth}
     >
       {Cell}
     </VariableSizeGrid>

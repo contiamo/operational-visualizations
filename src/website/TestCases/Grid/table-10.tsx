@@ -97,7 +97,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
           <VictoryAxis scale={scale} />
         </VictoryChart>
       ),
-      row: (row: any) => {
+      row: ({ row }: any) => {
         const citiesSet = new Set<string>();
         pivotedFrame.row(row).forEach("Customer.City", x => citiesSet.add(x));
         const cities = [...citiesSet];

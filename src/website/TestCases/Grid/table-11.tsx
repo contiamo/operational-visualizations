@@ -115,14 +115,14 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
     });
 
     const axes = {
-      row: (row: string[]) => {
+      row: ({ row, width }: { row: string[]; width: number; height: number }) => {
         const cities = uniqueValues(row, "Customer.City", pivotedFrame);
         const scale = d3
           .scaleOrdinal()
           .domain(cities)
           .range(cities.map((_, i) => (cities.length - 1 - i) * 35 + 15));
         return (
-          <svg width={100} height={85} viewBox="0 0 100 100" style={{ marginTop: 15 }}>
+          <svg width={width} height={85} viewBox="0 0 100 100" style={{ marginTop: 15 }}>
             <Axis scale={scale} transform={"translate(90, 0)"} />
           </svg>
         );
@@ -131,33 +131,32 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
 
     ReactDOM.render(
       <AutoSizer style={{ width: "100%", minHeight: "450px", height: "100%" }}>
-        {({ width, height }) => (
+        {size => (
           <NewGrid
             measures={["sales", "revenue"]}
-            width={width}
-            height={height}
+            width={size.width}
+            height={size.height}
             axes={axes}
             data={pivotedFrame}
             accessors={{
               height: param => {
-                // if ("row" in param) {
-                //   const cities = uniqueValues(param.row, "Customer.City", pivotedFrame);
-                //   return cities.length * 30 + 15;
-                // }
+                if ("row" in param) {
+                  const cities = uniqueValues(param.row, "Customer.City", pivotedFrame);
+                  return cities.length * 30 + 15;
+                }
                 return "columnIndex" in param || ("measure" in param && param.measure === true) ? 35 : 100;
               },
               width: param => ("rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : 100),
             }}
-            cell={({ data, measure, row }: any) => {
-              // const cell = data.toRecordListMap({ [measure]: "x", "Customer.City": "y" });
+            cell={({ data, measure, row, width, height }: any) => {
               const cell = data.toRecordList([measure, "Customer.City"]);
               const cities = uniqueValues(row, "Customer.City", pivotedFrame);
               return (
                 <Chart
                   config={
                     {
-                      width: 100,
-                      height: 100,
+                      width,
+                      height,
                       legend: false,
                     } as any
                   }
