@@ -1,9 +1,3 @@
-/**
- * TODO:
- * - add tests
- * - consider implementing lazy versions of pivot and groupBy
- * - see if we can improve static types
- */
 import { PivotFrame } from "./PivotFrame";
 import { IteratableFrame, Matrix, PivotProps, Schema } from "./types";
 
@@ -28,7 +22,6 @@ export default class DataFrame<Name extends string = string> implements Iteratab
     this.data.forEach(dataRow => cb(...columnsIndex.map(columnIndex => dataRow[columnIndex])));
   }
 
-  // TODO add explanation
   public pivot<Column extends Name, Row extends Name>(prop: PivotProps<Column, Row>) {
     // check if the input params are valid
     const rowDimensions = prop.rows.length;
@@ -39,6 +32,7 @@ export default class DataFrame<Name extends string = string> implements Iteratab
     if (columnDimensions === 0) {
       throw new Error("Please provide at least one column or columnDimension");
     }
+
     return new PivotFrame(this.schema, this.data, prop);
   }
 }

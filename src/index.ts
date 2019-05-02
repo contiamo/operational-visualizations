@@ -20,3 +20,7 @@ export * from "./axis_utils/typings";
 export { AxesData, LegendDatum } from "./Chart/typings";
 export * from "./data_handling/multidimensional_dataset";
 export * from "./Grid/types";
+
+export * from "./DataFrame/types";
+export { default as DataFrame } from "./DataFrame/DataFrame";
+export * from "./NewGrid/NewGrid";
