@@ -90,11 +90,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
             height={height}
             data={pivotedFrame}
             measures={["sales", "revenue"]}
-            cellStyle={{ padding: "10px" }}
-            accessors={{
-              height: () => 35,
-              width: param => ("rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : 100),
-            }}
+            style={{ cell: { padding: "10px" } }}
           />
         )}
       </AutoSizer>,
@@ -106,4 +102,4 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
 export const title: string = "New Grid";
 
 // Must match the file name so we can link to the code on GitHub
-export const slug = "table-6";
+export const slug = "table-1";

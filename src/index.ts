@@ -14,13 +14,12 @@ export { default as computeTimeAxes } from "./axis_utils/compute_time_axes";
 export { default as MultidimensionalDataset } from "./data_handling/multidimensional_dataset";
 export { default as Grid } from "./Grid/Grid";
 export { default as gridConfigToAccessors } from "./Grid/gridConfigToAccessors";
+export { default as DataFrame } from "./DataFrame/DataFrame";
+export * from "./NewGrid/NewGrid";
 
 // Type exports
 export * from "./axis_utils/typings";
 export { AxesData, LegendDatum } from "./Chart/typings";
 export * from "./data_handling/multidimensional_dataset";
 export * from "./Grid/types";
-
 export * from "./DataFrame/types";
-export { default as DataFrame } from "./DataFrame/DataFrame";
-export * from "./NewGrid/NewGrid";

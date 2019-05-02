@@ -5,19 +5,28 @@ import { PivotFrame } from "../DataFrame/PivotFrame";
 import { coordinateToHeightParam, coordinateToWidthParam, exhaustiveCheck, indexToCoordinate } from "./coordinateUitls";
 import { HeightParam, WidthParam } from "./types";
 
-// Default cell render prop for table display
-const tableCell = <Name extends string = string>({ data, measure }: { data: FragmentFrame<Name>; measure: Name }) =>
+type Diff<T, U> = T extends U ? never : T;
+type Defined<T> = Diff<T, undefined>;
+
+// Optimisation for hooks, because {} !== {}
+const emptyObject = Object.freeze({});
+
+const defaultBorderStyle = "1px solid #e8e8e8";
+
+const defaultCell = <Name extends string = string>({ data, measure }: { data: FragmentFrame<Name>; measure: Name }) =>
   `${data.peak(measure)}`;
 
-// Default border style
-const borderStyle = "1px solid #e8e8e8";
+const defaultWidth = () => 120;
+const defaultHeight = () => 35;
 
-// this doesn't work as expected
 type Props<Name extends string = string> = {
   width: number;
   height: number;
   data: PivotFrame<Name>;
-  cellStyle?: React.CSSProperties;
+  style?: {
+    cell?: React.CSSProperties;
+    border?: string;
+  };
   axes?: {
     row?: (_: { row: string[]; width: number; height: number }) => React.ReactNode;
     column?: (_: { column: string[]; width: number; height: number }) => React.ReactNode;
@@ -54,10 +63,17 @@ type Props<Name extends string = string> = {
     });
 
 export function NewGrid<Name extends string = string>(props: Props<Name>) {
-  const { data, cellStyle } = props;
-  const cell = props.cell || tableCell;
-  const axes = props.axes || {};
-  const accessors = props.accessors || {};
+  const { data } = props;
+  const cell = props.cell || defaultCell;
+  const axes = props.axes || (emptyObject as Defined<Props<Name>["axes"]>);
+  const accessors = props.accessors || (emptyObject as Defined<Props<Name>["accessors"]>);
+  const heightAccessors = accessors.height || (defaultHeight as Defined<Defined<Props<Name>["accessors"]>["height"]>);
+  const widthAccessors = accessors.width || (defaultWidth as Defined<Defined<Props<Name>["accessors"]>["width"]>);
+
+  const styleProp = props.style || (emptyObject as Defined<Props<Name>["style"]>);
+  const borderStyle = styleProp.border || defaultBorderStyle;
+  const cellStyle = styleProp.cell || emptyObject;
+
   const measures = "measures" in props ? props.measures : [];
   const measuresPlacement = ("measures" in props ? props.measuresPlacement : undefined) || "column";
 
@@ -89,7 +105,19 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
     [rowHeadersCount, measuresPlacement, columnHeadersCount, measuresMultiplier, data, axes, measures],
   );
 
-  // Cell is repsonsible for rendering all kind of cells: dimensions, measure deimensions, data.
+  const rowHeight = useCallback(
+    (rowIndex: number) =>
+      heightAccessors(coordinateToHeightParam(indexToCoordinateMemoised({ rowIndex, columnIndex: 0 }))),
+    [heightAccessors, indexToCoordinateMemoised],
+  );
+
+  const columnWidth = useCallback(
+    (columnIndex: number) =>
+      widthAccessors(coordinateToWidthParam(indexToCoordinateMemoised({ rowIndex: 0, columnIndex }))),
+    [widthAccessors, indexToCoordinateMemoised],
+  );
+
+  // Cell is repsonsible for rendering all kind of cells: dimensions, measure deimensions, data, axes.
   // Because from the Grid point of view they all the same.
   // We use some math to differentiate what is what based on idexes.
   const Cell = useMemo(
@@ -103,12 +131,8 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
       };
       let item: React.ReactNode = null;
 
-      const height = accessors.height
-        ? accessors.height(coordinateToHeightParam(indexToCoordinateMemoised({ rowIndex, columnIndex: 0 })))
-        : 100;
-      const width = accessors.width
-        ? accessors.width(coordinateToWidthParam(indexToCoordinateMemoised({ rowIndex: 0, columnIndex })))
-        : 100;
+      const height = rowHeight(rowIndex);
+      const width = columnWidth(columnIndex);
 
       switch (cellCoordinates.type) {
         case "Empty":
@@ -160,23 +184,7 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
 
       return <div style={{ ...cellStyle, ...border, ...style }}>{item}</div>;
     },
-    [indexToCoordinateMemoised, data, cell],
-  );
-
-  const rowHeight = useCallback(
-    (rowIndex: number) => {
-      const param = coordinateToHeightParam(indexToCoordinateMemoised({ rowIndex, columnIndex: 0 }));
-      return accessors.height ? accessors.height(param) : 100;
-    },
-    [accessors.height, indexToCoordinateMemoised],
-  );
-
-  const columnWidth = useCallback(
-    (columnIndex: number) => {
-      const param = coordinateToWidthParam(indexToCoordinateMemoised({ rowIndex: 0, columnIndex }));
-      return accessors.width ? accessors.width(param) : 100;
-    },
-    [accessors.height, indexToCoordinateMemoised],
+    [indexToCoordinateMemoised, data, cell, borderStyle, cellStyle, rowHeight, columnWidth],
   );
 
   return (
