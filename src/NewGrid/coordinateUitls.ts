@@ -11,10 +11,12 @@ export type IndexToCoordinate = <Name extends string = string>(
     measuresMultiplier: number;
     data: PivotFrame<Name>;
     axes: {
-      row?: (_: { row: string[]; width: number; height: number }) => React.ReactNode;
-      column?: (_: { column: string[]; width: number; height: number }) => React.ReactNode;
+      // we don't care about exact types, we care if render props are present or not
+      // tslint:disable-next-line
+      row?: Function;
+      // tslint:disable-next-line
+      column?: Function;
     };
-
     measures: Name[];
   },
 ) => (prop: { columnIndex: number; rowIndex: number }) => CellCoordinates<Name>;
@@ -39,7 +41,6 @@ export const indexToCoordinate: IndexToCoordinate = ({
     measuresMultiplier;
 
   if (columnIndex < rowHeadersCount && rowIndex < columnHeadersCount) {
-    // one huge fizz buzz, need to fix this
     if (
       measuresPlacement === "column" &&
       measuresMultiplier > 1 &&
@@ -170,9 +171,8 @@ export const indexToCoordinate: IndexToCoordinate = ({
   }
 };
 
-// those functions (coordinateToWidthParam, coordinateToHeightParam) take into account 15 or more use-cases
-// but in reality we use only 7, because one of the coordinates is always 0 .e.g. first row or firs column
-// I nee to simplify it
+// Those functions (coordinateToWidthParam, coordinateToHeightParam) take into account 16 use cases
+// but for detecting width and Height we need only 8 use cases (4 for rows and 4 columns)
 
 export const coordinateToWidthParam = <Name extends string = string>(prop: CellCoordinates<Name>): WidthParam<Name> => {
   switch (prop.type) {
@@ -213,7 +213,7 @@ export const coordinateToWidthParam = <Name extends string = string>(prop: CellC
       }
     default:
       exhaustiveCheck(prop);
-      throw new Error("not exhaustive");
+      throw new Error("Not exhaustive");
   }
 };
 
@@ -258,6 +258,6 @@ export const coordinateToHeightParam = <Name extends string = string>(
       }
     default:
       exhaustiveCheck(prop);
-      throw new Error("not exhaustive");
+      throw new Error("Not exhaustive");
   }
 };

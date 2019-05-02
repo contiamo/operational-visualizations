@@ -131,7 +131,7 @@ const stats = {
 }
 ```
 
-For categorical data it needs collect uique values per rows/columns.
+For categorical data it needs collect unique values per rows/columns.
 
 ## stats module
 

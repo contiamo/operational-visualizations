@@ -1,33 +1,22 @@
 /*
+          {measure}+--+ +--+{axis}
+                      | |
+{rowIndex}+------+    | |    +-----+{column, measure}
+                 v    v v    v
+            +----+---++++----+---+
+            |        | | |Columns|
+            |        | | |       |
+            |        | | +-------+
+            |        | | |Measure|
+            |        | | +-------+
+            |        | | |Axis   |
+            +--------------------+
+            |Rows    |M|A|Cells  |
+            |        | | |       |
+            +--------+-+-+-------+
 
-                        Column
-             +-------+ +-+
-             |Columns| | | 0 ColumnIndex
-             |       | | |
-             |       | | | 1
-             |       | | |
-             |       | | | 2
-             +-------+ +-+
-             |Measure|
-             +-------+
-             |Axis   |
-+--------------------+
-|Rows    |M|A|Cells  |
-|        | | |       |
-|        | | |       |
-|        | | |       |
-|        | | |       |
-|        | | |       |
-|        | | |       |
-+--------+-+-+-------+
-
-+--------+
-|        | Row
-+--------+
- 0 1 2 3   RowIndex
-
+rowIndex - when we create PivotFrame, we provide rows for index, like ["A", "B", "C"]; rowIndex corresponds to this config - rowIndex 0 is for "A", rowIndex 1 is for "B" etc.
 */
-
 export type WidthParam<Name extends string = string> =
   | {
       // width of an empty cell or a row header
@@ -48,6 +37,21 @@ export type WidthParam<Name extends string = string> =
       measure?: Name;
     };
 
+/*
+               +--------------------+
+{columnIndex}  |            |Columns|
+               |            |       |
+               +--------------------+
+{measure}+---->+            |Measure|
+               +--------------------+
+{axis}+------->+            |Axis   |
+               +--------------------+
+{row, measure} |Rows    |M|A|Cells  |
+               |        | | |       |
+               +--------+-+-+-------+
+
+columnIndex - when we create PivotFrame, we provide columns for index, like ["X", "Y", "Z"]; columnIndex corresponds to this config - columnIndex 0 is for "X", columnIndex 1 is for "Y" etc.         
+*/
 export type HeightParam<Name extends string = string> =
   | {
       // height of an empty cell or a column header
@@ -68,6 +72,34 @@ export type HeightParam<Name extends string = string> =
       measure?: Name;
     };
 
+/*
+                                  ColumnHeader
+                                   +
+          +--------------------+   |
+Empty --->+            |Columns+<--+
+          |            |       |   |
+          |            |       |   |
+          |            |       |   |
+          |            |       |   |
+          |            +-------+   |
+          |            |Measure+<--+
+          |            +-------+
+          |            |Axis   +<--+ColumnAxis
+          +--------------------+
+          |Rows    |M|A|Cells  +<--+Cell
+          |        | | |       |
+          |        | | |       |
+          |        | | |       |
+          |        | | |       |
+          |        | | |       |
+          |        | | |       |
+          ++-------+++++-------+
+           ^        ^ ^
+           |        | |
+RowHeader -+--------+ |
+                      |
+RowAxis --------------+
+*/
 export type CellCoordinates<Name extends string = string> =
   | {
       type: "Empty";

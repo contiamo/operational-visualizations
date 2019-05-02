@@ -1,6 +1,9 @@
 # NewGrid
 
-TODO: rename to Grid after deleting previous version.
+TODO:
+
+- rename to Grid after deleting previous version.
+- add tests as soon as we finalise API
 
 This component is used to show pivot table. Cells can be simple text (classical pivot table) or charts, to do the trick it uses `cell` render prop, which will get Frame as param (as well as other params).
 
@@ -21,3 +24,5 @@ Grid expects `cell` render property, which will render content of cells. For tex
 `style.cell` - styles of cell, you can use it to provide padding for example
 
 `style.border` - style of border
+
+`measuresPlacement` - if we want to place measures in rows or columns. Defaults to column.
