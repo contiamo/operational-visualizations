@@ -27,10 +27,10 @@ export default class DataFrame<Name extends string = string> implements Iteratab
     const rowDimensions = prop.rows.length;
     const columnDimensions = prop.columns.length;
     if (rowDimensions === 0) {
-      throw new Error("Please provide at least one row or rowDimension");
+      throw new Error("Please provide at least one row");
     }
     if (columnDimensions === 0) {
-      throw new Error("Please provide at least one column or columnDimension");
+      throw new Error("Please provide at least one column");
     }
 
     return new PivotFrame(this.schema, this.data, prop);

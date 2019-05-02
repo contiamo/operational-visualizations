@@ -1,4 +1,6 @@
-/*
+// tslint:disable
+/**
+ * ```
           {measure}+--+ +--+{axis}
                       | |
 {rowIndex}+------+    | |    +-----+{column, measure}
@@ -14,10 +16,11 @@
             |Rows    |M|A|Cells  |
             |        | | |       |
             +--------+-+-+-------+
-
-rowIndex - when we create PivotFrame, we provide rows for index, like ["A", "B", "C"]; rowIndex corresponds to this config - rowIndex 0 is for "A", rowIndex 1 is for "B" etc.
-*/
+```
+  * `rowIndex` - when we create `PivotFrame`, we provide `rows` for index, like ["A", "B", "C"]; rowIndex corresponds to this config - `rowIndex` 0 is for "A", `rowIndex` 1 is for "B" etc.
+  */
 export type WidthParam<Name extends string = string> =
+  // tslint:enable
   | {
       // width of an empty cell or a row header
       // this can be row (dimension) name as well
@@ -37,7 +40,9 @@ export type WidthParam<Name extends string = string> =
       measure?: Name;
     };
 
-/*
+// tslint:disable
+/**
+ * ```
                +--------------------+
 {columnIndex}  |            |Columns|
                |            |       |
@@ -49,10 +54,12 @@ export type WidthParam<Name extends string = string> =
 {row, measure} |Rows    |M|A|Cells  |
                |        | | |       |
                +--------+-+-+-------+
-
-columnIndex - when we create PivotFrame, we provide columns for index, like ["X", "Y", "Z"]; columnIndex corresponds to this config - columnIndex 0 is for "X", columnIndex 1 is for "Y" etc.         
-*/
+```
+ *
+ * `columnIndex` - when we create `PivotFrame`, we provide `columns` for index, like ["X", "Y", "Z"]; columnIndex corresponds to this config - `columnIndex` 0 is for "X", `columnIndex` 1 is for "Y" etc.
+ */
 export type HeightParam<Name extends string = string> =
+  // tslint:enable
   | {
       // height of an empty cell or a column header
       // this can be column (dimension) name as well
@@ -72,7 +79,9 @@ export type HeightParam<Name extends string = string> =
       measure?: Name;
     };
 
-/*
+// tslint:disable
+/**
+ * ```
                                   ColumnHeader
                                    +
           +--------------------+   |
@@ -99,8 +108,10 @@ Empty --->+            |Columns+<--+
 RowHeader -+--------+ |
                       |
 RowAxis --------------+
-*/
+```
+  */
 export type CellCoordinates<Name extends string = string> =
+  // tslint:enable
   | {
       type: "Empty";
       columnIndex?: number;
