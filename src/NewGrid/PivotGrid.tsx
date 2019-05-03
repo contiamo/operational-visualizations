@@ -70,8 +70,6 @@ interface TextOnlyPivotGridProps<Name extends string> {
     prop: {
       data: FragmentFrame<Name>;
       measure: Name;
-      row: string[];
-      column: string[];
       width: number;
       height: number;
     },
@@ -86,8 +84,6 @@ interface GeneralPivotGridProps<Name extends string> {
   cell: (
     prop: {
       data: FragmentFrame<Name>;
-      row: string[];
-      column: string[];
       width: number;
       height: number;
     },
@@ -100,8 +96,8 @@ interface Accessors<Name extends string> {
 }
 
 interface Axes {
-  row?: (rowProps: { row: string[]; width: number; height: number }) => React.ReactNode;
-  column?: (columnProps: { column: string[]; width: number; height: number }) => React.ReactNode;
+  row?: (rowProps: { row: number; width: number; height: number }) => React.ReactNode;
+  column?: (columnProps: { column: number; width: number; height: number }) => React.ReactNode;
 }
 
 interface PivotGridStyle {
@@ -249,10 +245,8 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
           };
 
           item = cell({
-            data: data.cell(cellCoordinates.rowIndex, cellCoordinates.columnIndex),
+            data: data.cell(cellCoordinates.row, cellCoordinates.column),
             measure: cellCoordinates.measure!,
-            row: cellCoordinates.row,
-            column: cellCoordinates.column,
             height,
             width,
           });
@@ -263,7 +257,7 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
           } else {
             if (cellCoordinates.rowIndex !== undefined) {
               border = { ...headerStyle, ...border };
-              const value = cellCoordinates.row[cellCoordinates.rowIndex];
+              const value = cellCoordinates.label!;
               item = header({ value, height, width });
             } else {
               border = { ...headerStyle, ...dimensionStyle, ...border };
@@ -278,7 +272,7 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
           } else {
             if (cellCoordinates.columnIndex !== undefined) {
               border = { ...headerStyle, ...border };
-              const value = cellCoordinates.column[cellCoordinates.columnIndex];
+              const value = cellCoordinates.label!;
               item = header({ value, height, width });
             } else {
               border = { ...headerStyle, ...dimensionStyle, ...border };
@@ -339,4 +333,4 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
       </VariableSizeGrid>
     </div>
   );
-});
+}) as <Name extends string = string>(props: Props<Name>) => JSX.Element;

@@ -195,7 +195,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
     ) {
       return {
         type: "RowHeader",
-        row: data.rowHeaders()[rowIndexReal],
+        row: rowIndexReal,
         measure: data.getPivotRows()[rowDepth],
         empty: rowIndexReal > 0 || measuresIndex > 0,
       };
@@ -208,21 +208,22 @@ export const indexToCoordinate: IndexToCoordinate = ({
       if (axes.row && rowDepth === rowHeadersCount - 1) {
         return {
           type: "RowAxis",
-          row: data.rowHeaders()[rowIndexReal],
+          row: rowIndexReal,
           measure: measures[measuresIndex],
         };
       } else {
         // or with measure labels
         return {
           type: "RowHeader",
-          row: data.rowHeaders()[rowIndexReal],
+          row: rowIndexReal,
           measure: measures[measuresIndex],
         };
       }
     } else {
       return {
         type: "RowHeader",
-        row: data.rowHeaders()[rowIndexReal],
+        row: rowIndexReal,
+        label: data.rowHeaders()[rowIndexReal][rowDepth],
         measure: measures[measuresIndex],
         rowIndex: rowDepth,
         empty: (prevRow && prevRow[rowDepth] === dimension) || (measuresIndex > 0 && measuresPlacement === "row"),
@@ -243,7 +244,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
     ) {
       return {
         type: "ColumnHeader",
-        column: data.columnHeaders()[columnIndexReal],
+        column: columnIndexReal,
         measure: data.getPivotColumns()[columnDepth],
         empty: columnIndexReal > 0 || measuresIndex > 0,
       };
@@ -256,21 +257,22 @@ export const indexToCoordinate: IndexToCoordinate = ({
       if (axes.column && columnDepth === columnHeadersCount - 1) {
         return {
           type: "ColumnAxis",
-          column: data.columnHeaders()[columnIndexReal],
+          column: columnIndexReal,
           measure: measures[measuresIndex],
         };
       } else {
         // or with measure labels
         return {
           type: "ColumnHeader",
-          column: data.columnHeaders()[columnIndexReal],
+          column: columnIndexReal,
           measure: measures[measuresIndex],
         };
       }
     } else {
       return {
         type: "ColumnHeader",
-        column: data.columnHeaders()[columnIndexReal],
+        column: columnIndexReal,
+        label: data.columnHeaders()[columnIndexReal][columnDepth],
         measure: measures[measuresIndex],
         columnIndex: columnDepth,
         empty:
@@ -281,10 +283,8 @@ export const indexToCoordinate: IndexToCoordinate = ({
   } else {
     return {
       type: "Cell",
-      rowIndex: rowIndexReal,
-      columnIndex: columnIndexReal,
-      row: data.rowHeaders()[rowIndexReal],
-      column: data.columnHeaders()[columnIndexReal],
+      row: rowIndexReal,
+      column: columnIndexReal,
       measure: measures[measuresIndex],
     };
   }
@@ -321,7 +321,7 @@ export const coordinateToWidthParam = <Name extends string = string>(prop: CellC
         axis: true,
       };
     case "RowHeader":
-      if (prop.rowIndex) {
+      if (prop.rowIndex !== undefined) {
         return {
           rowIndex: prop.rowIndex,
         };
@@ -366,7 +366,7 @@ export const coordinateToHeightParam = <Name extends string = string>(
         axis: true,
       };
     case "ColumnHeader":
-      if (prop.columnIndex) {
+      if (prop.columnIndex !== undefined) {
         return {
           columnIndex: prop.columnIndex,
         };
