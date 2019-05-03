@@ -72,6 +72,8 @@ interface TextOnlyPivotGridProps<Name extends string> {
       measure: Name;
       width: number;
       height: number;
+      row: number;
+      column: number;
     },
   ) => React.ReactNode;
 }
@@ -86,6 +88,8 @@ interface GeneralPivotGridProps<Name extends string> {
       data: FragmentFrame<Name>;
       width: number;
       height: number;
+      row: number;
+      column: number;
     },
   ) => React.ReactNode;
 }
@@ -247,6 +251,8 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
           item = cell({
             data: data.cell(cellCoordinates.row, cellCoordinates.column),
             measure: cellCoordinates.measure!,
+            row: cellCoordinates.row,
+            column: cellCoordinates.column,
             height,
             width,
           });

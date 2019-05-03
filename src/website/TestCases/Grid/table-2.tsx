@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import ReactDOM from "react-dom";
 import { MarathonEnvironment } from "../../Marathon";
 
@@ -105,6 +105,7 @@ const Axis: React.FC<{ orientation?: "left"; scale: any; transform: string }> = 
   return <g transform={transform} ref={ref} />;
 });
 
+// TODO: move it to stats module
 const uniqueValues = <Name extends string>(row: number, column: Name, pivotedFrame: PivotFrame<Name>): string[] => {
   const set = new Set<string>();
   pivotedFrame.row(row).forEach(column, x => set.add(x));
@@ -120,11 +121,15 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
 
     const axes = {
       row: ({ row, width }: { row: number; width: number; height: number }) => {
-        const cities = uniqueValues(row, "Customer.City", pivotedFrame);
-        const scale = d3
-          .scaleOrdinal()
-          .domain(cities)
-          .range(cities.map((_, i) => (cities.length - 1 - i) * 35 + 15));
+        const cities = useMemo(() => uniqueValues(row, "Customer.City", pivotedFrame), [row]);
+        const scale = useMemo(
+          () =>
+            d3
+              .scaleOrdinal()
+              .domain(cities)
+              .range(cities.map((_, i) => (cities.length - 1 - i) * 35 + 15)),
+          [cities],
+        );
         return (
           <svg width={width} height={85} viewBox="0 0 100 100" style={{ marginTop: 15 }}>
             <Axis scale={scale} transform={"translate(90, 0)"} />
@@ -153,18 +158,20 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
               width: param => ("rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : 100),
             }}
             cell={({ data, measure, row, width, height }: any) => {
-              const cell = data.toRecordList([measure, "Customer.City"]);
-              const cities = uniqueValues(row, "Customer.City", pivotedFrame);
-              return (
-                <Chart
-                  config={
-                    {
-                      width,
-                      height,
-                      legend: false,
-                    } as any
-                  }
-                  data={{
+              const cell = useMemo(() => data.toRecordList([measure, "Customer.City"]), []);
+              const cities = useMemo(() => uniqueValues(row, "Customer.City", pivotedFrame), []);
+              const config = useMemo(
+                () =>
+                  ({
+                    width,
+                    height,
+                    legend: false,
+                  } as any),
+                [],
+              );
+              const chartData = useMemo(
+                () =>
+                  ({
                     series: [
                       {
                         data: cell,
@@ -185,9 +192,10 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
                         hideAxis: true,
                       } as any,
                     },
-                  }}
-                />
+                  } as any),
+                [],
               );
+              return <Chart config={config} data={chartData} />;
             }}
           />
         )}
