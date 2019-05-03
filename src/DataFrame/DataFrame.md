@@ -1,8 +1,8 @@
 # DataFrame
 
-DataFrame suppose to be row- or column-oriented storage similar to SQL table or [Pandas DataFrame](https://pandas.pydata.org/pandas-docs/stable/getting_started/dsintro.html#dataframe).
+DataFrame is a row- or column-oriented storage similar to SQL table or [Pandas DataFrame](https://pandas.pydata.org/pandas-docs/stable/getting_started/dsintro.html#dataframe).
 
-Main purpose of this structure is to implement medium for data to be consumed by visualisation library,
+The main purpose of this structure is to implement a medium for data to be consumed by a visualisation library,
 this means that we are not interested in implementing all features, that Pandas DataFrame or SQL provide, we only need to implement basic operations.
 
 Operations that we need to support:
