@@ -167,8 +167,9 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
             ...cellStyle,
             ...border,
           };
+
           item = cell({
-            data: data.cell(cellCoordinates.row, cellCoordinates.column),
+            data: data.cell(cellCoordinates.rowIndex, cellCoordinates.columnIndex),
             measure: cellCoordinates.measure!,
             row: cellCoordinates.row,
             column: cellCoordinates.column,

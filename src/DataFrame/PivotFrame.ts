@@ -55,8 +55,19 @@ export class PivotFrame<Name extends string = string> {
     return new FragmentFrame(this.schema, this.data, column as number[]);
   }
 
-  public cell(rowIdentifier: string[], columnIdentifier: string[]) {
+  public cell(rowIdentifier: string[] | number, columnIdentifier: string[] | number) {
     this.buildIndex();
+
+    if (!Array.isArray(rowIdentifier) && this.prop.rows.length === 0) {
+      return new FragmentFrame(this.schema, this.data, [rowIdentifier]);
+    }
+
+    if (!Array.isArray(columnIdentifier) && this.prop.columns.length === 0) {
+      return new FragmentFrame(this.schema, this.data, [columnIdentifier]);
+    }
+
+    rowIdentifier = Array.isArray(rowIdentifier) ? rowIdentifier : this.rowsCache[rowIdentifier];
+    columnIdentifier = Array.isArray(columnIdentifier) ? columnIdentifier : this.columnsCache[columnIdentifier];
 
     let row = this.rowIndex;
     rowIdentifier.forEach(i => {
@@ -141,8 +152,8 @@ export class PivotFrame<Name extends string = string> {
       });
     });
 
-    this.columnsCache = columns;
-    this.rowsCache = rows;
+    this.columnsCache = this.prop.columns.length === 0 ? this.schema.map(_ => []) : columns;
+    this.rowsCache = this.prop.rows.length === 0 ? this.data.map(_ => []) : rows;
     this.columnIndex = columnIndex;
     this.rowIndex = rowIndex;
   }

@@ -124,6 +124,8 @@ export type CellCoordinates<Name extends string = string> =
       row: string[];
       column: string[];
       measure?: Name;
+      rowIndex: number;
+      columnIndex: number;
     }
   | {
       type: "RowHeader";
