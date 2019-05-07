@@ -30,9 +30,14 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
     if (columnIndex < 0) {
       throw new Error(`Unknown column ${column}`);
     }
-    if (this.index.length < 0 && this.index.length > 1) {
+    if (this.index.length > 1) {
       throw new Error(`Only frame with exactly one row are good for peak`);
     }
+    if (this.index.length === 0) {
+      // empty cell, if there is not enough data for pivoting
+      return null;
+    }
+
     return this.data[this.index[0]][columnIndex];
   }
 }

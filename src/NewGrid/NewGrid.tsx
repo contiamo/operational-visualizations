@@ -13,8 +13,10 @@ const emptyObject = Object.freeze({});
 
 const defaultBorderStyle = "1px solid #e8e8e8";
 
-const defaultCell = <Name extends string = string>({ data, measure }: { data: FragmentFrame<Name>; measure: Name }) =>
-  `${data.peak(measure)}`;
+const defaultCell = <Name extends string = string>({ data, measure }: { data: FragmentFrame<Name>; measure: Name }) => {
+  const value = data.peak(measure);
+  return value === null ? "-" : `${value}`;
+};
 
 const defaultWidth = () => 120;
 const defaultHeight = () => 35;
