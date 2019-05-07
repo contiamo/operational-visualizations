@@ -1,4 +1,4 @@
-# NewGrid
+# PivotGrid
 
 TODO:
 

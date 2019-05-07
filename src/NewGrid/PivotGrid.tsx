@@ -83,7 +83,7 @@ type Props<Name extends string = string> = {
       ) => React.ReactNode;
     });
 
-export function NewGrid<Name extends string = string>(props: Props<Name>) {
+export function PivotGrid<Name extends string = string>(props: Props<Name>) {
   const { data } = props;
   const cell = props.cell || defaultCell;
   const header = props.header || defaultHeader;

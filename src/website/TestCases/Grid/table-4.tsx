@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { MarathonEnvironment } from "../../Marathon";
 
 import DataFrame from "../../../DataFrame/DataFrame";
-import { PivotGrid } from "../../../NewGrid/PivotGrid";
+import { TableGrid } from "../../../NewGrid/TableGrid";
 
 import AutoSizer from "react-virtualized-auto-sizer";
 
@@ -78,20 +78,15 @@ const frame = new DataFrame(rawData.columns, rawData.rows);
 
 export const marathon = ({ test, container }: MarathonEnvironment) => {
   test("Column measures", () => {
-    const pivotedFrame = frame.pivot({
-      rows: ["Customer.Continent", "Customer.Country", "Customer.City"],
-      columns: ["Customer.AgeGroup", "Customer.Gender"],
-    });
     ReactDOM.render(
       <AutoSizer style={{ width: "100%", minHeight: "450px", height: "100%" }}>
         {({ width, height }) => (
-          <PivotGrid
+          <TableGrid
             width={width}
             height={height}
-            data={pivotedFrame}
-            measures={["sales", "revenue"]}
+            data={frame}
             style={{
-              cell: { padding: "10px", textAlign: "right" },
+              cell: { padding: "10px" },
             }}
           />
         )}
@@ -101,7 +96,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
   });
 };
 
-export const title: string = "New Grid";
+export const title: string = "Table";
 
 // Must match the file name so we can link to the code on GitHub
-export const slug = "table-1";
+export const slug = "table-4";

@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { MarathonEnvironment } from "../../Marathon";
 
 import DataFrame from "../../../DataFrame/DataFrame";
-import { NewGrid } from "../../../NewGrid/NewGrid";
+import { PivotGrid } from "../../../NewGrid/PivotGrid";
 
 import AutoSizer from "react-virtualized-auto-sizer";
 
@@ -47,7 +47,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
     ReactDOM.render(
       <AutoSizer style={{ width: "100%", minHeight: "450px", height: "100%" }}>
         {({ width, height }) => (
-          <NewGrid
+          <PivotGrid
             width={width}
             height={height}
             data={pivotedFrame}

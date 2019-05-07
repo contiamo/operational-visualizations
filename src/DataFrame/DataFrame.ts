@@ -10,6 +10,17 @@ export default class DataFrame<Name extends string = string> implements Iteratab
     this.data = data;
   }
 
+  public stats() {
+    return {
+      columns: this.schema.length,
+      rows: this.data.length,
+    };
+  }
+
+  public get(rowIndex: number, columnIndex: number) {
+    return this.data[rowIndex][columnIndex];
+  }
+
   public forEach(columns: Name | Name[], cb: (...columnValue: any[]) => void) {
     if (!Array.isArray(columns)) {
       columns = [columns];

@@ -15,7 +15,7 @@ export { default as MultidimensionalDataset } from "./data_handling/multidimensi
 export { default as Grid } from "./Grid/Grid";
 export { default as gridConfigToAccessors } from "./Grid/gridConfigToAccessors";
 export { default as DataFrame } from "./DataFrame/DataFrame";
-export * from "./NewGrid/NewGrid";
+export * from "./NewGrid/PivotGrid";
 
 // Type exports
 export * from "./axis_utils/typings";

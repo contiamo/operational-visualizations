@@ -1,6 +1,6 @@
 # Considerations
 
-- do we want to support accessors for the NewGrid (the same way as Grid does)
+- do we want to support accessors for the PivotGrid (the same way as Grid does)
   - it is very extensible mechanism on the one side, but it is overkill from the other side
 - we need to support table display
   - for general table display we would need some kind of aggregation or we can pick first row from the set, because we have pre-aggregated data from the server
