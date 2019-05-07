@@ -41,7 +41,7 @@ export function TableGrid<Name extends string = string>(props: Props<Name>) {
   const { data } = props;
 
   const columnCount = data.stats().columns;
-  const rowCount = data.stats().rows;
+  const rowCount = data.stats().rows + 1;
 
   const accessors = props.accessors || (emptyObject as Defined<Props<Name>["accessors"]>);
   const heightAccessors = accessors.height || (defaultHeight as Defined<Defined<Props<Name>["accessors"]>["height"]>);
