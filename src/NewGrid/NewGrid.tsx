@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from "react";
 import { GridChildComponentProps, VariableSizeGrid } from "react-window";
 import { FragmentFrame } from "../DataFrame/FragmentFrame";
 import { PivotFrame } from "../DataFrame/PivotFrame";
-import { coordinateToHeightParam, coordinateToWidthParam, exhaustiveCheck, indexToCoordinate } from "./coordinateUitls";
+import { coordinateToHeightParam, coordinateToWidthParam, exhaustiveCheck, indexToCoordinate } from "./coordinateUtils";
 import { HeightParam, WidthParam } from "./types";
 
 type Diff<T, U> = T extends U ? never : T;
