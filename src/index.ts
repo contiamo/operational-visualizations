@@ -16,6 +16,7 @@ export { default as Grid } from "./Grid/Grid";
 export { default as gridConfigToAccessors } from "./Grid/gridConfigToAccessors";
 export { default as DataFrame } from "./DataFrame/DataFrame";
 export * from "./NewGrid/PivotGrid";
+export * from "./NewGrid/TableGrid";
 
 // Type exports
 export * from "./axis_utils/typings";
