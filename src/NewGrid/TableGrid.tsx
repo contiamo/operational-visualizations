@@ -70,6 +70,13 @@ export function TableGrid<Name extends string = string>(props: Props<Name>) {
         item = `${data.get(rowIndex - 1, columnIndex)}`;
       }
 
+      if (columnIndex === columnCount - 1) {
+        border.borderRight = borderStyle;
+      }
+      if (rowIndex === rowCount - 1) {
+        border.borderBottom = borderStyle;
+      }
+
       return <div style={{ ...border, ...style }}>{item}</div>;
     },
     [data, cellStyle, borderStyle, backgroundStyle],

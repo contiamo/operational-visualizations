@@ -79,7 +79,7 @@ const frame = new DataFrame(rawData.columns, rawData.rows);
 export const marathon = ({ test, container }: MarathonEnvironment) => {
   test("Column measures", () => {
     ReactDOM.render(
-      <AutoSizer style={{ width: "100%", minHeight: "450px", height: "100%" }}>
+      <AutoSizer style={{ width: "100%", minHeight: "450px", height: "100%", background: "#fff" }}>
         {({ width, height }) => (
           <TableGrid
             width={width}

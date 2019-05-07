@@ -83,7 +83,14 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
       columns: ["Customer.AgeGroup", "Customer.Gender"],
     });
     ReactDOM.render(
-      <AutoSizer style={{ width: "100%", minHeight: "450px", height: "100%" }}>
+      <AutoSizer
+        style={{
+          width: "100%",
+          minHeight: "450px",
+          height: "100%",
+          background: "#fff",
+        }}
+      >
         {({ width, height }) => (
           <PivotGrid
             width={width}

@@ -212,6 +212,13 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
           exhaustiveCheck(cellCoordinates);
       }
 
+      if (columnIndex === columnCount - 1) {
+        border.borderRight = borderStyle;
+      }
+      if (rowIndex === rowCount - 1) {
+        border.borderBottom = borderStyle;
+      }
+
       return <div style={{ ...border, ...style }}>{item}</div>;
     },
     [
