@@ -12,14 +12,24 @@ type Defined<T> = Diff<T, undefined>;
 const emptyObject = Object.freeze({});
 
 const defaultBorderStyle = "1px solid #e8e8e8";
+const defaultBackground = "#fff";
 
 const defaultCell = <Name extends string = string>({ data, measure }: { data: FragmentFrame<Name>; measure: Name }) => {
   const value = data.peak(measure);
-  return value === null ? "-" : `${value}`;
+  return value === null ? "–" : `${value}`;
 };
+
+const defaultHeader = ({ value }: { value: string; width: number; height: number }) => value;
 
 const defaultWidth = () => 120;
 const defaultHeight = () => 35;
+
+const defaultHeaderStyle: React.CSSProperties = {
+  padding: "10px",
+  textOverflow: "ellipsis",
+  overflow: "hidden",
+  whiteSpace: "nowrap",
+};
 
 type Props<Name extends string = string> = {
   width: number;
@@ -27,7 +37,9 @@ type Props<Name extends string = string> = {
   data: PivotFrame<Name>;
   style?: {
     cell?: React.CSSProperties;
+    header?: React.CSSProperties;
     border?: string;
+    background?: string;
   };
   axes?: {
     row?: (_: { row: string[]; width: number; height: number }) => React.ReactNode;
@@ -37,6 +49,13 @@ type Props<Name extends string = string> = {
     width?: (p: WidthParam<Name>) => number;
     height?: (p: HeightParam<Name>) => number;
   };
+  header?: (
+    prop: {
+      value: string;
+      width: number;
+      height: number;
+    },
+  ) => React.ReactNode;
 } & (
   | {
       measures: Name[];
@@ -67,6 +86,7 @@ type Props<Name extends string = string> = {
 export function NewGrid<Name extends string = string>(props: Props<Name>) {
   const { data } = props;
   const cell = props.cell || defaultCell;
+  const header = props.header || defaultHeader;
   const axes = props.axes || (emptyObject as Defined<Props<Name>["axes"]>);
   const accessors = props.accessors || (emptyObject as Defined<Props<Name>["accessors"]>);
   const heightAccessors = accessors.height || (defaultHeight as Defined<Defined<Props<Name>["accessors"]>["height"]>);
@@ -75,6 +95,8 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
   const styleProp = props.style || (emptyObject as Defined<Props<Name>["style"]>);
   const borderStyle = styleProp.border || defaultBorderStyle;
   const cellStyle = styleProp.cell || emptyObject;
+  const headerStyle = styleProp.header || defaultHeaderStyle;
+  const backgroundStyle = styleProp.background || defaultBackground;
 
   const measures = "measures" in props ? props.measures : [];
   const measuresPlacement = ("measures" in props ? props.measuresPlacement : undefined) || "column";
@@ -129,7 +151,7 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
       let border: React.CSSProperties = {
         borderTop: borderStyle,
         borderLeft: borderStyle,
-        background: "#fff",
+        background: backgroundStyle,
       };
       let item: React.ReactNode = null;
 
@@ -141,6 +163,10 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
           border = {};
           break;
         case "Cell":
+          border = {
+            ...cellStyle,
+            ...border,
+          };
           item = cell({
             data: data.cell(cellCoordinates.row, cellCoordinates.column),
             measure: cellCoordinates.measure!,
@@ -152,22 +178,24 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
           break;
         case "RowHeader":
           if (cellCoordinates.empty) {
-            border = { borderLeft: borderStyle, background: "#fff" };
+            border = { ...headerStyle, borderLeft: borderStyle, background: backgroundStyle };
           } else {
-            item =
-              cellCoordinates.rowIndex !== undefined
-                ? cellCoordinates.row[cellCoordinates.rowIndex]
-                : cellCoordinates.measure;
+            border = { ...headerStyle, ...border };
+            const value = (cellCoordinates.rowIndex !== undefined
+              ? cellCoordinates.row[cellCoordinates.rowIndex]
+              : cellCoordinates.measure)!;
+            item = header({ value, height, width });
           }
           break;
         case "ColumnHeader":
           if (cellCoordinates.empty) {
-            border = { borderTop: borderStyle, background: "#fff" };
+            border = { ...headerStyle, borderTop: borderStyle, background: backgroundStyle };
           } else {
-            item =
-              cellCoordinates.columnIndex !== undefined
-                ? cellCoordinates.column[cellCoordinates.columnIndex]
-                : cellCoordinates.measure;
+            border = { ...headerStyle, ...border };
+            const value = (cellCoordinates.columnIndex !== undefined
+              ? cellCoordinates.column[cellCoordinates.columnIndex]
+              : cellCoordinates.measure)!;
+            item = header({ value, height, width });
           }
           break;
         case "RowAxis":
@@ -184,9 +212,20 @@ export function NewGrid<Name extends string = string>(props: Props<Name>) {
           exhaustiveCheck(cellCoordinates);
       }
 
-      return <div style={{ ...cellStyle, ...border, ...style }}>{item}</div>;
+      return <div style={{ ...border, ...style }}>{item}</div>;
     },
-    [indexToCoordinateMemoised, data, cell, borderStyle, cellStyle, rowHeight, columnWidth],
+    [
+      indexToCoordinateMemoised,
+      data,
+      cell,
+      header,
+      rowHeight,
+      columnWidth,
+      borderStyle,
+      cellStyle,
+      headerStyle,
+      backgroundStyle,
+    ],
   );
 
   return (

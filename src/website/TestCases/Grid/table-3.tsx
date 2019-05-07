@@ -52,7 +52,10 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
             height={height}
             data={pivotedFrame}
             measures={["unitSales"]}
-            style={{ cell: { padding: "10px" } }}
+            style={{
+              cell: { padding: "10px", textAlign: "right" },
+            }}
+            header={({ value }) => <span title={value}>{value}</span>}
           />
         )}
       </AutoSizer>,
