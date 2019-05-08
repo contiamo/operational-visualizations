@@ -26,9 +26,9 @@ export type IndexToCoordinate = <Name extends string = string>(
  * We use virtual scrolling in the Grid, so we need to be able to tell the size of each cell in the grid.
  * We decided to treat all type of cells as if they are in one big grid, including cells with headers, axes, measure names, values.
  * This function takes index coordinates in the "big grid" (x, y) and converts it to specific type of cells, 
- * for example { type: Empty }, { type: Cell }... so we would be able to pattern match against type 
+ * for example `{ type: Empty }`, `{ type: Cell }`... so we would be able to pattern match against type 
  * and render appropriate cell or tell the dimenstion of the cell.
- * Cells are positioned this way in the big grid:
+ * Cells are positioned this way in the "big grid":
  *```
                                   ColumnHeader
                                    +

@@ -76,67 +76,96 @@ export class PivotFrame<Name extends string = string> {
       {} as Record<Name, number>,
     );
 
-    let maxColumnLength = 0;
-    let maxRowLength = 0;
+    /**
+     * We need those only for case when we pivot by one direction
+     * e.g. when `this.prop.columns.length === 0` or `this.prop.rows.length === 0`
+     */
+    let maxColumnDepth = 0;
+    let maxRowDepth = 0;
 
     const lastInRow = this.prop.rows.length - 1;
+    const pivotByRows = this.prop.rows.map(dimension => nameToIndex[dimension]);
+    /**
+     * tree structure implemented as nested records
+     * {[valueFromRowA]: {[valueFromRowB]: {...: [<numbers of rows in this.data with valueFromRowA, valueFromRowB ...>] }}}
+     * It corresponds to `CREATE INDEX rowTreeIndex ON table (rowA, rowB, ...);` - in first level we will have unique values for [rowA],
+     * in second level we will have unique values for [rowA, rowB] etc.
+     * In the end there is a list of indexes of rows from original data.
+     * If we need to find what rows (from the `this.data`) correspond to [valueFromRowA, valueFromRowB ...]
+     * we can do following rowTreeIndex[valueFromRowA][valueFromRowB][...] and we will get array on indexes
+     */
     const rowTreeIndex = {} as Record<DimensionValue, any>;
-    const rows: DimensionValue[][] = [];
+    /**
+     * matrix structure implemented as array of arrays
+     * [[valueFromRowA, valueFromRowB, ...]]
+     * It corresponds to `SELECT rowA, rowB, ... FROM table GROUP BY rowA, rowB, ...`
+     */
+    const rowHeaders: DimensionValue[][] = [];
+    /**
+     * matrix structure implemented as array of arrays
+     * [[<numbers of rows in this.data with valueFromRowA, valueFromRowB ...>]]
+     * first row in rowHeaders corresponds to first row in rowHeaders etc.
+     */
     const rowIndex: number[][] = [];
 
     const lastInColumn = this.prop.columns.length - 1;
+    const pivotByColumns = this.prop.columns.map(dimension => nameToIndex[dimension]);
+    // see rowTreeIndex
     const columnTreeIndex = {} as Record<DimensionValue, any>;
-    const columns: DimensionValue[][] = [];
+    // see rowHeaders
+    const columnHeaders: DimensionValue[][] = [];
+    // see rowIndex
     const columnIndex: number[][] = [];
 
     this.data.forEach((dataRow, rowNumber) => {
-      const row: DimensionValue[] = [];
+      const rowHeader: DimensionValue[] = [];
       let previousRow: Record<DimensionValue, any> = rowTreeIndex;
 
-      this.prop.rows.forEach((dimension, i) => {
-        const dimensionValue = dataRow[nameToIndex[dimension]];
-        row.push(dimensionValue);
+      pivotByRows.forEach((dimensionIndex, i) => {
+        const dimensionValue = dataRow[dimensionIndex];
+        rowHeader.push(dimensionValue);
 
         if (previousRow[dimensionValue] === undefined) {
           if (i === lastInRow) {
-            rows.push(row);
-            rowIndex[rows.length - 1] = previousRow[dimensionValue] = [];
+            rowHeaders.push(rowHeader);
+            rowIndex[rowHeaders.length - 1] = previousRow[dimensionValue] = [];
           } else {
             previousRow[dimensionValue] = {};
           }
         }
         if (i === lastInRow) {
           previousRow[dimensionValue].push(rowNumber);
-          maxRowLength = Math.max(previousRow[dimensionValue].length, maxRowLength);
+          maxRowDepth = Math.max(previousRow[dimensionValue].length, maxRowDepth);
         }
         previousRow = previousRow[dimensionValue];
       });
 
-      const column: DimensionValue[] = [];
+      const columnHeader: DimensionValue[] = [];
       let previousColumn: Record<DimensionValue, any> = columnTreeIndex;
 
-      this.prop.columns.forEach((dimension, i) => {
-        const dimensionValue = dataRow[nameToIndex[dimension]];
-        column.push(dimensionValue);
+      pivotByColumns.forEach((dimensionIndex, i) => {
+        const dimensionValue = dataRow[dimensionIndex];
+        columnHeader.push(dimensionValue);
         if (previousColumn[dimensionValue] === undefined) {
           if (i === lastInColumn) {
-            columns.push(column);
-            columnIndex[columns.length - 1] = previousColumn[dimensionValue] = [];
+            columnHeaders.push(columnHeader);
+            columnIndex[columnHeaders.length - 1] = previousColumn[dimensionValue] = [];
           } else {
             previousColumn[dimensionValue] = {};
           }
         }
         if (i === lastInColumn) {
           previousColumn[dimensionValue].push(rowNumber);
-          maxColumnLength = Math.max(previousColumn[dimensionValue].length, maxColumnLength);
+          maxColumnDepth = Math.max(previousColumn[dimensionValue].length, maxColumnDepth);
         }
         previousColumn = previousColumn[dimensionValue];
       });
     });
 
     this.columnHeadersInternal =
-      this.prop.columns.length === 0 ? Array.from({ length: maxRowLength }).map(_ => []) : columns;
-    this.rowHeadersInternal = this.prop.rows.length === 0 ? Array.from({ length: maxColumnLength }).map(_ => []) : rows;
+      this.prop.columns.length === 0 ? Array.from({ length: maxRowDepth }).map(_ => []) : columnHeaders;
+    this.rowHeadersInternal =
+      this.prop.rows.length === 0 ? Array.from({ length: maxColumnDepth }).map(_ => []) : rowHeaders;
 
     this.columnIndex = columnIndex;
     this.rowIndex = rowIndex;
