@@ -67,7 +67,7 @@ export function TableGrid<Name extends string = string>(props: Props<Name>) {
         item = data.schema[columnIndex].name;
       } else {
         border = { ...cellStyle, ...border };
-        item = `${data.get(rowIndex - 1, columnIndex)}`;
+        item = `${data.cell(rowIndex - 1, columnIndex)}`;
       }
 
       if (columnIndex === columnCount - 1) {

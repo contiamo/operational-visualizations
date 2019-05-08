@@ -118,8 +118,8 @@ pivotedFrame.rowsIndex(); // [["Q", "W"], ["E", "R"]];
 To access data via index we can use `row`, `column` or `cell` methods, which will return new Frame with corresponding horizontal slices of the data (FragmentFrame).
 
 ```ts
-pivotedFrame.row(["E", "R"]); // FragmentFrame<[["E", "R", "z", "x", 2], ["E", "R", "c", "v", 3]]>
-pivotedFrame.cell(["E", "R"], ["z", "x"]); // FragmentFrame<[["E", "R", "z", "x", 2]]>
+pivotedFrame.row(1); // FragmentFrame<[["E", "R", "z", "x", 2], ["E", "R", "c", "v", 3]]>
+pivotedFrame.cell(1, 0); // FragmentFrame<[["E", "R", "z", "x", 2]]>
 ```
 
 ## FragmentFrame
