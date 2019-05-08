@@ -14,12 +14,22 @@ const emptyObject = Object.freeze({});
 const defaultBorderStyle = "1px solid #e8e8e8";
 const defaultBackground = "#fff";
 
+const toString = (value: boolean | string) => {
+  if (value === true) {
+    return "true";
+  }
+  if (value === false) {
+    return "false";
+  }
+  return value;
+};
+
 const defaultCell = <Name extends string = string>({ data, measure }: { data: FragmentFrame<Name>; measure: Name }) => {
   const value = data.peak(measure);
   return value === null ? "–" : `${value}`;
 };
 
-const defaultHeader = ({ value }: { value: string; width: number; height: number }) => value;
+const defaultHeader = ({ value }: { value: string; width: number; height: number }) => toString(value);
 
 const defaultWidth = () => 120;
 const defaultHeight = () => 35;

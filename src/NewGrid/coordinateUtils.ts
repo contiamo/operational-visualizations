@@ -144,7 +144,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
     // row headers
     const dimension = data.rowHeaders()[rowIndexReal][columnIndex];
     const prevRow = data.rowHeaders()[rowIndexReal - 1];
-    if (!dimension) {
+    if (dimension === undefined) {
       if (axes.row && columnIndex === rowHeadersCount - 1) {
         return {
           type: "RowAxis",
@@ -172,7 +172,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
     // column headers
     const dimension = data.columnHeaders()[columnIndexReal][rowIndex];
     const prevColumn = data.columnHeaders()[columnIndexReal - 1];
-    if (!dimension) {
+    if (dimension === undefined) {
       if (axes.column && rowIndex === columnHeadersCount - 1) {
         return {
           type: "ColumnAxis",

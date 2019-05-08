@@ -1,25 +1,5 @@
 # PivotFrame
 
-## Pivoting in one direction
-
-After integrating PivotFrame in real-life application we discovered that we need to support case when there are either 0 columns or 0 rows for pivoting e.g. pivoting in one direction. For example:
-
-```ts
-dataFrame.pivot({ rows: ["A", "B"], columns: [] });
-dataFrame.pivot({ rows: [], columns: ["C", "D"] });
-```
-
-And to access rows/columns/cells in this case we would need to use numbers instead of actual values, like this:
-
-```ts
-pivotedFrame.row(1); // FragmentFrame<[["E", "R", "z", "x", 2], ["E", "R", "c", "v", 3]]>
-pivotedFrame.cell(1, 1); // FragmentFrame<[["E", "R", "z", "x", 2]]>
-```
-
-## Bug with boolean columns
-
-We discovered that there is a bug when we pivot by boolean row or column value (`true` or `false`) - we can't use `false` in the index-tree data structure.
-
 ## Empty cells
 
 We discovered that there is an edge case with empty cells when we do pivoting. For example we use SQL-like interface to get the data and we use `LIMIT` to prevent overfetching data.
