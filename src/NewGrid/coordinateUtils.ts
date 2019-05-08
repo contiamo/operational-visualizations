@@ -104,27 +104,27 @@ export const indexToCoordinate: IndexToCoordinate = ({
     };
   } else if (columnIndex < rowHeadersCount) {
     // row headers
-    const dimension = data.rowsIndex()[rowIndexReal][columnIndex];
-    const prevRow = data.rowsIndex()[rowIndexReal - 1];
+    const dimension = data.rowHeaders()[rowIndexReal][columnIndex];
+    const prevRow = data.rowHeaders()[rowIndexReal - 1];
     if (!dimension) {
       if (axes.row && columnIndex === rowHeadersCount - 1) {
         return {
           type: "RowAxis",
-          row: data.rowsIndex()[rowIndexReal],
+          row: data.rowHeaders()[rowIndexReal],
           measure: measures[measuresIndex],
         };
       } else {
         // measure dimension
         return {
           type: "RowHeader",
-          row: data.rowsIndex()[rowIndexReal],
+          row: data.rowHeaders()[rowIndexReal],
           measure: measures[measuresIndex],
         };
       }
     } else {
       return {
         type: "RowHeader",
-        row: data.rowsIndex()[rowIndexReal],
+        row: data.rowHeaders()[rowIndexReal],
         measure: measures[measuresIndex],
         rowIndex: columnIndex,
         empty: (prevRow && prevRow[columnIndex] === dimension) || (measuresIndex > 0 && measuresPlacement === "row"),
@@ -132,27 +132,27 @@ export const indexToCoordinate: IndexToCoordinate = ({
     }
   } else if (rowIndex < columnHeadersCount) {
     // column headers
-    const dimension = data.columnsIndex()[columnIndexReal][rowIndex];
-    const prevColumn = data.columnsIndex()[columnIndexReal - 1];
+    const dimension = data.columnHeaders()[columnIndexReal][rowIndex];
+    const prevColumn = data.columnHeaders()[columnIndexReal - 1];
     if (!dimension) {
       if (axes.column && rowIndex === columnHeadersCount - 1) {
         return {
           type: "ColumnAxis",
-          column: data.columnsIndex()[columnIndexReal],
+          column: data.columnHeaders()[columnIndexReal],
           measure: measures[measuresIndex],
         };
       } else {
         // measure dimension
         return {
           type: "ColumnHeader",
-          column: data.columnsIndex()[columnIndexReal],
+          column: data.columnHeaders()[columnIndexReal],
           measure: measures[measuresIndex],
         };
       }
     } else {
       return {
         type: "ColumnHeader",
-        column: data.columnsIndex()[columnIndexReal],
+        column: data.columnHeaders()[columnIndexReal],
         measure: measures[measuresIndex],
         columnIndex: rowIndex,
         empty:
@@ -164,8 +164,8 @@ export const indexToCoordinate: IndexToCoordinate = ({
       type: "Cell",
       rowIndex: rowIndexReal,
       columnIndex: columnIndexReal,
-      row: data.rowsIndex()[rowIndexReal],
-      column: data.columnsIndex()[columnIndexReal],
+      row: data.rowHeaders()[rowIndexReal],
+      column: data.columnHeaders()[columnIndexReal],
       measure: measures[measuresIndex],
     };
   }

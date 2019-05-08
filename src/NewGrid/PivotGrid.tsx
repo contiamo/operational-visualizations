@@ -103,17 +103,17 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
 
   const measuresMultiplier = measures.length === 0 ? 1 : measures.length;
   const rowHeadersCount =
-    (data.rowsIndex()[0] || []).length +
+    (data.rowHeaders()[0] || []).length +
     (measuresPlacement === "row" && measuresMultiplier > 1 ? 1 : 0) +
     (axes.row ? 1 : 0);
   const columnHeadersCount =
-    (data.columnsIndex()[0] || []).length +
+    (data.columnHeaders()[0] || []).length +
     (measuresPlacement === "column" && measuresMultiplier > 1 ? 1 : 0) +
     (axes.column ? 1 : 0);
   const columnCount =
-    rowHeadersCount + data.columnsIndex().length * (measuresPlacement === "column" ? measuresMultiplier : 1);
+    rowHeadersCount + data.columnHeaders().length * (measuresPlacement === "column" ? measuresMultiplier : 1);
   const rowCount =
-    columnHeadersCount + data.rowsIndex().length * (measuresPlacement === "row" ? measuresMultiplier : 1);
+    columnHeadersCount + data.rowHeaders().length * (measuresPlacement === "row" ? measuresMultiplier : 1);
 
   const indexToCoordinateMemoised = useMemo(
     () =>

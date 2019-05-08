@@ -17,7 +17,7 @@ export default class DataFrame<Name extends string = string> implements Iteratab
     };
   }
 
-  public get(rowIndex: number, columnIndex: number) {
+  public cell(rowIndex: number, columnIndex: number) {
     return this.data[rowIndex][columnIndex];
   }
 
@@ -34,6 +34,10 @@ export default class DataFrame<Name extends string = string> implements Iteratab
   }
 
   public pivot<Column extends Name, Row extends Name>(prop: PivotProps<Column, Row>) {
+    // check if the input params are valid
+    if (prop.rows.length === 0 && prop.columns.length === 0) {
+      throw new Error("Please provide at least one row or column");
+    }
     return new PivotFrame(this.schema, this.data, prop);
   }
 }
