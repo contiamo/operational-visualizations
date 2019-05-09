@@ -97,6 +97,8 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
             height={height}
             data={pivotedFrame}
             measures={["sales", "revenue"]}
+            measuresPlacement="row"
+            dimensionLabels="top"
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}

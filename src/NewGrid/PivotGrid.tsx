@@ -3,7 +3,7 @@ import { GridChildComponentProps, VariableSizeGrid } from "react-window";
 import { FragmentFrame } from "../DataFrame/FragmentFrame";
 import { PivotFrame } from "../DataFrame/PivotFrame";
 import { coordinateToHeightParam, coordinateToWidthParam, exhaustiveCheck, indexToCoordinate } from "./coordinateUtils";
-import { HeightParam, WidthParam } from "./types";
+import { HeightParam, WidthParam, DimensionLabels } from "./types";
 
 type Diff<T, U> = T extends U ? never : T;
 type Defined<T> = Diff<T, undefined>;
@@ -66,6 +66,7 @@ type Props<Name extends string = string> = {
       height: number;
     },
   ) => React.ReactNode;
+  dimensionLabels?: DimensionLabels | "top" | "left" | "none";
 } & (
   | {
       measures: Name[];
@@ -101,6 +102,9 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
   const accessors = props.accessors || (emptyObject as Defined<Props<Name>["accessors"]>);
   const heightAccessors = accessors.height || (defaultHeight as Defined<Defined<Props<Name>["accessors"]>["height"]>);
   const widthAccessors = accessors.width || (defaultWidth as Defined<Defined<Props<Name>["accessors"]>["width"]>);
+  const dimensionLabels = ((typeof props.dimensionLabels === "string"
+    ? { row: props.dimensionLabels, column: props.dimensionLabels }
+    : props.dimensionLabels) || { row: "none", column: "none" }) as DimensionLabels;
 
   const styleProp = props.style || (emptyObject as Defined<Props<Name>["style"]>);
   const borderStyle = styleProp.border || defaultBorderStyle;
@@ -112,14 +116,18 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
   const measuresPlacement = ("measures" in props ? props.measuresPlacement : undefined) || "column";
 
   const measuresMultiplier = measures.length === 0 ? 1 : measures.length;
-  const rowHeadersCount =
-    (data.rowHeaders()[0] || []).length +
+  let rowHeadersCount =
+    data.rowHeaders()[0].length * (dimensionLabels.row === "left" ? 2 : 1) +
     (measuresPlacement === "row" && measuresMultiplier > 1 ? 1 : 0) +
     (axes.row ? 1 : 0);
-  const columnHeadersCount =
-    (data.columnHeaders()[0] || []).length +
+  if (rowHeadersCount === 0 && dimensionLabels.column === "left") rowHeadersCount = 1;
+
+  let columnHeadersCount =
+    data.columnHeaders()[0].length * (dimensionLabels.column === "top" ? 2 : 1) +
     (measuresPlacement === "column" && measuresMultiplier > 1 ? 1 : 0) +
     (axes.column ? 1 : 0);
+  if (columnHeadersCount === 0 && dimensionLabels.row === "top") columnHeadersCount = 1;
+
   const columnCount =
     rowHeadersCount + data.columnHeaders().length * (measuresPlacement === "column" ? measuresMultiplier : 1);
   const rowCount =
@@ -135,8 +143,19 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
         data,
         axes,
         measures,
+        dimensionLabels,
       }),
-    [rowHeadersCount, measuresPlacement, columnHeadersCount, measuresMultiplier, data, axes, measures],
+    [
+      rowHeadersCount,
+      measuresPlacement,
+      columnHeadersCount,
+      measuresMultiplier,
+      data,
+      axes,
+      measures,
+      dimensionLabels.row,
+      dimensionLabels.column,
+    ],
   );
 
   const rowHeight = useCallback(
@@ -151,9 +170,11 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
     [widthAccessors, indexToCoordinateMemoised],
   );
 
-  // Cell is repsonsible for rendering all kind of cells: dimensions, measure deimensions, data, axes.
-  // Because from the Grid point of view they all the same.
-  // We use some math to differentiate what is what based on idexes.
+  /**
+   * Cell is repsonsible for rendering all kind of cells: dimensions, measure deimensions, data, axes.
+   * Because from the Grid point of view they all the same.
+   * We use some math to differentiate what is what based on idexes.
+   */
   const Cell = useMemo(
     () => ({ columnIndex, rowIndex, style }: GridChildComponentProps) => {
       const cellCoordinates = indexToCoordinateMemoised({ columnIndex, rowIndex });
@@ -170,7 +191,12 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
 
       switch (cellCoordinates.type) {
         case "Empty":
-          border = {};
+          if (cellCoordinates.label !== undefined) {
+            border = { ...headerStyle, ...border };
+            item = `${cellCoordinates.label}`;
+          } else {
+            border = {};
+          }
           break;
         case "Cell":
           border = {

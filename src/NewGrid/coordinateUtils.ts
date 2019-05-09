@@ -1,5 +1,5 @@
 import { PivotFrame } from "../DataFrame/PivotFrame";
-import { CellCoordinates, HeightParam, WidthParam } from "./types";
+import { CellCoordinates, DimensionLabels, HeightParam, WidthParam } from "./types";
 
 export const exhaustiveCheck = (_: never) => undefined;
 
@@ -18,6 +18,7 @@ export type IndexToCoordinate = <Name extends string = string>(
       column?: Function;
     };
     measures: Name[];
+    dimensionLabels: DimensionLabels;
   },
 ) => (prop: { columnIndex: number; rowIndex: number }) => CellCoordinates<Name>;
 
@@ -27,7 +28,7 @@ export type IndexToCoordinate = <Name extends string = string>(
  * We decided to treat all type of cells as if they are in one big grid, including cells with headers, axes, measure names, values.
  * This function takes index coordinates in the "big grid" (x, y) and converts it to specific type of cells, 
  * for example `{ type: Empty }`, `{ type: Cell }`... so we would be able to pattern match against type 
- * and render appropriate cell or tell the dimenstion of the cell.
+ * and render appropriate cell or tell the dimension of the cell.
  * Cells are positioned this way in the "big grid":
  *```
                                   ColumnHeader
@@ -67,6 +68,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
   data,
   axes,
   measures,
+  dimensionLabels,
 }) => ({ columnIndex, rowIndex }) => {
   const columnIndexReal = Math.floor(
     (columnIndex - rowHeadersCount) / (measuresPlacement === "column" ? measuresMultiplier : 1),
@@ -78,7 +80,31 @@ export const indexToCoordinate: IndexToCoordinate = ({
     (measuresPlacement === "column" ? columnIndex - rowHeadersCount : rowIndex - columnHeadersCount) %
     measuresMultiplier;
 
-  if (columnIndex < rowHeadersCount && rowIndex < columnHeadersCount) {
+  /** column headers, columns measures, column axis */
+  const isRowHeaders = columnIndex < rowHeadersCount;
+  /** row headers, columns measures, column axis */
+  const isColumnHeaders = rowIndex < columnHeadersCount;
+  const isEmpty = isRowHeaders && isColumnHeaders;
+
+  if (isEmpty) {
+    if (dimensionLabels.column === "left" && columnIndex === rowHeadersCount - 1) {
+      return {
+        type: "Empty",
+        rowIndex: columnIndex,
+        columnIndex: rowIndex,
+        label: data.pivotColumns()[rowIndex] || "",
+      };
+    }
+
+    if (dimensionLabels.row === "top" && rowIndex === columnHeadersCount - 1) {
+      return {
+        type: "Empty",
+        rowIndex: columnIndex,
+        columnIndex: rowIndex,
+        label: data.pivotRows()[columnIndex] || "",
+      };
+    }
+
     if (
       measuresPlacement === "column" &&
       measuresMultiplier > 1 &&
@@ -135,17 +161,30 @@ export const indexToCoordinate: IndexToCoordinate = ({
         axis: true,
       };
     }
+
     return {
       type: "Empty",
       rowIndex: columnIndex,
       columnIndex: rowIndex,
     };
-  } else if (columnIndex < rowHeadersCount) {
-    // row headers
-    const dimension = data.rowHeaders()[rowIndexReal][columnIndex];
+  } else if (isRowHeaders) {
+    const rowDimensionLabelsOnLeft = dimensionLabels.row === "left";
+    const rowDepth = rowDimensionLabelsOnLeft ? Math.floor(columnIndex / 2) : columnIndex;
+    const dimension = data.rowHeaders()[rowIndexReal][rowDepth];
+
+    const showDimensionLabel = rowDimensionLabelsOnLeft && columnIndex % 2 === 0;
+    if (showDimensionLabel && dimension !== undefined) {
+      return {
+        type: "RowHeader",
+        row: data.rowHeaders()[rowIndexReal],
+        measure: data.pivotRows()[rowDepth],
+        empty: rowIndexReal > 0 || measuresIndex > 0,
+      };
+    }
+
     const prevRow = data.rowHeaders()[rowIndexReal - 1];
     if (dimension === undefined) {
-      if (axes.row && columnIndex === rowHeadersCount - 1) {
+      if (axes.row && rowDepth === rowHeadersCount - 1) {
         return {
           type: "RowAxis",
           row: data.rowHeaders()[rowIndexReal],
@@ -164,16 +203,28 @@ export const indexToCoordinate: IndexToCoordinate = ({
         type: "RowHeader",
         row: data.rowHeaders()[rowIndexReal],
         measure: measures[measuresIndex],
-        rowIndex: columnIndex,
-        empty: (prevRow && prevRow[columnIndex] === dimension) || (measuresIndex > 0 && measuresPlacement === "row"),
+        rowIndex: rowDepth,
+        empty: (prevRow && prevRow[rowDepth] === dimension) || (measuresIndex > 0 && measuresPlacement === "row"),
       };
     }
-  } else if (rowIndex < columnHeadersCount) {
-    // column headers
-    const dimension = data.columnHeaders()[columnIndexReal][rowIndex];
+  } else if (isColumnHeaders) {
+    const columnDimensionLabelsAbove = dimensionLabels.column === "top";
+    const columnDepth = columnDimensionLabelsAbove ? Math.floor(rowIndex / 2) : rowIndex;
+    const dimension = data.columnHeaders()[columnIndexReal][columnDepth];
+
+    const showDimensionLabel = columnDimensionLabelsAbove && rowIndex % 2 === 0;
+    if (showDimensionLabel && dimension !== undefined) {
+      return {
+        type: "ColumnHeader",
+        column: data.columnHeaders()[columnIndexReal],
+        measure: data.pivotColumns()[columnDepth],
+        empty: columnIndexReal > 0 || measuresIndex > 0,
+      };
+    }
+
     const prevColumn = data.columnHeaders()[columnIndexReal - 1];
     if (dimension === undefined) {
-      if (axes.column && rowIndex === columnHeadersCount - 1) {
+      if (axes.column && columnDepth === columnHeadersCount - 1) {
         return {
           type: "ColumnAxis",
           column: data.columnHeaders()[columnIndexReal],
@@ -192,9 +243,10 @@ export const indexToCoordinate: IndexToCoordinate = ({
         type: "ColumnHeader",
         column: data.columnHeaders()[columnIndexReal],
         measure: measures[measuresIndex],
-        columnIndex: rowIndex,
+        columnIndex: columnDepth,
         empty:
-          (prevColumn && prevColumn[rowIndex] === dimension) || (measuresIndex > 0 && measuresPlacement === "column"),
+          (prevColumn && prevColumn[columnDepth] === dimension) ||
+          (measuresIndex > 0 && measuresPlacement === "column"),
       };
     }
   } else {

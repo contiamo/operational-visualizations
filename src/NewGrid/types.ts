@@ -118,6 +118,7 @@ export type CellCoordinates<Name extends string = string> =
       rowIndex?: number;
       measure?: "row" | "column";
       axis?: boolean;
+      label?: Name | ""; // empty string is for empty cell
     }
   | {
       type: "Cell";
@@ -153,3 +154,11 @@ export type CellCoordinates<Name extends string = string> =
       column: string[]; // values of dimension
       measure?: Name;
     };
+
+export type DimensionLabels =
+  | { row: "top"; column: "top" } // "top"
+  | { row: "left"; column: "left" } // "left"
+  | { row: "none"; column: "none" } // "none"
+  | { row: "left"; column: "top" }
+  | { row: "top" | "left"; column: "none" }
+  | { row: "none"; column: "top" | "left" };

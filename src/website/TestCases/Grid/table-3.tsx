@@ -56,6 +56,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
               cell: { padding: "10px", textAlign: "right" },
             }}
             header={({ value }) => <span title={value}>{value}</span>}
+            dimensionLabels={{ column: "top", row: "left" }}
           />
         )}
       </AutoSizer>,

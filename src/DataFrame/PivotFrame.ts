@@ -22,6 +22,14 @@ export class PivotFrame<Name extends string = string> {
     this.prop = prop;
   }
 
+  public pivotRows() {
+    return this.prop.rows;
+  }
+
+  public pivotColumns() {
+    return this.prop.columns;
+  }
+
   public rowHeaders() {
     this.buildIndex();
     return this.rowHeadersInternal;
