@@ -44,7 +44,7 @@ const data = [[1, "Hilda"], [2, "David"], [3, "Frida"]];
 
 ## Implementation
 
-All Frames are immutable. As soon they were created they do no mutate internal values, but at the moment of writing they do not have any protectection against mutation from the outside, for example you can mutate array of data if it was passed as variable and you still have access to this variable, we leave it to developers to not violate immutability of internals.
+All Frames are immutable. As soon they were created they do no mutate internal values, but at the moment of writing they do not have any protection against mutation from the outside, for example you can mutate array of data if it was passed as variable and you still have access to this variable, we leave it to developers to not violate immutability of internals.
 
 Because Frames are immutable, they share the same data and scheme - passed as reference, not copied.
 
