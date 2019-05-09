@@ -79,7 +79,7 @@ const frame = new DataFrame(rawData.columns, rawData.rows);
 export const marathon = ({ test, container }: MarathonEnvironment) => {
   test("Column measures", () => {
     const pivotedFrame = frame.pivot({
-      rows: ["Customer.Continent", "Customer.Country", "Customer.City"],
+      rows: [],
       columns: ["Customer.AgeGroup", "Customer.Gender"],
     });
     ReactDOM.render(
@@ -108,7 +108,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
   });
 };
 
-export const title: string = "New Grid";
+export const title: string = "Grid with pivoting only in one direction";
 
 // Must match the file name so we can link to the code on GitHub
-export const slug = "table-1";
+export const slug = "table-5";
