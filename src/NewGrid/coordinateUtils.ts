@@ -92,7 +92,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
         type: "Empty",
         rowIndex: columnIndex,
         columnIndex: rowIndex,
-        label: data.pivotColumns()[rowIndex] || "",
+        dimensionLabel: data.pivotColumns()[rowIndex] || "",
       };
     }
 
@@ -101,7 +101,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
         type: "Empty",
         rowIndex: columnIndex,
         columnIndex: rowIndex,
-        label: data.pivotRows()[columnIndex] || "",
+        dimensionLabel: data.pivotRows()[columnIndex] || "",
       };
     }
 

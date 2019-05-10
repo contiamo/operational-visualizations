@@ -3,7 +3,7 @@ import { GridChildComponentProps, VariableSizeGrid } from "react-window";
 import { FragmentFrame } from "../DataFrame/FragmentFrame";
 import { PivotFrame } from "../DataFrame/PivotFrame";
 import { coordinateToHeightParam, coordinateToWidthParam, exhaustiveCheck, indexToCoordinate } from "./coordinateUtils";
-import { HeightParam, WidthParam, DimensionLabels } from "./types";
+import { DimensionLabels, HeightParam, WidthParam } from "./types";
 
 type Diff<T, U> = T extends U ? never : T;
 type Defined<T> = Diff<T, undefined>;
@@ -120,13 +120,17 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
     data.rowHeaders()[0].length * (dimensionLabels.row === "left" ? 2 : 1) +
     (measuresPlacement === "row" && measuresMultiplier > 1 ? 1 : 0) +
     (axes.row ? 1 : 0);
-  if (rowHeadersCount === 0 && dimensionLabels.column === "left") rowHeadersCount = 1;
+  if (rowHeadersCount === 0 && dimensionLabels.column === "left") {
+    rowHeadersCount = 1;
+  }
 
   let columnHeadersCount =
     data.columnHeaders()[0].length * (dimensionLabels.column === "top" ? 2 : 1) +
     (measuresPlacement === "column" && measuresMultiplier > 1 ? 1 : 0) +
     (axes.column ? 1 : 0);
-  if (columnHeadersCount === 0 && dimensionLabels.row === "top") columnHeadersCount = 1;
+  if (columnHeadersCount === 0 && dimensionLabels.row === "top") {
+    columnHeadersCount = 1;
+  }
 
   const columnCount =
     rowHeadersCount + data.columnHeaders().length * (measuresPlacement === "column" ? measuresMultiplier : 1);
@@ -191,9 +195,9 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
 
       switch (cellCoordinates.type) {
         case "Empty":
-          if (cellCoordinates.label !== undefined) {
+          if (cellCoordinates.dimensionLabel !== undefined) {
             border = { ...headerStyle, ...border };
-            item = `${cellCoordinates.label}`;
+            item = `${cellCoordinates.dimensionLabel}`;
           } else {
             border = {};
           }
