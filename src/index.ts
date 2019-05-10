@@ -12,6 +12,7 @@ export { default as computeQuantAxes } from "./axis_utils/compute_quant_axes";
 export { default as computeCategoricalAxes } from "./axis_utils/compute_categorical_axes";
 export { default as computeTimeAxes } from "./axis_utils/compute_time_axes";
 export { default as DataFrame } from "./DataFrame/DataFrame";
+export { PivotFramePreindexed } from "./DataFrame/PivotFramePreindexed";
 export * from "./NewGrid/PivotGrid";
 export * from "./NewGrid/TableGrid";
 
