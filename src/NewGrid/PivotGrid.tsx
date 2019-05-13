@@ -52,24 +52,66 @@ const defaultHeaderStyle: React.CSSProperties = {
   whiteSpace: "nowrap",
 };
 
-type Props<Name extends string = string> = {
+/**
+ * We support text only pivot grid out of the box,
+ * for this case you don't need to provide cell render prop, but you need to provide measures
+ */
+interface TextOnlyPivotGridProps<Name extends string> {
+  measures: Name[];
+  /** default value is "column" */
+  measuresPlacement?: "row" | "column";
+  cell?: (
+    prop: {
+      data: FragmentFrame<Name>;
+      measure: Name;
+      row: string[];
+      column: string[];
+      width: number;
+      height: number;
+    },
+  ) => React.ReactNode;
+}
+
+/**
+ * This is props for general PivotGrid, you need to provide cell render prop.
+ * It can return any React component which will be rendered in cells
+ */
+interface GeneralPivotGridProps<Name extends string> {
+  cell: (
+    prop: {
+      data: FragmentFrame<Name>;
+      row: string[];
+      column: string[];
+      width: number;
+      height: number;
+    },
+  ) => React.ReactNode;
+}
+
+interface Accessors<Name extends string> {
+  width?: (p: WidthParam<Name>) => number;
+  height?: (p: HeightParam<Name>) => number;
+}
+
+interface Axes {
+  row?: (_: { row: string[]; width: number; height: number }) => React.ReactNode;
+  column?: (_: { column: string[]; width: number; height: number }) => React.ReactNode;
+}
+
+interface PivotGridStyle {
+  cell?: React.CSSProperties;
+  header?: React.CSSProperties;
+  border?: string;
+  background?: string;
+}
+
+type Props<Name extends string = string> = (TextOnlyPivotGridProps<Name> | GeneralPivotGridProps<Name>) & {
   width: number;
   height: number;
   data: PivotFrame<Name>;
-  style?: {
-    cell?: React.CSSProperties;
-    header?: React.CSSProperties;
-    border?: string;
-    background?: string;
-  };
-  axes?: {
-    row?: (_: { row: string[]; width: number; height: number }) => React.ReactNode;
-    column?: (_: { column: string[]; width: number; height: number }) => React.ReactNode;
-  };
-  accessors?: {
-    width?: (p: WidthParam<Name>) => number;
-    height?: (p: HeightParam<Name>) => number;
-  };
+  style?: PivotGridStyle;
+  axes?: Axes;
+  accessors?: Accessors<Name>;
   header?: (
     prop: {
       value: string;
@@ -78,32 +120,7 @@ type Props<Name extends string = string> = {
     },
   ) => React.ReactNode;
   dimensionLabels?: DimensionLabels | "top" | "left" | "none";
-} & (
-  | {
-      measures: Name[];
-      measuresPlacement?: "row" | "column";
-      cell?: (
-        prop: {
-          data: FragmentFrame<Name>;
-          measure: Name;
-          row: string[];
-          column: string[];
-          width: number;
-          height: number;
-        },
-      ) => React.ReactNode;
-    }
-  | {
-      cell: (
-        prop: {
-          data: FragmentFrame<Name>;
-          row: string[];
-          column: string[];
-          width: number;
-          height: number;
-        },
-      ) => React.ReactNode;
-    });
+};
 
 /**
  * For convinience we allow shortucts "top" | "left" | "none" for PivotGrid component for dimensionLabels prop,
@@ -120,12 +137,12 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
   const { data } = props;
   const cell = props.cell || defaultCell;
   const header = props.header || defaultHeader;
-  const axes = props.axes || (emptyObject as Defined<Props<Name>["axes"]>);
-  const accessors = props.accessors || (emptyObject as Defined<Props<Name>["accessors"]>);
-  const heightAccessors = accessors.height || (defaultHeight as Defined<Defined<Props<Name>["accessors"]>["height"]>);
-  const widthAccessors = accessors.width || (defaultWidth as Defined<Defined<Props<Name>["accessors"]>["width"]>);
+  const axes = props.axes || (emptyObject as Axes);
+  const accessors = props.accessors || (emptyObject as Accessors<Name>);
+  const heightAccessors = accessors.height || (defaultHeight as Defined<Accessors<Name>["height"]>);
+  const widthAccessors = accessors.width || (defaultWidth as Defined<Accessors<Name>["width"]>);
   const dimensionLabels = dimensionLabelsShortcut(props.dimensionLabels) || { row: "none", column: "none" };
-  const styleProp = props.style || (emptyObject as Defined<Props<Name>["style"]>);
+  const styleProp = props.style || (emptyObject as PivotGridStyle);
   const borderStyle = styleProp.border || defaultBorderStyle;
   const cellStyle = styleProp.cell || emptyObject;
   const headerStyle = styleProp.header || defaultHeaderStyle;
