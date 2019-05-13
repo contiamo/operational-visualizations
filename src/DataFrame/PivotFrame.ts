@@ -4,17 +4,17 @@ import { Matrix, PivotProps, Schema } from "./types";
 const intersect = <T>(...arr: T[][]): T[] => arr.reduce((prev, curr) => prev.filter(x => curr.includes(x)));
 
 // theoretically it can be bool, but TS doesn't allow to use bool as index value
-type DimensionValue = string;
+export type DimensionValue = string;
 
 export class PivotFrame<Name extends string = string> {
-  private readonly data: Matrix<any>;
-  private readonly schema: Schema<Name>;
-  private readonly prop: PivotProps<Name, Name>;
+  protected readonly data: Matrix<any>;
+  protected readonly schema: Schema<Name>;
+  protected readonly prop: PivotProps<Name, Name>;
 
-  private rowHeadersInternal!: DimensionValue[][];
-  private columnHeadersInternal!: DimensionValue[][];
-  private columnIndex!: number[][];
-  private rowIndex!: number[][];
+  protected rowHeadersInternal!: DimensionValue[][];
+  protected columnHeadersInternal!: DimensionValue[][];
+  protected columnIndex!: number[][];
+  protected rowIndex!: number[][];
 
   constructor(schema: Schema<Name>, data: Matrix<any>, prop: PivotProps<Name, Name>) {
     this.schema = schema;
