@@ -2,7 +2,7 @@ import { DimensionValue, PivotFrame } from "./PivotFrame";
 import { Matrix, PivotProps, Schema } from "./types";
 
 /**
- * This class exposes internal implemenatation of PivotFrame,
+ * This class exposes internal implementation of PivotFrame,
  * but it allows you to do optimisation in case you already have indexed prebuilt,
  * for example from the server response.
  * It means that the class can break without notice if we will change implementation,
