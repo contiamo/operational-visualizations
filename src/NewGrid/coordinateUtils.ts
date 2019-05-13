@@ -92,7 +92,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
         type: "Empty",
         rowIndex: columnIndex,
         columnIndex: rowIndex,
-        dimensionLabel: data.pivotColumns()[rowIndex] || "",
+        dimensionLabel: data.getPivotColumns()[rowIndex] || "",
       };
     }
 
@@ -101,7 +101,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
         type: "Empty",
         rowIndex: columnIndex,
         columnIndex: rowIndex,
-        dimensionLabel: data.pivotRows()[columnIndex] || "",
+        dimensionLabel: data.getPivotRows()[columnIndex] || "",
       };
     }
 
@@ -177,7 +177,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
       return {
         type: "RowHeader",
         row: data.rowHeaders()[rowIndexReal],
-        measure: data.pivotRows()[rowDepth],
+        measure: data.getPivotRows()[rowDepth],
         empty: rowIndexReal > 0 || measuresIndex > 0,
       };
     }
@@ -217,7 +217,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
       return {
         type: "ColumnHeader",
         column: data.columnHeaders()[columnIndexReal],
-        measure: data.pivotColumns()[columnDepth],
+        measure: data.getPivotColumns()[columnDepth],
         empty: columnIndexReal > 0 || measuresIndex > 0,
       };
     }
@@ -351,3 +351,114 @@ export const coordinateToHeightParam = <Name extends string = string>(
       throw new Error("Not exhaustive");
   }
 };
+
+/**
+ * Get number of slots required to show row headers, including row labels, row values, measure labels and axis
+ */
+export const getRowHeadersCount = <Name extends string = string>({
+  axes,
+  data,
+  dimensionLabels,
+  measuresPlacement,
+  measuresMultiplier,
+}: {
+  axes: {
+    // we don't care about exact types, we care if render props are present or not
+    // tslint:disable-next-line
+    row?: Function;
+    // tslint:disable-next-line
+    column?: Function;
+  };
+  data: PivotFrame<Name>;
+  dimensionLabels: DimensionLabels;
+  measuresPlacement: "row" | "column";
+  measuresMultiplier: number;
+}) => {
+  const rowsDepth = data.getPivotRows.length;
+  const showMeasureLabelsInRows = measuresPlacement === "row";
+
+  let rowHeadersCount =
+    // if we place labels on the left in rows we need to double number of slots
+    // because it will look like: labelA | valueA | labelB | valueB
+    rowsDepth * (dimensionLabels.row === "left" ? 2 : 1) +
+    // if we show measure labels and there is more than one measure add one slot for it
+    (showMeasureLabelsInRows && measuresMultiplier > 1 ? 1 : 0) +
+    // add one slot for axes
+    (axes.row ? 1 : 0);
+
+  // if we don't have rowHeaders slots and we show labels for columns on the left
+  // we need to add one slot for it
+  if (rowHeadersCount === 0 && dimensionLabels.column === "left") {
+    rowHeadersCount = 1;
+  }
+  return rowHeadersCount;
+};
+
+/**
+ * Get number of slots required to show column headers, including column labels, column values, measure labels and axis
+ */
+export const getColumnHeadersCount = <Name extends string = string>({
+  axes,
+  data,
+  dimensionLabels,
+  measuresPlacement,
+  measuresMultiplier,
+}: {
+  axes: {
+    // we don't care about exact types, we care if render props are present or not
+    // tslint:disable-next-line
+    row?: Function;
+    // tslint:disable-next-line
+    column?: Function;
+  };
+  data: PivotFrame<Name>;
+  dimensionLabels: DimensionLabels;
+  measuresPlacement: "row" | "column";
+  measuresMultiplier: number;
+}) => {
+  const columnDepth = data.getPivotColumns().length;
+  const showMeasureLabelsInColumns = measuresPlacement === "column";
+
+  // see getRowHeadersCount for explanation
+  let columnHeadersCount =
+    columnDepth * (dimensionLabels.column === "top" ? 2 : 1) +
+    (showMeasureLabelsInColumns && measuresMultiplier > 1 ? 1 : 0) +
+    (axes.column ? 1 : 0);
+
+  if (columnHeadersCount === 0 && dimensionLabels.row === "top") {
+    columnHeadersCount = 1;
+  }
+  return columnHeadersCount;
+};
+
+/**
+ * Get total number of row slots required to show the grid e.g. number of headers + number of data cells
+ * if we show measure labels in columns we need to increase number of data cell by number of measures
+ */
+export const getColumnCount = <Name extends string = string>({
+  rowHeadersCount,
+  data,
+  measuresPlacement,
+  measuresMultiplier,
+}: {
+  data: PivotFrame<Name>;
+  measuresPlacement: "row" | "column";
+  measuresMultiplier: number;
+  rowHeadersCount: number;
+}) => rowHeadersCount + data.columnHeaders().length * (measuresPlacement === "column" ? measuresMultiplier : 1);
+
+/**
+ * Get total number of column slots required to show the grid e.g. number of headers + number of data cells
+ * if we show measure labels in rows we need to increase number of data cell by number of measures
+ */
+export const getRowCount = <Name extends string = string>({
+  columnHeadersCount,
+  data,
+  measuresPlacement,
+  measuresMultiplier,
+}: {
+  data: PivotFrame<Name>;
+  measuresPlacement: "row" | "column";
+  measuresMultiplier: number;
+  columnHeadersCount: number;
+}) => columnHeadersCount + data.rowHeaders().length * (measuresPlacement === "row" ? measuresMultiplier : 1);

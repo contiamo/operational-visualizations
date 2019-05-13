@@ -2,7 +2,18 @@ import React, { useCallback, useMemo } from "react";
 import { GridChildComponentProps, VariableSizeGrid } from "react-window";
 import { FragmentFrame } from "../DataFrame/FragmentFrame";
 import { PivotFrame } from "../DataFrame/PivotFrame";
-import { coordinateToHeightParam, coordinateToWidthParam, exhaustiveCheck, indexToCoordinate } from "./coordinateUtils";
+
+import {
+  coordinateToHeightParam,
+  coordinateToWidthParam,
+  exhaustiveCheck,
+  getColumnCount,
+  getColumnHeadersCount,
+  getRowCount,
+  getRowHeadersCount,
+  indexToCoordinate,
+} from "./coordinateUtils";
+
 import { DimensionLabels, HeightParam, WidthParam } from "./types";
 
 type Diff<T, U> = T extends U ? never : T;
@@ -94,7 +105,18 @@ type Props<Name extends string = string> = {
       ) => React.ReactNode;
     });
 
+/**
+ * For convinience we allow shortucts "top" | "left" | "none" for PivotGrid component for dimensionLabels prop,
+ * For example, "top" is shortcut for { row: "top", column: "top" }.
+ * This function converts from shortcut to extended version
+ */
+const dimensionLabelsShortcut = (dimensionLabels?: DimensionLabels | "top" | "left" | "none") =>
+  (typeof dimensionLabels === "string" ? { row: dimensionLabels, column: dimensionLabels } : dimensionLabels) as
+    | DimensionLabels
+    | undefined;
+
 export function PivotGrid<Name extends string = string>(props: Props<Name>) {
+  // assigning default values
   const { data } = props;
   const cell = props.cell || defaultCell;
   const header = props.header || defaultHeader;
@@ -102,40 +124,32 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
   const accessors = props.accessors || (emptyObject as Defined<Props<Name>["accessors"]>);
   const heightAccessors = accessors.height || (defaultHeight as Defined<Defined<Props<Name>["accessors"]>["height"]>);
   const widthAccessors = accessors.width || (defaultWidth as Defined<Defined<Props<Name>["accessors"]>["width"]>);
-  const dimensionLabels = ((typeof props.dimensionLabels === "string"
-    ? { row: props.dimensionLabels, column: props.dimensionLabels }
-    : props.dimensionLabels) || { row: "none", column: "none" }) as DimensionLabels;
-
+  const dimensionLabels = dimensionLabelsShortcut(props.dimensionLabels) || { row: "none", column: "none" };
   const styleProp = props.style || (emptyObject as Defined<Props<Name>["style"]>);
   const borderStyle = styleProp.border || defaultBorderStyle;
   const cellStyle = styleProp.cell || emptyObject;
   const headerStyle = styleProp.header || defaultHeaderStyle;
   const backgroundStyle = styleProp.background || defaultBackground;
-
   const measures = "measures" in props ? props.measures : [];
   const measuresPlacement = ("measures" in props ? props.measuresPlacement : undefined) || "column";
 
+  // calculating size of the grid
   const measuresMultiplier = measures.length === 0 ? 1 : measures.length;
-  let rowHeadersCount =
-    data.rowHeaders()[0].length * (dimensionLabels.row === "left" ? 2 : 1) +
-    (measuresPlacement === "row" && measuresMultiplier > 1 ? 1 : 0) +
-    (axes.row ? 1 : 0);
-  if (rowHeadersCount === 0 && dimensionLabels.column === "left") {
-    rowHeadersCount = 1;
-  }
-
-  let columnHeadersCount =
-    data.columnHeaders()[0].length * (dimensionLabels.column === "top" ? 2 : 1) +
-    (measuresPlacement === "column" && measuresMultiplier > 1 ? 1 : 0) +
-    (axes.column ? 1 : 0);
-  if (columnHeadersCount === 0 && dimensionLabels.row === "top") {
-    columnHeadersCount = 1;
-  }
-
-  const columnCount =
-    rowHeadersCount + data.columnHeaders().length * (measuresPlacement === "column" ? measuresMultiplier : 1);
-  const rowCount =
-    columnHeadersCount + data.rowHeaders().length * (measuresPlacement === "row" ? measuresMultiplier : 1);
+  const rowHeadersCount = getRowHeadersCount({ axes, data, dimensionLabels, measuresPlacement, measuresMultiplier });
+  const columnHeadersCount = getColumnHeadersCount({
+    axes,
+    data,
+    dimensionLabels,
+    measuresPlacement,
+    measuresMultiplier,
+  });
+  const columnCount = getColumnCount({ rowHeadersCount, data, measuresPlacement, measuresMultiplier });
+  const rowCount = getRowCount({
+    columnHeadersCount,
+    data,
+    measuresPlacement,
+    measuresMultiplier,
+  });
 
   const indexToCoordinateMemoised = useMemo(
     () =>
@@ -263,6 +277,8 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
       return <div style={{ ...border, ...style }}>{item}</div>;
     },
     [
+      columnCount,
+      rowCount,
       indexToCoordinateMemoised,
       data,
       cell,
