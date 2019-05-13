@@ -134,21 +134,21 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
   const measuresPlacement = ("measures" in props ? props.measuresPlacement : undefined) || "column";
 
   // calculating size of the grid
-  const measuresMultiplier = measures.length === 0 ? 1 : measures.length;
-  const rowHeadersCount = getRowHeadersCount({ axes, data, dimensionLabels, measuresPlacement, measuresMultiplier });
+  const measuresCount = measures.length === 0 ? 1 : measures.length;
+  const rowHeadersCount = getRowHeadersCount({ axes, data, dimensionLabels, measuresPlacement, measuresCount });
   const columnHeadersCount = getColumnHeadersCount({
     axes,
     data,
     dimensionLabels,
     measuresPlacement,
-    measuresMultiplier,
+    measuresCount,
   });
-  const columnCount = getColumnCount({ rowHeadersCount, data, measuresPlacement, measuresMultiplier });
+  const columnCount = getColumnCount({ rowHeadersCount, data, measuresPlacement, measuresCount });
   const rowCount = getRowCount({
     columnHeadersCount,
     data,
     measuresPlacement,
-    measuresMultiplier,
+    measuresCount,
   });
 
   const indexToCoordinateMemoised = useMemo(
@@ -157,7 +157,7 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
         rowHeadersCount,
         measuresPlacement,
         columnHeadersCount,
-        measuresMultiplier,
+        measuresCount,
         data,
         axes,
         measures,
@@ -167,7 +167,7 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
       rowHeadersCount,
       measuresPlacement,
       columnHeadersCount,
-      measuresMultiplier,
+      measuresCount,
       data,
       axes,
       measures,

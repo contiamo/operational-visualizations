@@ -8,7 +8,7 @@ export type IndexToCoordinate = <Name extends string = string>(
     rowHeadersCount: number;
     measuresPlacement: "row" | "column";
     columnHeadersCount: number;
-    measuresMultiplier: number;
+    measuresCount: number;
     data: PivotFrame<Name>;
     axes: {
       // we don't care about exact types, we care if render props are present or not
@@ -64,29 +64,28 @@ export const indexToCoordinate: IndexToCoordinate = ({
   rowHeadersCount,
   measuresPlacement,
   columnHeadersCount,
-  measuresMultiplier,
+  measuresCount,
   data,
   axes,
   measures,
   dimensionLabels,
 }) => ({ columnIndex, rowIndex }) => {
   const columnIndexReal = Math.floor(
-    (columnIndex - rowHeadersCount) / (measuresPlacement === "column" ? measuresMultiplier : 1),
+    (columnIndex - rowHeadersCount) / (measuresPlacement === "column" ? measuresCount : 1),
   );
-  const rowIndexReal = Math.floor(
-    (rowIndex - columnHeadersCount) / (measuresPlacement === "row" ? measuresMultiplier : 1),
-  );
+  const rowIndexReal = Math.floor((rowIndex - columnHeadersCount) / (measuresPlacement === "row" ? measuresCount : 1));
   const measuresIndex =
-    (measuresPlacement === "column" ? columnIndex - rowHeadersCount : rowIndex - columnHeadersCount) %
-    measuresMultiplier;
+    (measuresPlacement === "column" ? columnIndex - rowHeadersCount : rowIndex - columnHeadersCount) % measuresCount;
 
   /** column headers, columns measures, column axis */
   const isRowHeaders = columnIndex < rowHeadersCount;
   /** row headers, columns measures, column axis */
   const isColumnHeaders = rowIndex < columnHeadersCount;
+  /** top left zone with empty cells */
   const isEmpty = isRowHeaders && isColumnHeaders;
 
   if (isEmpty) {
+    // if we place column labels on the left and this is column right before columns headers
     if (dimensionLabels.column === "left" && columnIndex === rowHeadersCount - 1) {
       return {
         type: "Empty",
@@ -96,6 +95,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
       };
     }
 
+    // if we place row labels at the top and this is row right above row headers
     if (dimensionLabels.row === "top" && rowIndex === columnHeadersCount - 1) {
       return {
         type: "Empty",
@@ -105,11 +105,16 @@ export const indexToCoordinate: IndexToCoordinate = ({
       };
     }
 
+    // if this the row with column measure
     if (
+      // show measures in column headers
       measuresPlacement === "column" &&
-      measuresMultiplier > 1 &&
-      (axes.column ? rowIndex === columnHeadersCount - 2 : rowIndex === columnHeadersCount - 1)
+      // and we have more than one measure
+      measuresCount > 1 &&
+      // and we are in the row exactly above data cells or exactly above axes
+      rowIndex === columnHeadersCount - 1 - (axes.column ? 1 : 0)
     ) {
+      // if this is a cell with row axis
       if (axes.row && columnIndex === rowHeadersCount - 1) {
         return {
           type: "Empty",
@@ -123,11 +128,16 @@ export const indexToCoordinate: IndexToCoordinate = ({
         };
       }
     }
+
     if (
+      // show measures in row headers
       measuresPlacement === "row" &&
-      measuresMultiplier > 1 &&
-      (axes.row ? columnIndex === rowHeadersCount - 2 : columnIndex === rowHeadersCount - 1)
+      // and we have more than one measure
+      measuresCount > 1 &&
+      // and we are in the column exactly before data cells or exactly before axes
+      columnIndex === rowHeadersCount - 1 - (axes.row ? 1 : 0)
     ) {
+      // if this is a cell with column axis
       if (axes.column && rowIndex === columnHeadersCount - 1) {
         return {
           type: "Empty",
@@ -141,6 +151,14 @@ export const indexToCoordinate: IndexToCoordinate = ({
         };
       }
     }
+    // if we are in the cell with row axis in it and column axis in it
+    if (axes.column && rowIndex === columnHeadersCount - 1 && axes.row && columnIndex === rowHeadersCount - 1) {
+      return {
+        type: "Empty",
+        axis: true,
+      };
+    }
+    // if we are in the column with row axis in it
     if (axes.row && columnIndex === rowHeadersCount - 1) {
       return {
         type: "Empty",
@@ -148,6 +166,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
         axis: true,
       };
     }
+    // if we are in the row with column axis in it
     if (axes.column && rowIndex === columnHeadersCount - 1) {
       return {
         type: "Empty",
@@ -155,13 +174,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
         axis: true,
       };
     }
-    if (axes.column && rowIndex === columnHeadersCount - 1 && axes.row && columnIndex === rowHeadersCount - 1) {
-      return {
-        type: "Empty",
-        axis: true,
-      };
-    }
-
+    // other empty cells
     return {
       type: "Empty",
       rowIndex: columnIndex,
@@ -172,8 +185,14 @@ export const indexToCoordinate: IndexToCoordinate = ({
     const rowDepth = rowDimensionLabelsOnLeft ? Math.floor(columnIndex / 2) : columnIndex;
     const dimension = data.rowHeaders()[rowIndexReal][rowDepth];
 
-    const showDimensionLabel = rowDimensionLabelsOnLeft && columnIndex % 2 === 0;
-    if (showDimensionLabel && dimension !== undefined) {
+    if (
+      // do we show row dimensions on the left
+      rowDimensionLabelsOnLeft &&
+      // and this is even column (0, 2, 4)
+      columnIndex % 2 === 0 &&
+      // and there is dimension value
+      dimension !== undefined
+    ) {
       return {
         type: "RowHeader",
         row: data.rowHeaders()[rowIndexReal],
@@ -183,7 +202,9 @@ export const indexToCoordinate: IndexToCoordinate = ({
     }
 
     const prevRow = data.rowHeaders()[rowIndexReal - 1];
+    // there is no dimnsion so it should be cell with measure or axis
     if (dimension === undefined) {
+      // are we in column with row axis
       if (axes.row && rowDepth === rowHeadersCount - 1) {
         return {
           type: "RowAxis",
@@ -191,7 +212,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
           measure: measures[measuresIndex],
         };
       } else {
-        // measure dimension
+        // or with measure labels
         return {
           type: "RowHeader",
           row: data.rowHeaders()[rowIndexReal],
@@ -212,8 +233,14 @@ export const indexToCoordinate: IndexToCoordinate = ({
     const columnDepth = columnDimensionLabelsAbove ? Math.floor(rowIndex / 2) : rowIndex;
     const dimension = data.columnHeaders()[columnIndexReal][columnDepth];
 
-    const showDimensionLabel = columnDimensionLabelsAbove && rowIndex % 2 === 0;
-    if (showDimensionLabel && dimension !== undefined) {
+    if (
+      // do we show column label on the top
+      columnDimensionLabelsAbove &&
+      // and this is even row (0, 2, 4)
+      rowIndex % 2 === 0 &&
+      // and there is dimension value
+      dimension !== undefined
+    ) {
       return {
         type: "ColumnHeader",
         column: data.columnHeaders()[columnIndexReal],
@@ -223,7 +250,9 @@ export const indexToCoordinate: IndexToCoordinate = ({
     }
 
     const prevColumn = data.columnHeaders()[columnIndexReal - 1];
+    // there is no dimnsion so it should be cell with measure or axis
     if (dimension === undefined) {
+      // are we in row with column axis
       if (axes.column && columnDepth === columnHeadersCount - 1) {
         return {
           type: "ColumnAxis",
@@ -231,7 +260,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
           measure: measures[measuresIndex],
         };
       } else {
-        // measure dimension
+        // or with measure labels
         return {
           type: "ColumnHeader",
           column: data.columnHeaders()[columnIndexReal],
@@ -360,7 +389,7 @@ export const getRowHeadersCount = <Name extends string = string>({
   data,
   dimensionLabels,
   measuresPlacement,
-  measuresMultiplier,
+  measuresCount,
 }: {
   axes: {
     // we don't care about exact types, we care if render props are present or not
@@ -372,7 +401,7 @@ export const getRowHeadersCount = <Name extends string = string>({
   data: PivotFrame<Name>;
   dimensionLabels: DimensionLabels;
   measuresPlacement: "row" | "column";
-  measuresMultiplier: number;
+  measuresCount: number;
 }) => {
   const rowsDepth = data.getPivotRows.length;
   const showMeasureLabelsInRows = measuresPlacement === "row";
@@ -382,7 +411,7 @@ export const getRowHeadersCount = <Name extends string = string>({
     // because it will look like: labelA | valueA | labelB | valueB
     rowsDepth * (dimensionLabels.row === "left" ? 2 : 1) +
     // if we show measure labels and there is more than one measure add one slot for it
-    (showMeasureLabelsInRows && measuresMultiplier > 1 ? 1 : 0) +
+    (showMeasureLabelsInRows && measuresCount > 1 ? 1 : 0) +
     // add one slot for axes
     (axes.row ? 1 : 0);
 
@@ -402,7 +431,7 @@ export const getColumnHeadersCount = <Name extends string = string>({
   data,
   dimensionLabels,
   measuresPlacement,
-  measuresMultiplier,
+  measuresCount,
 }: {
   axes: {
     // we don't care about exact types, we care if render props are present or not
@@ -414,7 +443,7 @@ export const getColumnHeadersCount = <Name extends string = string>({
   data: PivotFrame<Name>;
   dimensionLabels: DimensionLabels;
   measuresPlacement: "row" | "column";
-  measuresMultiplier: number;
+  measuresCount: number;
 }) => {
   const columnDepth = data.getPivotColumns().length;
   const showMeasureLabelsInColumns = measuresPlacement === "column";
@@ -422,7 +451,7 @@ export const getColumnHeadersCount = <Name extends string = string>({
   // see getRowHeadersCount for explanation
   let columnHeadersCount =
     columnDepth * (dimensionLabels.column === "top" ? 2 : 1) +
-    (showMeasureLabelsInColumns && measuresMultiplier > 1 ? 1 : 0) +
+    (showMeasureLabelsInColumns && measuresCount > 1 ? 1 : 0) +
     (axes.column ? 1 : 0);
 
   if (columnHeadersCount === 0 && dimensionLabels.row === "top") {
@@ -439,13 +468,13 @@ export const getColumnCount = <Name extends string = string>({
   rowHeadersCount,
   data,
   measuresPlacement,
-  measuresMultiplier,
+  measuresCount,
 }: {
   data: PivotFrame<Name>;
   measuresPlacement: "row" | "column";
-  measuresMultiplier: number;
+  measuresCount: number;
   rowHeadersCount: number;
-}) => rowHeadersCount + data.columnHeaders().length * (measuresPlacement === "column" ? measuresMultiplier : 1);
+}) => rowHeadersCount + data.columnHeaders().length * (measuresPlacement === "column" ? measuresCount : 1);
 
 /**
  * Get total number of column slots required to show the grid e.g. number of headers + number of data cells
@@ -455,10 +484,10 @@ export const getRowCount = <Name extends string = string>({
   columnHeadersCount,
   data,
   measuresPlacement,
-  measuresMultiplier,
+  measuresCount,
 }: {
   data: PivotFrame<Name>;
   measuresPlacement: "row" | "column";
-  measuresMultiplier: number;
+  measuresCount: number;
   columnHeadersCount: number;
-}) => columnHeadersCount + data.rowHeaders().length * (measuresPlacement === "row" ? measuresMultiplier : 1);
+}) => columnHeadersCount + data.rowHeaders().length * (measuresPlacement === "row" ? measuresCount : 1);
