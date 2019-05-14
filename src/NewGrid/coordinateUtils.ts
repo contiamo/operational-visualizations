@@ -403,7 +403,7 @@ export const getRowHeadersCount = <Name extends string = string>({
   measuresPlacement: "row" | "column";
   measuresCount: number;
 }) => {
-  const rowsDepth = data.getPivotRows.length;
+  const rowsDepth = data.getPivotRows().length;
   const showMeasureLabelsInRows = measuresPlacement === "row";
 
   let rowHeadersCount =
