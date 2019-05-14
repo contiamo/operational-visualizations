@@ -99,6 +99,13 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
             measures={["sales", "revenue"]}
             style={{
               cell: { padding: "10px", textAlign: "right" },
+              header: {
+                background: "rgb(246,246,246)",
+                padding: "10px",
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+              },
             }}
             measuresPlacement="row"
             dimensionLabels="top"

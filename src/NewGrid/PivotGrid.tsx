@@ -37,7 +37,7 @@ const toString = (value: boolean | string) => {
 
 const defaultCell = <Name extends string = string>({ data, measure }: { data: FragmentFrame<Name>; measure: Name }) => {
   const value = data.peak(measure);
-  return value === null ? "–" : `${value}`;
+  return value === null ? null : `${value}`;
 };
 
 const defaultHeader = ({ value }: { value: string; width: number; height: number }) => (
@@ -139,7 +139,7 @@ const dimensionLabelsShortcut = (dimensionLabels?: DimensionLabels | "top" | "le
     | DimensionLabels
     | undefined;
 
-export function PivotGrid<Name extends string = string>(props: Props<Name>) {
+export const PivotGrid = React.memo(<Name extends string = string>(props: Props<Name>) => {
   // assigning default values
   const { data } = props;
   const cell = props.cell || defaultCell;
@@ -225,7 +225,6 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
       let border: React.CSSProperties = {
         borderTop: borderStyle,
         borderLeft: borderStyle,
-        background: backgroundStyle,
       };
       let item: React.ReactNode = null;
 
@@ -240,7 +239,7 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
             const value = cellCoordinates.dimensionLabel;
             item = header({ value, height, width });
           } else {
-            border = {};
+            border = { ...headerStyle };
           }
           break;
         case "Cell":
@@ -260,7 +259,7 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
           break;
         case "RowHeader":
           if (cellCoordinates.empty) {
-            border = { ...headerStyle, borderLeft: borderStyle, background: backgroundStyle };
+            border = { ...headerStyle, borderLeft: borderStyle };
           } else {
             if (cellCoordinates.rowIndex !== undefined) {
               border = { ...headerStyle, ...border };
@@ -275,7 +274,7 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
           break;
         case "ColumnHeader":
           if (cellCoordinates.empty) {
-            border = { ...headerStyle, borderTop: borderStyle, background: backgroundStyle };
+            border = { ...headerStyle, borderTop: borderStyle };
           } else {
             if (cellCoordinates.columnIndex !== undefined) {
               border = { ...headerStyle, ...border };
@@ -309,7 +308,7 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
         border.borderBottom = borderStyle;
       }
 
-      return <div style={{ ...border, ...style }}>{item}</div>;
+      return <div style={{ background: backgroundStyle, ...border, ...style }}>{item}</div>;
     },
     [
       columnCount,
@@ -339,4 +338,4 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
       {Cell}
     </VariableSizeGrid>
   );
-}
+});
