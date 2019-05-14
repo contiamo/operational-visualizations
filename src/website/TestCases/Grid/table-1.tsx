@@ -100,6 +100,8 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
+            measuresPlacement="row"
+            dimensionLabels="top"
           />
         )}
       </AutoSizer>,

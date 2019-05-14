@@ -2,8 +2,19 @@ import React, { useCallback, useMemo } from "react";
 import { GridChildComponentProps, VariableSizeGrid } from "react-window";
 import { FragmentFrame } from "../DataFrame/FragmentFrame";
 import { PivotFrame } from "../DataFrame/PivotFrame";
-import { coordinateToHeightParam, coordinateToWidthParam, exhaustiveCheck, indexToCoordinate } from "./coordinateUtils";
-import { HeightParam, WidthParam } from "./types";
+
+import {
+  coordinateToHeightParam,
+  coordinateToWidthParam,
+  exhaustiveCheck,
+  getColumnCount,
+  getColumnHeadersCount,
+  getRowCount,
+  getRowHeadersCount,
+  indexToCoordinate,
+} from "./coordinateUtils";
+
+import { DimensionLabels, HeightParam, WidthParam } from "./types";
 
 type Diff<T, U> = T extends U ? never : T;
 type Defined<T> = Diff<T, undefined>;
@@ -41,24 +52,66 @@ const defaultHeaderStyle: React.CSSProperties = {
   whiteSpace: "nowrap",
 };
 
-type Props<Name extends string = string> = {
+/**
+ * We support text only pivot grid out of the box,
+ * for this case you don't need to provide cell render prop, but you need to provide measures
+ */
+interface TextOnlyPivotGridProps<Name extends string> {
+  measures: Name[];
+  /** default value is "column" */
+  measuresPlacement?: "row" | "column";
+  cell?: (
+    prop: {
+      data: FragmentFrame<Name>;
+      measure: Name;
+      row: string[];
+      column: string[];
+      width: number;
+      height: number;
+    },
+  ) => React.ReactNode;
+}
+
+/**
+ * This is props for general PivotGrid, you need to provide cell render prop.
+ * It can return any React component which will be rendered in cells
+ */
+interface GeneralPivotGridProps<Name extends string> {
+  cell: (
+    prop: {
+      data: FragmentFrame<Name>;
+      row: string[];
+      column: string[];
+      width: number;
+      height: number;
+    },
+  ) => React.ReactNode;
+}
+
+interface Accessors<Name extends string> {
+  width?: (p: WidthParam<Name>) => number;
+  height?: (p: HeightParam<Name>) => number;
+}
+
+interface Axes {
+  row?: (rowProps: { row: string[]; width: number; height: number }) => React.ReactNode;
+  column?: (columnProps: { column: string[]; width: number; height: number }) => React.ReactNode;
+}
+
+interface PivotGridStyle {
+  cell?: React.CSSProperties;
+  header?: React.CSSProperties;
+  border?: string;
+  background?: string;
+}
+
+type Props<Name extends string = string> = (TextOnlyPivotGridProps<Name> | GeneralPivotGridProps<Name>) & {
   width: number;
   height: number;
   data: PivotFrame<Name>;
-  style?: {
-    cell?: React.CSSProperties;
-    header?: React.CSSProperties;
-    border?: string;
-    background?: string;
-  };
-  axes?: {
-    row?: (_: { row: string[]; width: number; height: number }) => React.ReactNode;
-    column?: (_: { column: string[]; width: number; height: number }) => React.ReactNode;
-  };
-  accessors?: {
-    width?: (p: WidthParam<Name>) => number;
-    height?: (p: HeightParam<Name>) => number;
-  };
+  style?: PivotGridStyle;
+  axes?: Axes;
+  accessors?: Accessors<Name>;
   header?: (
     prop: {
       value: string;
@@ -66,64 +119,54 @@ type Props<Name extends string = string> = {
       height: number;
     },
   ) => React.ReactNode;
-} & (
-  | {
-      measures: Name[];
-      measuresPlacement?: "row" | "column";
-      cell?: (
-        prop: {
-          data: FragmentFrame<Name>;
-          measure: Name;
-          row: string[];
-          column: string[];
-          width: number;
-          height: number;
-        },
-      ) => React.ReactNode;
-    }
-  | {
-      cell: (
-        prop: {
-          data: FragmentFrame<Name>;
-          row: string[];
-          column: string[];
-          width: number;
-          height: number;
-        },
-      ) => React.ReactNode;
-    });
+  dimensionLabels?: DimensionLabels | "top" | "left" | "none";
+};
+
+/**
+ * For convinience we allow shortucts "top" | "left" | "none" for PivotGrid component for dimensionLabels prop,
+ * For example, "top" is shortcut for { row: "top", column: "top" }.
+ * This function converts from shortcut to extended version
+ */
+const dimensionLabelsShortcut = (dimensionLabels?: DimensionLabels | "top" | "left" | "none") =>
+  (typeof dimensionLabels === "string" ? { row: dimensionLabels, column: dimensionLabels } : dimensionLabels) as
+    | DimensionLabels
+    | undefined;
 
 export function PivotGrid<Name extends string = string>(props: Props<Name>) {
+  // assigning default values
   const { data } = props;
   const cell = props.cell || defaultCell;
   const header = props.header || defaultHeader;
-  const axes = props.axes || (emptyObject as Defined<Props<Name>["axes"]>);
-  const accessors = props.accessors || (emptyObject as Defined<Props<Name>["accessors"]>);
-  const heightAccessors = accessors.height || (defaultHeight as Defined<Defined<Props<Name>["accessors"]>["height"]>);
-  const widthAccessors = accessors.width || (defaultWidth as Defined<Defined<Props<Name>["accessors"]>["width"]>);
-
-  const styleProp = props.style || (emptyObject as Defined<Props<Name>["style"]>);
+  const axes = props.axes || (emptyObject as Axes);
+  const accessors = props.accessors || (emptyObject as Accessors<Name>);
+  const heightAccessors = accessors.height || (defaultHeight as Defined<Accessors<Name>["height"]>);
+  const widthAccessors = accessors.width || (defaultWidth as Defined<Accessors<Name>["width"]>);
+  const dimensionLabels = dimensionLabelsShortcut(props.dimensionLabels) || { row: "none", column: "none" };
+  const styleProp = props.style || (emptyObject as PivotGridStyle);
   const borderStyle = styleProp.border || defaultBorderStyle;
   const cellStyle = styleProp.cell || emptyObject;
   const headerStyle = styleProp.header || defaultHeaderStyle;
   const backgroundStyle = styleProp.background || defaultBackground;
-
   const measures = "measures" in props ? props.measures : [];
   const measuresPlacement = ("measures" in props ? props.measuresPlacement : undefined) || "column";
 
-  const measuresMultiplier = measures.length === 0 ? 1 : measures.length;
-  const rowHeadersCount =
-    (data.rowHeaders()[0] || []).length +
-    (measuresPlacement === "row" && measuresMultiplier > 1 ? 1 : 0) +
-    (axes.row ? 1 : 0);
-  const columnHeadersCount =
-    (data.columnHeaders()[0] || []).length +
-    (measuresPlacement === "column" && measuresMultiplier > 1 ? 1 : 0) +
-    (axes.column ? 1 : 0);
-  const columnCount =
-    rowHeadersCount + data.columnHeaders().length * (measuresPlacement === "column" ? measuresMultiplier : 1);
-  const rowCount =
-    columnHeadersCount + data.rowHeaders().length * (measuresPlacement === "row" ? measuresMultiplier : 1);
+  // calculating size of the grid
+  const measuresCount = measures.length === 0 ? 1 : measures.length;
+  const rowHeadersCount = getRowHeadersCount({ axes, data, dimensionLabels, measuresPlacement, measuresCount });
+  const columnHeadersCount = getColumnHeadersCount({
+    axes,
+    data,
+    dimensionLabels,
+    measuresPlacement,
+    measuresCount,
+  });
+  const columnCount = getColumnCount({ rowHeadersCount, data, measuresPlacement, measuresCount });
+  const rowCount = getRowCount({
+    columnHeadersCount,
+    data,
+    measuresPlacement,
+    measuresCount,
+  });
 
   const indexToCoordinateMemoised = useMemo(
     () =>
@@ -131,12 +174,23 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
         rowHeadersCount,
         measuresPlacement,
         columnHeadersCount,
-        measuresMultiplier,
+        measuresCount,
         data,
         axes,
         measures,
+        dimensionLabels,
       }),
-    [rowHeadersCount, measuresPlacement, columnHeadersCount, measuresMultiplier, data, axes, measures],
+    [
+      rowHeadersCount,
+      measuresPlacement,
+      columnHeadersCount,
+      measuresCount,
+      data,
+      axes,
+      measures,
+      dimensionLabels.row,
+      dimensionLabels.column,
+    ],
   );
 
   const rowHeight = useCallback(
@@ -151,9 +205,11 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
     [widthAccessors, indexToCoordinateMemoised],
   );
 
-  // Cell is repsonsible for rendering all kind of cells: dimensions, measure deimensions, data, axes.
-  // Because from the Grid point of view they all the same.
-  // We use some math to differentiate what is what based on idexes.
+  /**
+   * Cell is repsonsible for rendering all kind of cells: dimensions, measure deimensions, data, axes.
+   * Because from the Grid point of view they all the same.
+   * We use some math to differentiate what is what based on idexes.
+   */
   const Cell = useMemo(
     () => ({ columnIndex, rowIndex, style }: GridChildComponentProps) => {
       const cellCoordinates = indexToCoordinateMemoised({ columnIndex, rowIndex });
@@ -170,7 +226,12 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
 
       switch (cellCoordinates.type) {
         case "Empty":
-          border = {};
+          if (cellCoordinates.dimensionLabel !== undefined) {
+            border = { ...headerStyle, ...border };
+            item = `${cellCoordinates.dimensionLabel}`;
+          } else {
+            border = {};
+          }
           break;
         case "Cell":
           border = {
@@ -233,6 +294,8 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
       return <div style={{ ...border, ...style }}>{item}</div>;
     },
     [
+      columnCount,
+      rowCount,
       indexToCoordinateMemoised,
       data,
       cell,
