@@ -21,6 +21,12 @@ const defaultHeaderStyle: React.CSSProperties = {
   whiteSpace: "nowrap",
 };
 
+const defaultHeader = ({ value }: { value: string }) => <span title={value}>{value}</span>;
+
+const defaultDimensionStyle: React.CSSProperties = {
+  fontWeight: "bold",
+};
+
 interface Props<Name extends string = string> {
   width: number;
   height: number;
@@ -28,6 +34,7 @@ interface Props<Name extends string = string> {
   style?: {
     cell?: React.CSSProperties;
     header?: React.CSSProperties;
+    dimension?: React.CSSProperties;
     border?: string;
     background?: string;
   };
@@ -35,6 +42,11 @@ interface Props<Name extends string = string> {
     width?: () => number;
     height?: () => number;
   };
+  header?: (
+    prop: {
+      value: Name;
+    },
+  ) => React.ReactNode;
 }
 
 export function TableGrid<Name extends string = string>(props: Props<Name>) {
@@ -53,6 +65,9 @@ export function TableGrid<Name extends string = string>(props: Props<Name>) {
   const backgroundStyle = styleProp.background || defaultBackground;
   const headerStyle = styleProp.header || defaultHeaderStyle;
 
+  const header = props.header || defaultHeader;
+  const dimensionStyle = styleProp.dimension || defaultDimensionStyle;
+
   const Cell = useMemo(
     () => ({ columnIndex, rowIndex, style }: GridChildComponentProps) => {
       let border: React.CSSProperties = {
@@ -63,8 +78,9 @@ export function TableGrid<Name extends string = string>(props: Props<Name>) {
 
       let item: React.ReactNode = null;
       if (rowIndex === 0) {
-        border = { ...headerStyle, ...border };
-        item = data.schema[columnIndex].name;
+        border = { ...headerStyle, ...dimensionStyle, ...border };
+        const value = data.schema[columnIndex].name;
+        item = header({ value });
       } else {
         border = { ...cellStyle, ...border };
         item = `${data.cell(rowIndex - 1, columnIndex)}`;
@@ -79,7 +95,7 @@ export function TableGrid<Name extends string = string>(props: Props<Name>) {
 
       return <div style={{ ...border, ...style }}>{item}</div>;
     },
-    [data, cellStyle, borderStyle, backgroundStyle],
+    [data, cellStyle, borderStyle, backgroundStyle, header, dimensionStyle],
   );
 
   return (
