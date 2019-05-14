@@ -40,7 +40,9 @@ const defaultCell = <Name extends string = string>({ data, measure }: { data: Fr
   return value === null ? "–" : `${value}`;
 };
 
-const defaultHeader = ({ value }: { value: string; width: number; height: number }) => toString(value);
+const defaultHeader = ({ value }: { value: string; width: number; height: number }) => (
+  <span title={value}>{toString(value)}</span>
+);
 
 const defaultWidth = () => 120;
 const defaultHeight = () => 35;
@@ -50,6 +52,10 @@ const defaultHeaderStyle: React.CSSProperties = {
   textOverflow: "ellipsis",
   overflow: "hidden",
   whiteSpace: "nowrap",
+};
+
+const defaultDimensionStyle: React.CSSProperties = {
+  fontWeight: "bold",
 };
 
 /**
@@ -101,6 +107,7 @@ interface Axes {
 interface PivotGridStyle {
   cell?: React.CSSProperties;
   header?: React.CSSProperties;
+  dimension?: React.CSSProperties;
   border?: string;
   background?: string;
 }
@@ -145,6 +152,7 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
   const styleProp = props.style || (emptyObject as PivotGridStyle);
   const borderStyle = styleProp.border || defaultBorderStyle;
   const cellStyle = styleProp.cell || emptyObject;
+  const dimensionStyle = styleProp.dimension || defaultDimensionStyle;
   const headerStyle = styleProp.header || defaultHeaderStyle;
   const backgroundStyle = styleProp.background || defaultBackground;
   const measures = "measures" in props ? props.measures : [];
@@ -224,11 +232,13 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
       const height = rowHeight(rowIndex);
       const width = columnWidth(columnIndex);
 
+      // TODO refactor item, border assignment see https://github.com/contiamo/operational-visualizations/issues/47
       switch (cellCoordinates.type) {
         case "Empty":
           if (cellCoordinates.dimensionLabel !== undefined) {
-            border = { ...headerStyle, ...border };
-            item = `${cellCoordinates.dimensionLabel}`;
+            border = { ...headerStyle, ...dimensionStyle, ...border };
+            const value = cellCoordinates.dimensionLabel;
+            item = header({ value, height, width });
           } else {
             border = {};
           }
@@ -252,22 +262,30 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
           if (cellCoordinates.empty) {
             border = { ...headerStyle, borderLeft: borderStyle, background: backgroundStyle };
           } else {
-            border = { ...headerStyle, ...border };
-            const value = (cellCoordinates.rowIndex !== undefined
-              ? cellCoordinates.row[cellCoordinates.rowIndex]
-              : cellCoordinates.measure)!;
-            item = header({ value, height, width });
+            if (cellCoordinates.rowIndex !== undefined) {
+              border = { ...headerStyle, ...border };
+              const value = cellCoordinates.row[cellCoordinates.rowIndex];
+              item = header({ value, height, width });
+            } else {
+              border = { ...headerStyle, ...dimensionStyle, ...border };
+              const value = cellCoordinates.measure!;
+              item = header({ value, height, width });
+            }
           }
           break;
         case "ColumnHeader":
           if (cellCoordinates.empty) {
             border = { ...headerStyle, borderTop: borderStyle, background: backgroundStyle };
           } else {
-            border = { ...headerStyle, ...border };
-            const value = (cellCoordinates.columnIndex !== undefined
-              ? cellCoordinates.column[cellCoordinates.columnIndex]
-              : cellCoordinates.measure)!;
-            item = header({ value, height, width });
+            if (cellCoordinates.columnIndex !== undefined) {
+              border = { ...headerStyle, ...border };
+              const value = cellCoordinates.column[cellCoordinates.columnIndex];
+              item = header({ value, height, width });
+            } else {
+              border = { ...headerStyle, ...dimensionStyle, ...border };
+              const value = cellCoordinates.measure!;
+              item = header({ value, height, width });
+            }
           }
           break;
         case "RowAxis":
