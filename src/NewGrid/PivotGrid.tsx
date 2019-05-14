@@ -232,6 +232,7 @@ export function PivotGrid<Name extends string = string>(props: Props<Name>) {
       const height = rowHeight(rowIndex);
       const width = columnWidth(columnIndex);
 
+      // TODO refactor item, border assignment see https://github.com/contiamo/operational-visualizations/issues/47
       switch (cellCoordinates.type) {
         case "Empty":
           if (cellCoordinates.dimensionLabel !== undefined) {
