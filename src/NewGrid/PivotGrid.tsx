@@ -94,8 +94,8 @@ interface Accessors<Name extends string> {
 }
 
 interface Axes {
-  row?: (_: { row: string[]; width: number; height: number }) => React.ReactNode;
-  column?: (_: { column: string[]; width: number; height: number }) => React.ReactNode;
+  row?: (rowProps: { row: string[]; width: number; height: number }) => React.ReactNode;
+  column?: (columnProps: { column: string[]; width: number; height: number }) => React.ReactNode;
 }
 
 interface PivotGridStyle {
