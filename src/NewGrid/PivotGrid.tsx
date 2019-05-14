@@ -308,7 +308,7 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
         border.borderBottom = borderStyle;
       }
 
-      return <div style={{ background: backgroundStyle, ...border, ...style }}>{item}</div>;
+      return <div style={{ ...border, ...style }}>{item}</div>;
     },
     [
       columnCount,
@@ -322,20 +322,21 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
       borderStyle,
       cellStyle,
       headerStyle,
-      backgroundStyle,
     ],
   );
 
   return (
-    <VariableSizeGrid
-      height={props.height}
-      width={props.width}
-      columnCount={columnCount}
-      rowCount={rowCount}
-      rowHeight={rowHeight}
-      columnWidth={columnWidth}
-    >
-      {Cell}
-    </VariableSizeGrid>
+    <div style={{ background: backgroundStyle, height: props.height, width: props.width }}>
+      <VariableSizeGrid
+        height={props.height}
+        width={props.width}
+        columnCount={columnCount}
+        rowCount={rowCount}
+        rowHeight={rowHeight}
+        columnWidth={columnWidth}
+      >
+        {Cell}
+      </VariableSizeGrid>
+    </div>
   );
 });
