@@ -36,7 +36,7 @@ export type WidthParam<Name extends string = string> =
     }
   | {
       // width of a column header or a data cell
-      column: string[];
+      column: number;
       measure?: Name;
     };
 
@@ -75,7 +75,7 @@ export type HeightParam<Name extends string = string> =
     }
   | {
       // height of a row header or a data cell
-      row: string[];
+      row: number;
       measure?: Name;
     };
 
@@ -122,36 +122,36 @@ export type CellCoordinates<Name extends string = string> =
     }
   | {
       type: "Cell";
-      row: string[];
-      column: string[];
       measure?: Name;
-      rowIndex: number;
-      columnIndex: number;
+      row: number;
+      column: number;
     }
   | {
       type: "RowHeader";
-      row: string[];
-      // either rowIndex or measure should be present
+      row: number;
+      // either label or measure should be present
       rowIndex?: number;
+      label?: string;
       measure?: Name;
       empty?: boolean; // true if adjacent cell have the same value
     }
   | {
       type: "ColumnHeader";
-      column: string[];
-      // either columnIndex or measure should be present
+      column: number;
+      // either label or measure should be present
       columnIndex?: number;
+      label?: string;
       measure?: Name;
       empty?: boolean; // true if adjacent cell have the same value
     }
   | {
       type: "RowAxis";
-      row: string[]; // values of dimension
+      row: number;
       measure?: Name;
     }
   | {
       type: "ColumnAxis";
-      column: string[]; // values of dimension
+      column: number;
       measure?: Name;
     };
 

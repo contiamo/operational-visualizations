@@ -49,12 +49,18 @@ export class PivotFrame<Name extends string = string> {
   public row(rowIdentifier: number) {
     this.buildIndex();
     const row = this.rowIndex[rowIdentifier];
+    if (row === undefined) {
+      throw new Error(`Can't find row #${rowIdentifier}`);
+    }
     return new FragmentFrame(this.schema, this.data, row);
   }
 
   public column(columnIdentifier: number) {
     this.buildIndex();
     const column = this.columnIndex[columnIdentifier];
+    if (column === undefined) {
+      throw new Error(`Can't find column #${columnIdentifier}`);
+    }
     return new FragmentFrame(this.schema, this.data, column);
   }
 

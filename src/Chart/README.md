@@ -12,94 +12,54 @@ There are several renderers which can be combined if desired:
 
 ## Usage
 
-```js
-;(() => {
-  const AreaRenderer = {
-    accessors: {
-      interpolate: "monotoneX",
+```ts
+import React from "react";
+import ReactDOM from "react-dom";
+
+import { Chart as ChartFacade, VisualizationWrapper } from "@operational/visualizations";
+import { Data, ChartConfig, Accessors } from "@operational/visualizations/lib/Chart/typings";
+
+const Chart: React.FC<{
+  data: Data;
+  config?: ChartConfig;
+  accessors?: Record<string, Accessors<any>>;
+}> = React.memo(({ data, accessors, config }) => (
+  <VisualizationWrapper facade={ChartFacade} data={data} accessors={accessors} config={config} />
+));
+
+const data: Data = {
+  series: [
+    {
+      data: [
+        { x: new Date(2018, 2, 10), y: Math.floor(Math.random() * 500) - 250 },
+        { x: new Date(2018, 2, 11), y: Math.floor(Math.random() * 500) - 250 },
+        { x: new Date(2018, 2, 12), y: Math.floor(Math.random() * 500) - 250 },
+        { x: new Date(2018, 2, 13), y: Math.floor(Math.random() * 500) - 250 },
+        { x: new Date(2018, 2, 14), y: Math.floor(Math.random() * 500) - 250 },
+        { x: new Date(2018, 2, 16), y: Math.floor(Math.random() * 500) - 250 },
+        { x: new Date(2018, 2, 17), y: Math.floor(Math.random() * 500) - 250 },
+      ],
+      name: "Pageviews: homepage",
+      key: "series1",
+      renderAs: [{ type: "bars" }, { type: "text" }],
     },
-    type: "area",
-  }
-
-  const LineRenderer = {
-    accessors: {
-      interpolate: "monotoneX",
+  ],
+  axes: {
+    x1: {
+      type: "time",
+      start: new Date(2018, 2, 10),
+      end: new Date(2018, 2, 17),
+      interval: "day",
+      title: "2018",
     },
-    type: "line",
-  }
-
-  const data: any = {
-    series: [
-      {
-        data: [
-          { x: new Date(2018, 2, 11), y: 100 },
-          { x: new Date(2018, 2, 12), y: 300 },
-          { x: new Date(2018, 2, 13), y: 500 },
-          { x: new Date(2018, 2, 14), y: 300 },
-          { x: new Date(2018, 2, 15), y: 200 },
-        ],
-        name: "Pageviews 2018",
-        key: "series1",
-        renderAs: [AreaRenderer, LineRenderer],
-      },
-      {
-        data: [
-          { x: new Date(2018, 2, 10), y: 500 },
-          { x: new Date(2018, 2, 11), y: 450 },
-          { x: new Date(2018, 2, 12), y: 250 },
-          { x: new Date(2018, 2, 13), y: 425 },
-          { x: new Date(2018, 2, 14), y: 570 },
-        ],
-        name: "Pageviews 2017",
-        yAxis: "y2",
-        key: "series2",
-        renderAs: [AreaRenderer, LineRenderer],
-      },
-    ],
-    axes: {
-      x1: {
-        type: "time",
-        start: new Date(2018, 2, 10),
-        end: new Date(2018, 2, 15),
-        interval: "day",
-      },
-      y1: {
-        type: "quant",
-      },
-      y2: {
-        type: "quant",
-      },
+    y1: {
+      type: "quant",
     },
-  }
+  },
+};
 
-  class Chart extends React.Component {
-    state = {
-      config: {
-        width: 250,
-        height: 250,
-      },
-      data: data,
-      accessors: {},
-    }
-
-    render() {
-      return (
-        <VisualizationWrapper
-          facade={Chart}
-          data={this.state.data}
-          accessors={this.state.accessors}
-          config={this.state.config}
-        />
-      )
-    }
-  }
-
-  return (
-    <div>
-      <Chart />
-    </div>
-  )
-})()
+const rootElement = document.getElementById("root");
+ReactDOM.render(<Chart data={data} />, rootElement);
 ```
 
 For general use-cases, check out our collection of [visual test cases](/visualizations/chart/testcases).
