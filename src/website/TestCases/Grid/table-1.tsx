@@ -98,9 +98,17 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
             data={pivotedFrame}
             measures={["sales", "revenue"]}
             style={{
-              cell: { padding: "10px", textAlign: "right" },
+              cell: { padding: "10px", textAlign: "right", background: "#fff" },
+              background: "rgb(246, 246, 246)",
+              // background: "linear-gradient(to right, orange , yellow, green, cyan, blue, violet)",
+              header: {
+                padding: "10px",
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+              },
             }}
-            measuresPlacement="row"
+            measuresPlacement="column"
             dimensionLabels="top"
           />
         )}
