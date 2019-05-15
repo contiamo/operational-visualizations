@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { MarathonEnvironment } from "../../Marathon";
 
 import DataFrame from "../../../DataFrame/DataFrame";
-import { TableGrid } from "../../../NewGrid/TableGrid";
+import { TableGrid } from "../../../Grid/TableGrid";
 
 import AutoSizer from "react-virtualized-auto-sizer";
 

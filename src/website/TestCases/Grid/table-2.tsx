@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { MarathonEnvironment } from "../../Marathon";
 
 import DataFrame from "../../../DataFrame/DataFrame";
-import { PivotGrid } from "../../../NewGrid/PivotGrid";
+import { PivotGrid } from "../../../Grid/PivotGrid";
 
 import AutoSizer from "react-virtualized-auto-sizer";
 

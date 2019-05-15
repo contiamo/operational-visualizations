@@ -14,8 +14,8 @@ export { default as computeTimeAxes } from "./axis_utils/compute_time_axes";
 export { default as DataFrame } from "./DataFrame/DataFrame";
 export { PivotFramePreindexed } from "./DataFrame/PivotFramePreindexed";
 export { PivotFrame } from "./DataFrame/PivotFrame";
-export * from "./NewGrid/PivotGrid";
-export * from "./NewGrid/TableGrid";
+export * from "./Grid/PivotGrid";
+export * from "./Grid/TableGrid";
 
 // Type exports
 export * from "./axis_utils/typings";
