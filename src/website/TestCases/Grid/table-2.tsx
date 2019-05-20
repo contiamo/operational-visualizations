@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useMemo } from "react";
 import ReactDOM from "react-dom";
 import { MarathonEnvironment } from "../../Marathon";
 
@@ -87,23 +87,9 @@ const Chart: React.FC<{
   <VisualizationWrapper facade={ChartFacade} data={data} accessors={accessors} config={config} />
 ));
 
-// @ts-ignore
-import * as d3 from "d3";
+import { scaleOrdinal } from "d3-scale";
 import { PivotFrame } from "../../../DataFrame/PivotFrame";
-
-const Axis: React.FC<{ orientation?: "left"; scale: any; transform: string }> = React.memo(({ scale, transform }) => {
-  const ref = useRef<SVGGElement>(null);
-  useEffect(
-    () => {
-      if (ref.current) {
-        const axis = d3.axisLeft(scale);
-        d3.select(ref.current).call(axis);
-      }
-    },
-    [ref, scale],
-  );
-  return <g transform={transform} ref={ref} />;
-});
+import { Axis } from "../../../ReactComponents/Axis";
 
 // TODO: move it to stats module
 const uniqueValues = <Name extends string>(row: number, column: Name, pivotedFrame: PivotFrame<Name>): string[] => {
@@ -124,8 +110,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
         const cities = useMemo(() => uniqueValues(row, "Customer.City", pivotedFrame), [row]);
         const scale = useMemo(
           () =>
-            d3
-              .scaleOrdinal()
+            scaleOrdinal()
               .domain(cities)
               .range(cities.map((_, i) => (cities.length - 1 - i) * 35 + 15)),
           [cities],
