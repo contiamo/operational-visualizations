@@ -80,6 +80,9 @@ import { getCategoricalStats } from "../../../DataFrame/stats";
 import { Axis } from "../../../ReactComponents/Axis";
 import { Bars, useScaleBand, useScaleLinear } from "../../../ReactComponents/Bars";
 
+const padding = 5;
+const barWidth = 30; // (cellHeight - padding * 2) / maxNumberOfBars;
+
 export const marathon = ({ test, container }: MarathonEnvironment) => {
   test("Column measures", () => {
     const pivotedFrame = frame.pivot({
@@ -89,11 +92,11 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
 
     const axes = {
       row: ({ row, width, height }: { row: number; width: number; height: number }) => {
-        const h = height - 10;
+        const h = height - 2 * padding;
         const yScale = useScaleBand({ data: pivotedFrame.row(row), column: "Customer.City", size: height });
         return (
-          <svg width={width} height={h} viewBox={`0 0 ${width} ${h}`} style={{ margin: "5 0" }}>
-            <Axis scale={yScale} transform={`translate(${width}, -5)`} />
+          <svg width={width} height={h} viewBox={`0 0 ${width} ${h}`} style={{ margin: `${padding} 0` }}>
+            <Axis scale={yScale} transform={`translate(${width}, -${padding})`} />
           </svg>
         );
       },
@@ -112,25 +115,25 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
               height: param => {
                 if ("row" in param) {
                   const cities = getCategoricalStats(pivotedFrame.row(param.row)).unqiue["Customer.City"];
-                  return cities.length * 30 + 15;
+                  return cities.length * barWidth + padding * 2;
                 }
                 return "columnIndex" in param || ("measure" in param && param.measure === true) ? 35 : 100;
               },
               width: param => ("rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : 100),
             }}
             cell={({ data, row, width, height, measure }: any) => {
-              const w = width - 10;
-              const h = height - 10;
+              const w = width - 2 * padding;
+              const h = height - 2 * padding;
               const yScale = useScaleBand({ data: pivotedFrame.row(row), column: "Customer.City", size: h });
               const xScale = useScaleLinear({ data: frame, size: w, column: "sales" });
               return (
-                <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ margin: 5 }}>
+                <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ margin: padding }}>
                   <Bars
                     data={data}
                     xScale={xScale}
                     yScale={yScale}
-                    x={r => r[measure === "sales" ? 5 : 6]}
-                    y={r => r[2]}
+                    x={frame.getAccessor(measure)}
+                    y={frame.getAccessor("Customer.City")}
                     style={{ fill: "#1f78b4" }}
                   />
                 </svg>
