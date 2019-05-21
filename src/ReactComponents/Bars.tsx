@@ -1,48 +1,57 @@
-import { max, range } from "d3-array";
 import { ScaleBand, scaleBand, ScaleLinear, scaleLinear } from "d3-scale";
 import React, { useMemo } from "react";
+import { DataFrame } from "..";
+import { getCategoricalStats, getQuantitiveStats } from "../DataFrame/stats";
+import { IteratableFrame } from "../DataFrame/types";
 
 export interface BarsProps {
-  data: any[]; // TODO change to DataFrame
-  widthScale: ScaleBand<any>;
-  heightScale: ScaleLinear<any, any>;
+  data: DataFrame<string>;
+  xScale: ScaleLinear<any, any>;
+  yScale: ScaleBand<any>;
+  y: (row: any[]) => number;
+  x: (row: any[]) => number;
   transform?: React.SVGAttributes<SVGRectElement>["transform"];
   style?: React.SVGAttributes<SVGGElement>["style"] | ((i: number) => React.SVGAttributes<SVGGElement>["style"]);
 }
 
-export const useScaleBand = ({
+export const useScaleBand = <Name extends string>({
   data,
+  column,
   size,
 }: {
-  data: any[]; // TODO change to DataFrame
+  data: IteratableFrame<Name>;
+  column: Name;
   size: number;
 }) =>
   useMemo(
     () =>
       scaleBand()
-        .domain(range(0, data.length) as any)
+        .domain(getCategoricalStats(data).unqiue[column])
         .range([0, size]),
     [data, size],
   );
 
-export const useScaleLinear = ({
+export const useScaleLinear = <Name extends string>({
   data,
+  column,
   size,
 }: {
-  data: any[]; // TODO change to DataFrame
+  data: IteratableFrame<Name>;
+  column: Name;
   size: number;
 }) =>
   useMemo(
-    () =>
-      scaleLinear()
-        .domain([0, max(data)])
-        .range([0, size]),
-    [data, size],
+    () => {
+      return scaleLinear()
+        .domain([0, getQuantitiveStats(data).max[column]])
+        .range([0, size]);
+    },
+    [data, size, column],
   );
 
 export const Bars: React.FC<BarsProps> = React.memo(props => {
-  const { data, transform, widthScale, heightScale } = props;
-  const height = heightScale(heightScale.domain()[1]);
+  const { data, transform, xScale, yScale, x, y } = props;
+  // const width = xScale(xScale.domain()[1]);
   // TypeScript can't handle this case normally :/
   const styleProp =
     typeof props.style === "function"
@@ -53,10 +62,10 @@ export const Bars: React.FC<BarsProps> = React.memo(props => {
     <g transform={transform}>
       {data.map((d, i) => (
         <rect
-          x={widthScale(i)}
-          y={height - heightScale(d)}
-          width={widthScale.bandwidth()}
-          height={heightScale(d)}
+          y={yScale(y(d))}
+          x={0}
+          height={yScale.bandwidth()}
+          width={xScale(x(d))}
           style={styleProp.isFunction ? styleProp.style(i) : styleProp.style}
           key={i}
         />

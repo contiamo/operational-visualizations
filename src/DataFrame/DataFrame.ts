@@ -21,6 +21,10 @@ export default class DataFrame<Name extends string = string> implements Iteratab
     return this.data[rowIndex][columnIndex];
   }
 
+  public map<A>(callback: (row: any[], index: number) => A) {
+    return this.data.map(callback);
+  }
+
   public forEach(columns: Name | Name[], cb: (...columnValue: any[]) => void) {
     if (!Array.isArray(columns)) {
       columns = [columns];

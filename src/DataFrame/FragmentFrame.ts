@@ -11,6 +11,10 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
     this.index = index;
   }
 
+  public map<A>(callback: (row: any[], index: number) => A) {
+    return this.index.map((i, j) => callback(this.data[i], j));
+  }
+
   public forEach(columns: Name | Name[], cb: (...columnValue: any[]) => void) {
     if (!Array.isArray(columns)) {
       columns = [columns];

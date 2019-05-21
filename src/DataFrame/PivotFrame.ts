@@ -16,10 +16,16 @@ export class PivotFrame<Name extends string = string> {
   protected columnIndex!: number[][];
   protected rowIndex!: number[][];
 
+  // we need those for referential transperancy
+  private readonly rowCache: Map<number, FragmentFrame<Name>>;
+  private readonly columnCache: Map<number, FragmentFrame<Name>>;
+
   constructor(schema: Schema<Name>, data: Matrix<any>, prop: PivotProps<Name, Name>) {
     this.schema = schema;
     this.data = data;
     this.prop = prop;
+    this.rowCache = new Map<number, FragmentFrame<Name>>();
+    this.columnCache = new Map<number, FragmentFrame<Name>>();
   }
 
   /**
@@ -52,7 +58,10 @@ export class PivotFrame<Name extends string = string> {
     if (row === undefined) {
       throw new Error(`Can't find row #${rowIdentifier}`);
     }
-    return new FragmentFrame(this.schema, this.data, row);
+    if (!this.rowCache.has(rowIdentifier)) {
+      this.rowCache.set(rowIdentifier, new FragmentFrame(this.schema, this.data, row));
+    }
+    return this.rowCache.get(rowIdentifier)!;
   }
 
   public column(columnIdentifier: number) {
@@ -61,7 +70,10 @@ export class PivotFrame<Name extends string = string> {
     if (column === undefined) {
       throw new Error(`Can't find column #${columnIdentifier}`);
     }
-    return new FragmentFrame(this.schema, this.data, column);
+    if (!this.columnCache.has(columnIdentifier)) {
+      this.columnCache.set(columnIdentifier, new FragmentFrame(this.schema, this.data, column));
+    }
+    return this.columnCache.get(columnIdentifier)!;
   }
 
   public cell(rowIdentifier: number, columnIdentifier: number) {

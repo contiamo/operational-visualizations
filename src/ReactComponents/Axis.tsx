@@ -1,11 +1,11 @@
 import { axisLeft } from "d3-axis";
-import { ScaleOrdinal } from "d3-scale";
+import { ScaleBand } from "d3-scale";
 import { select } from "d3-selection";
 import React, { useEffect, useRef } from "react";
 
 export interface AxisProps {
   /** see  https://github.com/d3/d3-scale */
-  scale: ScaleOrdinal<any, any>;
+  scale: ScaleBand<any>; // AxisScale<Domain>;
   // left | right | bottom | top
   orientation?: "left";
   /** see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform */
