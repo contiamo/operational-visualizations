@@ -4,15 +4,31 @@ import { DataFrame } from "..";
 import { getCategoricalStats, getQuantitiveStats } from "../DataFrame/stats";
 import { IteratableFrame } from "../DataFrame/types";
 
-export interface BarsProps {
-  data: DataFrame<string>;
+export interface BarsPropsHorizontal {
+  direction?: "horizontal";
   xScale: ScaleLinear<any, any>;
-  yScale: ScaleBand<any>;
-  y: (row: any[]) => number;
+  yScale: ScaleBand<string>;
   x: (row: any[]) => number;
+  y: (row: any[]) => string;
+}
+
+export interface BarsPropsVeritcal {
+  direction: "vertical";
+  yScale: ScaleLinear<any, any>;
+  xScale: ScaleBand<string>;
+  y: (row: any[]) => number;
+  x: (row: any[]) => string;
+}
+
+export type BarsProps = (BarsPropsHorizontal | BarsPropsVeritcal) & {
+  data: DataFrame<string>;
   transform?: React.SVGAttributes<SVGRectElement>["transform"];
   style?: React.SVGAttributes<SVGGElement>["style"] | ((i: number) => React.SVGAttributes<SVGGElement>["style"]);
-}
+};
+
+/**
+ * TODO: move scales to stats and use WeakMap instead of useMemo
+ */
 
 export const useScaleBand = <Name extends string>({
   data,
@@ -41,35 +57,52 @@ export const useScaleLinear = <Name extends string>({
   size: number;
 }) =>
   useMemo(
-    () => {
-      return scaleLinear()
+    () =>
+      scaleLinear()
         .domain([0, getQuantitiveStats(data).max[column]])
-        .range([0, size]);
-    },
+        .range([0, size]),
     [data, size, column],
   );
 
 export const Bars: React.FC<BarsProps> = React.memo(props => {
-  const { data, transform, xScale, yScale, x, y } = props;
-  // const width = xScale(xScale.domain()[1]);
   // TypeScript can't handle this case normally :/
   const styleProp =
     typeof props.style === "function"
       ? { isFunction: true as true, style: props.style }
       : { isFunction: false as false, style: props.style };
 
-  return (
-    <g transform={transform}>
-      {data.map((d, i) => (
-        <rect
-          y={yScale(y(d))}
-          x={0}
-          height={yScale.bandwidth()}
-          width={xScale(x(d))}
-          style={styleProp.isFunction ? styleProp.style(i) : styleProp.style}
-          key={i}
-        />
-      ))}
-    </g>
-  );
+  if (props.direction === "vertical") {
+    const { data, transform, xScale, yScale, x, y } = props;
+    const height = yScale(yScale.domain()[1]);
+    return (
+      <g transform={transform}>
+        {data.map((d, i) => (
+          <rect
+            x={xScale(x(d))}
+            y={height - yScale(y(d))}
+            width={xScale.bandwidth()}
+            height={yScale(y(d))}
+            style={styleProp.isFunction ? styleProp.style(i) : styleProp.style}
+            key={i}
+          />
+        ))}
+      </g>
+    );
+  } else {
+    const { data, transform, xScale, yScale, x, y } = props;
+    return (
+      <g transform={transform}>
+        {data.map((d, i) => (
+          <rect
+            y={yScale(y(d))}
+            x={0}
+            height={yScale.bandwidth()}
+            width={xScale(x(d))}
+            style={styleProp.isFunction ? styleProp.style(i) : styleProp.style}
+            key={i}
+          />
+        ))}
+      </g>
+    );
+  }
 });
