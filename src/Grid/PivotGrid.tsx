@@ -63,36 +63,45 @@ const defaultDimensionStyle: React.CSSProperties = {
  * for this case you don't need to provide cell render prop, but you need to provide measures
  */
 interface TextOnlyPivotGridProps<Name extends string> {
+  type?: "text";
   measures: Name[];
   /** default value is "column" */
   measuresPlacement?: "row" | "column";
-  cell?: (
-    prop: {
-      data: FragmentFrame<Name>;
-      measure: Name;
-      width: number;
-      height: number;
-      row: number;
-      column: number;
-    },
-  ) => React.ReactNode;
 }
 
 /**
  * This is props for general PivotGrid, you need to provide cell render prop.
  * It can return any React component which will be rendered in cells
  */
-interface GeneralPivotGridProps<Name extends string> {
-  cell: (
-    prop: {
-      data: FragmentFrame<Name>;
-      width: number;
-      height: number;
-      row: number;
-      column: number;
-    },
-  ) => React.ReactNode;
-}
+type GeneralPivotGridProps<Name extends string> =
+  | {
+      type: "general";
+      cell: (
+        prop: {
+          data: FragmentFrame<Name>;
+          width: number;
+          height: number;
+          row: number;
+          column: number;
+        },
+      ) => React.ReactNode;
+    }
+  | {
+      type: "generalWithMeasures";
+      measures: Name[];
+      /** default value is "column" */
+      measuresPlacement?: "row" | "column";
+      cell: (
+        prop: {
+          data: FragmentFrame<Name>;
+          width: number;
+          height: number;
+          row: number;
+          column: number;
+          measure: Name;
+        },
+      ) => React.ReactNode;
+    };
 
 interface Accessors<Name extends string> {
   width?: (p: WidthParam<Name>) => number;
@@ -142,7 +151,7 @@ const dimensionLabelsShortcut = (dimensionLabels?: DimensionLabels | "top" | "le
 export const PivotGrid = React.memo(<Name extends string = string>(props: Props<Name>) => {
   // assigning default values
   const { data } = props;
-  const cell = props.cell || defaultCell;
+  const cell = "cell" in props ? props.cell : defaultCell;
   const header = props.header || defaultHeader;
   const axes = props.axes || (emptyObject as Axes);
   const accessors = props.accessors || (emptyObject as Accessors<Name>);

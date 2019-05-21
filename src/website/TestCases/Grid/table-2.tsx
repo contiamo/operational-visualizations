@@ -106,6 +106,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
       <AutoSizer style={{ width: "100%", minHeight: "450px", height: "100%" }}>
         {size => (
           <PivotGrid
+            type="generalWithMeasures"
             measures={["sales", "revenue"]}
             width={size.width}
             height={size.height}
@@ -121,7 +122,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
               },
               width: param => ("rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : 100),
             }}
-            cell={({ data, row, width, height, measure }: any) => {
+            cell={({ data, row, width, height, measure }) => {
               const w = width - 2 * padding;
               const h = height - 2 * padding;
               const yScale = useScaleBand({ data: pivotedFrame.row(row), column: "Customer.City", size: h });

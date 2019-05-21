@@ -1,6 +1,5 @@
 import { ScaleBand, scaleBand, ScaleLinear, scaleLinear } from "d3-scale";
 import React, { useMemo } from "react";
-import { DataFrame } from "..";
 import { getCategoricalStats, getQuantitiveStats } from "../DataFrame/stats";
 import { IteratableFrame } from "../DataFrame/types";
 
@@ -20,8 +19,8 @@ export interface BarsPropsVeritcal {
   x: (row: any[]) => string;
 }
 
-export type BarsProps = (BarsPropsHorizontal | BarsPropsVeritcal) & {
-  data: DataFrame<string>;
+export type BarsProps<Name extends string> = (BarsPropsHorizontal | BarsPropsVeritcal) & {
+  data: IteratableFrame<Name>;
   transform?: React.SVGAttributes<SVGRectElement>["transform"];
   style?: React.SVGAttributes<SVGGElement>["style"] | ((i: number) => React.SVGAttributes<SVGGElement>["style"]);
 };
@@ -64,7 +63,9 @@ export const useScaleLinear = <Name extends string>({
     [data, size, column],
   );
 
-export const Bars: React.FC<BarsProps> = React.memo(props => {
+type BarsComponent = <Name extends string>(props: BarsProps<Name>) => React.ReactElement | null;
+
+export const Bars: BarsComponent = React.memo(props => {
   // TypeScript can't handle this case normally :/
   const styleProp =
     typeof props.style === "function"
