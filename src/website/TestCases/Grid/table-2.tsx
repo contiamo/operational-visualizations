@@ -82,7 +82,13 @@ import { Bars } from "../../../ReactComponents/Bars";
 import { useScaleBand, useScaleLinear } from "../../../ReactComponents/scale";
 
 const padding = 5;
-const barWidth = 30; // (cellHeight - padding * 2) / maxNumberOfBars;
+const chartWidth = 100;
+const chartHeight = 100;
+// TODO:
+// - implement proper math for this magic number
+// - implement padding for bars
+const maxNumberOfBars = 3;
+const barWidth = (chartHeight - padding * 2) / maxNumberOfBars;
 
 export const marathon = ({ test, container }: MarathonEnvironment) => {
   test("Column measures", () => {
@@ -118,9 +124,10 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
                 if ("row" in param) {
                   return uniqueValues(pivotedFrame.row(param.row), "Customer.City").length * barWidth + padding * 2;
                 }
-                return "columnIndex" in param || ("measure" in param && param.measure === true) ? 35 : 100;
+                return "columnIndex" in param || ("measure" in param && param.measure === true) ? 35 : chartHeight;
               },
-              width: param => ("rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : 100),
+              width: param =>
+                "rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : chartWidth,
             }}
             cell={({ data, row, width, height, measure }) => {
               const w = width - 2 * padding;

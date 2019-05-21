@@ -4,7 +4,7 @@
  * Not sure it is the optimal way.
  *
  * TODO: revise this later, as well revise `forEach` method,
- *  maybe it should return the same way as `map` does.
+ *  maybe it should return row the same way as `map` does.
  */
 
 import { IteratableFrame } from "./types";
