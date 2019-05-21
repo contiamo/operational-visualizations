@@ -1,21 +1,21 @@
 import { ScaleBand, ScaleLinear } from "d3-scale";
 import React from "react";
-import { IteratableFrame } from "../DataFrame/types";
+import { Accessor, IteratableFrame } from "../DataFrame/types";
 
 export interface BarsPropsHorizontal {
   direction?: "horizontal";
   xScale: ScaleLinear<any, any>;
   yScale: ScaleBand<string>;
-  x: (row: any[]) => number;
-  y: (row: any[]) => string;
+  x: Accessor<string, string>;
+  y: Accessor<string, number>;
 }
 
 export interface BarsPropsVeritcal {
   direction: "vertical";
   yScale: ScaleLinear<any, any>;
   xScale: ScaleBand<string>;
-  y: (row: any[]) => number;
-  x: (row: any[]) => string;
+  y: Accessor<string, number>;
+  x: Accessor<string, string>;
 }
 
 export type BarsProps<Name extends string> = (BarsPropsHorizontal | BarsPropsVeritcal) & {
@@ -40,10 +40,10 @@ export const Bars: BarsComponent = React.memo(props => {
       <g transform={transform}>
         {data.map((d, i) => (
           <rect
-            x={xScale(x(d))}
-            y={height - yScale(y(d))}
+            x={xScale(d[x.index])}
+            y={height - yScale(d[y.index])}
             width={xScale.bandwidth()}
-            height={yScale(y(d))}
+            height={yScale(d[y.index])}
             style={styleProp.isFunction ? styleProp.style(i) : styleProp.style}
             key={i}
           />
@@ -56,10 +56,10 @@ export const Bars: BarsComponent = React.memo(props => {
       <g transform={transform}>
         {data.map((d, i) => (
           <rect
-            y={yScale(y(d))}
+            y={yScale(d[y.index])}
             x={0}
             height={yScale.bandwidth()}
-            width={xScale(x(d))}
+            width={xScale(d[x.index])}
             style={styleProp.isFunction ? styleProp.style(i) : styleProp.style}
             key={i}
           />

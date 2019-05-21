@@ -1,10 +1,5 @@
 import { PivotFrame } from "./PivotFrame";
-import { IteratableFrame, Matrix, PivotProps, Schema } from "./types";
-
-export interface Accessor<Name extends string> {
-  (row: any[]): any;
-  column: Name;
-}
+import { Accessor, IteratableFrame, Matrix, PivotProps, Schema } from "./types";
 
 export default class DataFrame<Name extends string = string> implements IteratableFrame<Name> {
   private readonly data: Matrix<any>;
@@ -37,6 +32,7 @@ export default class DataFrame<Name extends string = string> implements Iteratab
       }
       const accessor = ((row: any[]) => row[index]) as Accessor<Name>;
       accessor.column = column;
+      accessor.index = index;
       this.accessorCache.set(column, accessor);
     }
     return this.accessorCache.get(column)!;
