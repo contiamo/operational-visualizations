@@ -1,6 +1,5 @@
-import { ScaleBand, scaleBand, ScaleLinear, scaleLinear } from "d3-scale";
-import React, { useMemo } from "react";
-import { getCategoricalStats, getQuantitiveStats } from "../DataFrame/stats";
+import { ScaleBand, ScaleLinear } from "d3-scale";
+import React from "react";
 import { IteratableFrame } from "../DataFrame/types";
 
 export interface BarsPropsHorizontal {
@@ -24,44 +23,6 @@ export type BarsProps<Name extends string> = (BarsPropsHorizontal | BarsPropsVer
   transform?: React.SVGAttributes<SVGRectElement>["transform"];
   style?: React.SVGAttributes<SVGGElement>["style"] | ((i: number) => React.SVGAttributes<SVGGElement>["style"]);
 };
-
-/**
- * TODO: move scales to stats and use WeakMap instead of useMemo
- */
-
-export const useScaleBand = <Name extends string>({
-  data,
-  column,
-  size,
-}: {
-  data: IteratableFrame<Name>;
-  column: Name;
-  size: number;
-}) =>
-  useMemo(
-    () =>
-      scaleBand()
-        .domain(getCategoricalStats(data).unqiue[column])
-        .range([0, size]),
-    [data, size],
-  );
-
-export const useScaleLinear = <Name extends string>({
-  data,
-  column,
-  size,
-}: {
-  data: IteratableFrame<Name>;
-  column: Name;
-  size: number;
-}) =>
-  useMemo(
-    () =>
-      scaleLinear()
-        .domain([0, getQuantitiveStats(data).max[column]])
-        .range([0, size]),
-    [data, size, column],
-  );
 
 type BarsComponent = <Name extends string>(props: BarsProps<Name>) => React.ReactElement | null;
 

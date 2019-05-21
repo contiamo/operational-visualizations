@@ -1,10 +1,10 @@
-import { IteratableFrame } from "./types";
-
 /**
  * TODO: change API of this module it is ugly
  */
 
-const weakMemoize = <A extends object, B>(func: (a: A) => B) => {
+import { IteratableFrame } from "./types";
+
+export const weakMemoize = <A extends object, B>(func: (a: A) => B) => {
   const cache = new WeakMap();
   return (a: A) => {
     if (!cache.has(a)) {

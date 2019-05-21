@@ -78,7 +78,8 @@ const frame = new DataFrame(rawData.columns, rawData.rows);
 
 import { getCategoricalStats } from "../../../DataFrame/stats";
 import { Axis } from "../../../ReactComponents/Axis";
-import { Bars, useScaleBand, useScaleLinear } from "../../../ReactComponents/Bars";
+import { Bars } from "../../../ReactComponents/Bars";
+import { useScaleBand, useScaleLinear } from "../../../ReactComponents/scale";
 
 const padding = 5;
 const barWidth = 30; // (cellHeight - padding * 2) / maxNumberOfBars;
@@ -93,7 +94,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
     const axes = {
       row: ({ row, width, height }: { row: number; width: number; height: number }) => {
         const h = height - 2 * padding;
-        const yScale = useScaleBand({ data: pivotedFrame.row(row), column: "Customer.City", size: height });
+        const yScale = useScaleBand({ frame: pivotedFrame.row(row), column: "Customer.City", size: height });
         return (
           <svg width={width} height={h} viewBox={`0 0 ${width} ${h}`} style={{ margin: `${padding} 0` }}>
             <Axis scale={yScale} transform={`translate(${width}, -${padding})`} />
@@ -125,8 +126,8 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
             cell={({ data, row, width, height, measure }) => {
               const w = width - 2 * padding;
               const h = height - 2 * padding;
-              const yScale = useScaleBand({ data: pivotedFrame.row(row), column: "Customer.City", size: h });
-              const xScale = useScaleLinear({ data: frame, size: w, column: "sales" });
+              const yScale = useScaleBand({ frame: pivotedFrame.row(row), column: "Customer.City", size: h });
+              const xScale = useScaleLinear({ frame, size: w, column: "sales" });
               return (
                 <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ margin: padding }}>
                   <Bars
