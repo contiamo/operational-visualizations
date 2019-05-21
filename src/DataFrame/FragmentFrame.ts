@@ -44,24 +44,4 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
 
     return this.data[this.index[0]][columnIndex];
   }
-
-  // we need this function for visualisation
-  public toRecordList(columnsFilter?: Name[]) {
-    let columns = this.schema.map((x, index) => ({ ...x, index }));
-    if (columnsFilter) {
-      columns = columns.filter(x => columnsFilter.includes(x.name));
-    } else {
-      columns.filter(x => x.type === "number");
-    }
-    return this.index.map(rowNumber => {
-      const dataRow = this.data[rowNumber];
-      return columns.reduce(
-        (result, column) => {
-          result[column.name] = dataRow[column.index];
-          return result;
-        },
-        {} as Record<Name, any>,
-      );
-    });
-  }
 }

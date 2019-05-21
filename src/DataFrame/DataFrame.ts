@@ -29,10 +29,6 @@ export default class DataFrame<Name extends string = string> implements Iteratab
     return this.data[rowIndex][columnIndex];
   }
 
-  public map<A>(callback: (row: any[], index: number) => A) {
-    return this.data.map(callback);
-  }
-
   public getAccessor(column: Name): Accessor<Name> {
     if (!this.accessorCache.has(column)) {
       const index = this.schema.findIndex(x => x.name === column);
@@ -44,6 +40,10 @@ export default class DataFrame<Name extends string = string> implements Iteratab
       this.accessorCache.set(column, accessor);
     }
     return this.accessorCache.get(column)!;
+  }
+
+  public map<A>(callback: (row: any[], index: number) => A) {
+    return this.data.map(callback);
   }
 
   public forEach(columns: Name | Name[], cb: (...columnValue: any[]) => void) {

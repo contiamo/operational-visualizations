@@ -1,6 +1,6 @@
 import { scaleBand, scaleLinear } from "d3-scale";
 import { useMemo } from "react";
-import { getCategoricalStats, getQuantitiveStats } from "../DataFrame/stats";
+import { maxValue, uniqueValues } from "../DataFrame/stats";
 import { IteratableFrame } from "../DataFrame/types";
 
 export interface ScaleProps<Name extends string> {
@@ -15,7 +15,7 @@ export interface ScaleProps<Name extends string> {
  */
 export const getScaleBand = <Name extends string>({ frame, column, size }: ScaleProps<Name>) =>
   scaleBand()
-    .domain(getCategoricalStats(frame).unqiue[column])
+    .domain(uniqueValues(frame, column))
     .range([0, size]);
 
 /**
@@ -24,7 +24,7 @@ export const getScaleBand = <Name extends string>({ frame, column, size }: Scale
  */
 export const getScaleLinear = <Name extends string>({ frame, column, size }: ScaleProps<Name>) =>
   scaleLinear()
-    .domain([0, getQuantitiveStats(frame).max[column]])
+    .domain([0, maxValue(frame, column)])
     .range([0, size]);
 
 // Hook versions for convenience

@@ -1,10 +1,15 @@
 /**
- * TODO: change API of this module it is ugly
+ * There was attempt to optimize state for frame,
+ * by iterating only twice over frame and calculate all values and memoise the result.
+ * Not sure it is the optimal way.
+ *
+ * TODO: revise this later, as well revise `forEach` method,
+ *  maybe it should return the same way as `map` does.
  */
 
 import { IteratableFrame } from "./types";
 
-export const weakMemoize = <A extends object, B>(func: (a: A) => B) => {
+const weakMemoize = <A extends object, B>(func: (a: A) => B) => {
   const cache = new WeakMap();
   return (a: A) => {
     if (!cache.has(a)) {
@@ -28,7 +33,7 @@ type GetQuantitiveStats = <Name extends string>(
 ) => { min: Record<Name, number>; max: Record<Name, number> };
 
 // For numerical data for now we get min, max. We can get mean, deviation distribution as well
-export const getQuantitiveStats: GetQuantitiveStats = weakMemoize(frame => {
+const getQuantitiveStats: GetQuantitiveStats = weakMemoize(frame => {
   const quantitiveColumns = frame.schema.filter(column => column.type === "number").map(column => column.name);
   let max: number[] = [];
   let min: number[] = [];
@@ -53,7 +58,7 @@ export const getQuantitiveStats: GetQuantitiveStats = weakMemoize(frame => {
 
 type GetCategoricalStats = <Name extends string>(frame: IteratableFrame<Name>) => { unqiue: Record<Name, string[]> };
 
-export const getCategoricalStats: GetCategoricalStats = weakMemoize(frame => {
+const getCategoricalStats: GetCategoricalStats = weakMemoize(frame => {
   const categoricalColumns = frame.schema.filter(column => column.type === "string").map(column => column.name);
   const unqiue: Array<Set<string>> = categoricalColumns.map(_ => new Set<string>());
 
@@ -67,3 +72,11 @@ export const getCategoricalStats: GetCategoricalStats = weakMemoize(frame => {
     unqiue: zip(categoricalColumns, unqiue.map(x => [...x])),
   };
 });
+
+export const uniqueValues = <Name extends string>(frame: IteratableFrame<Name>, column: Name): string[] => {
+  return getCategoricalStats(frame).unqiue[column];
+};
+
+export const maxValue = <Name extends string>(frame: IteratableFrame<Name>, column: Name): number => {
+  return getQuantitiveStats(frame).max[column];
+};

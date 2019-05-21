@@ -76,7 +76,7 @@ const rawData = {
 
 const frame = new DataFrame(rawData.columns, rawData.rows);
 
-import { getCategoricalStats } from "../../../DataFrame/stats";
+import { uniqueValues } from "../../../DataFrame/stats";
 import { Axis } from "../../../ReactComponents/Axis";
 import { Bars } from "../../../ReactComponents/Bars";
 import { useScaleBand, useScaleLinear } from "../../../ReactComponents/scale";
@@ -116,8 +116,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
             accessors={{
               height: param => {
                 if ("row" in param) {
-                  const cities = getCategoricalStats(pivotedFrame.row(param.row)).unqiue["Customer.City"];
-                  return cities.length * barWidth + padding * 2;
+                  return uniqueValues(pivotedFrame.row(param.row), "Customer.City").length * barWidth + padding * 2;
                 }
                 return "columnIndex" in param || ("measure" in param && param.measure === true) ? 35 : 100;
               },

@@ -7,7 +7,7 @@ export interface AxisProps {
   /** see  https://github.com/d3/d3-scale */
   scale: ScaleBand<any>; // AxisScale<Domain>;
   // left | right | bottom | top
-  orientation?: "left";
+  direction?: "left";
   /** see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform */
   transform?: string;
 }
