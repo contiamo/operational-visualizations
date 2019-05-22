@@ -1,0 +1,14 @@
+.cache
+node_modules
+package-lock.json
+.DS_Store
+.idea
+*.log
+.vscode
+dist
+build
+lib
+# Files managed by operational-scripts
+tslint.json
+tsconfig.json
+.prettierrc

@@ -1,0 +1,32 @@
+{
+  "name": "visualizations-monorepo",
+  "workspaces": [
+    "packages/*"
+  ],
+  "description": "Contiamo visualizations monorepo",
+  "repository": "git@github.com:contiamo/operational-visualizations.git",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "build": "lerna run build --stream --parallel",
+    "test": "lerna run test --stream --parallel",
+    "start": "yarn workspace @operational/visualizations start",
+    "prepublishOnly": "operational-scripts prepare"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "lerna": "^3.14.1",
+    "typescript": "^3.4.5",
+    "@operational/scripts": "^1.4.0",
+    "@types/d3-scale": "^2.1.1",
+    "@types/d3-selection": "^1.4.1",
+    "@types/react": "^16.8.18",
+    "@types/react-dom": "^16.8.4",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
+  },
+  "files": [
+    "lib"
+  ],
+  "main": "./dist/main.js"
+}

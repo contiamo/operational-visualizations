@@ -1,0 +1,22 @@
+{
+  "name": "@operational/frame",
+  "version": "1.0.0",
+  "description": "Contiamo DataFrame.",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "repository": "git@github.com:contiamo/operational-visualizations.git",
+  "author": "stereobooster <stereobooster@gmail.com>",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "test": "operational-scripts test",
+    "start": "operational-scripts start",
+    "build": "operational-scripts build",
+    "prepublishOnly": "operational-scripts prepare"
+  }
+}

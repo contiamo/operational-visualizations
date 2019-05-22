@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+  - "10"
+cache: yarn
+notifications:
+  email: false
+env:
+  matrix:
+    - JEST_MAX_WORKERS: 4
+script:
+  - yarn test
+  - yarn build
