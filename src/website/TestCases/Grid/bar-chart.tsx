@@ -68,6 +68,11 @@ interface BarChartProps<Name extends string> {
 const BarChart = <Name extends string>({ width, height, margin, data, XColumn, YColumn }: BarChartProps<Name>) => {
   const yScale = useScaleBand({ frame: data, column: YColumn, size: height });
   const xScale = useScaleLinear({ frame: data, column: XColumn, size: width });
+
+  // magic numbers
+  yScale.paddingInner(0.4);
+  yScale.paddingOuter(0.2);
+
   return (
     <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
       <Bars
@@ -84,7 +89,7 @@ const BarChart = <Name extends string>({ width, height, margin, data, XColumn, Y
   );
 };
 
-// Magic number
+// number of pixels picked manually to make sure that YAxis fits on the screen
 const magicMargin = 60;
 
 export const marathon = ({ test, container }: MarathonEnvironment) => {

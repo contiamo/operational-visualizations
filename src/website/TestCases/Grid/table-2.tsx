@@ -84,11 +84,9 @@ import { useScaleBand, useScaleLinear } from "../../../ReactComponents/scale";
 const padding = 5;
 const chartWidth = 100;
 const chartHeight = 100;
-// TODO:
-// - implement proper math for this magic number
-// - implement padding for bars
-const maxNumberOfBars = 3;
-const barWidth = (chartHeight - padding * 2) / maxNumberOfBars;
+// number of maximal bars in a row (value picked manually)
+const magicMaxNumberOfBars = 3;
+const barWidth = (chartHeight - padding * 2) / magicMaxNumberOfBars;
 
 export const marathon = ({ test, container }: MarathonEnvironment) => {
   test("Column measures", () => {

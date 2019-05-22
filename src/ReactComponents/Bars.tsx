@@ -39,6 +39,7 @@ export const Bars: BarsComponent = React.memo(props => {
   if (props.direction === "vertical") {
     const { data, transform, xScale, yScale, x, y } = props;
     const height = yScale(yScale.domain()[1]);
+
     return (
       <g transform={transform || defaultTransform}>
         {data.mapRows((d, i) => (
