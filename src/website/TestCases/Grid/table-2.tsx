@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 import { MarathonEnvironment } from "../../Marathon";
 
@@ -76,41 +76,17 @@ const rawData = {
 
 const frame = new DataFrame(rawData.columns, rawData.rows);
 
-import { Accessors, ChartConfig, Data } from "../../../Chart/typings";
-import { Chart as ChartFacade, VisualizationWrapper } from "../../../index";
+import { uniqueValues } from "../../../DataFrame/stats";
+import { Axis } from "../../../ReactComponents/Axis";
+import { Bars } from "../../../ReactComponents/Bars";
+import { useScaleBand, useScaleLinear } from "../../../ReactComponents/scale";
 
-const Chart: React.FC<{
-  data: Data;
-  config?: ChartConfig;
-  accessors?: Record<string, Accessors<any>>;
-}> = React.memo(({ data, accessors, config }) => (
-  <VisualizationWrapper facade={ChartFacade} data={data} accessors={accessors} config={config} />
-));
-
-// @ts-ignore
-import * as d3 from "d3";
-import { PivotFrame } from "../../../DataFrame/PivotFrame";
-
-const Axis: React.FC<{ orientation?: "left"; scale: any; transform: string }> = React.memo(({ scale, transform }) => {
-  const ref = useRef<SVGGElement>(null);
-  useEffect(
-    () => {
-      if (ref.current) {
-        const axis = d3.axisLeft(scale);
-        d3.select(ref.current).call(axis);
-      }
-    },
-    [ref, scale],
-  );
-  return <g transform={transform} ref={ref} />;
-});
-
-// TODO: move it to stats module
-const uniqueValues = <Name extends string>(row: number, column: Name, pivotedFrame: PivotFrame<Name>): string[] => {
-  const set = new Set<string>();
-  pivotedFrame.row(row).forEach(column, x => set.add(x));
-  return [...set];
-};
+const padding = 5;
+const chartWidth = 100;
+const chartHeight = 100;
+// number of maximal bars in a row (value picked manually)
+const magicMaxNumberOfBars = 3;
+const barWidth = (chartHeight - padding * 2) / magicMaxNumberOfBars;
 
 export const marathon = ({ test, container }: MarathonEnvironment) => {
   test("Column measures", () => {
@@ -120,19 +96,12 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
     });
 
     const axes = {
-      row: ({ row, width }: { row: number; width: number; height: number }) => {
-        const cities = useMemo(() => uniqueValues(row, "Customer.City", pivotedFrame), [row]);
-        const scale = useMemo(
-          () =>
-            d3
-              .scaleOrdinal()
-              .domain(cities)
-              .range(cities.map((_, i) => (cities.length - 1 - i) * 35 + 15)),
-          [cities],
-        );
+      row: ({ row, width, height }: { row: number; width: number; height: number }) => {
+        const h = height - 2 * padding;
+        const yScale = useScaleBand({ frame: pivotedFrame.row(row), column: "Customer.City", size: height });
         return (
-          <svg width={width} height={85} viewBox="0 0 100 100" style={{ marginTop: 15 }}>
-            <Axis scale={scale} transform={"translate(90, 0)"} />
+          <svg width={width} height={h} viewBox={`0 0 ${width} ${h}`} style={{ margin: `${padding} 0` }}>
+            <Axis scale={yScale} transform={`translate(${width}, -${padding})`} direction="left" />
           </svg>
         );
       },
@@ -142,6 +111,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
       <AutoSizer style={{ width: "100%", minHeight: "450px", height: "100%" }}>
         {size => (
           <PivotGrid
+            type="generalWithMeasures"
             measures={["sales", "revenue"]}
             width={size.width}
             height={size.height}
@@ -150,52 +120,30 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
             accessors={{
               height: param => {
                 if ("row" in param) {
-                  const cities = uniqueValues(param.row, "Customer.City", pivotedFrame);
-                  return cities.length * 30 + 15;
+                  return uniqueValues(pivotedFrame.row(param.row), "Customer.City").length * barWidth + padding * 2;
                 }
-                return "columnIndex" in param || ("measure" in param && param.measure === true) ? 35 : 100;
+                return "columnIndex" in param || ("measure" in param && param.measure === true) ? 35 : chartHeight;
               },
-              width: param => ("rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : 100),
+              width: param =>
+                "rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : chartWidth,
             }}
-            cell={({ data, measure, row, width, height }: any) => {
-              const cell = useMemo(() => data.toRecordList([measure, "Customer.City"]), []);
-              const cities = useMemo(() => uniqueValues(row, "Customer.City", pivotedFrame), []);
-              const config = useMemo(
-                () =>
-                  ({
-                    width,
-                    height,
-                    legend: false,
-                  } as any),
-                [],
+            cell={({ data, row, width, height, measure }) => {
+              const w = width - 2 * padding;
+              const h = height - 2 * padding;
+              const yScale = useScaleBand({ frame: pivotedFrame.row(row), column: "Customer.City", size: h });
+              const xScale = useScaleLinear({ frame, size: w, column: "sales" });
+              return (
+                <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ margin: padding }}>
+                  <Bars
+                    data={data}
+                    xScale={xScale}
+                    yScale={yScale}
+                    x={frame.getCursor(measure)}
+                    y={frame.getCursor("Customer.City")}
+                    style={{ fill: "#1f78b4" }}
+                  />
+                </svg>
               );
-              const chartData = useMemo(
-                () =>
-                  ({
-                    series: [
-                      {
-                        data: cell,
-                        name: "",
-                        key: "series1",
-                        renderAs: [{ type: "bars", accessors: { barWidth: () => 18 } }],
-                        datumAccessors: { x: (r: any) => r[measure], y: (r: any) => r["Customer.City"] },
-                      },
-                    ],
-                    axes: {
-                      x1: {
-                        type: "quant",
-                        hideAxis: true,
-                      },
-                      y1: {
-                        type: "categorical",
-                        values: cities,
-                        hideAxis: true,
-                      } as any,
-                    },
-                  } as any),
-                [],
-              );
-              return <Chart config={config} data={chartData} />;
             }}
           />
         )}
