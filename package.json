@@ -8,7 +8,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "build": "lerna run build --stream --parallel",
+    "build": "lerna run build",
     "test": "lerna run test --stream --parallel",
     "start": "yarn workspace @operational/visualizations start",
     "prepublishOnly": "operational-scripts prepare"
@@ -24,9 +24,5 @@
     "@types/react-dom": "^16.8.4",
     "react": "^16.8.6",
     "react-dom": "^16.8.6"
-  },
-  "files": [
-    "lib"
-  ],
-  "main": "./dist/main.js"
+  }
 }

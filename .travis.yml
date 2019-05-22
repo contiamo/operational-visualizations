@@ -8,5 +8,5 @@ env:
   matrix:
     - JEST_MAX_WORKERS: 4
 script:
-  - yarn test
+  # - yarn test
   - yarn build
