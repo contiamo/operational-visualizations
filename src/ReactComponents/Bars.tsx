@@ -1,6 +1,7 @@
 import { ScaleBand, ScaleLinear } from "d3-scale";
 import React from "react";
 import { ColumnCursor, IteratableFrame } from "../DataFrame/types";
+import { useChartTransform } from "./Chart";
 
 export interface BarsPropsHorizontal {
   direction?: "horizontal";
@@ -27,6 +28,8 @@ export type BarsProps<Name extends string> = (BarsPropsHorizontal | BarsPropsVer
 type BarsComponent = <Name extends string>(props: BarsProps<Name>) => React.ReactElement | null;
 
 export const Bars: BarsComponent = React.memo(props => {
+  const defaultTransform = useChartTransform();
+
   // TypeScript can't handle this case normally :/
   const styleProp =
     typeof props.style === "function"
@@ -37,7 +40,7 @@ export const Bars: BarsComponent = React.memo(props => {
     const { data, transform, xScale, yScale, x, y } = props;
     const height = yScale(yScale.domain()[1]);
     return (
-      <g transform={transform}>
+      <g transform={transform || defaultTransform}>
         {data.mapRows((d, i) => (
           <rect
             x={xScale(d[x.index])}
@@ -53,7 +56,7 @@ export const Bars: BarsComponent = React.memo(props => {
   } else {
     const { data, transform, xScale, yScale, x, y } = props;
     return (
-      <g transform={transform}>
+      <g transform={transform || defaultTransform}>
         {data.mapRows((d, i) => (
           <rect
             y={yScale(d[y.index])}

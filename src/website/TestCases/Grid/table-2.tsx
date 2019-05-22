@@ -103,7 +103,7 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
         const yScale = useScaleBand({ frame: pivotedFrame.row(row), column: "Customer.City", size: height });
         return (
           <svg width={width} height={h} viewBox={`0 0 ${width} ${h}`} style={{ margin: `${padding} 0` }}>
-            <Axis scale={yScale} transform={`translate(${width}, -${padding})`} />
+            <Axis scale={yScale} transform={`translate(${width}, -${padding})`} direction="left" />
           </svg>
         );
       },
