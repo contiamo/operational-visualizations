@@ -28,14 +28,14 @@ export const useChartTransform = () => {
 ```
 height   width           margin
 +         +    +             +
-|         |    +<------------+
+|         |    | <-----------+
 |         v    |             |
 |   +-----+----+----------+  |
 |   |                     |  |
 +-> |                     |  |
-    |   XXXXXX      XX    |  |
-    |  XX    X    XX      |  v
-+---+  X     XX  XX       +--++
+    |   XXXXXX      XX    |  v
+    |  XX    X    XX      |  
++---+  X     XX  XX       +---+
     |  X      XXXX        |
     |  X                  |
     |                     |

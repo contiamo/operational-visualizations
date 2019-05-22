@@ -53,33 +53,46 @@ import { Bars } from "../../../ReactComponents/Bars";
 import { Chart } from "../../../ReactComponents/Chart";
 import { useScaleBand, useScaleLinear } from "../../../ReactComponents/scale";
 
+interface BarChartProps<Name extends string> {
+  width: number;
+  height: number;
+  margin: number;
+  data: DataFrame<Name>;
+  XColumn: Name;
+  YColumn: Name;
+}
+
+/**
+ * Example of how you can compose more complex charts out of 'atoms'
+ */
+const BarChart = <Name extends string>({ width, height, margin, data, XColumn, YColumn }: BarChartProps<Name>) => {
+  const yScale = useScaleBand({ frame: data, column: YColumn, size: height });
+  const xScale = useScaleLinear({ frame: data, column: XColumn, size: width });
+  return (
+    <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
+      <Bars
+        data={data}
+        xScale={xScale}
+        yScale={yScale}
+        x={data.getCursor(XColumn)}
+        y={data.getCursor(YColumn)}
+        style={{ fill: "#1f78b4" }}
+      />
+      <Axis scale={xScale} direction="bottom" />
+      <Axis scale={yScale} direction="left" />
+    </Chart>
+  );
+};
+
 // Magic number
-const margin = 60;
+const magicMargin = 60;
 
 export const marathon = ({ test, container }: MarathonEnvironment) => {
   test("Column measures", () => {
-    const BarChart = React.memo(() => {
-      const width = 300;
-      const height = 300;
-      const yScale = useScaleBand({ frame, column: "Customer.City", size: height });
-      const xScale = useScaleLinear({ frame, size: width, column: "sales" });
-
-      return (
-        <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
-          <Bars
-            data={frame}
-            xScale={xScale}
-            yScale={yScale}
-            x={frame.getCursor("sales")}
-            y={frame.getCursor("Customer.City")}
-            style={{ fill: "#1f78b4" }}
-          />
-          <Axis scale={xScale} direction="bottom" />
-          <Axis scale={yScale} direction="left" />
-        </Chart>
-      );
-    });
-    ReactDOM.render(<BarChart />, container);
+    ReactDOM.render(
+      <BarChart XColumn="sales" YColumn="Customer.City" width={300} height={300} margin={magicMargin} data={frame} />,
+      container,
+    );
   });
 };
 
