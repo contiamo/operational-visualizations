@@ -1,11 +1,11 @@
 import { PivotFrame } from "./PivotFrame";
-import { Accessor, IteratableFrame, Matrix, PivotProps, Schema } from "./types";
+import { ColumnCursor, IteratableFrame, Matrix, PivotProps, Schema } from "./types";
 
 export default class DataFrame<Name extends string = string> implements IteratableFrame<Name> {
   private readonly data: Matrix<any>;
   public readonly schema: Schema<Name>;
 
-  private readonly accessorCache: Map<Name, Accessor<Name>>;
+  private readonly accessorCache: Map<Name, ColumnCursor<Name>>;
 
   constructor(schema: Schema<Name>, data: Matrix<any>) {
     this.schema = schema;
@@ -24,13 +24,13 @@ export default class DataFrame<Name extends string = string> implements Iteratab
     return this.data[rowIndex][columnIndex];
   }
 
-  public getAccessor(column: Name): Accessor<Name> {
+  public getCursor(column: Name): ColumnCursor<Name> {
     if (!this.accessorCache.has(column)) {
       const index = this.schema.findIndex(x => x.name === column);
       if (index === -1) {
         throw new Error(`There is no column ${column}`);
       }
-      const accessor = ((row: any[]) => row[index]) as Accessor<Name>;
+      const accessor = ((row: any[]) => row[index]) as ColumnCursor<Name>;
       accessor.column = column;
       accessor.index = index;
       this.accessorCache.set(column, accessor);
@@ -38,7 +38,7 @@ export default class DataFrame<Name extends string = string> implements Iteratab
     return this.accessorCache.get(column)!;
   }
 
-  public map<A>(callback: (row: any[], index: number) => A) {
+  public mapRows<A>(callback: (row: any[], index: number) => A) {
     return this.data.map(callback);
   }
 

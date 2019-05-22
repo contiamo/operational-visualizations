@@ -140,8 +140,8 @@ export const marathon = ({ test, container }: MarathonEnvironment) => {
                     data={data}
                     xScale={xScale}
                     yScale={yScale}
-                    x={frame.getAccessor(measure)}
-                    y={frame.getAccessor("Customer.City")}
+                    x={frame.getCursor(measure)}
+                    y={frame.getCursor("Customer.City")}
                     style={{ fill: "#1f78b4" }}
                   />
                 </svg>
