@@ -45,7 +45,7 @@ height   width           margin
                +
 ```
  */
-export const Chart: React.FC<ChartProps> = React.memo(({ width, height, margin: margin, style, children }) => (
+export const Chart: React.FC<ChartProps> = React.memo(({ width, height, margin = 0, style, children }) => (
   // tslint:enable
   <svg
     width={width + margin! * 2}

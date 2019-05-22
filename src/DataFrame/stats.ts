@@ -60,7 +60,7 @@ type GetCategoricalStats = <Name extends string>(frame: IteratableFrame<Name>) =
 
 const getCategoricalStats: GetCategoricalStats = weakMemoize(frame => {
   const categoricalColumns = frame.schema.filter(column => column.type === "string").map(column => column.name);
-  const unqiue: Array<Set<string>> = categoricalColumns.map(_ => new Set<string>());
+  const unique: Array<Set<string>> = categoricalColumns.map(() => new Set<string>());
 
   frame.forEach(categoricalColumns, (...values) => {
     values.forEach((value, i) => {
