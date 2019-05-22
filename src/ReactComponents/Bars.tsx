@@ -42,12 +42,12 @@ export const Bars: BarsComponent = React.memo(props => {
 
     return (
       <g transform={transform || defaultTransform}>
-        {data.mapRows((d, i) => (
+        {data.mapRows((row, i) => (
           <rect
-            x={xScale(d[x.index])}
-            y={height - yScale(d[y.index])}
+            x={xScale(row[x.index])}
+            y={height - yScale(row[y.index])}
             width={xScale.bandwidth()}
-            height={yScale(d[y.index])}
+            height={yScale(row[y.index])}
             style={styleProp.isFunction ? styleProp.style(i) : styleProp.style}
             key={i}
           />
@@ -58,12 +58,12 @@ export const Bars: BarsComponent = React.memo(props => {
     const { data, transform, xScale, yScale, x, y } = props;
     return (
       <g transform={transform || defaultTransform}>
-        {data.mapRows((d, i) => (
+        {data.mapRows((row, i) => (
           <rect
-            y={yScale(d[y.index])}
+            y={yScale(row[y.index])}
             x={0}
             height={yScale.bandwidth()}
-            width={xScale(d[x.index])}
+            width={xScale(row[x.index])}
             style={styleProp.isFunction ? styleProp.style(i) : styleProp.style}
             key={i}
           />

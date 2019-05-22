@@ -48,12 +48,12 @@ height   width           margin
 export const Chart: React.FC<ChartProps> = React.memo(({ width, height, margin = 0, style, children }) => (
   // tslint:enable
   <svg
-    width={width + margin! * 2}
-    height={height + margin! * 2}
-    viewBox={`0 0 ${width + margin! * 2} ${height + margin! * 2}`}
+    width={width + margin * 2}
+    height={height + margin * 2}
+    viewBox={`0 0 ${width + margin * 2} ${height + margin * 2}`}
     style={style}
   >
-    <ChartContext.Provider value={{ margin: margin!, width, height }}>{children}</ChartContext.Provider>
+    <ChartContext.Provider value={{ margin, width, height }}>{children}</ChartContext.Provider>
   </svg>
 ));
 

@@ -5,12 +5,12 @@ export default class DataFrame<Name extends string = string> implements Iteratab
   private readonly data: Matrix<any>;
   public readonly schema: Schema<Name>;
 
-  private readonly accessorCache: Map<Name, ColumnCursor<Name>>;
+  private readonly cursorCache: Map<Name, ColumnCursor<Name>>;
 
   constructor(schema: Schema<Name>, data: Matrix<any>) {
     this.schema = schema;
     this.data = data;
-    this.accessorCache = new Map();
+    this.cursorCache = new Map();
   }
 
   public stats() {
@@ -25,17 +25,17 @@ export default class DataFrame<Name extends string = string> implements Iteratab
   }
 
   public getCursor(column: Name): ColumnCursor<Name> {
-    if (!this.accessorCache.has(column)) {
+    if (!this.cursorCache.has(column)) {
       const index = this.schema.findIndex(x => x.name === column);
       if (index === -1) {
-        throw new Error(`There is no column ${column}`);
+        throw new Error(`Unknown column: ${column}`);
       }
-      const accessor = ((row: any[]) => row[index]) as ColumnCursor<Name>;
-      accessor.column = column;
-      accessor.index = index;
-      this.accessorCache.set(column, accessor);
+      const cursor = ((row: any[]) => row[index]) as ColumnCursor<Name>;
+      cursor.column = column;
+      cursor.index = index;
+      this.cursorCache.set(column, cursor);
     }
-    return this.accessorCache.get(column)!;
+    return this.cursorCache.get(column)!;
   }
 
   public mapRows<A>(callback: (row: any[], index: number) => A) {

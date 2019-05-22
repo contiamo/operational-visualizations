@@ -56,7 +56,7 @@ const getQuantitiveStats: GetQuantitiveStats = weakMemoize(frame => {
   };
 });
 
-type GetCategoricalStats = <Name extends string>(frame: IteratableFrame<Name>) => { unqiue: Record<Name, string[]> };
+type GetCategoricalStats = <Name extends string>(frame: IteratableFrame<Name>) => { unique: Record<Name, string[]> };
 
 const getCategoricalStats: GetCategoricalStats = weakMemoize(frame => {
   const categoricalColumns = frame.schema.filter(column => column.type === "string").map(column => column.name);
@@ -64,17 +64,17 @@ const getCategoricalStats: GetCategoricalStats = weakMemoize(frame => {
 
   frame.forEach(categoricalColumns, (...values) => {
     values.forEach((value, i) => {
-      unqiue[i].add(value);
+      unique[i].add(value);
     });
   });
 
   return {
-    unqiue: zip(categoricalColumns, unqiue.map(x => [...x])),
+    unique: zip(categoricalColumns, unique.map(x => [...x])),
   };
 });
 
 export const uniqueValues = <Name extends string>(frame: IteratableFrame<Name>, column: Name): string[] => {
-  return getCategoricalStats(frame).unqiue[column];
+  return getCategoricalStats(frame).unique[column];
 };
 
 export const maxValue = <Name extends string>(frame: IteratableFrame<Name>, column: Name): number => {
