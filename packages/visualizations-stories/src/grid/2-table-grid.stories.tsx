@@ -1,5 +1,5 @@
 import { DataFrame } from "@operational/frame";
-import { PivotGrid } from "@operational/grid";
+import { TableGrid } from "@operational/grid";
 import { storiesOf } from "@storybook/react";
 import * as React from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -73,37 +73,17 @@ const rawData = {
 
 const frame = new DataFrame(rawData.columns, rawData.rows);
 
-storiesOf("@operational/grid/1. Pivot table", module).add("basic", () => {
-  const pivotedFrame = frame.pivot({
-    rows: ["Customer.Continent", "Customer.Country", "Customer.City"],
-    columns: ["Customer.AgeGroup", "Customer.Gender"],
-  });
+storiesOf("@operational/grid/2. Table", module).add("basic", () => {
   return (
-    <AutoSizer
-      style={{
-        minHeight: "500px",
-        height: "100%",
-      }}
-    >
+    <AutoSizer style={{ minHeight: "500px", height: "100%" }}>
       {({ width, height }) => (
-        <PivotGrid
+        <TableGrid
           width={width}
           height={height}
-          data={pivotedFrame}
-          measures={["sales", "revenue"]}
+          data={frame}
           style={{
-            cell: { padding: "10px", textAlign: "right", background: "#fff" },
-            background: "rgb(246, 246, 246)",
-            // background: "linear-gradient(to right, orange , yellow, green, cyan, blue, violet)",
-            header: {
-              padding: "10px",
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-              whiteSpace: "nowrap",
-            },
+            cell: { padding: "10px" },
           }}
-          measuresPlacement="column"
-          dimensionLabels="top"
         />
       )}
     </AutoSizer>
