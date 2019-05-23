@@ -11,7 +11,7 @@
     "build": "lerna run build",
     "clean": "lerna run clean --stream --parallel",
     "test": "lerna run test --stream --parallel",
-    "start": "yarn workspace @operational/visualizations start"
+    "start": "lerna run start --stream --parallel"
   },
   "dependencies": {},
   "devDependencies": {
