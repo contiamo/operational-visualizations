@@ -1,7 +1,8 @@
 {
   "name": "@operational/grid",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Contiamo visualization library.",
+  "module": "./lib/index.js",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "repository": "git@github.com:contiamo/operational-visualizations.git",
@@ -20,8 +21,8 @@
     "start": "echo 'Not implemented' && exit 1"
   },
   "dependencies": {
-    "react-window": "^1.8.1",
-    "@operational/frame": "1.0.0"
+    "@operational/frame": "*",
+    "react-window": "^1.8.1"
   },
   "peerDependencies": {
     "react": "^16.8.0",

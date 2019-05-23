@@ -2,6 +2,7 @@
   "name": "@operational/visualizations",
   "version": "7.0.0",
   "description": "Contiamo visualization library.",
+  "module": "./lib/index.js",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "repository": "git@github.com:contiamo/operational-visualizations.git",
@@ -19,7 +20,7 @@
     "test": "echo 'Not implemented' && exit 1"
   },
   "dependencies": {
-    "@operational/frame": "1.0.0",
+    "@operational/frame": "*",
     "d3-axis": "^1.0.12",
     "d3-scale": "^3.0.0",
     "d3-selection": "^1.3.2"

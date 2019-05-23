@@ -16,8 +16,6 @@
   "dependencies": {},
   "devDependencies": {
     "@operational/scripts": "^1.4.0",
-    "@types/d3-scale": "^2.1.1",
-    "@types/d3-selection": "^1.4.1",
     "@types/react": "^16.8.18",
     "@types/react-dom": "^16.8.4",
     "lerna": "^3.14.1",

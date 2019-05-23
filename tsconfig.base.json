@@ -3,7 +3,7 @@
   "include": ["packages/*/src"],
   "compilerOptions": {
     "skipLibCheck": false,
-    "target": "es6",
+    "target": "es2015",
     "module": "esnext",
     "lib": ["es2015", "dom", "es2016.array.include", "es2017.object"],
     "jsx": "react",
@@ -13,6 +13,7 @@
     "outDir": "lib",
     "downlevelIteration": true,
     "strict": true,
+    "removeComments": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
