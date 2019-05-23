@@ -14,10 +14,10 @@
     "lib"
   ],
   "scripts": {
-    "test": "operational-scripts test",
-    "start": "operational-scripts start",
-    "build": "operational-scripts build",
-    "prepublishOnly": "operational-scripts prepare"
+    "build": "tsc",
+    "clean": "rimraf tsconfig.tsbuildinfo lib dist",
+    "test": "echo 'Not implemented' && exit 1",
+    "start": "echo 'Not implemented' && exit 1"
   },
   "dependencies": {
     "react-window": "^1.8.1",

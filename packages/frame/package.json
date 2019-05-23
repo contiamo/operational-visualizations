@@ -14,9 +14,8 @@
     "lib"
   ],
   "scripts": {
-    "test": "operational-scripts test",
-    "start": "operational-scripts start",
-    "build": "operational-scripts build",
-    "prepublishOnly": "operational-scripts prepare"
+    "build": "tsc",
+    "test": "echo 'Not implemented' && exit 1",
+    "clean": "rimraf tsconfig.tsbuildinfo lib dist"
   }
 }

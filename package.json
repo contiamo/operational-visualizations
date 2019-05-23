@@ -9,20 +9,21 @@
   "private": true,
   "scripts": {
     "build": "lerna run build",
+    "clean": "lerna run clean --stream --parallel",
     "test": "lerna run test --stream --parallel",
-    "start": "yarn workspace @operational/visualizations start",
-    "prepublishOnly": "operational-scripts prepare"
+    "start": "yarn workspace @operational/visualizations start"
   },
   "dependencies": {},
   "devDependencies": {
-    "lerna": "^3.14.1",
-    "typescript": "^3.4.5",
     "@operational/scripts": "^1.4.0",
     "@types/d3-scale": "^2.1.1",
     "@types/d3-selection": "^1.4.1",
     "@types/react": "^16.8.18",
     "@types/react-dom": "^16.8.4",
+    "lerna": "^3.14.1",
     "react": "^16.8.6",
-    "react-dom": "^16.8.6"
+    "react-dom": "^16.8.6",
+    "rimraf": "^2.6.3",
+    "typescript": "^3.4.5"
   }
 }
