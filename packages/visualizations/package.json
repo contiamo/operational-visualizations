@@ -17,7 +17,8 @@
   "scripts": {
     "build": "tsc",
     "clean": "rimraf tsconfig.tsbuildinfo lib dist",
-    "test": "echo 'Not implemented' && exit 1"
+    "test": "echo 'Not implemented' && exit 1",
+    "start": "tsc -w"
   },
   "dependencies": {
     "@operational/frame": "*",
