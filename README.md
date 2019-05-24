@@ -12,7 +12,6 @@ This project is structured as a [monorepo](https://www.atlassian.com/git/tutoria
 
 ```
 yarn
-yarn build
 yarn start
 ```
 
@@ -35,6 +34,6 @@ yarn build
 - ⚠️ typescript errors don't show up in the browser, but show up in the terminal among listo of other messages it is really hard to spot it, so developer can be frustrated why changes don't apply. On the bright side type errors show up in `yarn test --watch`
 - 😞️ `lint-ts` errors doesn't show up in the browser, but show up when you try to commit, which is very annoying
 - 😞 [Jest doesn't support ES modules](https://github.com/facebook/jest/issues/4842), so we need to compile all modules down to ES5 and CommonJS.
-- In order to start storybook you need to run `yarn build` once, so it would have sub-packages ready, after it can watch for file changes.
-- In order to run tests you need to run `yarn build` once, so it would have sub-packages ready, after it can watch for file changes.
-- build script relies on order of packages e.g. `frame` supposed to be built first, `visualizations-stories` supposed to be built last.
+- In order to start storybook you need to run `yarn build` once, so it would have sub-packages ready, after it can watch for file changes. That is why we added `"prestart": "yarn build"`
+- In order to run tests you need to run `yarn build` once, so it would have sub-packages ready, after it can watch for file changes. That is why we added `"pretest": "yarn build"`
+- Build script relies on order of packages e.g. `frame` supposed to be built first, `visualizations-stories` supposed to be built last.

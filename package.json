@@ -8,7 +8,9 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "prestart": "yarn build",
     "start": "lerna run start --stream --parallel",
+    "pretest": "yarn build",
     "test": "jest --config=jest.json",
     "build": "lerna run build --stream --scope=@operational/{frame,grid,visualizations}",
     "clean": "lerna run clean --stream --parallel",
