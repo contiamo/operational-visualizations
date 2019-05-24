@@ -2,6 +2,12 @@
 
 ## Getting Started
 
+This is [monorepo](https://www.atlassian.com/git/tutorials/monorepos) for operational visualizations and related libraries. It consists of three libraries:
+
+- [`frame`](packages/frame) - representation of multidimensional data.
+- [`visualizations`](packages/visualizations) - set of visualisations primitives for building visualisations, React library. Uses frame as data source.
+- [`grid`](packages/grid) - React component pivot table. Uses frame as data source. You can use `grid` together with `visualizations` to show visualisations in cells of pivot table.
+
 ## Running locally
 
 ```

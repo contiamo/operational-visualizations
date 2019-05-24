@@ -7,7 +7,7 @@
   "scripts": {
     "build": "build-storybook -o dist",
     "test": "CHROMATIC_APP_CODE= chromatic test --exit-zero-on-changes",
-    "start": "start-storybook"
+    "start": "start-storybook -p 8080"
   },
   "dependencies": {
     "@operational/frame": "*",
