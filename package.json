@@ -10,8 +10,10 @@
   "scripts": {
     "start": "lerna run start --stream --parallel",
     "test": "operational-scripts test",
-    "build": "lerna run build --stream",
+    "build": "lerna run build --stream --scope=@operational/{frame,grid,visualizations}",
     "clean": "lerna run clean --stream --parallel",
+    "build-stories": "lerna run build --stream --scope=@operational/visualizations-stories",
+    "test-stories": "lerna run test --stream --scope=@operational/visualizations-stories",
     "prepublishOnly": "operational-scripts prepare"
   },
   "devDependencies": {
