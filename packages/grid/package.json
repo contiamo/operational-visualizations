@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Contiamo visualization library.",
   "module": "./lib/index.js",
-  "main": "./lib/index.js",
+  "main": "./lib/index.umd.js",
   "types": "./lib/index.d.ts",
   "repository": "git@github.com:contiamo/operational-visualizations.git",
   "author": "stereobooster <stereobooster@gmail.com>",
@@ -17,7 +17,7 @@
   "scripts": {
     "start": "tsc -w",
     "test": "echo 'Run this command instead: cd ../.. && yarn test' && exit 1",
-    "build": "tsc",
+    "build": "tsc && rollup lib/index.js --format umd --name frame --sourcemap --file lib/index.umd.js",
     "clean": "rimraf tsconfig.tsbuildinfo lib dist"
   },
   "dependencies": {

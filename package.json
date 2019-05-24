@@ -10,7 +10,7 @@
   "scripts": {
     "start": "lerna run start --stream --parallel",
     "test": "operational-scripts test",
-    "build": "lerna run build",
+    "build": "lerna run build --stream",
     "clean": "lerna run clean --stream --parallel",
     "prepublishOnly": "operational-scripts prepare"
   },
@@ -22,6 +22,7 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "rimraf": "^2.6.3",
+    "rollup": "^1.12.3",
     "typescript": "^3.4.5"
   },
   "files": [
