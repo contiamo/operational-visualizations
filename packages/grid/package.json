@@ -1,6 +1,6 @@
 {
   "name": "@operational/grid",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Contiamo visualization library.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -20,10 +20,10 @@
     "clean": "rimraf tsconfig.tsbuildinfo lib dist"
   },
   "dependencies": {
-    "@operational/frame": "0.0.1",
     "react-window": "^1.8.1"
   },
   "peerDependencies": {
+    "@operational/frame": "0.0.1",
     "react": "^16.8.0",
     "react-dom": "^16.8.0"
   },
