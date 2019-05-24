@@ -11,5 +11,6 @@ env:
     - CHROMATIC: "true"
 
 script:
+  - yarn clean
   - if [ "$CHROMATIC" == "false" ]; then  yarn test                         ; fi
   - if [ "$CHROMATIC" == "true" ];  then  yarn build && yarn test-stories   ; fi
