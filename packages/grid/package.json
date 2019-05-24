@@ -28,6 +28,7 @@
     "react-dom": "^16.8.0"
   },
   "devDependencies": {
+    "@operational/frame": "0.0.1",
     "@types/react-window": "^1.8.0"
   }
 }
