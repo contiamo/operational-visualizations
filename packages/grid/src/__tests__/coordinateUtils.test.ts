@@ -77,7 +77,7 @@ const pivotedFrame = frame.pivot({
 
 describe("coordinateUtils", () => {
   describe("getColumnCount()", () => {
-    xit("returns value from data matrix", () => {
+    it("2 slots for row header + 4 slots for AgeGroup × Gender", () => {
       expect(
         getColumnCount({
           rowHeadersCount: 2,
@@ -85,7 +85,7 @@ describe("coordinateUtils", () => {
           measuresPlacement: "column",
           measuresCount: 1,
         }),
-      ).toEqual(-1);
+      ).toEqual(6);
     });
   });
 });
