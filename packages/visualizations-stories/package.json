@@ -5,9 +5,11 @@
   "description": "Stories of @operational/visualizations rendering libraries for E2E tests",
   "license": "MIT",
   "scripts": {
+    "start": "start-storybook -p 8080",
+    "storybook": "start-storybook -p 8080",
+    "test": "./node_modules/.bin/chromatic test --app-code=\"lh0tyo268i\"",
     "build": "build-storybook -o dist",
-    "test": "CHROMATIC_APP_CODE= chromatic test --exit-zero-on-changes",
-    "start": "start-storybook"
+    "clean": "rimraf tsconfig.tsbuildinfo lib dist"
   },
   "dependencies": {
     "@operational/frame": "*",

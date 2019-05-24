@@ -6,7 +6,10 @@ notifications:
   email: false
 env:
   matrix:
-    - JEST_MAX_WORKERS: 4
+    - CHROMATIC: "false"
+      JEST_MAX_WORKERS: 4
+    - CHROMATIC: "true"
+
 script:
-  # - yarn test
-  - yarn build
+  - if [ "$CHROMATIC" == "false" ]; then  yarn test                         ; fi
+  - if [ "$CHROMATIC" == "true" ];  then  yarn build && yarn test-stories   ; fi

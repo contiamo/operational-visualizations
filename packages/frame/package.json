@@ -2,7 +2,6 @@
   "name": "@operational/frame",
   "version": "0.0.1",
   "description": "Contiamo DataFrame.",
-  "module": "./lib/index.js",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "repository": "git@github.com:contiamo/operational-visualizations.git",
@@ -15,9 +14,9 @@
     "lib"
   ],
   "scripts": {
+    "start": "tsc -w",
+    "test": "echo 'Run this command instead: cd ../.. && yarn test' && exit 1",
     "build": "tsc",
-    "test": "echo 'Not implemented' && exit 1",
-    "clean": "rimraf tsconfig.tsbuildinfo lib dist",
-    "start": "tsc -w"
+    "clean": "rimraf tsconfig.tsbuildinfo lib dist"
   }
 }
