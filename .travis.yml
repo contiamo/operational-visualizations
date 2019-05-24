@@ -10,3 +10,4 @@ env:
 script:
   - yarn build
   - yarn test
+  - yarn test-stories

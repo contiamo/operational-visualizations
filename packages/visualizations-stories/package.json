@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "start": "start-storybook -p 8080",
-    "test": "CHROMATIC_APP_CODE= chromatic test --exit-zero-on-changes",
+    "storybook": "start-storybook -p 8080",
+    "test": "./node_modules/.bin/chromatic test --app-code=\"lh0tyo268i\"",
     "build": "build-storybook -o dist",
     "clean": "rimraf tsconfig.tsbuildinfo lib dist"
   },
