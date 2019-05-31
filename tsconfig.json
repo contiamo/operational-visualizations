@@ -2,7 +2,7 @@
   "exclude": ["node_modules", "dist", "lib", "__tests__", "**/*.test*", "**/*.spec*"],
   "files": [],
   "compilerOptions": {
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "target": "esnext",
     "module": "esnext",
     "lib": ["es2015", "dom", "es2016.array.include", "es2017.object"],
