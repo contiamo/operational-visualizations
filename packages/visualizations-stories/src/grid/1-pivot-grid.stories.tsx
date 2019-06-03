@@ -284,6 +284,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
     const axes = {
       row: ({ row, width, height }: { row: number; width: number; height: number }) => {
         const h = height - 2 * padding;
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         const yScale = useScaleBand({ frame: pivotedFrame.row(row), column: "Customer.City", size: height });
         return (
           <svg width={width} height={h} viewBox={`0 0 ${width} ${h}`} style={{ margin: `${padding} 0` }}>
