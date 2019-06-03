@@ -146,7 +146,10 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
   const accessors = props.accessors || (emptyObject as Accessors<Name>);
   const heightAccessors = accessors.height || (defaultHeight as Defined<Accessors<Name>["height"]>);
   const widthAccessors = accessors.width || (defaultWidth as Defined<Accessors<Name>["width"]>);
-  const dimensionLabels = dimensionLabelsShortcut(props.dimensionLabels) || { row: "none", column: "none" };
+  const dimensionLabels = useMemo(
+    () => (dimensionLabelsShortcut(props.dimensionLabels) || { row: "none", column: "none" }) as DimensionLabels,
+    [props.dimensionLabels],
+  );
   const styleProp = props.style || (emptyObject as PivotGridStyle);
   const borderStyle = styleProp.border || defaultBorderStyle;
   const cellStyle = styleProp.cell || emptyObject;
@@ -186,17 +189,7 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
         measures,
         dimensionLabels,
       }),
-    [
-      rowHeadersCount,
-      measuresPlacement,
-      columnHeadersCount,
-      measuresCount,
-      data,
-      axes,
-      measures,
-      dimensionLabels.row,
-      dimensionLabels.column,
-    ],
+    [rowHeadersCount, measuresPlacement, columnHeadersCount, measuresCount, data, axes, measures, dimensionLabels],
   );
 
   const rowHeight = useCallback(
@@ -320,6 +313,8 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
       borderStyle,
       cellStyle,
       headerStyle,
+      axes,
+      dimensionStyle,
     ],
   );
 

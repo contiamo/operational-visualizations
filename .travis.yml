@@ -11,6 +11,6 @@ env:
     - CHROMATIC: "true"
 
 script:
-  - if [ "$CHROMATIC" == "false" ];                              then  yarn test                                             ; fi
+  - if [ "$CHROMATIC" == "false" ];                              then  yarn lint  && yarn test                                             ; fi
   - if [ "$CHROMATIC" == "true"  && "$TRAVIS_BRANCH" == "next"]; then  yarn build && yarn test:stories --auto-accept-changes ; fi
   - if [ "$CHROMATIC" == "true"  && "$TRAVIS_BRANCH" != "next"]; then  yarn build && yarn test:stories                       ; fi

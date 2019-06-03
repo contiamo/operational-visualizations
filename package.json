@@ -16,7 +16,7 @@
     "build": "tsc --build",
     "build:stories": "lerna run build --stream --scope=@operational/visualizations-stories",
     "clean": "rimraf packages/*/{tsconfig.tsbuildinfo,lib,dist}",
-    "prepublishOnly": "operational-scripts prepare"
+    "lint": "eslint packages/**/src/**/*.{ts,tsx}"
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",
@@ -27,17 +27,31 @@
     "@types/react-dom": "^16.8.4",
     "@types/react-test-renderer": "^16.8.1",
     "babel-jest": "^24.8.0",
+    "husky": "^2.3.0",
     "jest": "^24.8.0",
     "lerna": "^3.14.1",
+    "lint-staged": "^8.1.7",
+    "prettier": "^1.17.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-scripts": "^3.0.1",
     "react-test-renderer": "^16.8.6",
     "rimraf": "^2.6.3",
     "ts-jest": "^24.0.2",
     "typescript": "^3.5.1"
   },
-  "files": [
-    "lib"
-  ],
-  "main": "./dist/main.js"
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint"
+    ],
+    "*.{ts,tsx,json,md}": [
+      "prettier --write",
+      "git add"
+    ]
+  }
 }
