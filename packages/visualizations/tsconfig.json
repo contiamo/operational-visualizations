@@ -1,9 +1,14 @@
 {
   "include": ["src"],
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "lib",
-    "rootDir": "src"
+    "rootDir": "src",
+    "baseUrl": "."
   },
-  "references": [{ "path": "../frame" }]
+  "references": [
+    {
+      "path": "../frame"
+    }
+  ]
 }

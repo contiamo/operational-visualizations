@@ -20,7 +20,7 @@
     "clean": "rimraf tsconfig.tsbuildinfo lib dist"
   },
   "dependencies": {
-    "react-window": "^1.8.1"
+    "react-window": "^1.8.2"
   },
   "peerDependencies": {
     "@operational/frame": "0.0.1",
