@@ -254,11 +254,11 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
           } else {
             if (cellCoordinates.rowIndex !== undefined) {
               border = { ...headerStyle, ...border };
-              const value = cellCoordinates.label!;
+              const value = cellCoordinates.label || "";
               item = header({ value, height, width });
             } else {
               border = { ...headerStyle, ...dimensionStyle, ...border };
-              const value = cellCoordinates.measure!;
+              const value = cellCoordinates.measure || "";
               item = header({ value, height, width });
             }
           }
@@ -269,11 +269,11 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
           } else {
             if (cellCoordinates.columnIndex !== undefined) {
               border = { ...headerStyle, ...border };
-              const value = cellCoordinates.label!;
+              const value = cellCoordinates.label || "";
               item = header({ value, height, width });
             } else {
               border = { ...headerStyle, ...dimensionStyle, ...border };
-              const value = cellCoordinates.measure!;
+              const value = cellCoordinates.measure || "";
               item = header({ value, height, width });
             }
           }
