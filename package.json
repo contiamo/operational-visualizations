@@ -9,7 +9,7 @@
   "private": true,
   "scripts": {
     "prestart": "yarn build",
-    "start": "lerna run start --stream --scope=@operational/visualizations-stories",
+    "start": "lerna run start --stream --parallel",
     "pretest": "yarn build",
     "test": "jest --config=jest.json",
     "test:stories": "lerna run test --stream --scope=@operational/visualizations-stories",
