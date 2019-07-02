@@ -1,31 +1,24 @@
-import { ColumnCursor, IteratableFrame } from "@operational/frame";
+import { DataFrame } from "@operational/frame";
 import { ScaleBand, ScaleLinear } from "d3-scale";
 import React from "react";
 import { useChartTransform } from "./Chart";
 
-export interface BarsPropsHorizontal {
-  direction?: "horizontal";
-  xScale: ScaleLinear<any, any>;
-  yScale: ScaleBand<string>;
-  x: ColumnCursor<string, string>;
-  y: ColumnCursor<string, number>;
-}
-
-export interface BarsPropsVeritcal {
-  direction: "vertical";
-  yScale: ScaleLinear<any, any>;
-  xScale: ScaleBand<string>;
-  y: ColumnCursor<string, number>;
-  x: ColumnCursor<string, string>;
-}
-
-export type BarsProps<Name extends string> = (BarsPropsHorizontal | BarsPropsVeritcal) & {
-  data: IteratableFrame<Name>;
+export interface BarsProps<Name extends string> {
+  direction: "horizontal" | "vertical";
+  data: DataFrame<Name>;
+  metric: Name;
+  categorical: Name;
+  metricScale: ScaleLinear<any, any>;
+  categoricalScale: ScaleBand<string>;
   transform?: React.SVGAttributes<SVGRectElement>["transform"];
-  style?: React.SVGAttributes<SVGGElement>["style"] | ((i: number) => React.SVGAttributes<SVGGElement>["style"]);
-};
+  style?:
+    | React.SVGAttributes<SVGGElement>["style"]
+    | ((i: number) => React.SVGAttributes<SVGGElement>["style"]);
+}
 
-type BarsComponent = <Name extends string>(props: BarsProps<Name>) => React.ReactElement | null;
+type BarsComponent = <Name extends string>(
+  props: BarsProps<Name>
+) => React.ReactElement | null;
 
 export const Bars: BarsComponent = React.memo(props => {
   const defaultTransform = useChartTransform();
@@ -37,17 +30,25 @@ export const Bars: BarsComponent = React.memo(props => {
       : { isFunction: false as false, style: props.style };
 
   if (props.direction === "vertical") {
-    const { data, transform, xScale, yScale, x, y } = props;
-    const height = yScale(yScale.domain()[1]);
-
+    const {
+      data,
+      transform,
+      metric,
+      categorical,
+      metricScale,
+      categoricalScale
+    } = props;
+    const height = metricScale(metricScale.domain()[0]);
+    const xIndex = data.getCursor(categorical).index;
+    const yIndex = data.getCursor(metric).index;
     return (
       <g transform={transform || defaultTransform}>
         {data.mapRows((row, i) => (
           <rect
-            x={xScale(row[x.index])}
-            y={height - yScale(row[y.index])}
-            width={xScale.bandwidth()}
-            height={yScale(row[y.index])}
+            x={categoricalScale(row[xIndex])}
+            y={metricScale(row[yIndex])}
+            width={categoricalScale.bandwidth()}
+            height={height - metricScale(row[yIndex])}
             style={styleProp.isFunction ? styleProp.style(i) : styleProp.style}
             key={i}
           />
@@ -55,15 +56,24 @@ export const Bars: BarsComponent = React.memo(props => {
       </g>
     );
   } else {
-    const { data, transform, xScale, yScale, x, y } = props;
+    const {
+      data,
+      transform,
+      metric,
+      categorical,
+      metricScale,
+      categoricalScale
+    } = props;
+    const xIndex = data.getCursor(metric).index;
+    const yIndex = data.getCursor(categorical).index;
     return (
       <g transform={transform || defaultTransform}>
         {data.mapRows((row, i) => (
           <rect
-            y={yScale(row[y.index])}
+            y={categoricalScale(row[yIndex])}
             x={0}
-            height={yScale.bandwidth()}
-            width={xScale(row[x.index])}
+            height={categoricalScale.bandwidth()}
+            width={metricScale(row[xIndex])}
             style={styleProp.isFunction ? styleProp.style(i) : styleProp.style}
             key={i}
           />
