@@ -22,35 +22,35 @@ interface BarChartProps<Name extends string> {
   height: number;
   margin: number | [number, number] | [number, number, number, number];
   data: BarsProps["data"];
-  dimension: Name;
-  measure: Name;
+  categorical: Name;
+  metric: Name;
 }
 
 /**
  * Example of how you can compose more complex charts out of 'atoms'
  */
-const BarChart = <Name extends string>({ width, height, margin, data, dimension, measure }: BarChartProps<Name>) => {
-  const dimensionScale = useScaleBand({ frame: data, column: dimension, range: [height, 0] });
-  const measureScale = useScaleLinear({ frame: data, column: measure, range: [0, width] });
+const BarChart = <Name extends string>({ width, height, margin, data, categorical, metric }: BarChartProps<Name>) => {
+  const categoricalScale = useScaleBand({ frame: data, column: categorical, range: [height, 0] });
+  const metricScale = useScaleLinear({ frame: data, column: metric, range: [0, width] });
 
   return (
     <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
       <Bars
         direction={"horizontal"}
         data={data}
-        dimension={dimension}
-        measure={measure}
-        dimensionScale={dimensionScale}
-        measureScale={measureScale}
+        categorical={categorical}
+        metric={metric}
+        categoricalScale={categoricalScale}
+        metricScale={metricScale}
         style={{ fill: "#1f78b4" }}
       />
-      <Axis scale={dimensionScale} position="left" />
-      <Axis scale={measureScale} position="bottom" />
+      <Axis scale={categoricalScale} position="left" />
+      <Axis scale={metricScale} position="bottom" />
     </Chart>
   );
 };
 
 const App = () => (
-    <BarChart measure="sales" dimension="Customer.City" width={300} height={300} margin={[20, 60]} data={frame} />
+    <BarChart metric="sales" categorical="Customer.City" width={300} height={300} margin={[20, 60]} data={frame} />
 );
 ```

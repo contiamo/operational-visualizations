@@ -52,30 +52,30 @@ interface BarChartProps<Name extends string> {
   height: number;
   margin: number | [number, number] | [number, number, number, number];
   data: BarsProps["data"];
-  dimension: Name;
-  measure: Name;
+  categorical: Name;
+  metric: Name;
 }
 
 /**
  * Example of how you can compose more complex charts out of 'atoms'
  */
-const BarChart = <Name extends string>({ width, height, margin, data, dimension, measure }: BarChartProps<Name>) => {
-  const dimensionScale = useScaleBand({ frame: data, column: dimension, range: [0, width] });
-  const measureScale = useScaleLinear({ frame: data, column: measure, range: [height, 0] });
+const BarChart = <Name extends string>({ width, height, margin, data, categorical, metric }: BarChartProps<Name>) => {
+  const categoricalScale = useScaleBand({ frame: data, column: categorical, range: [0, width] });
+  const metricScale = useScaleLinear({ frame: data, column: metric, range: [height, 0] });
 
   return (
     <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
       <Bars
         direction={"vertical"}
         data={data}
-        dimension={dimension}
-        measure={measure}
-        dimensionScale={dimensionScale}
-        measureScale={measureScale}
+        categorical={categorical}
+        metric={metric}
+        categoricalScale={categoricalScale}
+        metricScale={metricScale}
         style={{ fill: "#1f78b4" }}
       />
-      <Axis scale={dimensionScale} position="top" />
-      <Axis scale={measureScale} position="right" />
+      <Axis scale={categoricalScale} position="top" />
+      <Axis scale={metricScale} position="right" />
     </Chart>
   );
 };
@@ -84,6 +84,6 @@ storiesOf("@operational/visualizations/1. Bar chart", module).add("vertical", ()
   // number of pixels picked manually to make sure that YAxis fits on the screen
   const magicMargin = 60;
   return (
-    <BarChart measure="sales" dimension="Customer.City" width={300} height={300} margin={magicMargin} data={frame} />
+    <BarChart metric="sales" categorical="Customer.City" width={300} height={300} margin={magicMargin} data={frame} />
   );
 });
