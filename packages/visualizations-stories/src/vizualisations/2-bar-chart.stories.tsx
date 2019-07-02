@@ -60,13 +60,13 @@ interface BarChartProps<Name extends string> {
  * Example of how you can compose more complex charts out of 'atoms'
  */
 const BarChart = <Name extends string>({ width, height, margin, data, dimension, measure }: BarChartProps<Name>) => {
-  const dimensionScale = useScaleBand({ frame: data, column: dimension, range: [height, 0] });
-  const measureScale = useScaleLinear({ frame: data, column: measure, range: [0, width] });
+  const dimensionScale = useScaleBand({ frame: data, column: dimension, range: [0, width] });
+  const measureScale = useScaleLinear({ frame: data, column: measure, range: [height, 0] });
 
   return (
     <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
       <Bars
-        direction={"horizontal"}
+        direction={"vertical"}
         data={data}
         dimension={dimension}
         measure={measure}
@@ -74,16 +74,15 @@ const BarChart = <Name extends string>({ width, height, margin, data, dimension,
         measureScale={measureScale}
         style={{ fill: "#1f78b4" }}
       />
-      <Axis scale={dimensionScale} position="left" />
-      <Axis scale={measureScale} position="bottom" />
+      <Axis scale={dimensionScale} position="top" />
+      <Axis scale={measureScale} position="right" />
     </Chart>
   );
 };
 
-storiesOf("@operational/visualizations/1. Bar chart", module).add("horizontal", () => {
+storiesOf("@operational/visualizations/1. Bar chart", module).add("vertical", () => {
   // number of pixels picked manually to make sure that YAxis fits on the screen
-  const magicMargin = [5, 10, 20, 60];
-
+  const magicMargin = 60;
   return (
     <BarChart measure="sales" dimension="Customer.City" width={300} height={300} margin={magicMargin} data={frame} />
   );
