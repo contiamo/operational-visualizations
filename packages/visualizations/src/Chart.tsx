@@ -1,5 +1,6 @@
 import React, { CSSProperties, useContext } from "react";
 
+type Margin = number | [number, number] | [number, number, number, number];
 export interface ChartProps {
   width: number;
   height: number;
@@ -8,24 +9,30 @@ export interface ChartProps {
    * If 2 values are specified, these represent top/bottom margins, and left/right margins.
    * If 4 values are specified, these are the top, right, bottom and left margins, in that order.
    */
-  margin?: number | [number, number] | [number, number, number, number];
+  margin?: Margin;
   style?: CSSProperties;
 }
 
 const initialMargins = { top: 0, bottom: 0, left: 0, right: 0 };
-const ChartContext = React.createContext({ margins: initialMargins, width: 0, height: 0 });
+const ChartContext = React.createContext({
+  margins: initialMargins,
+  width: 0,
+  height: 0
+});
 
-export const useAxisTransform = (direction: "left" | "right" | "top" | "bottom") => {
+export const useAxisTransform = (
+  direction: "left" | "right" | "top" | "bottom"
+) => {
   const { margins, height, width } = useContext(ChartContext);
-  switch(direction) {
+  switch (direction) {
     case "bottom":
-      return `translate(${margins.left}, ${height + margins.top})`
+      return `translate(${margins.left}, ${height + margins.top})`;
     case "top":
-      return `translate(${margins.left}, ${margins.top})`
+      return `translate(${margins.left}, ${margins.top})`;
     case "left":
-      return `translate(${margins.left}, ${margins.top})`
+      return `translate(${margins.left}, ${margins.top})`;
     case "right":
-      return `translate(${width + margins.left}, ${margins.top})`
+      return `translate(${width + margins.left}, ${margins.top})`;
   }
 };
 
@@ -34,20 +41,20 @@ export const useChartTransform = () => {
   return `translate(${margins.left}, ${margins.top})`;
 };
 
-const expandMargins = (margin: ChartProps["margin"] = 0) =>
+const expandMargins = (margin: Margin) =>
   Array.isArray(margin)
     ? {
-      top: margin[0],
-      right: margin[1],
-      bottom: margin[2] || margin[0],
-      left: margin[3] || margin[1],
-    }
+        top: margin[0],
+        right: margin[1],
+        bottom: margin[2] || margin[0],
+        left: margin[3] || margin[1]
+      }
     : {
-      top: margin,
-      right: margin,
-      bottom: margin,
-      left: margin,
-    }
+        top: margin,
+        right: margin,
+        bottom: margin,
+        left: margin
+      };
 
 // tslint:disable
 /**
@@ -75,17 +82,23 @@ height   width           margin
                +
 ```
  */
-export const Chart: React.FC<ChartProps> = React.memo(({ width, height, margin, style, children }) => {
-  const margins = expandMargins(margin)
-  return (
-    // tslint:enable
-    <svg
-      width={width + margins.left + margins.right}
-      height={height + margins.top + margins.bottom}
-      viewBox={`0 0 ${width + margins.left + margins.right} ${height + margins.top + margins.bottom}`}
-      style={style}
-    >
-      <ChartContext.Provider value={{ margins, width, height }}>{children}</ChartContext.Provider>
-    </svg>
-  )
-});
+export const Chart: React.FC<ChartProps> = React.memo(
+  ({ width, height, margin = 0, style, children }) => {
+    const margins = expandMargins(margin);
+    return (
+      // tslint:enable
+      <svg
+        width={width + margins.left + margins.right}
+        height={height + margins.top + margins.bottom}
+        viewBox={`0 0 ${width + margins.left + margins.right} ${height +
+          margins.top +
+          margins.bottom}`}
+        style={style}
+      >
+        <ChartContext.Provider value={{ margins, width, height }}>
+          {children}
+        </ChartContext.Provider>
+      </svg>
+    );
+  }
+);
