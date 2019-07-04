@@ -1,14 +1,17 @@
-import { IteratableFrame, Matrix, Schema } from "./types";
+import { ColumnCursor, IteratableFrame, Matrix, Schema } from "./types";
 
-export class FragmentFrame<Name extends string = string> implements IteratableFrame<Name> {
+export class FragmentFrame<Name extends string = string>
+  implements IteratableFrame<Name> {
   private readonly data: Matrix<any>;
   public readonly schema: Schema<Name>;
   private readonly index: number[];
+  private readonly cursorCache: Map<Name, ColumnCursor<Name>>;
 
   constructor(schema: Schema<Name>, data: Matrix<any>, index: number[]) {
     this.schema = schema;
     this.data = data;
     this.index = index;
+    this.cursorCache = new Map();
   }
 
   public mapRows<A>(callback: (row: any[], index: number) => A) {
@@ -20,12 +23,30 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
       columns = [columns];
     }
 
-    const columnsIndex = columns.map(column => this.schema.findIndex(x => x.name === column));
+    const columnsIndex = columns.map(column =>
+      this.schema.findIndex(x => x.name === column)
+    );
     if (columnsIndex.some(x => x < 0)) {
       throw new Error(`Unknown column in ${columns}`);
     }
 
-    this.index.forEach(i => cb(...columnsIndex.map(columnIndex => this.data[i][columnIndex])));
+    this.index.forEach(i =>
+      cb(...columnsIndex.map(columnIndex => this.data[i][columnIndex]))
+    );
+  }
+
+  public getCursor(column: Name): ColumnCursor<Name> {
+    if (!this.cursorCache.has(column)) {
+      const index = this.schema.findIndex(x => x.name === column);
+      if (index === -1) {
+        throw new Error(`Unknown column: ${column}`);
+      }
+      const cursor = ((row: any[]) => row[index]) as ColumnCursor<Name>;
+      cursor.column = column;
+      cursor.index = index;
+      this.cursorCache.set(column, cursor);
+    }
+    return this.cursorCache.get(column)!;
   }
 
   // we need this function for table display

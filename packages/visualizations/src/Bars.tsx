@@ -1,11 +1,11 @@
-import { DataFrame } from "@operational/frame";
+import { DataFrame, FragmentFrame } from "@operational/frame";
 import { ScaleBand, ScaleLinear } from "d3-scale";
 import React from "react";
 import { useChartTransform } from "./Chart";
 
 export interface BarsProps<Name extends string> {
   direction: "horizontal" | "vertical";
-  data: DataFrame<Name>;
+  data: DataFrame<Name> | FragmentFrame<Name>;
   metric: Name;
   categorical: Name;
   metricScale: ScaleLinear<any, any>;
