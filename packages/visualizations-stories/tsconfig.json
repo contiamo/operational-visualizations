@@ -1,3 +1,20 @@
 {
-  "extends": "../../tsconfig.json"
+  "include": ["src"],
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "lib",
+    "rootDir": "src",
+    "baseUrl": "."
+  },
+  "references": [
+    {
+      "path": "../frame"
+    },
+    {
+      "path": "../grid"
+    },
+    {
+      "path": "../visualizations"
+    }
+  ]
 }
