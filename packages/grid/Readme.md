@@ -5,7 +5,7 @@ This component is used to show pivot table. Cells can be simple text (classical 
 ## Installation
 
 ```
-yarn add @operational/frame
+yarn add @operational/grid
 ```
 
 ## Usage
