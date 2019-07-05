@@ -9,7 +9,9 @@
   "private": true,
   "scripts": {
     "prestart": "yarn build",
-    "start": "lerna run start --stream --parallel",
+    "start": "run-p start:*",
+    "start:stories": "lerna run start --stream --scope=@operational/visualizations-stories",
+    "start:watch": "tsc --build --watch --preserveWatchOutput",
     "pretest": "yarn build",
     "test": "jest --config=jest.json",
     "test:stories": "lerna run test --stream --scope=@operational/visualizations-stories",
@@ -31,6 +33,7 @@
     "jest": "^24.8.0",
     "lerna": "^3.14.1",
     "lint-staged": "^8.1.7",
+    "npm-run-all": "^4.1.5",
     "prettier": "^1.17.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",

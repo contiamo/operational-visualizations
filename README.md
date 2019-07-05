@@ -21,7 +21,7 @@ to run tests
 yarn test --watch
 ```
 
-Open http://localhost:6000/
+Open http://localhost:7000/
 
 ## Building for Production
 
