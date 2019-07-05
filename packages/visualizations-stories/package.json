@@ -15,6 +15,7 @@
     "@operational/frame": "*",
     "@operational/grid": "*",
     "@operational/visualizations": "*",
+    "@types/react-virtualized-auto-sizer": "^1.0.0",
     "react-virtualized-auto-sizer": "^1.0.2"
   },
   "peerDependencies": {

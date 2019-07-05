@@ -1,5 +1,5 @@
 import { DataFrame } from "@operational/frame";
-import { Axis, Bars, BarsProps, Chart, useScaleBand, useScaleLinear } from "@operational/visualizations";
+import { Axis, Bars, Chart, useScaleBand, useScaleLinear } from "@operational/visualizations";
 import { storiesOf } from "@storybook/react";
 import * as React from "react";
 
@@ -51,7 +51,7 @@ interface BarChartProps<Name extends string> {
   width: number;
   height: number;
   margin: number | [number, number] | [number, number, number, number];
-  data: BarsProps["data"];
+  data: DataFrame<Name>;
   categorical: Name;
   metric: Name;
 }
@@ -68,8 +68,8 @@ const BarChart = <Name extends string>({ width, height, margin, data, categorica
       <Bars
         direction={"vertical"}
         data={data}
-        categorical={categorical}
-        metric={metric}
+        categorical={data.getCursor(categorical)}
+        metric={data.getCursor(metric)}
         categoricalScale={categoricalScale}
         metricScale={metricScale}
         style={{ fill: "#1f78b4" }}

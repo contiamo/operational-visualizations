@@ -1,4 +1,4 @@
-import { DataFrame, uniqueValues } from "@operational/frame";
+import { DataFrame, uniqueValues, IteratableFrame } from "@operational/frame";
 import { PivotGrid } from "@operational/grid";
 import { Axis, Bars, useScaleBand, useScaleLinear } from "@operational/visualizations";
 import { storiesOf } from "@storybook/react";
@@ -285,10 +285,14 @@ storiesOf("@operational/grid/1. Pivot table", module)
       row: ({ row, width, height }: { row: number; width: number; height: number }) => {
         const h = height - 2 * padding;
         // eslint-disable-next-line react-hooks/rules-of-hooks
-        const yScale = useScaleBand({ frame: pivotedFrame.row(row), column: "Customer.City", size: height });
+        const yScale = useScaleBand({
+          frame: pivotedFrame.row(row) as IteratableFrame<string>,
+          column: "Customer.City",
+          range: [0, height],
+        });
         return (
           <svg width={width} height={h} viewBox={`0 0 ${width} ${h}`} style={{ margin: `${padding} 0` }}>
-            <Axis scale={yScale} transform={`translate(${width}, -${padding})`} direction="left" />
+            <Axis scale={yScale} transform={`translate(${width}, -${padding})`} position="left" />
           </svg>
         );
       },
@@ -317,17 +321,26 @@ storiesOf("@operational/grid/1. Pivot table", module)
             cell={({ data, row, width, height, measure }) => {
               const w = width - 2 * padding;
               const h = height - 2 * padding;
-              const yScale = useScaleBand({ frame: pivotedFrame.row(row), column: "Customer.City", size: h });
-              const xScale = useScaleLinear({ frame, size: w, column: "sales" });
+              const yScale = useScaleBand({
+                frame: pivotedFrame.row(row) as IteratableFrame<string>,
+                column: "Customer.City",
+                range: [0, h],
+              });
+              const xScale = useScaleLinear({
+                frame: frame as IteratableFrame<string>,
+                range: [0, w],
+                column: "sales",
+              });
               return (
                 <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ margin: padding }}>
                   <Bars
-                    data={data}
-                    xScale={xScale}
-                    yScale={yScale}
-                    x={frame.getCursor(measure)}
-                    y={frame.getCursor("Customer.City")}
+                    data={data as IteratableFrame<string>}
+                    metricScale={xScale}
+                    categoricalScale={yScale}
+                    metric={frame.getCursor(measure)}
+                    categorical={frame.getCursor("Customer.City")}
                     style={{ fill: "#1f78b4" }}
+                    direction="horizontal"
                   />
                 </svg>
               );

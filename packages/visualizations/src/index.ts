@@ -1,4 +1,4 @@
 export { Axis } from "./Axis";
-export { Bars } from "./Bars";
+export { Bars, BarsProps } from "./Bars";
 export { Chart } from "./Chart";
 export * from "./scale";

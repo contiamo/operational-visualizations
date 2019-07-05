@@ -1,7 +1,8 @@
-import { DataFrame } from "@operational/frame";
-import { Axis, Bars, BarsProps, Chart, useScaleBand, useScaleLinear } from "@operational/visualizations";
-import { storiesOf } from "@storybook/react";
 import * as React from "react";
+import { storiesOf } from "@storybook/react";
+import { DataFrame } from "@operational/frame";
+import { Axis, Bars, Chart, useScaleBand, useScaleLinear } from "@operational/visualizations";
+import { ChartProps } from "@operational/visualizations/lib/Chart";
 
 const rawData = {
   columns: [
@@ -50,8 +51,8 @@ const frame = new DataFrame(rawData.columns, rawData.rows);
 interface BarChartProps<Name extends string> {
   width: number;
   height: number;
-  margin: number | [number, number] | [number, number, number, number];
-  data: BarsProps["data"];
+  margin: ChartProps["margin"];
+  data: DataFrame<Name>;
   categorical: Name;
   metric: Name;
 }
@@ -68,8 +69,8 @@ const BarChart = <Name extends string>({ width, height, margin, data, categorica
       <Bars
         direction={"horizontal"}
         data={data}
-        categorical={categorical}
-        metric={metric}
+        categorical={data.getCursor(categorical)}
+        metric={data.getCursor(metric)}
         categoricalScale={categoricalScale}
         metricScale={metricScale}
         style={{ fill: "#1f78b4" }}
@@ -82,7 +83,7 @@ const BarChart = <Name extends string>({ width, height, margin, data, categorica
 
 storiesOf("@operational/visualizations/1. Bar chart", module).add("horizontal", () => {
   // number of pixels picked manually to make sure that YAxis fits on the screen
-  const magicMargin = [5, 10, 20, 60];
+  const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
 
   return (
     <BarChart metric="sales" categorical="Customer.City" width={300} height={300} margin={magicMargin} data={frame} />
