@@ -176,7 +176,6 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
     measuresPlacement,
     measuresCount,
   });
-  console.log({ columnCount, rowCount, measuresCount });
 
   const indexToCoordinateMemoised = useMemo(
     () =>
