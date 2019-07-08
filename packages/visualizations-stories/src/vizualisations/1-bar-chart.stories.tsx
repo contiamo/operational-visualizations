@@ -1,7 +1,8 @@
-import { DataFrame } from "@operational/frame";
-import { Axis, Bars, BarsProps, Chart, useScaleBand, useScaleLinear } from "@operational/visualizations";
-import { storiesOf } from "@storybook/react";
 import * as React from "react";
+import { storiesOf } from "@storybook/react";
+import { DataFrame } from "@operational/frame";
+import { Axis, Bars, Chart, useScaleBand, useScaleLinear, BarsProps } from "@operational/visualizations";
+import { ChartProps } from "@operational/visualizations/lib/Chart";
 
 const rawData = {
   columns: [
@@ -50,41 +51,82 @@ const frame = new DataFrame(rawData.columns, rawData.rows);
 interface BarChartProps<Name extends string> {
   width: number;
   height: number;
-  margin: number | [number, number] | [number, number, number, number];
-  data: BarsProps["data"];
+  margin: ChartProps["margin"];
+  data: DataFrame<Name>;
   categorical: Name;
   metric: Name;
+  direction: BarsProps["direction"];
 }
 
 /**
  * Example of how you can compose more complex charts out of 'atoms'
  */
-const BarChart = <Name extends string>({ width, height, margin, data, categorical, metric }: BarChartProps<Name>) => {
-  const categoricalScale = useScaleBand({ frame: data, column: categorical, range: [height, 0] });
-  const metricScale = useScaleLinear({ frame: data, column: metric, range: [0, width] });
+const BarChart = <Name extends string>({
+  width,
+  height,
+  margin,
+  data,
+  categorical,
+  metric,
+  direction,
+}: BarChartProps<Name>) => {
+  const categoricalScale = useScaleBand({
+    frame: data,
+    column: categorical,
+    range: direction === "horizontal" ? [0, height] : [0, width],
+  });
+  const metricScale = useScaleLinear({
+    frame: data,
+    column: metric,
+    range: direction === "horizontal" ? [0, width] : [height, 0],
+  });
 
   return (
     <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
       <Bars
-        direction={"horizontal"}
+        direction={direction}
         data={data}
-        categorical={categorical}
-        metric={metric}
+        categorical={data.getCursor(categorical)}
+        metric={data.getCursor(metric)}
         categoricalScale={categoricalScale}
         metricScale={metricScale}
         style={{ fill: "#1f78b4" }}
       />
-      <Axis scale={categoricalScale} position="left" />
-      <Axis scale={metricScale} position="bottom" />
+      <Axis scale={categoricalScale} position={direction === "horizontal" ? "left" : "bottom"} />
+      <Axis scale={metricScale} position={direction === "horizontal" ? "bottom" : "left"} />
     </Chart>
   );
 };
 
-storiesOf("@operational/visualizations/1. Bar chart", module).add("horizontal", () => {
-  // number of pixels picked manually to make sure that YAxis fits on the screen
-  const magicMargin = [5, 10, 20, 60];
+storiesOf("@operational/visualizations/1. Bar chart", module)
+  .add("horizontal", () => {
+    // number of pixels picked manually to make sure that YAxis fits on the screen
+    const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
 
-  return (
-    <BarChart metric="sales" categorical="Customer.City" width={300} height={300} margin={magicMargin} data={frame} />
-  );
-});
+    return (
+      <BarChart
+        metric="sales"
+        categorical="Customer.City"
+        width={300}
+        height={300}
+        margin={magicMargin}
+        data={frame}
+        direction="horizontal"
+      />
+    );
+  })
+  .add("vertical", () => {
+    // number of pixels picked manually to make sure that YAxis fits on the screen
+    const magicMargin = 60;
+    return (
+      <BarChart
+        metric="sales"
+        categorical="Customer.City"
+        width={300}
+        height={300}
+        margin={magicMargin}
+        data={frame}
+        direction="vertical"
+      />
+    );
+  });

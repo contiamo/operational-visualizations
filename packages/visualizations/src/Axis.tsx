@@ -20,16 +20,16 @@ export const Axis: React.FC<AxisProps> = React.memo(({ scale, transform, positio
     if (ref.current) {
       switch (position) {
         case "bottom":
-          select(ref.current).call(axisBottom(scale))
+          select(ref.current).call(axisBottom(scale));
           break;
         case "top":
-          select(ref.current).call(axisTop(scale))
+          select(ref.current).call(axisTop(scale));
           break;
         case "left":
-          select(ref.current).call(axisLeft(scale))
+          select(ref.current).call(axisLeft(scale));
           break;
         case "right":
-          select(ref.current).call(axisRight(scale))
+          select(ref.current).call(axisRight(scale));
           break;
       }
     }

@@ -17,12 +17,10 @@ const initialMargins = { top: 0, bottom: 0, left: 0, right: 0 };
 const ChartContext = React.createContext({
   margins: initialMargins,
   width: 0,
-  height: 0
+  height: 0,
 });
 
-export const useAxisTransform = (
-  direction: "left" | "right" | "top" | "bottom"
-) => {
+export const useAxisTransform = (direction: "left" | "right" | "top" | "bottom") => {
   const { margins, height, width } = useContext(ChartContext);
   switch (direction) {
     case "bottom":
@@ -47,13 +45,13 @@ const expandMargins = (margin: Margin) =>
         top: margin[0],
         right: margin[1],
         bottom: margin[2] || margin[0],
-        left: margin[3] || margin[1]
+        left: margin[3] || margin[1],
       }
     : {
         top: margin,
         right: margin,
         bottom: margin,
-        left: margin
+        left: margin,
       };
 
 // tslint:disable
@@ -82,23 +80,17 @@ height   width           margin
                +
 ```
  */
-export const Chart: React.FC<ChartProps> = React.memo(
-  ({ width, height, margin = 0, style, children }) => {
-    const margins = expandMargins(margin);
-    return (
-      // tslint:enable
-      <svg
-        width={width + margins.left + margins.right}
-        height={height + margins.top + margins.bottom}
-        viewBox={`0 0 ${width + margins.left + margins.right} ${height +
-          margins.top +
-          margins.bottom}`}
-        style={style}
-      >
-        <ChartContext.Provider value={{ margins, width, height }}>
-          {children}
-        </ChartContext.Provider>
-      </svg>
-    );
-  }
-);
+export const Chart: React.FC<ChartProps> = React.memo(({ width, height, margin = 0, style, children }) => {
+  const margins = expandMargins(margin);
+  return (
+    // tslint:enable
+    <svg
+      width={width + margins.left + margins.right}
+      height={height + margins.top + margins.bottom}
+      viewBox={`0 0 ${width + margins.left + margins.right} ${height + margins.top + margins.bottom}`}
+      style={style}
+    >
+      <ChartContext.Provider value={{ margins, width, height }}>{children}</ChartContext.Provider>
+    </svg>
+  );
+});

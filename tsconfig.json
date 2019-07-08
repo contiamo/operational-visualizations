@@ -38,6 +38,9 @@
     },
     {
       "path": "packages/visualizations"
+    },
+    {
+      "path": "packages/visualizations-stories"
     }
   ]
 }
