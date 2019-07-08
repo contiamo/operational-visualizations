@@ -274,6 +274,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
       columns: [],
     });
 
+    console.log(pivotedFrame.row(0));
     return (
       <AutoSizer style={{ minHeight: "500px", height: "100%" }}>
         {({ width, height }) => (

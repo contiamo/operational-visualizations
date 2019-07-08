@@ -55,7 +55,7 @@ export class PivotFrame<Name extends string = string> {
   public row(rowIdentifier: number) {
     this.buildIndex();
     const row = this.rowIndex[rowIdentifier];
-    if (row === undefined) {
+    if (this.rowIndex.length && row === undefined) {
       throw new Error(`Can't find row #${rowIdentifier}`);
     }
     if (!this.rowCache.has(rowIdentifier)) {
@@ -67,7 +67,7 @@ export class PivotFrame<Name extends string = string> {
   public column(columnIdentifier: number) {
     this.buildIndex();
     const column = this.columnIndex[columnIdentifier];
-    if (column === undefined) {
+    if (this.columnIndex.length && column === undefined) {
       throw new Error(`Can't find column #${columnIdentifier}`);
     }
     if (!this.columnCache.has(columnIdentifier)) {
