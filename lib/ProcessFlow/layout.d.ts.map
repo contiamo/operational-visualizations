@@ -1,0 +1,1 @@
+{"version":3,"file":"layout.d.ts","sourceRoot":"","sources":["../../src/ProcessFlow/layout.ts"],"names":[],"mappings":"AAcA,OAAO,EAAS,KAAK,EAAe,MAAM,WAAW,CAAC;AAEtD,cAAM,MAAM;IACH,KAAK,EAAG,KAAK,EAAE,CAAC;IAEhB,aAAa,CAAC,KAAK,EAAE,KAAK,EAAE;IAQnC,OAAO,CAAC,qBAAqB;IA0B7B,OAAO,CAAC,wBAAwB;IAwBhC,OAAO,CAAC,qBAAqB;CAwB9B;AA8ED,eAAe,MAAM,CAAC"}

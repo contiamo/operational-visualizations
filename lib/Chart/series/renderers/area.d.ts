@@ -1,0 +1,42 @@
+import Series from "../chart_series";
+import { AreaRendererAccessors, AxisOrientation, D3Selection, Datum, RendererClass, SingleRendererOptionsParam, State } from "../../typings";
+declare type Options = SingleRendererOptionsParam<AreaRendererAccessors, "area">;
+declare class Area implements RendererClass<AreaRendererAccessors, "area"> {
+    private data;
+    private el;
+    private isRange;
+    options: Options;
+    private series;
+    private state;
+    type: "area";
+    private xIsBaseline;
+    private closeGaps;
+    private color;
+    private interpolate;
+    private opacity;
+    private x;
+    private x0;
+    private x1;
+    private xScale;
+    private y;
+    private y0;
+    private y1;
+    private yScale;
+    constructor(state: State, el: D3Selection, data: Datum[], options: Options, series: Series);
+    update(data: Datum[], options: Options): void;
+    draw(): void;
+    close(): void;
+    dataForAxis(axis: AxisOrientation): any[];
+    private appendSeriesGroup;
+    private setAxisScales;
+    private assignAccessors;
+    private addMissingData;
+    private updateClipPath;
+    private isDefined;
+    private createAreaPath;
+    private startPath;
+    private path;
+    private clipPath;
+}
+export default Area;
+//# sourceMappingURL=area.d.ts.map

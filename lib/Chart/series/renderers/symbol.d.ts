@@ -1,0 +1,40 @@
+import Series from "../chart_series";
+import { AxisOrientation, D3Selection, Datum, EventEmitter, RendererClass, SingleRendererOptionsParam, State, SymbolRendererAccessors } from "../../typings";
+declare type Options = SingleRendererOptionsParam<SymbolRendererAccessors, "symbol">;
+declare class Symbol implements RendererClass<SymbolRendererAccessors, "symbol"> {
+    private data;
+    private el;
+    private events;
+    options: Options;
+    private series;
+    private state;
+    type: "symbol";
+    private xIsBaseline;
+    private xScale;
+    private yScale;
+    private fill;
+    private focusContent;
+    private opacity;
+    private size;
+    private stroke;
+    private symbol;
+    private x;
+    private y;
+    constructor(state: State, el: D3Selection, data: Datum[], options: Options, series: Series, events: EventEmitter);
+    update(data: Datum[], options: Options): void;
+    draw(): void;
+    close(): void;
+    dataForAxis(axis: AxisOrientation): any[];
+    private appendSeriesGroup;
+    private validate;
+    private assignAccessors;
+    private defaultFocusContent;
+    private setAxisScales;
+    private transform;
+    private startTransform;
+    private onMouseOver;
+    private onMouseOut;
+    private onClick;
+}
+export default Symbol;
+//# sourceMappingURL=symbol.d.ts.map
