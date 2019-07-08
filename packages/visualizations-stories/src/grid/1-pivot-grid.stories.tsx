@@ -286,7 +286,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
-            cell={(opts: any) => JSON.stringify(opts)}
+            cell={({ measure }: { measure: string }) => `Data for: ${measure}`}
           />
         )}
       </AutoSizer>
