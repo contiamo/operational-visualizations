@@ -54,6 +54,14 @@ export class PivotFrame<Name extends string = string> {
 
   public row(rowIdentifier: number) {
     this.buildIndex();
+
+    if (this.prop.rows.length === 0 && this.prop.columns.length === 0) {
+      if (!this.rowCache.has(rowIdentifier)) {
+        this.rowCache.set(rowIdentifier, new FragmentFrame(this.schema, this.data, this.data.map((_, i) => i)));
+      }
+      return this.rowCache.get(rowIdentifier)!;
+    }
+
     const row = this.rowIndex[rowIdentifier];
     if (row === undefined) {
       throw new Error(`Can't find row #${rowIdentifier}`);
@@ -66,6 +74,14 @@ export class PivotFrame<Name extends string = string> {
 
   public column(columnIdentifier: number) {
     this.buildIndex();
+
+    if (this.prop.rows.length === 0 && this.prop.columns.length === 0) {
+      if (!this.columnCache.has(columnIdentifier)) {
+        this.columnCache.set(columnIdentifier, new FragmentFrame(this.schema, this.data, this.data.map((_, i) => i)));
+      }
+      return this.columnCache.get(columnIdentifier)!;
+    }
+
     const column = this.columnIndex[columnIdentifier];
     if (column === undefined) {
       throw new Error(`Can't find column #${columnIdentifier}`);
