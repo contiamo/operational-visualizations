@@ -53,15 +53,17 @@ export class PivotFrame<Name extends string = string> {
   }
 
   public row(rowIdentifier: number) {
-    this.buildIndex();
-
+    // This is very specific case when we need PivotFrame, but without pivoting itself.
+    // We need it to show the grid with "pivoting" only by measures.
+    // In this case `row`, `column` and `cell` methods will return the same result containing the whole data set
     if (this.prop.rows.length === 0 && this.prop.columns.length === 0) {
-      if (!this.rowCache.has(rowIdentifier)) {
-        this.rowCache.set(rowIdentifier, new FragmentFrame(this.schema, this.data, this.data.map((_, i) => i)));
+      if (!this.rowCache.has(0)) {
+        this.rowCache.set(0, new FragmentFrame(this.schema, this.data, this.data.map((_, i) => i)));
       }
-      return this.rowCache.get(rowIdentifier)!;
+      return this.rowCache.get(0)!;
     }
 
+    this.buildIndex();
     const row = this.rowIndex[rowIdentifier];
     if (row === undefined) {
       throw new Error(`Can't find row #${rowIdentifier}`);
@@ -73,15 +75,15 @@ export class PivotFrame<Name extends string = string> {
   }
 
   public column(columnIdentifier: number) {
-    this.buildIndex();
-
+    // see row method for explanations
     if (this.prop.rows.length === 0 && this.prop.columns.length === 0) {
-      if (!this.columnCache.has(columnIdentifier)) {
-        this.columnCache.set(columnIdentifier, new FragmentFrame(this.schema, this.data, this.data.map((_, i) => i)));
+      if (!this.rowCache.has(0)) {
+        this.rowCache.set(0, new FragmentFrame(this.schema, this.data, this.data.map((_, i) => i)));
       }
-      return this.columnCache.get(columnIdentifier)!;
+      return this.rowCache.get(0)!;
     }
 
+    this.buildIndex();
     const column = this.columnIndex[columnIdentifier];
     if (column === undefined) {
       throw new Error(`Can't find column #${columnIdentifier}`);
@@ -93,12 +95,15 @@ export class PivotFrame<Name extends string = string> {
   }
 
   public cell(rowIdentifier: number, columnIdentifier: number) {
-    this.buildIndex();
-
+    // see row method for explanations
     if (this.prop.rows.length === 0 && this.prop.columns.length === 0) {
-      return new FragmentFrame(this.schema, this.data, this.data.map((_, i) => i));
+      if (!this.rowCache.has(0)) {
+        this.rowCache.set(0, new FragmentFrame(this.schema, this.data, this.data.map((_, i) => i)));
+      }
+      return this.rowCache.get(0)!;
     }
 
+    this.buildIndex();
     if (this.prop.rows.length === 0) {
       const index = this.columnIndex[columnIdentifier][rowIdentifier];
       return new FragmentFrame(this.schema, this.data, index !== undefined ? [index] : []);
