@@ -474,11 +474,7 @@ export const getColumnCount = <Name extends string = string>({
   rowHeadersCount: number;
 }) => {
   if (data.columnHeaders().length === 0 && data.rowHeaders().length === 0) {
-    if (measuresPlacement === "column") {
-      return measuresCount;
-    } else {
-      return 2;
-    }
+    return measuresPlacement === "column" ? measuresCount : 2;
   } else {
     return rowHeadersCount + data.columnHeaders().length * (measuresPlacement === "column" ? measuresCount : 1);
   }
@@ -500,11 +496,7 @@ export const getRowCount = <Name extends string = string>({
   columnHeadersCount: number;
 }) => {
   if (data.columnHeaders().length === 0 && data.rowHeaders().length === 0) {
-    if (measuresPlacement === "row") {
-      return measuresCount;
-    } else {
-      return 2;
-    }
+    return measuresPlacement === "row" ? measuresCount : 2;
   } else {
     return columnHeadersCount + data.rowHeaders().length * (measuresPlacement === "row" ? measuresCount : 1);
   }
