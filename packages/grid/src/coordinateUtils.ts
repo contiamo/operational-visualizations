@@ -181,7 +181,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
   } else if (isRowHeaders) {
     const rowDimensionLabelsOnLeft = dimensionLabels.row === "left";
     const rowDepth = rowDimensionLabelsOnLeft ? Math.floor(columnIndex / 2) : columnIndex;
-    const dimension = data.rowHeaders()[rowIndexReal][rowDepth];
+    const dimension = data.rowHeaders().length > 0 ? data.rowHeaders()[rowIndexReal][rowDepth] : undefined;
 
     if (
       // do we show row dimensions on the left
@@ -230,7 +230,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
   } else if (isColumnHeaders) {
     const columnDimensionLabelsAbove = dimensionLabels.column === "top";
     const columnDepth = columnDimensionLabelsAbove ? Math.floor(rowIndex / 2) : rowIndex;
-    const dimension = data.columnHeaders()[columnIndexReal][columnDepth];
+    const dimension = data.columnHeaders().length > 0 ? data.columnHeaders()[columnIndexReal][columnDepth] : undefined;
 
     if (
       // do we show column label on the top
@@ -472,7 +472,17 @@ export const getColumnCount = <Name extends string = string>({
   measuresPlacement: "row" | "column";
   measuresCount: number;
   rowHeadersCount: number;
-}) => rowHeadersCount + data.columnHeaders().length * (measuresPlacement === "column" ? measuresCount : 1);
+}) => {
+  if (data.columnHeaders().length === 0 && data.rowHeaders().length === 0) {
+    if (measuresPlacement === "column") {
+      return measuresCount;
+    } else {
+      return 2;
+    }
+  } else {
+    return rowHeadersCount + data.columnHeaders().length * (measuresPlacement === "column" ? measuresCount : 1);
+  }
+};
 
 /**
  * Get total number of column slots required to show the grid e.g. number of headers + number of data cells
@@ -488,4 +498,14 @@ export const getRowCount = <Name extends string = string>({
   measuresPlacement: "row" | "column";
   measuresCount: number;
   columnHeadersCount: number;
-}) => columnHeadersCount + data.rowHeaders().length * (measuresPlacement === "row" ? measuresCount : 1);
+}) => {
+  if (data.columnHeaders().length === 0 && data.rowHeaders().length === 0) {
+    if (measuresPlacement === "row") {
+      return measuresCount;
+    } else {
+      return 2;
+    }
+  } else {
+    return columnHeadersCount + data.rowHeaders().length * (measuresPlacement === "row" ? measuresCount : 1);
+  }
+};

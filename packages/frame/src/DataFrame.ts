@@ -56,9 +56,6 @@ export class DataFrame<Name extends string = string> implements IteratableFrame<
 
   public pivot<Column extends Name, Row extends Name>(prop: PivotProps<Column, Row>) {
     // check if the input params are valid
-    if (prop.rows.length === 0 && prop.columns.length === 0) {
-      throw new Error("Please provide at least one row or column");
-    }
     return new PivotFrame(this.schema, this.data, prop);
   }
 }

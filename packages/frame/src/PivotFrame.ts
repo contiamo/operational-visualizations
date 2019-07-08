@@ -79,6 +79,10 @@ export class PivotFrame<Name extends string = string> {
   public cell(rowIdentifier: number, columnIdentifier: number) {
     this.buildIndex();
 
+    if (this.prop.rows.length === 0 && this.prop.columns.length === 0) {
+      return new FragmentFrame(this.schema, this.data, this.data.map((_, i) => i));
+    }
+
     if (this.prop.rows.length === 0) {
       const index = this.columnIndex[columnIdentifier][rowIdentifier];
       return new FragmentFrame(this.schema, this.data, index !== undefined ? [index] : []);

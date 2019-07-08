@@ -268,6 +268,30 @@ storiesOf("@operational/grid/1. Pivot table", module)
       </AutoSizer>
     );
   })
+  .add("allow zero dimensions", () => {
+    const pivotedFrame = frameForBug.pivot({
+      rows: [],
+      columns: [],
+    });
+
+    return (
+      <AutoSizer style={{ minHeight: "500px", height: "100%" }}>
+        {({ width, height }) => (
+          <PivotGrid
+            width={width}
+            height={height}
+            data={pivotedFrame}
+            measures={["A", "B", "C"]}
+            measuresPlacement="row"
+            style={{
+              cell: { padding: "10px", textAlign: "right" },
+            }}
+            cell={(opts: any) => JSON.stringify(opts)}
+          />
+        )}
+      </AutoSizer>
+    );
+  })
   .add("with vizualisation", () => {
     const padding = 5;
     const chartWidth = 100;
