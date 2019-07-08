@@ -73,7 +73,7 @@ const BarChart = <Name extends string>({
   const categoricalScale = useScaleBand({
     frame: data,
     column: categorical,
-    range: direction === "horizontal" ? [height, 0] : [0, width],
+    range: direction === "horizontal" ? [0, height] : [0, width],
   });
   const metricScale = useScaleLinear({
     frame: data,
