@@ -197,7 +197,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
       </AutoSizer>
     );
   })
-  .add("pivoting in one direction", () => {
+  .add("pivoting in one direction, measures in rows", () => {
     const pivotedFrame = frame.pivot({
       rows: [],
       columns: ["Customer.AgeGroup", "Customer.Gender"],
@@ -212,6 +212,31 @@ storiesOf("@operational/grid/1. Pivot table", module)
             data={pivotedFrame}
             measures={["sales", "revenue"]}
             measuresPlacement="row"
+            dimensionLabels="top"
+            style={{
+              cell: { padding: "10px", textAlign: "right" },
+            }}
+            cell={({ measure }: { measure: string }) => `${measure}`}
+          />
+        )}
+      </AutoSizer>
+    );
+  })
+  .add("pivoting in one direction, measures in columns", () => {
+    const pivotedFrame = frame.pivot({
+      rows: [],
+      columns: ["Customer.AgeGroup", "Customer.Gender"],
+    });
+
+    return (
+      <AutoSizer style={{ minHeight: "500px", height: "100%" }}>
+        {({ width, height }) => (
+          <PivotGrid
+            width={width}
+            height={height}
+            data={pivotedFrame}
+            measures={["sales", "revenue"]}
+            measuresPlacement="column"
             dimensionLabels="top"
             style={{
               cell: { padding: "10px", textAlign: "right" },
