@@ -1,4 +1,4 @@
-import { IteratableFrame, Matrix, Schema } from "./types";
+import { IteratableFrame, Matrix, Schema, RawRow } from "./types";
 
 export class FragmentFrame<Name extends string = string> implements IteratableFrame<Name> {
   private readonly data: Matrix<any>;
@@ -11,8 +11,8 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
     this.index = index;
   }
 
-  public mapRows<A>(callback: (row: any[], index: number) => A) {
-    return this.index.map((i, j) => callback(this.data[i], j));
+  public mapRows<A>(callback: (row: RawRow, index: number, prevRow?: RawRow) => A) {
+    return this.index.map((i, j) => callback(this.data[i], j, this.data[i - 1]));
   }
 
   public forEach(columns: Name | Name[], cb: (...columnValue: any[]) => void) {

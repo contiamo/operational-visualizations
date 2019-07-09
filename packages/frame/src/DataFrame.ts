@@ -1,5 +1,5 @@
 import { PivotFrame } from "./PivotFrame";
-import { ColumnCursor, IteratableFrame, Matrix, PivotProps, Schema } from "./types";
+import { ColumnCursor, IteratableFrame, Matrix, PivotProps, Schema, RawRow } from "./types";
 
 export class DataFrame<Name extends string = string> implements IteratableFrame<Name> {
   private readonly data: Matrix<any>;
@@ -38,8 +38,8 @@ export class DataFrame<Name extends string = string> implements IteratableFrame<
     return this.cursorCache.get(column)!;
   }
 
-  public mapRows<A>(callback: (row: any[], index: number) => A) {
-    return this.data.map(callback);
+  public mapRows<A>(callback: (row: RawRow, index: number, prevRow?: RawRow) => A) {
+    return this.data.map((row, i) => callback(row, i, this.data[i - 1]));
   }
 
   public forEach(columns: Name | Name[], cb: (...columnValue: any[]) => void) {

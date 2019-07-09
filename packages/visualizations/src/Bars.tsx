@@ -28,35 +28,50 @@ export const Bars: BarsComponent = React.memo(props => {
   if (props.direction === "vertical") {
     const { data, transform, metric, categorical, metricScale, categoricalScale } = props;
     const height = metricScale(metricScale.domain()[0]);
-
+    let y = 0;
     return (
       <g transform={transform || defaultTransform}>
-        {data.mapRows((row, i) => (
-          <rect
-            x={categoricalScale(categorical(row))}
-            y={metricScale(metric(row))}
-            width={categoricalScale.bandwidth()}
-            height={height - metricScale(metric(row))}
-            style={styleProp.isFunction ? styleProp.style(i) : styleProp.style}
-            key={i}
-          />
-        ))}
+        {data.mapRows((row, i, prevRow) => {
+          if (prevRow && prevRow[categorical.index] === row[categorical.index]) {
+            y += height - metricScale(prevRow[metric.index]);
+          } else {
+            y = 0;
+          }
+          return (
+            <rect
+              x={categoricalScale(row[categorical.index])}
+              y={metricScale(row[metric.index]) - y}
+              width={categoricalScale.bandwidth()}
+              height={height - metricScale(row[metric.index])}
+              style={styleProp.isFunction ? styleProp.style(i) : styleProp.style}
+              key={i}
+            />
+          );
+        })}
       </g>
     );
   } else {
     const { data, transform, metric, categorical, metricScale, categoricalScale } = props;
+    let x = 0;
     return (
       <g transform={transform || defaultTransform}>
-        {data.mapRows((row, i) => (
-          <rect
-            y={categoricalScale(categorical(row))}
-            x={0}
-            height={categoricalScale.bandwidth()}
-            width={metricScale(metric(row))}
-            style={styleProp.isFunction ? styleProp.style(i) : styleProp.style}
-            key={i}
-          />
-        ))}
+        {data.mapRows((row, i, prevRow) => {
+          if (prevRow && prevRow[categorical.index] === row[categorical.index]) {
+            x += metricScale(prevRow[metric.index]);
+          } else {
+            x = 0;
+          }
+          return (
+            <rect
+              y={categoricalScale(row[categorical.index])}
+              x={x}
+              height={categoricalScale.bandwidth()}
+              width={metricScale(row[metric.index])}
+              style={styleProp.isFunction ? styleProp.style(i) : styleProp.style}
+              key={i}
+            />
+          );
+        })}
       </g>
     );
   }

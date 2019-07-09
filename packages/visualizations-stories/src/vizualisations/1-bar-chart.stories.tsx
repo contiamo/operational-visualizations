@@ -129,4 +129,34 @@ storiesOf("@operational/visualizations/1. Bar chart", module)
         direction="vertical"
       />
     );
+  })
+  .add("stacked horizontal", () => {
+    // number of pixels picked manually to make sure that YAxis fits on the screen
+    const magicMargin = 60;
+    return (
+      <BarChart
+        metric="sales"
+        categorical="Customer.Country"
+        width={300}
+        height={300}
+        margin={magicMargin}
+        data={frame}
+        direction="horizontal"
+      />
+    );
+  })
+  .add("stacked vertical", () => {
+    // number of pixels picked manually to make sure that YAxis fits on the screen
+    const magicMargin = 60;
+    return (
+      <BarChart
+        metric="sales"
+        categorical="Customer.Country"
+        width={300}
+        height={300}
+        margin={magicMargin}
+        data={frame}
+        direction="vertical"
+      />
+    );
   });
