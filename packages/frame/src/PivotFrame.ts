@@ -15,6 +15,7 @@ export class PivotFrame<Name extends string = string> {
   protected columnHeadersInternal!: DimensionValue[][];
   protected columnIndex!: number[][];
   protected rowIndex!: number[][];
+  protected frameWithoutPivoting!: FragmentFrame<Name>;
 
   // we need those for referential transperancy
   private readonly rowCache: Map<number, FragmentFrame<Name>>;
@@ -53,6 +54,10 @@ export class PivotFrame<Name extends string = string> {
   }
 
   public row(rowIdentifier: number) {
+    if (this.prop.rows.length === 0) {
+      return this.getFrameWithoutPivoting();
+    }
+
     this.buildIndex();
     const row = this.rowIndex[rowIdentifier];
     if (row === undefined) {
@@ -65,6 +70,10 @@ export class PivotFrame<Name extends string = string> {
   }
 
   public column(columnIdentifier: number) {
+    if (this.prop.columns.length === 0) {
+      return this.getFrameWithoutPivoting();
+    }
+
     this.buildIndex();
     const column = this.columnIndex[columnIdentifier];
     if (column === undefined) {
@@ -77,12 +86,11 @@ export class PivotFrame<Name extends string = string> {
   }
 
   public cell(rowIdentifier: number, columnIdentifier: number) {
-    this.buildIndex();
-
     if (this.prop.rows.length === 0 && this.prop.columns.length === 0) {
-      return new FragmentFrame(this.schema, this.data, this.data.map((_, i) => i));
+      return this.getFrameWithoutPivoting();
     }
 
+    this.buildIndex();
     if (this.prop.rows.length === 0) {
       const index = this.columnIndex[columnIdentifier][rowIdentifier];
       return new FragmentFrame(this.schema, this.data, index !== undefined ? [index] : []);
@@ -97,6 +105,16 @@ export class PivotFrame<Name extends string = string> {
     const column = this.columnIndex[columnIdentifier];
     const cell = intersect(row, column);
     return new FragmentFrame(this.schema, this.data, cell);
+  }
+
+  // This is very specific case when we need PivotFrame, but without pivoting itself.
+  // We need it to show the grid with "pivoting" only by measures.
+  // In this case `row`, `column` and `cell` methods will return the same result containing the whole data set
+  private getFrameWithoutPivoting() {
+    if (!this.frameWithoutPivoting) {
+      this.frameWithoutPivoting = new FragmentFrame(this.schema, this.data, this.data.map((_, i) => i));
+    }
+    return this.frameWithoutPivoting;
   }
 
   private buildIndex() {
