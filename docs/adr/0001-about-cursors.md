@@ -20,7 +20,7 @@ export interface ColumnCursor<Name extends string, ValueInRawRow = any> {
 }
 ```
 
-so we can access value like this `curor(row)` or more hacky and optimised way `row[curor.index]`. Second option is fragile, in case we would want to change implementation of `row` (for example, from row-oriented storage to column-orinted) it will brake in many places (at least we have types, which will make this refactoring easier).
+so we can access value like this `cursor(row)` or more hacky and optimised way `row[cursor.index]`. Second option is fragile, in case we would want to change implementation of `row` (for example, from row-oriented storage to column-orinted) it will brake in many places (at least we have types, which will make this refactoring easier).
 
 Cursor at the moment can be recieved from "root" `DataFrame`, which we think of as source of all derivative `PivotFrame`s and `FragmentFrame`s. Cursors are cached for referential transparency, so if they got passed down to React components, they will not trigger rerender.
 
