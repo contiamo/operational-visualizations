@@ -15,6 +15,7 @@ export class PivotFrame<Name extends string = string> {
   protected columnHeadersInternal!: DimensionValue[][];
   protected columnIndex!: number[][];
   protected rowIndex!: number[][];
+  protected frameWithoutPivoting!: FragmentFrame<Name>;
 
   // we need those for referential transperancy
   private readonly rowCache: Map<number, FragmentFrame<Name>>;
@@ -53,14 +54,8 @@ export class PivotFrame<Name extends string = string> {
   }
 
   public row(rowIdentifier: number) {
-    // This is very specific case when we need PivotFrame, but without pivoting itself.
-    // We need it to show the grid with "pivoting" only by measures.
-    // In this case `row`, `column` and `cell` methods will return the same result containing the whole data set
-    if (this.prop.rows.length === 0 && this.prop.columns.length === 0) {
-      if (!this.rowCache.has(0)) {
-        this.rowCache.set(0, new FragmentFrame(this.schema, this.data, this.data.map((_, i) => i)));
-      }
-      return this.rowCache.get(0)!;
+    if (this.prop.rows.length === 0) {
+      return this.getFrameWithoutPivoting();
     }
 
     this.buildIndex();
@@ -75,12 +70,8 @@ export class PivotFrame<Name extends string = string> {
   }
 
   public column(columnIdentifier: number) {
-    // see row method for explanations
-    if (this.prop.rows.length === 0 && this.prop.columns.length === 0) {
-      if (!this.rowCache.has(0)) {
-        this.rowCache.set(0, new FragmentFrame(this.schema, this.data, this.data.map((_, i) => i)));
-      }
-      return this.rowCache.get(0)!;
+    if (this.prop.columns.length === 0) {
+      return this.getFrameWithoutPivoting();
     }
 
     this.buildIndex();
@@ -95,12 +86,12 @@ export class PivotFrame<Name extends string = string> {
   }
 
   public cell(rowIdentifier: number, columnIdentifier: number) {
-    // see row method for explanations
     if (this.prop.rows.length === 0 && this.prop.columns.length === 0) {
-      if (!this.rowCache.has(0)) {
-        this.rowCache.set(0, new FragmentFrame(this.schema, this.data, this.data.map((_, i) => i)));
-      }
-      return this.rowCache.get(0)!;
+      return this.getFrameWithoutPivoting();
+    } else if (this.prop.rows.length === 0) {
+      return this.column(columnIdentifier);
+    } else if (this.prop.columns.length === 0) {
+      return this.row(rowIdentifier);
     }
 
     this.buildIndex();
@@ -118,6 +109,16 @@ export class PivotFrame<Name extends string = string> {
     const column = this.columnIndex[columnIdentifier];
     const cell = intersect(row, column);
     return new FragmentFrame(this.schema, this.data, cell);
+  }
+
+  // This is very specific case when we need PivotFrame, but without pivoting itself.
+  // We need it to show the grid with "pivoting" only by measures.
+  // In this case `row`, `column` and `cell` methods will return the same result containing the whole data set
+  private getFrameWithoutPivoting() {
+    if (!this.frameWithoutPivoting) {
+      this.frameWithoutPivoting = new FragmentFrame(this.schema, this.data, this.data.map((_, i) => i));
+    }
+    return this.frameWithoutPivoting;
   }
 
   private buildIndex() {
