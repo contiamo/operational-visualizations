@@ -5,7 +5,7 @@ export const exhaustiveCheck = (_: never) => undefined;
 
 export type IndexToCoordinate = <Name extends string = string>(prop: {
   rowHeadersCount: number;
-  measuresPlacement: "row" | "column";
+  measuresPlacement: "column" | "row";
   columnHeadersCount: number;
   measuresCount: number;
   data: PivotFrame<Name>;
@@ -69,11 +69,13 @@ export const indexToCoordinate: IndexToCoordinate = ({
   dimensionLabels,
 }) => ({ columnIndex, rowIndex }) => {
   const columnIndexReal = Math.floor(
-    (columnIndex - rowHeadersCount) / (measuresPlacement === "column" ? measuresCount : 1),
+    (columnIndex - rowHeadersCount) / (measuresPlacement === "row" ? measuresCount : 1),
   );
-  const rowIndexReal = Math.floor((rowIndex - columnHeadersCount) / (measuresPlacement === "row" ? measuresCount : 1));
+  const rowIndexReal = Math.floor(
+    (rowIndex - columnHeadersCount) / (measuresPlacement === "column" ? measuresCount : 1),
+  );
   const measuresIndex =
-    (measuresPlacement === "column" ? columnIndex - rowHeadersCount : rowIndex - columnHeadersCount) % measuresCount;
+    (measuresPlacement === "row" ? columnIndex - rowHeadersCount : rowIndex - columnHeadersCount) % measuresCount;
 
   /** column headers, columns measures, column axis */
   const isRowHeaders = columnIndex < rowHeadersCount;
@@ -106,7 +108,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
     // if this the row with column measure
     if (
       // show measures in column headers
-      measuresPlacement === "column" &&
+      measuresPlacement === "row" &&
       // and we have more than one measure
       measuresCount > 1 &&
       // and we are in the row exactly above data cells or exactly above axes
@@ -116,20 +118,20 @@ export const indexToCoordinate: IndexToCoordinate = ({
       if (axes.row && columnIndex === rowHeadersCount - 1) {
         return {
           type: "Empty",
-          measure: "column",
+          measure: "row",
           axis: true,
         };
       } else {
         return {
           type: "Empty",
-          measure: "column",
+          measure: "row",
         };
       }
     }
 
     if (
       // show measures in row headers
-      measuresPlacement === "row" &&
+      measuresPlacement === "column" &&
       // and we have more than one measure
       measuresCount > 1 &&
       // and we are in the column exactly before data cells or exactly before axes
@@ -139,13 +141,13 @@ export const indexToCoordinate: IndexToCoordinate = ({
       if (axes.column && rowIndex === columnHeadersCount - 1) {
         return {
           type: "Empty",
-          measure: "row",
+          measure: "column",
           axis: true,
         };
       } else {
         return {
           type: "Empty",
-          measure: "row",
+          measure: "column",
         };
       }
     }
@@ -224,7 +226,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
         label: data.rowHeaders()[rowIndexReal][rowDepth],
         measure: measures[measuresIndex],
         rowIndex: rowDepth,
-        empty: (prevRow && prevRow[rowDepth] === dimension) || (measuresIndex > 0 && measuresPlacement === "row"),
+        empty: (prevRow && prevRow[rowDepth] === dimension) || (measuresIndex > 0 && measuresPlacement === "column"),
       };
     }
   } else if (isColumnHeaders) {
@@ -274,8 +276,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
         measure: measures[measuresIndex],
         columnIndex: columnDepth,
         empty:
-          (prevColumn && prevColumn[columnDepth] === dimension) ||
-          (measuresIndex > 0 && measuresPlacement === "column"),
+          (prevColumn && prevColumn[columnDepth] === dimension) || (measuresIndex > 0 && measuresPlacement === "row"),
       };
     }
   } else {
@@ -398,11 +399,11 @@ export const getRowHeadersCount = <Name extends string = string>({
   };
   data: PivotFrame<Name>;
   dimensionLabels: DimensionLabels;
-  measuresPlacement: "row" | "column";
+  measuresPlacement: "column" | "row";
   measuresCount: number;
 }) => {
   const rowsDepth = data.getPivotRows().length;
-  const showMeasureLabelsInRows = measuresPlacement === "row";
+  const showMeasureLabelsInRows = measuresPlacement === "column";
 
   let rowHeadersCount =
     // if we place labels on the left in rows we need to double number of slots
@@ -440,11 +441,11 @@ export const getColumnHeadersCount = <Name extends string = string>({
   };
   data: PivotFrame<Name>;
   dimensionLabels: DimensionLabels;
-  measuresPlacement: "row" | "column";
+  measuresPlacement: "column" | "row";
   measuresCount: number;
 }) => {
   const columnDepth = data.getPivotColumns().length;
-  const showMeasureLabelsInColumns = measuresPlacement === "column";
+  const showMeasureLabelsInColumns = measuresPlacement === "row";
 
   // see getRowHeadersCount for explanation
   let columnHeadersCount =
@@ -469,14 +470,14 @@ export const getColumnCount = <Name extends string = string>({
   measuresCount,
 }: {
   data: PivotFrame<Name>;
-  measuresPlacement: "row" | "column";
+  measuresPlacement: "column" | "row";
   measuresCount: number;
   rowHeadersCount: number;
 }) => {
   if (data.columnHeaders().length === 0) {
-    return rowHeadersCount + (measuresPlacement === "column" ? measuresCount : 1);
+    return rowHeadersCount + (measuresPlacement === "row" ? measuresCount : 1);
   } else {
-    return rowHeadersCount + data.columnHeaders().length * (measuresPlacement === "column" ? measuresCount : 1);
+    return rowHeadersCount + data.columnHeaders().length * (measuresPlacement === "row" ? measuresCount : 1);
   }
 };
 
@@ -491,13 +492,13 @@ export const getRowCount = <Name extends string = string>({
   measuresCount,
 }: {
   data: PivotFrame<Name>;
-  measuresPlacement: "row" | "column";
+  measuresPlacement: "column" | "row";
   measuresCount: number;
   columnHeadersCount: number;
 }) => {
   if (data.rowHeaders().length === 0) {
-    return columnHeadersCount + (measuresPlacement === "row" ? measuresCount : 1);
+    return columnHeadersCount + (measuresPlacement === "column" ? measuresCount : 1);
   } else {
-    return columnHeadersCount + data.rowHeaders().length * (measuresPlacement === "row" ? measuresCount : 1);
+    return columnHeadersCount + data.rowHeaders().length * (measuresPlacement === "column" ? measuresCount : 1);
   }
 };

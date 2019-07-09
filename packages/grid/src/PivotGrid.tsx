@@ -64,8 +64,8 @@ const defaultDimensionStyle: React.CSSProperties = {
 interface TextOnlyPivotGridProps<Name extends string> {
   type?: "text";
   measures: Name[];
-  /** default value is "column" */
-  measuresPlacement?: "row" | "column";
+  /** default value is "row" */
+  measuresPlacement?: "column" | "row";
 }
 
 /**
@@ -86,8 +86,8 @@ type GeneralPivotGridProps<Name extends string> =
   | {
       type: "generalWithMeasures";
       measures: Name[];
-      /** default value is "column" */
-      measuresPlacement?: "row" | "column";
+      /** default value is "row" */
+      measuresPlacement?: "column" | "row";
       cell: (prop: {
         data: FragmentFrame<Name>;
         width: number;
@@ -157,7 +157,7 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
   const headerStyle = styleProp.header || defaultHeaderStyle;
   const backgroundStyle = styleProp.background || defaultBackground;
   const measures = "measures" in props ? props.measures : [];
-  const measuresPlacement = ("measures" in props ? props.measuresPlacement : undefined) || "column";
+  const measuresPlacement = ("measures" in props ? props.measuresPlacement : undefined) || "row";
 
   // calculating size of the grid
   const measuresCount = measures.length === 0 ? 1 : measures.length;

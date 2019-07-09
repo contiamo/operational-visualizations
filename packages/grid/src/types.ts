@@ -116,7 +116,7 @@ export type CellCoordinates<Name extends string = string> =
       type: "Empty";
       columnIndex?: number;
       rowIndex?: number;
-      measure?: "row" | "column";
+      measure?: "column" | "row";
       axis?: boolean;
       dimensionLabel?: Name | ""; // empty string is for empty cell
     }
