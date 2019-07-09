@@ -473,8 +473,8 @@ export const getColumnCount = <Name extends string = string>({
   measuresCount: number;
   rowHeadersCount: number;
 }) => {
-  if (data.columnHeaders().length === 0 && data.rowHeaders().length === 0) {
-    return measuresPlacement === "column" ? measuresCount : 2;
+  if (data.columnHeaders().length === 0) {
+    return rowHeadersCount + (measuresPlacement === "column" ? measuresCount : 2);
   } else {
     return rowHeadersCount + data.columnHeaders().length * (measuresPlacement === "column" ? measuresCount : 1);
   }
@@ -495,8 +495,8 @@ export const getRowCount = <Name extends string = string>({
   measuresCount: number;
   columnHeadersCount: number;
 }) => {
-  if (data.columnHeaders().length === 0 && data.rowHeaders().length === 0) {
-    return measuresPlacement === "row" ? measuresCount : 2;
+  if (data.rowHeaders().length === 0) {
+    return columnHeadersCount + (measuresPlacement === "row" ? measuresCount : 2);
   } else {
     return columnHeadersCount + data.rowHeaders().length * (measuresPlacement === "row" ? measuresCount : 1);
   }
