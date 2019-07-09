@@ -44,19 +44,21 @@ export class PivotFrame<Name extends string = string> {
   }
 
   public rowHeaders() {
+    if (this.prop.rows.length === 0) return [];
+
     this.buildIndex();
     return this.rowHeadersInternal;
   }
 
   public columnHeaders() {
+    if (this.prop.columns.length === 0) return [];
+
     this.buildIndex();
     return this.columnHeadersInternal;
   }
 
   public row(rowIdentifier: number) {
-    if (this.prop.rows.length === 0) {
-      return this.getFrameWithoutPivoting();
-    }
+    if (this.prop.rows.length === 0) return this.getFrameWithoutPivoting();
 
     this.buildIndex();
     const row = this.rowIndex[rowIdentifier];
@@ -70,9 +72,7 @@ export class PivotFrame<Name extends string = string> {
   }
 
   public column(columnIdentifier: number) {
-    if (this.prop.columns.length === 0) {
-      return this.getFrameWithoutPivoting();
-    }
+    if (this.prop.columns.length === 0) return this.getFrameWithoutPivoting();
 
     this.buildIndex();
     const column = this.columnIndex[columnIdentifier];
@@ -86,9 +86,7 @@ export class PivotFrame<Name extends string = string> {
   }
 
   public cell(rowIdentifier: number, columnIdentifier: number) {
-    if (this.prop.rows.length === 0 && this.prop.columns.length === 0) {
-      return this.getFrameWithoutPivoting();
-    }
+    if (this.prop.rows.length === 0 && this.prop.columns.length === 0) return this.getFrameWithoutPivoting();
 
     this.buildIndex();
     if (this.prop.rows.length === 0) {
