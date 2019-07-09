@@ -88,10 +88,6 @@ export class PivotFrame<Name extends string = string> {
   public cell(rowIdentifier: number, columnIdentifier: number) {
     if (this.prop.rows.length === 0 && this.prop.columns.length === 0) {
       return this.getFrameWithoutPivoting();
-    } else if (this.prop.rows.length === 0) {
-      return this.column(columnIdentifier);
-    } else if (this.prop.columns.length === 0) {
-      return this.row(rowIdentifier);
     }
 
     this.buildIndex();
