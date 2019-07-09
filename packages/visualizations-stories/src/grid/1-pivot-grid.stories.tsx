@@ -216,6 +216,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
+            cell={({ measure }: { measure: string }) => `${measure}`}
           />
         )}
       </AutoSizer>

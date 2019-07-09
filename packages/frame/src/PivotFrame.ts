@@ -44,23 +44,19 @@ export class PivotFrame<Name extends string = string> {
   }
 
   public rowHeaders() {
-    if (this.prop.rows.length === 0) return [];
-
     this.buildIndex();
     return this.rowHeadersInternal;
   }
 
   public columnHeaders() {
-    if (this.prop.columns.length === 0) return [];
-
     this.buildIndex();
     return this.columnHeadersInternal;
   }
 
   public row(rowIdentifier: number) {
     if (this.prop.rows.length === 0) return this.getFrameWithoutPivoting();
-
     this.buildIndex();
+
     const row = this.rowIndex[rowIdentifier];
     if (row === undefined) {
       throw new Error(`Can't find row #${rowIdentifier}`);
@@ -73,8 +69,8 @@ export class PivotFrame<Name extends string = string> {
 
   public column(columnIdentifier: number) {
     if (this.prop.columns.length === 0) return this.getFrameWithoutPivoting();
-
     this.buildIndex();
+
     const column = this.columnIndex[columnIdentifier];
     if (column === undefined) {
       throw new Error(`Can't find column #${columnIdentifier}`);
@@ -86,18 +82,14 @@ export class PivotFrame<Name extends string = string> {
   }
 
   public cell(rowIdentifier: number, columnIdentifier: number) {
-    if (this.prop.rows.length === 0 && this.prop.columns.length === 0) return this.getFrameWithoutPivoting();
-
+    if (this.prop.rows.length === 0 && this.prop.columns.length === 0) {
+      return this.getFrameWithoutPivoting();
+    } else if (this.prop.rows.length === 0) {
+      return this.column(columnIdentifier);
+    } else if (this.prop.columns.length === 0) {
+      return this.row(rowIdentifier);
+    }
     this.buildIndex();
-    if (this.prop.rows.length === 0) {
-      const index = this.columnIndex[columnIdentifier][rowIdentifier];
-      return new FragmentFrame(this.schema, this.data, index !== undefined ? [index] : []);
-    }
-
-    if (this.prop.columns.length === 0) {
-      const index = this.rowIndex[rowIdentifier][columnIdentifier];
-      return new FragmentFrame(this.schema, this.data, index !== undefined ? [index] : []);
-    }
 
     const row = this.rowIndex[rowIdentifier];
     const column = this.columnIndex[columnIdentifier];
@@ -127,13 +119,6 @@ export class PivotFrame<Name extends string = string> {
       },
       {} as Record<Name, number>,
     );
-
-    /**
-     * We need those only for case when we pivot by one direction
-     * e.g. when `this.prop.columns.length === 0` or `this.prop.rows.length === 0`
-     */
-    let maxColumnDepth = 0;
-    let maxRowDepth = 0;
 
     const lastInRow = this.prop.rows.length - 1;
     const pivotByRows = this.prop.rows.map(dimension => nameToIndex[dimension]);
@@ -187,7 +172,6 @@ export class PivotFrame<Name extends string = string> {
         }
         if (i === lastInRow) {
           previousRow[dimensionValue].push(rowNumber);
-          maxRowDepth = Math.max(previousRow[dimensionValue].length, maxRowDepth);
         }
         previousRow = previousRow[dimensionValue];
       });
@@ -208,17 +192,13 @@ export class PivotFrame<Name extends string = string> {
         }
         if (i === lastInColumn) {
           previousColumn[dimensionValue].push(rowNumber);
-          maxColumnDepth = Math.max(previousColumn[dimensionValue].length, maxColumnDepth);
         }
         previousColumn = previousColumn[dimensionValue];
       });
     });
 
-    this.columnHeadersInternal =
-      this.prop.columns.length === 0 ? Array.from({ length: maxRowDepth }).map(_ => []) : columnHeaders;
-    this.rowHeadersInternal =
-      this.prop.rows.length === 0 ? Array.from({ length: maxColumnDepth }).map(_ => []) : rowHeaders;
-
+    this.columnHeadersInternal = columnHeaders;
+    this.rowHeadersInternal = rowHeaders;
     this.columnIndex = columnIndex;
     this.rowIndex = rowIndex;
   }
