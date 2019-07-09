@@ -117,7 +117,7 @@ type Props<Name extends string = string> = (TextOnlyPivotGridProps<Name> | Gener
   style?: PivotGridStyle;
   axes?: Axes<Name>;
   accessors?: Accessors<Name>;
-  header?: (prop: { width: number; height: number; value: string }) => React.ReactElement | null;
+  header?: (prop: { value?: string; width: number; height: number }) => React.ReactElement | null;
   dimensionLabels?: DimensionLabels | "top" | "left" | "none";
 };
 
