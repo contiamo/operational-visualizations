@@ -104,8 +104,8 @@ interface Accessors<Name extends string> {
 }
 
 interface Axes {
-  row?: (rowProps: { row: number; width: number; height: number }) => React.ReactNode;
-  column?: (columnProps: { column: number; width: number; height: number }) => React.ReactNode;
+  row?: (rowProps: { row: number; measure?: string, width: number; height: number }) => React.ReactNode;
+  column?: (columnProps: { column: number; measure?: string, width: number; height: number }) => React.ReactNode;
 }
 
 interface PivotGridStyle {
@@ -280,12 +280,12 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
           break;
         case "RowAxis":
           if (axes.row) {
-            item = axes.row({ row: cellCoordinates.row, height, width });
+            item = axes.row({ row: cellCoordinates.row, measure: cellCoordinates.measure, height, width });
           }
           break;
         case "ColumnAxis":
           if (axes.column) {
-            item = axes.column({ column: cellCoordinates.column, height, width });
+            item = axes.column({ column: cellCoordinates.column, measure: cellCoordinates.measure, height, width });
           }
           break;
         default:
