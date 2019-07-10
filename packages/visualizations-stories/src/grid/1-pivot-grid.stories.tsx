@@ -326,6 +326,8 @@ storiesOf("@operational/grid/1. Pivot table", module)
     const magicMaxNumberOfBars = 3;
     const barWidth = (chartHeight - padding * 2) / magicMaxNumberOfBars;
 
+    const cityCursor = frame.getCursor("Customer.City");
+    const salesCursor = frame.getCursor("sales");
     const pivotedFrame = frame.pivot({
       rows: ["Customer.Continent", "Customer.Country"],
       columns: ["Customer.AgeGroup", "Customer.Gender"],
@@ -335,7 +337,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
       const h = height - 2 * padding;
       const yScale = useScaleBand({
         frame: pivotedFrame.row(row) as IteratableFrame<string>,
-        column: "Customer.City",
+        column: cityCursor,
         range: [0, height],
       });
       return (
@@ -359,7 +361,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             accessors={{
               height: param => {
                 if ("row" in param) {
-                  return uniqueValues(pivotedFrame.row(param.row), "Customer.City").length * barWidth + padding * 2;
+                  return uniqueValues(pivotedFrame.row(param.row), cityCursor).length * barWidth + padding * 2;
                 }
                 return "columnIndex" in param || ("measure" in param && param.measure === true) ? 35 : chartHeight;
               },
@@ -371,13 +373,13 @@ storiesOf("@operational/grid/1. Pivot table", module)
               const h = height - 2 * padding;
               const yScale = useScaleBand({
                 frame: pivotedFrame.row(row) as IteratableFrame<string>,
-                column: "Customer.City",
+                column: cityCursor,
                 range: [0, h],
               });
               const xScale = useScaleLinear({
                 frame: frame as IteratableFrame<string>,
                 range: [0, w],
-                column: "sales",
+                column: salesCursor,
               });
               return (
                 <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ margin: padding }}>

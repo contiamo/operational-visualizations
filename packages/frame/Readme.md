@@ -136,5 +136,4 @@ FragmentFrame - limited version of DataFrame. Maybe in the future we will remove
 
 At the moment of writing it exposes:
 
-- `forEach` method to iterate over the rows and
 - `peak` method to select value of column from the first row of frame (assumes there is only one row in the frame). Used for the `<PivotGrid />`
