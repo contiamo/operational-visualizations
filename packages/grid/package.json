@@ -1,6 +1,6 @@
 {
   "name": "@operational/grid",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Contiamo visualization library.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -24,7 +24,7 @@
     "react-window": "^1.8.2"
   },
   "peerDependencies": {
-    "@operational/frame": "0.0.1",
+    "@operational/frame": "0.1.0",
     "react": "^16.8.0",
     "react-dom": "^16.8.0"
   },
