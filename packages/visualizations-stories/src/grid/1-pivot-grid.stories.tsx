@@ -331,22 +331,20 @@ storiesOf("@operational/grid/1. Pivot table", module)
       columns: ["Customer.AgeGroup", "Customer.Gender"],
     });
 
-    const axes = {
-      row: ({ row, width, height }: { row: number; width: number; height: number }) => {
-        const h = height - 2 * padding;
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        const yScale = useScaleBand({
-          frame: pivotedFrame.row(row) as IteratableFrame<string>,
-          column: "Customer.City",
-          range: [0, height],
-        });
-        return (
-          <svg width={width} height={h} viewBox={`0 0 ${width} ${h}`} style={{ margin: `${padding} 0` }}>
-            <Axis scale={yScale} transform={`translate(${width}, -${padding})`} position="left" />
-          </svg>
-        );
-      },
+    const Row: React.FC<{ row: number; width: number; height: number }> = ({ row, width, height }) => {
+      const h = height - 2 * padding;
+      const yScale = useScaleBand({
+        frame: pivotedFrame.row(row) as IteratableFrame<string>,
+        column: "Customer.City",
+        range: [0, height],
+      });
+      return (
+        <svg width={width} height={h} viewBox={`0 0 ${width} ${h}`} style={{ margin: `${padding} 0` }}>
+          <Axis scale={yScale} transform={`translate(${width}, -${padding})`} position="left" />
+        </svg>
+      );
     };
+    const axes = { row: Row };
 
     return (
       <AutoSizer style={{ minHeight: "500px", height: "100%" }}>
