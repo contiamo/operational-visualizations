@@ -1,16 +1,11 @@
 import { IteratableFrame, ColumnCursor } from "./types";
 
-type StatsCacheItem = {
+interface StatsCacheItem {
   max?: number;
   unique?: string[];
-};
+}
 
-const statsCache = new WeakMap<
-  IteratableFrame<string>,
-  {
-    [K: number]: StatsCacheItem;
-  }
->();
+const statsCache = new WeakMap<IteratableFrame<string>, Record<number, StatsCacheItem>>();
 
 const getStatsCacheItem = <Name extends string>(
   frame: IteratableFrame<Name>,

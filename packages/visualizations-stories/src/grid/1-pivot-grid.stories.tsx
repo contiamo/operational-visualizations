@@ -334,14 +334,19 @@ storiesOf("@operational/grid/1. Pivot table", module)
     });
 
     const Row: React.FC<{ row: number; width: number; height: number }> = ({ row, width, height }) => {
-      const h = height - 2 * padding;
+      const heightWithoutPadding = height - 2 * padding;
       const yScale = useScaleBand({
         frame: pivotedFrame.row(row) as IteratableFrame<string>,
         column: cityCursor,
         range: [0, height],
       });
       return (
-        <svg width={width} height={h} viewBox={`0 0 ${width} ${h}`} style={{ margin: `${padding} 0` }}>
+        <svg
+          width={width}
+          height={heightWithoutPadding}
+          viewBox={`0 0 ${width} ${heightWithoutPadding}`}
+          style={{ margin: `${padding} 0` }}
+        >
           <Axis scale={yScale} transform={`translate(${width}, -${padding})`} position="left" />
         </svg>
       );
@@ -369,20 +374,25 @@ storiesOf("@operational/grid/1. Pivot table", module)
                 "rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : chartWidth,
             }}
             cell={({ data, row, width, height, measure }) => {
-              const w = width - 2 * padding;
-              const h = height - 2 * padding;
+              const widthWithoutPadding = width - 2 * padding;
+              const heightWithoutPadding = height - 2 * padding;
               const yScale = useScaleBand({
                 frame: pivotedFrame.row(row) as IteratableFrame<string>,
                 column: cityCursor,
-                range: [0, h],
+                range: [0, heightWithoutPadding],
               });
               const xScale = useScaleLinear({
                 frame: frame as IteratableFrame<string>,
-                range: [0, w],
+                range: [0, widthWithoutPadding],
                 column: salesCursor,
               });
               return (
-                <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ margin: padding }}>
+                <svg
+                  width={widthWithoutPadding}
+                  height={heightWithoutPadding}
+                  viewBox={`0 0 ${widthWithoutPadding} ${heightWithoutPadding}`}
+                  style={{ margin: padding }}
+                >
                   <Bars
                     data={data as IteratableFrame<string>}
                     metricScale={xScale}
