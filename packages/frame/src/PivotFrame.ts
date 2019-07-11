@@ -11,7 +11,7 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
   private readonly data: Matrix<any>;
   private readonly schema: Schema<Name>;
   private readonly prop: PivotProps<Name, Name>;
-  private readonly origin: WithCursor<Name>;
+  private readonly origin: DataFrame<Name>;
 
   protected rowHeadersInternal!: DimensionValue[][];
   protected columnHeadersInternal!: DimensionValue[][];
@@ -34,6 +34,11 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
 
   public getCursor(column: Name) {
     return this.origin.getCursor(column);
+  }
+
+  // get original DataFrame out of PivotFrame
+  public melt() {
+    return this.origin;
   }
 
   /**

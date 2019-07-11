@@ -1,3 +1,5 @@
+import { DataFrame } from "./DataFrame";
+
 /**
  * Can represent array of arrays or list of tuples or tuple of lists
  */
@@ -30,7 +32,7 @@ export interface IteratableFrame<Name extends string> extends WithCursor<Name> {
 export interface PivotProps<Column extends string, Row extends string> {
   rows: Row[];
   columns: Column[];
-  origin?: WithCursor<Column | Row>;
+  origin?: DataFrame<Column | Row>;
 }
 
 /**
