@@ -42,18 +42,6 @@ export class DataFrame<Name extends string = string> implements IteratableFrame<
     return this.data.map(callback);
   }
 
-  public forEach(columns: Name | Name[], cb: (...columnValue: any[]) => void) {
-    if (!Array.isArray(columns)) {
-      columns = [columns];
-    }
-
-    const columnsIndex = columns.map(column => this.schema.findIndex(x => x.name === column));
-    if (columnsIndex.some(x => x < 0)) {
-      throw new Error(`Unknown column in ${columns}`);
-    }
-    this.data.forEach(dataRow => cb(...columnsIndex.map(columnIndex => dataRow[columnIndex])));
-  }
-
   public pivot<Column extends Name, Row extends Name>(prop: PivotProps<Column, Row>) {
     // check if the input params are valid
     return new PivotFrame(this.schema, this.data, prop);

@@ -1,6 +1,6 @@
 {
   "name": "@operational/visualizations",
-  "version": "7.0.8",
+  "version": "7.0.10",
   "description": "Contiamo visualization library.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
@@ -26,7 +26,7 @@
     "d3-selection": "^1.3.2"
   },
   "peerDependencies": {
-    "@operational/frame": "0.1.0",
+    "@operational/frame": "^0.2.0",
     "react": "^16.8.0",
     "react-dom": "^16.8.0"
   },

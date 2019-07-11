@@ -72,12 +72,12 @@ const BarChart = <Name extends string>({
 }: BarChartProps<Name>) => {
   const categoricalScale = useScaleBand({
     frame: data,
-    column: categorical,
+    column: data.getCursor(categorical),
     range: direction === "horizontal" ? [0, height] : [0, width],
   });
   const metricScale = useScaleLinear({
     frame: data,
-    column: metric,
+    column: data.getCursor(metric),
     range: direction === "horizontal" ? [0, width] : [height, 0],
   });
 

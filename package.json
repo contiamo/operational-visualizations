@@ -18,6 +18,7 @@
     "build": "tsc --build",
     "build:stories": "lerna run build --stream --scope=@operational/visualizations-stories",
     "clean": "rimraf packages/*/{tsconfig.tsbuildinfo,lib,dist}",
+    "clean_modules": "rm -rf node_modules packages/*/node_modules && yarn",
     "lint": "eslint packages/**/src/**/*.{ts,tsx}"
   },
   "devDependencies": {

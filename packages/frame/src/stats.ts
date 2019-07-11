@@ -1,82 +1,57 @@
-/**
- * There was attempt to optimize state for frame,
- * by iterating only twice over frame and calculate all values and memoise the result.
- * Not sure it is the optimal way.
- *
- * TODO: revise this later, as well revise `forEach` method,
- *  maybe it should return row the same way as `map` does.
- */
+import { IteratableFrame, ColumnCursor } from "./types";
 
-import { IteratableFrame } from "./types";
+interface StatsCacheItem {
+  max?: number;
+  unique?: string[];
+}
 
-const weakMemoize = <A extends object, B>(func: (a: A) => B) => {
-  const cache = new WeakMap();
-  return (a: A) => {
-    if (!cache.has(a)) {
-      cache.set(a, func(a));
-    }
-    return cache.get(a) as B;
-  };
-};
+const statsCache = new WeakMap<IteratableFrame<string>, Record<number, StatsCacheItem>>();
 
-const zip = <A extends string, B>(a: A[], b: B[]) =>
-  a.reduce(
-    (acc, x, i) => {
-      acc[x] = b[i];
-      return acc;
-    },
-    {} as Record<A, B>,
-  );
-
-type GetQuantitiveStats = <Name extends string>(
+const getStatsCacheItem = <Name extends string>(
   frame: IteratableFrame<Name>,
-) => { min: Record<Name, number>; max: Record<Name, number> };
-
-// For numerical data for now we get min, max. We can get mean, deviation distribution as well
-const getQuantitiveStats: GetQuantitiveStats = weakMemoize(frame => {
-  const quantitiveColumns = frame.schema.filter(column => column.type === "number").map(column => column.name);
-  let max: number[] = [];
-  let min: number[] = [];
-
-  frame.forEach(quantitiveColumns, (...values) => {
-    if (max.length === 0) {
-      max = [...values];
-      min = [...values];
-    } else {
-      values.forEach((value, i) => {
-        max[i] = Math.max(value, max[i]);
-        min[i] = Math.min(value, min[i]);
-      });
-    }
-  });
-
-  return {
-    min: zip(quantitiveColumns, min),
-    max: zip(quantitiveColumns, max),
-  };
-});
-
-type GetCategoricalStats = <Name extends string>(frame: IteratableFrame<Name>) => { unique: Record<Name, string[]> };
-
-const getCategoricalStats: GetCategoricalStats = weakMemoize(frame => {
-  const categoricalColumns = frame.schema.filter(column => column.type === "string").map(column => column.name);
-  const unique: Array<Set<string>> = categoricalColumns.map(() => new Set<string>());
-
-  frame.forEach(categoricalColumns, (...values) => {
-    values.forEach((value, i) => {
-      unique[i].add(value);
-    });
-  });
-
-  return {
-    unique: zip(categoricalColumns, unique.map(x => [...x])),
-  };
-});
-
-export const uniqueValues = <Name extends string>(frame: IteratableFrame<Name>, column: Name): string[] => {
-  return getCategoricalStats(frame).unique[column];
+  column: ColumnCursor<Name>,
+): StatsCacheItem => {
+  if (!statsCache.has(frame)) {
+    statsCache.set(frame, {});
+  }
+  const cacheEntry = statsCache.get(frame)!;
+  if (!cacheEntry[column.index]) {
+    cacheEntry[column.index] = {};
+  }
+  return cacheEntry[column.index];
 };
 
-export const maxValue = <Name extends string>(frame: IteratableFrame<Name>, column: Name): number => {
-  return getQuantitiveStats(frame).max[column];
+export const maxValue = <Name extends string>(frame: IteratableFrame<Name>, column: ColumnCursor<Name>): number => {
+  const cacheItem = getStatsCacheItem(frame, column);
+  if (cacheItem.max === undefined) {
+    // if (process.env.NODE_ENV === "development") {
+    //   if (frame.schema[column.index].type !== "number") {
+    //     console.warn(`Trying to get max value of none-numeric column ${column.name}`);
+    //   }
+    // }
+    // if (frame.length() === 0) {
+    //   throw new Error("Can't get max value of empty Frame")
+    // }
+    let max: number | undefined = undefined;
+    frame.mapRows(row => {
+      max = max === undefined ? row[column.index] : Math.max(max, row[column.index]);
+    });
+    cacheItem.max = max!;
+  }
+  return cacheItem.max!;
+};
+
+export const uniqueValues = <Name extends string>(
+  frame: IteratableFrame<Name>,
+  column: ColumnCursor<Name>,
+): string[] => {
+  const cacheItem = getStatsCacheItem(frame, column);
+  if (cacheItem.unique === undefined) {
+    const unique = new Set<string>();
+    frame.mapRows(row => {
+      unique.add(row[column.index]);
+    });
+    cacheItem.unique = [...unique];
+  }
+  return cacheItem.unique!;
 };

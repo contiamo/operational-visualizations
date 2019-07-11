@@ -18,7 +18,6 @@ type RawRow = any[];
 
 export interface IteratableFrame<Name extends string> {
   /** needed for stats module */
-  forEach(columns: Name[], cb: (...values: any[]) => void): void;
   readonly schema: Schema<Name>;
   /** needed for visualisations */
   mapRows<Result>(callback: (row: RawRow, index: number) => Result): Result[];
