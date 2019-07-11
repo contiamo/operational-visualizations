@@ -1,11 +1,8 @@
-// this is circular dependency, on the other side we want to make origin optional
 import { DataFrame } from "./DataFrame";
+import { IteratableFrame, WithCursor, RawRow, ColumnCursor, Matrix, Schema } from "./types";
 
-import { IteratableFrame, Matrix, Schema, WithCursor, RawRow, ColumnCursor } from "./types";
-
-type FragmentFrameOptions<Name extends string> = {
-  index: number[];
-  origin?: WithCursor<Name>;
+const isColumnCursor = <Name extends string>(column: any): column is ColumnCursor<Name> => {
+  return column.index !== undefined;
 };
 
 export class FragmentFrame<Name extends string = string> implements IteratableFrame<Name> {
@@ -14,11 +11,11 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
   private readonly index: number[];
   private readonly origin: WithCursor<Name>;
 
-  constructor(schema: Schema<Name>, data: Matrix<any>, { index, origin }: FragmentFrameOptions<Name>) {
-    this.schema = schema;
-    this.data = data;
+  constructor(origin: DataFrame<Name>, index: number[]) {
+    this.schema = origin.__getData()[0];
+    this.data = origin.__getData()[1];
     this.index = index;
-    this.origin = origin || new DataFrame(schema, data);
+    this.origin = origin;
   }
 
   public getCursor(column: Name) {
@@ -31,7 +28,7 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
 
   // we need this function for table display
   public peak(column: Name | ColumnCursor<Name>) {
-    const columnIndex = "index" in column ? column.index : this.schema.findIndex(x => x.name === column);
+    const columnIndex = isColumnCursor(column) ? column.index : this.schema.findIndex(x => x.name === column);
     if (columnIndex < 0) {
       throw new Error(`Unknown column ${column}`);
     }

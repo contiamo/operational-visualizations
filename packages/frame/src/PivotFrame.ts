@@ -1,8 +1,6 @@
-// this is circular dependency, on the other side we want to make origin optional
 import { DataFrame } from "./DataFrame";
-
 import { FragmentFrame } from "./FragmentFrame";
-import { Matrix, PivotProps, PivotFrameOptions, Schema, WithCursor } from "./types";
+import { PivotProps, WithCursor, Matrix, Schema } from "./types";
 
 const intersect = <T>(...arr: T[][]): T[] => arr.reduce((prev, curr) => prev.filter(x => curr.includes(x)));
 
@@ -25,12 +23,11 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
   private readonly rowCache: Map<number, FragmentFrame<Name>>;
   private readonly columnCache: Map<number, FragmentFrame<Name>>;
 
-  constructor(schema: Schema<Name>, data: Matrix<any>, prop: PivotFrameOptions<Name, Name>) {
-    this.schema = schema;
-    this.data = data;
-    const { origin, ...rest } = prop;
-    this.prop = rest;
-    this.origin = origin || new DataFrame(schema, data);
+  constructor(origin: DataFrame<Name>, prop: PivotProps<Name, Name>) {
+    this.schema = origin.__getData()[0];
+    this.data = origin.__getData()[1];
+    this.prop = prop;
+    this.origin = origin;
     this.rowCache = new Map<number, FragmentFrame<Name>>();
     this.columnCache = new Map<number, FragmentFrame<Name>>();
   }
@@ -78,7 +75,7 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
       throw new Error(`Can't find row #${rowIdentifier}`);
     }
     if (!this.rowCache.has(rowIdentifier)) {
-      this.rowCache.set(rowIdentifier, new FragmentFrame(this.schema, this.data, { index: row, origin: this.origin }));
+      this.rowCache.set(rowIdentifier, new FragmentFrame(this.origin, row));
     }
     return this.rowCache.get(rowIdentifier)!;
   }
@@ -92,10 +89,7 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
       throw new Error(`Can't find column #${columnIdentifier}`);
     }
     if (!this.columnCache.has(columnIdentifier)) {
-      this.columnCache.set(
-        columnIdentifier,
-        new FragmentFrame(this.schema, this.data, { index: column, origin: this.origin }),
-      );
+      this.columnCache.set(columnIdentifier, new FragmentFrame(this.origin, column));
     }
     return this.columnCache.get(columnIdentifier)!;
   }
@@ -113,7 +107,7 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
     const row = this.rowIndex[rowIdentifier];
     const column = this.columnIndex[columnIdentifier];
     const cell = intersect(row, column);
-    return new FragmentFrame(this.schema, this.data, { index: cell, origin: this.origin });
+    return new FragmentFrame(this.origin, cell);
   }
 
   // This is very specific case when we need PivotFrame, but without pivoting itself.
@@ -121,10 +115,7 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
   // In this case `row`, `column` and `cell` methods will return the same result containing the whole data set
   private getFrameWithoutPivoting() {
     if (!this.frameWithoutPivoting) {
-      this.frameWithoutPivoting = new FragmentFrame(this.schema, this.data, {
-        index: this.data.map((_, i) => i),
-        origin: this.origin,
-      });
+      this.frameWithoutPivoting = new FragmentFrame(this.origin, this.data.map((_, i) => i));
     }
     return this.frameWithoutPivoting;
   }

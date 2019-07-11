@@ -1,5 +1,6 @@
 import { DimensionValue, PivotFrame } from "./PivotFrame";
-import { Matrix, PivotFrameOptions, Schema } from "./types";
+import { PivotProps } from "./types";
+import { DataFrame } from "./DataFrame";
 
 /**
  * This class exposes internal implementation of PivotFrame,
@@ -10,9 +11,8 @@ import { Matrix, PivotFrameOptions, Schema } from "./types";
  */
 export class PivotFramePreindexed<Name extends string = string> extends PivotFrame<Name> {
   constructor(
-    schema: Schema<Name>,
-    data: Matrix<any>,
-    prop: PivotFrameOptions<Name, Name> & {
+    origin: DataFrame<Name>,
+    prop: PivotProps<Name, Name> & {
       rowHeadersInternal: DimensionValue[][];
       columnHeadersInternal: DimensionValue[][];
       columnIndex: number[][];
@@ -20,7 +20,7 @@ export class PivotFramePreindexed<Name extends string = string> extends PivotFra
     },
   ) {
     const { rowHeadersInternal, columnHeadersInternal, columnIndex, rowIndex, ...rest } = prop;
-    super(schema, data, rest);
+    super(origin, rest);
     this.rowHeadersInternal = rowHeadersInternal;
     this.columnHeadersInternal = columnHeadersInternal;
     this.columnIndex = columnIndex;
