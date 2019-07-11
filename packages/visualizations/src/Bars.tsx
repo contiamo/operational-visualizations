@@ -16,7 +16,7 @@ export interface BarsProps<Name extends string = string> {
 
 type BarsComponent = <Name extends string>(props: BarsProps<Name>) => React.ReactElement | null;
 
-export const Bars: BarsComponent = React.memo(props => {
+export const Bars: BarsComponent = props => {
   const defaultTransform = useChartTransform();
 
   // TypeScript can't handle this case normally :/
@@ -60,4 +60,4 @@ export const Bars: BarsComponent = React.memo(props => {
       </g>
     );
   }
-});
+};
