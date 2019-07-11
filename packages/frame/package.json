@@ -21,6 +21,6 @@
     "prepare": "tsc"
   },
   "dependencies": {
-    "flru": "^1.0.1"
+    "flru": "^1.0.2"
   }
 }
