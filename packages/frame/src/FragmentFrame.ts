@@ -1,7 +1,7 @@
 // this is circular dependency, on the other side we want to make origin optional
 import { DataFrame } from "./DataFrame";
 
-import { IteratableFrame, Matrix, Schema, WithCursor, RawRow } from "./types";
+import { IteratableFrame, Matrix, Schema, WithCursor, RawRow, ColumnCursor } from "./types";
 
 type FragmentFrameOptions<Name extends string> = {
   index: number[];
@@ -30,8 +30,8 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
   }
 
   // we need this function for table display
-  public peak(column: Name) {
-    const columnIndex = this.schema.findIndex(x => x.name === column);
+  public peak(column: Name | ColumnCursor<Name>) {
+    const columnIndex = "index" in column ? column.index : this.schema.findIndex(x => x.name === column);
     if (columnIndex < 0) {
       throw new Error(`Unknown column ${column}`);
     }
@@ -39,6 +39,9 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
       throw new Error(`Only frame with exactly one row are good for peak`);
     }
     if (this.index.length === 0) {
+      // if (process.env.NODE_ENV === "development") {
+      //   console.warn(`Trying to peak value of empty Frame`);
+      // }
       // empty cell, if there is not enough data for pivoting
       return null;
     }

@@ -6,7 +6,7 @@ import { Matrix, PivotProps, PivotFrameOptions, Schema, WithCursor } from "./typ
 
 const intersect = <T>(...arr: T[][]): T[] => arr.reduce((prev, curr) => prev.filter(x => curr.includes(x)));
 
-// theoretically it can be string | bool, but TS doesn't allow to use bool as index value
+// theoretically it can be string | bool | number, but TS doesn't allow to use bool as index value
 export type DimensionValue = string;
 
 export class PivotFrame<Name extends string = string> implements WithCursor<Name> {
