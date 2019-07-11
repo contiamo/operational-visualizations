@@ -1,5 +1,5 @@
 import { DimensionValue, PivotFrame } from "./PivotFrame";
-import { Matrix, PivotProps, Schema } from "./types";
+import { Matrix, PivotFrameOptions, Schema } from "./types";
 
 /**
  * This class exposes internal implementation of PivotFrame,
@@ -12,7 +12,7 @@ export class PivotFramePreindexed<Name extends string = string> extends PivotFra
   constructor(
     schema: Schema<Name>,
     data: Matrix<any>,
-    prop: PivotProps<Name, Name> & {
+    prop: PivotFrameOptions<Name, Name> & {
       rowHeadersInternal: DimensionValue[][];
       columnHeadersInternal: DimensionValue[][];
       columnIndex: number[][];

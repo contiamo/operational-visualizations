@@ -16,7 +16,7 @@ export type Schema<Name extends string> = Array<{ name: Name; type?: any }>;
  * Instead we can use RowCursor, this way we would be able to change implementation to column oriented storage
  * without changing external code.
  */
-type RawRow = any[];
+export type RawRow = any[];
 
 export interface WithCursor<Name extends string> {
   getCursor(column: Name): ColumnCursor<Name>;
@@ -30,6 +30,11 @@ export interface IteratableFrame<Name extends string> extends WithCursor<Name> {
 }
 
 export interface PivotProps<Column extends string, Row extends string> {
+  rows: Row[];
+  columns: Column[];
+}
+
+export interface PivotFrameOptions<Column extends string, Row extends string> {
   rows: Row[];
   columns: Column[];
   origin?: DataFrame<Column | Row>;

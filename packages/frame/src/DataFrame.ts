@@ -1,5 +1,5 @@
 import { PivotFrame } from "./PivotFrame";
-import { ColumnCursor, IteratableFrame, Matrix, PivotProps, Schema } from "./types";
+import { ColumnCursor, IteratableFrame, Matrix, PivotProps, Schema, RawRow } from "./types";
 
 export class DataFrame<Name extends string = string> implements IteratableFrame<Name> {
   private readonly data: Matrix<any>;
@@ -30,7 +30,7 @@ export class DataFrame<Name extends string = string> implements IteratableFrame<
       if (index === -1) {
         throw new Error(`Unknown column: ${column}`);
       }
-      const cursor = ((row: any[]) => row[index]) as ColumnCursor<Name>;
+      const cursor = ((row: RawRow[]) => row[index]) as ColumnCursor<Name>;
       cursor.column = column;
       cursor.index = index;
       this.cursorCache.set(column, cursor);
@@ -38,12 +38,11 @@ export class DataFrame<Name extends string = string> implements IteratableFrame<
     return this.cursorCache.get(column)!;
   }
 
-  public mapRows<A>(callback: (row: any[], index: number) => A) {
+  public mapRows<A>(callback: (row: RawRow[], index: number) => A) {
     return this.data.map(callback);
   }
 
-  public pivot<Column extends Name, Row extends Name>(prop: PivotProps<Column, Row>) {
-    // check if the input params are valid
+  public pivot<Column extends Name, Row extends Name>(prop: PivotProps<Column, Row>): PivotFrame<Name> {
     return new PivotFrame(this.schema, this.data, {
       ...prop,
       origin: this,

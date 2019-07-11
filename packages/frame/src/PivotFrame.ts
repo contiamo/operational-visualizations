@@ -1,6 +1,8 @@
-import { FragmentFrame } from "./FragmentFrame";
-import { Matrix, PivotProps, Schema, WithCursor } from "./types";
+// this is circular dependency, on the other side we want to make origin optional
 import { DataFrame } from "./DataFrame";
+
+import { FragmentFrame } from "./FragmentFrame";
+import { Matrix, PivotProps, PivotFrameOptions, Schema, WithCursor } from "./types";
 
 const intersect = <T>(...arr: T[][]): T[] => arr.reduce((prev, curr) => prev.filter(x => curr.includes(x)));
 
@@ -23,21 +25,23 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
   private readonly rowCache: Map<number, FragmentFrame<Name>>;
   private readonly columnCache: Map<number, FragmentFrame<Name>>;
 
-  constructor(schema: Schema<Name>, data: Matrix<any>, prop: PivotProps<Name, Name>) {
+  constructor(schema: Schema<Name>, data: Matrix<any>, prop: PivotFrameOptions<Name, Name>) {
     this.schema = schema;
     this.data = data;
-    this.prop = prop;
+    const { origin, ...rest } = prop;
+    this.prop = rest;
+    this.origin = origin || new DataFrame(schema, data);
     this.rowCache = new Map<number, FragmentFrame<Name>>();
     this.columnCache = new Map<number, FragmentFrame<Name>>();
-    this.origin = prop.origin || new DataFrame(schema, data);
   }
 
   public getCursor(column: Name) {
     return this.origin.getCursor(column);
   }
 
-  // get original DataFrame out of PivotFrame
-  public melt() {
+  // this is reverse operation of pivot in the DataFrame
+  // in Pandas this called melt
+  public unpivot() {
     return this.origin;
   }
 

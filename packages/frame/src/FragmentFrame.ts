@@ -1,5 +1,7 @@
-import { IteratableFrame, Matrix, Schema, WithCursor } from "./types";
+// this is circular dependency, on the other side we want to make origin optional
 import { DataFrame } from "./DataFrame";
+
+import { IteratableFrame, Matrix, Schema, WithCursor, RawRow } from "./types";
 
 type FragmentFrameOptions<Name extends string> = {
   index: number[];
@@ -23,7 +25,7 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
     return this.origin.getCursor(column);
   }
 
-  public mapRows<A>(callback: (row: any[], index: number) => A) {
+  public mapRows<A>(callback: (row: RawRow, index: number) => A) {
     return this.index.map((i, j) => callback(this.data[i], j));
   }
 
