@@ -16,16 +16,21 @@ export type Schema<Name extends string> = Array<{ name: Name; type?: any }>;
  */
 type RawRow = any[];
 
-export interface IteratableFrame<Name extends string> {
+export interface WithCursor<Name extends string> {
+  getCursor(column: Name): ColumnCursor<Name>;
+}
+
+export interface IteratableFrame<Name extends string> extends WithCursor<Name> {
   /** needed for stats module */
   readonly schema: Schema<Name>;
   /** needed for visualisations */
   mapRows<Result>(callback: (row: RawRow, index: number) => Result): Result[];
 }
 
-export interface PivotProps<Column, Row> {
+export interface PivotProps<Column extends string, Row extends string> {
   rows: Row[];
   columns: Column[];
+  origin?: WithCursor<Column | Row>;
 }
 
 /**

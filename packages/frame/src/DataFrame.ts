@@ -44,6 +44,9 @@ export class DataFrame<Name extends string = string> implements IteratableFrame<
 
   public pivot<Column extends Name, Row extends Name>(prop: PivotProps<Column, Row>) {
     // check if the input params are valid
-    return new PivotFrame(this.schema, this.data, prop);
+    return new PivotFrame(this.schema, this.data, {
+      ...prop,
+      origin: this,
+    });
   }
 }
