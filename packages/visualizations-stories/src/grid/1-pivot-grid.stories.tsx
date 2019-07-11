@@ -216,7 +216,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
-            cell={({ measure }: { measure: string }) => `${measure}`}
+            cell={({ measure }: { measure: string | undefined }) => <>${measure}</>}
           />
         )}
       </AutoSizer>
@@ -241,7 +241,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
-            cell={({ measure }: { measure: string }) => `${measure}`}
+            cell={({ measure }: { measure: string | undefined }) => <>{measure}</>}
           />
         )}
       </AutoSizer>
@@ -312,7 +312,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
-            cell={({ measure }: { measure: string }) => `Data for: ${measure}`}
+            cell={({ measure }: { measure: string }) => <>Data for: {measure}</>}
           />
         )}
       </AutoSizer>
