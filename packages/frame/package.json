@@ -19,5 +19,8 @@
     "build": "tsc",
     "clean": "rimraf tsconfig.tsbuildinfo lib dist",
     "prepare": "tsc"
+  },
+  "dependencies": {
+    "flru": "^1.0.1"
   }
 }
