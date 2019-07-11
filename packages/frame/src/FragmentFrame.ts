@@ -1,5 +1,6 @@
 import { DataFrame } from "./DataFrame";
 import { IteratableFrame, WithCursor, RawRow, ColumnCursor, Matrix, Schema } from "./types";
+import { getData } from "./secret";
 
 const isColumnCursor = <Name extends string>(column: any): column is ColumnCursor<Name> => {
   return column.index !== undefined;
@@ -12,8 +13,8 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
   private readonly origin: WithCursor<Name>;
 
   constructor(origin: DataFrame<Name>, index: number[]) {
-    this.schema = origin.__getData()[0];
-    this.data = origin.__getData()[1];
+    this.schema = origin[getData]()[0];
+    this.data = origin[getData]()[1];
     this.index = index;
     this.origin = origin;
   }

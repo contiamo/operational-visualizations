@@ -1,5 +1,6 @@
 import { PivotFrame } from "./PivotFrame";
 import { ColumnCursor, IteratableFrame, Matrix, PivotProps, Schema, RawRow } from "./types";
+import { getData } from "./secret";
 
 export class DataFrame<Name extends string = string> implements IteratableFrame<Name> {
   private readonly data: Matrix<any>;
@@ -47,7 +48,7 @@ export class DataFrame<Name extends string = string> implements IteratableFrame<
   }
 
   // for internal use only
-  __getData() {
+  [getData]() {
     return [this.schema, this.data] as const;
   }
 }

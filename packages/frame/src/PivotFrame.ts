@@ -1,6 +1,7 @@
 import { DataFrame } from "./DataFrame";
 import { FragmentFrame } from "./FragmentFrame";
 import { PivotProps, WithCursor, Matrix, Schema } from "./types";
+import { getData } from "./secret";
 
 const intersect = <T>(...arr: T[][]): T[] => arr.reduce((prev, curr) => prev.filter(x => curr.includes(x)));
 
@@ -24,8 +25,8 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
   private readonly columnCache: Map<number, FragmentFrame<Name>>;
 
   constructor(origin: DataFrame<Name>, prop: PivotProps<Name, Name>) {
-    this.schema = origin.__getData()[0];
-    this.data = origin.__getData()[1];
+    this.schema = origin[getData]()[0];
+    this.data = origin[getData]()[1];
     this.prop = prop;
     this.origin = origin;
     this.rowCache = new Map<number, FragmentFrame<Name>>();
