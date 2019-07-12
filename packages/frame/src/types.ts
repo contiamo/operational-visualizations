@@ -14,16 +14,20 @@ export type Schema<Name extends string> = Array<{ name: Name; type?: any }>;
  * Instead we can use RowCursor, this way we would be able to change implementation to column oriented storage
  * without changing external code.
  */
-type RawRow = any[];
+export type RawRow = any[];
 
-export interface IteratableFrame<Name extends string> {
+export interface WithCursor<Name extends string> {
+  getCursor(column: Name): ColumnCursor<Name>;
+}
+
+export interface IteratableFrame<Name extends string> extends WithCursor<Name> {
   /** needed for stats module */
   readonly schema: Schema<Name>;
   /** needed for visualisations */
   mapRows<Result>(callback: (row: RawRow, index: number) => Result): Result[];
 }
 
-export interface PivotProps<Column, Row> {
+export interface PivotProps<Column extends string, Row extends string> {
   rows: Row[];
   columns: Column[];
 }

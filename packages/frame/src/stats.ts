@@ -24,6 +24,7 @@ const getStatsCacheItem = <Name extends string>(
 export const maxValue = <Name extends string>(frame: IteratableFrame<Name>, column: ColumnCursor<Name>): number => {
   const cacheItem = getStatsCacheItem(frame, column);
   if (cacheItem.max === undefined) {
+    // https://github.com/contiamo/operational-visualizations/issues/72
     // if (process.env.NODE_ENV === "development") {
     //   if (frame.schema[column.index].type !== "number") {
     //     console.warn(`Trying to get max value of none-numeric column ${column.name}`);
