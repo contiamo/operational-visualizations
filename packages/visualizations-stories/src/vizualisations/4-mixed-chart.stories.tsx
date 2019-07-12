@@ -2,6 +2,7 @@ import * as React from "react";
 import { storiesOf } from "@storybook/react";
 import { DataFrame } from "@operational/frame";
 import {
+  Area,
   AxialChartProps,
   Axis,
   Chart,
@@ -91,6 +92,15 @@ const MixedChart = <Name extends string>({
 
   return (
     <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
+      <Area
+        metricDirection={metricDirection}
+        data={data}
+        categorical={data.getCursor(categorical)}
+        metric={data.getCursor(metric)}
+        categoricalScale={categoricalScale}
+        metricScale={metricScale}
+        style={{ fill: "#ddd" }}
+      />
       <Bars
         metricDirection={metricDirection}
         data={data}
@@ -115,7 +125,7 @@ const MixedChart = <Name extends string>({
   );
 };
 
-storiesOf("@operational/visualizations/3. Mixed chart", module)
+storiesOf("@operational/visualizations/4. Mixed chart", module)
   .add("vertical", () => {
     // number of pixels picked manually to make sure that YAxis fits on the screen
     const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
