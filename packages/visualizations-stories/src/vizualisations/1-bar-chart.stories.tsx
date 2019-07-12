@@ -1,39 +1,46 @@
 import * as React from "react";
 import { storiesOf } from "@storybook/react";
 import { DataFrame } from "@operational/frame";
-import { Axis, Bars, Chart, useScaleBand, useScaleLinear, BarsProps } from "@operational/visualizations";
+import {
+  Axis,
+  Bars,
+  Chart,
+  useScaleBand,
+  useScaleLinear,
+  BarsProps
+} from "@operational/visualizations";
 import { ChartProps } from "@operational/visualizations/lib/Chart";
 
 const rawData = {
   columns: [
     {
       name: "Customer.Continent" as "Customer.Continent",
-      type: "string",
+      type: "string"
     },
     {
       name: "Customer.Country" as "Customer.Country",
-      type: "string",
+      type: "string"
     },
     {
       name: "Customer.City" as "Customer.City",
-      type: "string",
+      type: "string"
     },
     {
       name: "Customer.AgeGroup" as "Customer.AgeGroup",
-      type: "string",
+      type: "string"
     },
     {
       name: "Customer.Gender" as "Customer.Gender",
-      type: "string",
+      type: "string"
     },
     {
       name: "sales" as "sales",
-      type: "number",
+      type: "number"
     },
     {
       name: "revenue" as "revenue",
-      type: "number",
-    },
+      type: "number"
+    }
   ],
   rows: [
     ["Europe", "Germany", "Berlin", "<50", "Female", 101, 10.2],
@@ -42,8 +49,8 @@ const rawData = {
     ["Europe", "UK", "London", "<50", "Female", 401, 40.2],
     ["Europe", "UK", "Edinburgh", "<50", "Female", 501, 50.2],
     ["North America", "USA", "New York", "<50", "Female", 801, 80.2],
-    ["North America", "Canada", "Toronto", "<50", "Female", 801, 80.2],
-  ],
+    ["North America", "Canada", "Toronto", "<50", "Female", 801, 80.2]
+  ]
 };
 
 const frame = new DataFrame(rawData.columns, rawData.rows);
@@ -55,7 +62,7 @@ interface BarChartProps<Name extends string> {
   data: DataFrame<Name>;
   categorical: Name;
   metric: Name;
-  direction: BarsProps["direction"];
+  metricDirection: BarsProps["metricDirection"];
 }
 
 /**
@@ -68,23 +75,28 @@ const BarChart = <Name extends string>({
   data,
   categorical,
   metric,
-  direction,
+  metricDirection
 }: BarChartProps<Name>) => {
   const categoricalScale = useScaleBand({
     frame: data,
     column: categorical,
-    range: direction === "horizontal" ? [0, height] : [0, width],
+    range: metricDirection === "horizontal" ? [0, height] : [0, width]
   });
   const metricScale = useScaleLinear({
     frame: data,
     column: metric,
-    range: direction === "horizontal" ? [0, width] : [height, 0],
+    range: metricDirection === "horizontal" ? [0, width] : [height, 0]
   });
 
   return (
-    <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
+    <Chart
+      width={width}
+      height={height}
+      margin={margin}
+      style={{ background: "#fff" }}
+    >
       <Bars
-        direction={direction}
+        metricDirection={metricDirection}
         data={data}
         categorical={data.getCursor(categorical)}
         metric={data.getCursor(metric)}
@@ -92,8 +104,14 @@ const BarChart = <Name extends string>({
         metricScale={metricScale}
         style={{ fill: "#1f78b4" }}
       />
-      <Axis scale={categoricalScale} position={direction === "horizontal" ? "left" : "bottom"} />
-      <Axis scale={metricScale} position={direction === "horizontal" ? "bottom" : "left"} />
+      <Axis
+        scale={categoricalScale}
+        position={metricDirection === "horizontal" ? "left" : "bottom"}
+      />
+      <Axis
+        scale={metricScale}
+        position={metricDirection === "horizontal" ? "bottom" : "left"}
+      />
     </Chart>
   );
 };
@@ -111,7 +129,7 @@ storiesOf("@operational/visualizations/1. Bar chart", module)
         height={300}
         margin={magicMargin}
         data={frame}
-        direction="horizontal"
+        metricDirection="horizontal"
       />
     );
   })
@@ -126,7 +144,7 @@ storiesOf("@operational/visualizations/1. Bar chart", module)
         height={300}
         margin={magicMargin}
         data={frame}
-        direction="vertical"
+        metricDirection="vertical"
       />
     );
   });

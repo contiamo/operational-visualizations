@@ -1,6 +1,11 @@
 import { DataFrame, uniqueValues, IteratableFrame } from "@operational/frame";
 import { PivotGrid } from "@operational/grid";
-import { Axis, Bars, useScaleBand, useScaleLinear } from "@operational/visualizations";
+import {
+  Axis,
+  Bars,
+  useScaleBand,
+  useScaleLinear
+} from "@operational/visualizations";
 import { storiesOf } from "@storybook/react";
 import * as React from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -9,32 +14,32 @@ const rawData = {
   columns: [
     {
       name: "Customer.Continent" as "Customer.Continent",
-      type: "string",
+      type: "string"
     },
     {
       name: "Customer.Country" as "Customer.Country",
-      type: "string",
+      type: "string"
     },
     {
       name: "Customer.City" as "Customer.City",
-      type: "string",
+      type: "string"
     },
     {
       name: "Customer.AgeGroup" as "Customer.AgeGroup",
-      type: "string",
+      type: "string"
     },
     {
       name: "Customer.Gender" as "Customer.Gender",
-      type: "string",
+      type: "string"
     },
     {
       name: "sales" as "sales",
-      type: "number",
+      type: "number"
     },
     {
       name: "revenue" as "revenue",
-      type: "number",
-    },
+      type: "number"
+    }
   ],
   rows: [
     ["Europe", "Germany", "Berlin", "<50", "Female", 101, 10.2],
@@ -68,8 +73,8 @@ const rawData = {
     ["Europe", "UK", "Edinburgh", ">=50", "Male", 507, 50.8],
     ["Europe", "UK", "Dresden", ">=50", "Male", 707, 70.8],
     ["North America", "USA", "New York", ">=50", "Male", 807, 80.8],
-    ["North America", "Canada", "Toronto", ">=50", "Male", 907, 90.8],
-  ],
+    ["North America", "Canada", "Toronto", ">=50", "Male", 907, 90.8]
+  ]
 };
 
 const frame = new DataFrame(rawData.columns, rawData.rows);
@@ -78,16 +83,16 @@ const rawDataWithMissingCells = {
   schema: [
     {
       name: "Product.name",
-      type: "string",
+      type: "string"
     },
     {
       name: "Product.brand",
-      type: "string",
+      type: "string"
     },
     {
       name: "unitSales",
-      type: "number",
-    },
+      type: "number"
+    }
   ],
   data: [
     ["High Top Asparagus", "High Top", 321],
@@ -99,44 +104,50 @@ const rawDataWithMissingCells = {
     ["Red Spade Turkey Hot Dogs", "Red Spade", 306],
     ["Best Choice Low Fat Cookies", "Best Choice", 303],
     ["Gorilla Low Fat Sour Cream", "Gorilla", 315],
-    ["Tri-State Garlic", "Tri-State", 297],
-  ],
+    ["Tri-State Garlic", "Tri-State", 297]
+  ]
 };
 
-const frameWithMissingCells = new DataFrame(rawDataWithMissingCells.schema, rawDataWithMissingCells.data);
+const frameWithMissingCells = new DataFrame(
+  rawDataWithMissingCells.schema,
+  rawDataWithMissingCells.data
+);
 
 const rawDataWithBoolean = {
   columns: [
     {
       name: "Product.recyclablePackaging",
-      type: "boolean",
+      type: "boolean"
     },
     {
       name: "sales",
-      type: "number",
-    },
+      type: "number"
+    }
   ],
-  rows: [[false, 464473.76], [true, 614673.71]],
+  rows: [[false, 464473.76], [true, 614673.71]]
 };
 
-const frameWithBoolean = new DataFrame(rawDataWithBoolean.columns, rawDataWithBoolean.rows);
+const frameWithBoolean = new DataFrame(
+  rawDataWithBoolean.columns,
+  rawDataWithBoolean.rows
+);
 
 const rawDataForBug = {
   columns: [
     {
       name: "A" as "A",
-      type: "string",
+      type: "string"
     },
     {
       name: "B" as "B",
-      type: "string",
+      type: "string"
     },
     {
       name: "C" as "C",
-      type: "number",
-    },
+      type: "number"
+    }
   ],
-  rows: [["a", "c", 1], ["a", "d", 2], ["b", "d", 3]],
+  rows: [["a", "c", 1], ["a", "d", 2], ["b", "d", 3]]
 };
 
 const frameForBug = new DataFrame(rawDataForBug.columns, rawDataForBug.rows);
@@ -145,7 +156,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
   .add("basic", () => {
     const pivotedFrame = frame.pivot({
       rows: ["Customer.Continent", "Customer.Country", "Customer.City"],
-      columns: ["Customer.AgeGroup", "Customer.Gender"],
+      columns: ["Customer.AgeGroup", "Customer.Gender"]
     });
     return (
       <AutoSizer style={{ minHeight: "500px", height: "100%" }}>
@@ -163,8 +174,8 @@ storiesOf("@operational/grid/1. Pivot table", module)
                 padding: "10px",
                 textOverflow: "ellipsis",
                 overflow: "hidden",
-                whiteSpace: "nowrap",
-              },
+                whiteSpace: "nowrap"
+              }
             }}
             measuresPlacement="column"
             dimensionLabels="top"
@@ -176,7 +187,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
   .add("frame with missing cells", () => {
     const pivotedFrame = frameWithMissingCells.pivot({
       rows: ["Product.name"],
-      columns: ["Product.brand"],
+      columns: ["Product.brand"]
     });
 
     return (
@@ -188,7 +199,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             data={pivotedFrame}
             measures={["unitSales"]}
             style={{
-              cell: { padding: "10px", textAlign: "right" },
+              cell: { padding: "10px", textAlign: "right" }
             }}
             header={({ value }) => <span title={value}>{value}</span>}
             dimensionLabels={{ column: "top", row: "left" }}
@@ -200,7 +211,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
   .add("pivoting in one direction, measures in rows", () => {
     const pivotedFrame = frame.pivot({
       rows: [],
-      columns: ["Customer.AgeGroup", "Customer.Gender"],
+      columns: ["Customer.AgeGroup", "Customer.Gender"]
     });
 
     return (
@@ -214,7 +225,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             measuresPlacement="row"
             dimensionLabels="top"
             style={{
-              cell: { padding: "10px", textAlign: "right" },
+              cell: { padding: "10px", textAlign: "right" }
             }}
             cell={({ measure }: { measure: string }) => `${measure}`}
           />
@@ -225,7 +236,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
   .add("pivoting in one direction, measures in columns", () => {
     const pivotedFrame = frame.pivot({
       rows: [],
-      columns: ["Customer.AgeGroup", "Customer.Gender"],
+      columns: ["Customer.AgeGroup", "Customer.Gender"]
     });
 
     return (
@@ -239,7 +250,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             measuresPlacement="column"
             dimensionLabels="top"
             style={{
-              cell: { padding: "10px", textAlign: "right" },
+              cell: { padding: "10px", textAlign: "right" }
             }}
             cell={({ measure }: { measure: string }) => `${measure}`}
           />
@@ -250,7 +261,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
   .add("with boolean columns", () => {
     const pivotedFrame = frameWithBoolean.pivot({
       rows: [],
-      columns: ["Product.recyclablePackaging"],
+      columns: ["Product.recyclablePackaging"]
     });
 
     return (
@@ -263,7 +274,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             measures={["sales"]}
             dimensionLabels="left"
             style={{
-              cell: { padding: "10px", textAlign: "right" },
+              cell: { padding: "10px", textAlign: "right" }
             }}
           />
         )}
@@ -273,7 +284,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
   .add("demo of the bug", () => {
     const pivotedFrame = frameForBug.pivot({
       rows: ["A", "B"],
-      columns: [],
+      columns: []
     });
 
     return (
@@ -287,7 +298,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             measuresPlacement="row"
             dimensionLabels="top"
             style={{
-              cell: { padding: "10px", textAlign: "right" },
+              cell: { padding: "10px", textAlign: "right" }
             }}
           />
         )}
@@ -297,7 +308,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
   .add("allow zero dimensions", () => {
     const pivotedFrame = frameForBug.pivot({
       rows: [],
-      columns: [],
+      columns: []
     });
 
     return (
@@ -310,7 +321,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             measures={["A", "B", "C"]}
             measuresPlacement="row"
             style={{
-              cell: { padding: "10px", textAlign: "right" },
+              cell: { padding: "10px", textAlign: "right" }
             }}
             cell={({ measure }: { measure: string }) => `Data for: ${measure}`}
           />
@@ -328,24 +339,41 @@ storiesOf("@operational/grid/1. Pivot table", module)
 
     const pivotedFrame = frame.pivot({
       rows: ["Customer.Continent", "Customer.Country"],
-      columns: ["Customer.AgeGroup", "Customer.Gender"],
+      columns: ["Customer.AgeGroup", "Customer.Gender"]
     });
 
     const axes = {
-      row: ({ row, width, height }: { row: number; width: number; height: number }) => {
+      row: ({
+        row,
+        width,
+        height
+      }: {
+        row: number;
+        width: number;
+        height: number;
+      }) => {
         const h = height - 2 * padding;
         // eslint-disable-next-line react-hooks/rules-of-hooks
         const yScale = useScaleBand({
           frame: pivotedFrame.row(row) as IteratableFrame<string>,
           column: "Customer.City",
-          range: [0, height],
+          range: [0, height]
         });
         return (
-          <svg width={width} height={h} viewBox={`0 0 ${width} ${h}`} style={{ margin: `${padding} 0` }}>
-            <Axis scale={yScale} transform={`translate(${width}, -${padding})`} position="left" />
+          <svg
+            width={width}
+            height={h}
+            viewBox={`0 0 ${width} ${h}`}
+            style={{ margin: `${padding} 0` }}
+          >
+            <Axis
+              scale={yScale}
+              transform={`translate(${width}, -${padding})`}
+              position="left"
+            />
           </svg>
         );
-      },
+      }
     };
 
     return (
@@ -361,12 +389,23 @@ storiesOf("@operational/grid/1. Pivot table", module)
             accessors={{
               height: param => {
                 if ("row" in param) {
-                  return uniqueValues(pivotedFrame.row(param.row), "Customer.City").length * barWidth + padding * 2;
+                  return (
+                    uniqueValues(pivotedFrame.row(param.row), "Customer.City")
+                      .length *
+                      barWidth +
+                    padding * 2
+                  );
                 }
-                return "columnIndex" in param || ("measure" in param && param.measure === true) ? 35 : chartHeight;
+                return "columnIndex" in param ||
+                  ("measure" in param && param.measure === true)
+                  ? 35
+                  : chartHeight;
               },
               width: param =>
-                "rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : chartWidth,
+                "rowIndex" in param ||
+                ("measure" in param && param.measure === true)
+                  ? 120
+                  : chartWidth
             }}
             cell={({ data, row, width, height, measure }) => {
               const w = width - 2 * padding;
@@ -374,15 +413,20 @@ storiesOf("@operational/grid/1. Pivot table", module)
               const yScale = useScaleBand({
                 frame: pivotedFrame.row(row) as IteratableFrame<string>,
                 column: "Customer.City",
-                range: [0, h],
+                range: [0, h]
               });
               const xScale = useScaleLinear({
                 frame: frame as IteratableFrame<string>,
                 range: [0, w],
-                column: "sales",
+                column: "sales"
               });
               return (
-                <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ margin: padding }}>
+                <svg
+                  width={w}
+                  height={h}
+                  viewBox={`0 0 ${w} ${h}`}
+                  style={{ margin: padding }}
+                >
                   <Bars
                     data={data as IteratableFrame<string>}
                     metricScale={xScale}
@@ -390,7 +434,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
                     metric={frame.getCursor(measure)}
                     categorical={frame.getCursor("Customer.City")}
                     style={{ fill: "#1f78b4" }}
-                    direction="horizontal"
+                    metricDirection="horizontal"
                   />
                 </svg>
               );

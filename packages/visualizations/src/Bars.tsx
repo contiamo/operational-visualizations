@@ -4,17 +4,21 @@ import React from "react";
 import { useChartTransform } from "./Chart";
 
 export interface BarsProps<Name extends string = string> {
-  direction: "horizontal" | "vertical";
+  metricDirection: "horizontal" | "vertical";
   data: IteratableFrame<Name>;
   metric: ColumnCursor<Name>;
   categorical: ColumnCursor<Name>;
   metricScale: ScaleLinear<any, any>;
   categoricalScale: ScaleBand<string>;
   transform?: React.SVGAttributes<SVGRectElement>["transform"];
-  style?: React.SVGAttributes<SVGGElement>["style"] | ((i: number) => React.SVGAttributes<SVGGElement>["style"]);
+  style?:
+    | React.SVGAttributes<SVGGElement>["style"]
+    | ((i: number) => React.SVGAttributes<SVGGElement>["style"]);
 }
 
-type BarsComponent = <Name extends string>(props: BarsProps<Name>) => React.ReactElement | null;
+type BarsComponent = <Name extends string>(
+  props: BarsProps<Name>
+) => React.ReactElement | null;
 
 export const Bars: BarsComponent = React.memo(props => {
   const defaultTransform = useChartTransform();
@@ -25,8 +29,15 @@ export const Bars: BarsComponent = React.memo(props => {
       ? { isFunction: true as true, style: props.style }
       : { isFunction: false as false, style: props.style };
 
-  if (props.direction === "vertical") {
-    const { data, transform, metric, categorical, metricScale, categoricalScale } = props;
+  if (props.metricDirection === "vertical") {
+    const {
+      data,
+      transform,
+      metric,
+      categorical,
+      metricScale,
+      categoricalScale
+    } = props;
     const height = metricScale(metricScale.domain()[0]);
 
     return (
@@ -44,7 +55,14 @@ export const Bars: BarsComponent = React.memo(props => {
       </g>
     );
   } else {
-    const { data, transform, metric, categorical, metricScale, categoricalScale } = props;
+    const {
+      data,
+      transform,
+      metric,
+      categorical,
+      metricScale,
+      categoricalScale
+    } = props;
     return (
       <g transform={transform || defaultTransform}>
         {data.mapRows((row, i) => (
