@@ -135,7 +135,7 @@ For categorical data it needs collect uique values per rows/columns.
 
 ## stats module
 
-To implement stats module we need iterator, for example `forEach(column names)`.
+To implement stats module we need iterator, for example `mapRows()`.
 Also we would need to know types of columns (for quantative and categorical data we need different type of stats).
 
 To implement stats module for pivot table (or multi-index) we can provide following functions:

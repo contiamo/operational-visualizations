@@ -3,7 +3,7 @@ import { useChartTransform } from "./Chart";
 import { AxialChart } from "./types";
 import { getStyleProp } from "./utils";
 
-export const Bars: AxialChart<string> = React.memo(props => {
+export const Bars: AxialChart<string> = props => {
   const defaultTransform = useChartTransform();
   const styleProp = getStyleProp(props.style);
 
@@ -56,4 +56,4 @@ export const Bars: AxialChart<string> = React.memo(props => {
       </g>
     );
   }
-});
+};

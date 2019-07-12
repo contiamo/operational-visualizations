@@ -15,19 +15,6 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
     return this.index.map((i, j) => callback(this.data[i], j));
   }
 
-  public forEach(columns: Name | Name[], cb: (...columnValue: any[]) => void) {
-    if (!Array.isArray(columns)) {
-      columns = [columns];
-    }
-
-    const columnsIndex = columns.map(column => this.schema.findIndex(x => x.name === column));
-    if (columnsIndex.some(x => x < 0)) {
-      throw new Error(`Unknown column in ${columns}`);
-    }
-
-    this.index.forEach(i => cb(...columnsIndex.map(columnIndex => this.data[i][columnIndex])));
-  }
-
   // we need this function for table display
   public peak(column: Name) {
     const columnIndex = this.schema.findIndex(x => x.name === column);
