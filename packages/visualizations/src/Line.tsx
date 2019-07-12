@@ -5,7 +5,7 @@ import React from "react";
 import { useChartTransform } from "./Chart";
 
 export interface LineProps<Name extends string = string> {
-  monotoneDirection: "horizontal" | "vertical";
+  metricDirection: "horizontal" | "vertical";
   data: DataFrame<Name>;
   metric: ColumnCursor<Name>;
   categorical: ColumnCursor<Name>;
@@ -22,7 +22,7 @@ type LineComponent = <Name extends string>(
 export const Line: LineComponent = React.memo(props => {
   const defaultTransform = useChartTransform();
   const {
-    monotoneDirection,
+    metricDirection,
     data,
     transform,
     metric,
@@ -39,7 +39,7 @@ export const Line: LineComponent = React.memo(props => {
     const categoricalValue =
       categoricalTickWidth / 2 + (categoricalScale(categorical(row)) as number);
     const metricValue = metricScale(metric(row));
-    return (monotoneDirection === "horizontal"
+    return (metricDirection === "vertical"
       ? [categoricalValue, metricValue]
       : [metricValue, categoricalValue]) as [number, number];
   });

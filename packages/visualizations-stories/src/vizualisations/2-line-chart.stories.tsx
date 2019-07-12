@@ -62,7 +62,7 @@ interface LineChartProps<Name extends string> {
   data: DataFrame<Name>;
   categorical: Name;
   metric: Name;
-  monotoneDirection: LineProps["monotoneDirection"];
+  metricDirection: LineProps["metricDirection"];
 }
 
 interface MultipleLinesProps<Name extends string> {
@@ -72,7 +72,7 @@ interface MultipleLinesProps<Name extends string> {
   data: DataFrame<Name>;
   categorical: Name;
   metrics: Name[];
-  monotoneDirection: LineProps["monotoneDirection"];
+  metricDirection: LineProps["metricDirection"];
 }
 /**
  * Examples of how you can compose more complex charts out of 'atoms'
@@ -84,17 +84,17 @@ const LineChart = <Name extends string>({
   data,
   categorical,
   metric,
-  monotoneDirection
+  metricDirection
 }: LineChartProps<Name>) => {
   const categoricalScale = useScaleBand({
     frame: data,
     column: categorical,
-    range: monotoneDirection === "horizontal" ? [0, width] : [0, height]
+    range: metricDirection === "vertical" ? [0, width] : [0, height]
   });
   const metricScale = useScaleLinear({
     frame: data,
     column: metric,
-    range: monotoneDirection === "horizontal" ? [height, 0] : [0, width]
+    range: metricDirection === "vertical" ? [height, 0] : [0, width]
   });
 
   return (
@@ -105,7 +105,7 @@ const LineChart = <Name extends string>({
       style={{ background: "#fff" }}
     >
       <Line
-        monotoneDirection={monotoneDirection}
+        metricDirection={metricDirection}
         data={data}
         categorical={data.getCursor(categorical)}
         metric={data.getCursor(metric)}
@@ -115,11 +115,11 @@ const LineChart = <Name extends string>({
       />
       <Axis
         scale={categoricalScale}
-        position={monotoneDirection === "horizontal" ? "bottom" : "left"}
+        position={metricDirection === "vertical" ? "bottom" : "left"}
       />
       <Axis
         scale={metricScale}
-        position={monotoneDirection === "horizontal" ? "left" : "bottom"}
+        position={metricDirection === "vertical" ? "left" : "bottom"}
       />
     </Chart>
   );
@@ -145,17 +145,17 @@ const MultipleLines = <Name extends string>({
   data,
   categorical,
   metrics,
-  monotoneDirection
+  metricDirection
 }: MultipleLinesProps<Name>) => {
   const categoricalScale = useScaleBand({
     frame: data,
     column: categorical,
-    range: monotoneDirection === "horizontal" ? [0, width] : [0, height]
+    range: metricDirection === "vertical" ? [0, width] : [0, height]
   });
   const metricScale = useScaleLinear({
     frame: data,
     column: metrics[0],
-    range: monotoneDirection === "horizontal" ? [height, 0] : [0, width]
+    range: metricDirection === "vertical" ? [height, 0] : [0, width]
   });
 
   return (
@@ -167,7 +167,7 @@ const MultipleLines = <Name extends string>({
     >
       {metrics.map((metric, i) => (
         <Line
-          monotoneDirection={monotoneDirection}
+          metricDirection={metricDirection}
           data={data}
           categorical={data.getCursor(categorical)}
           metric={data.getCursor(metric)}
@@ -178,18 +178,18 @@ const MultipleLines = <Name extends string>({
       ))}
       <Axis
         scale={categoricalScale}
-        position={monotoneDirection === "horizontal" ? "bottom" : "left"}
+        position={metricDirection === "vertical" ? "bottom" : "left"}
       />
       <Axis
         scale={metricScale}
-        position={monotoneDirection === "horizontal" ? "left" : "bottom"}
+        position={metricDirection === "vertical" ? "left" : "bottom"}
       />
     </Chart>
   );
 };
 
 storiesOf("@operational/visualizations/2. Line chart", module)
-  .add("horizontal", () => {
+  .add("vertical", () => {
     // number of pixels picked manually to make sure that YAxis fits on the screen
     const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
 
@@ -201,11 +201,11 @@ storiesOf("@operational/visualizations/2. Line chart", module)
         height={300}
         margin={magicMargin}
         data={frame}
-        monotoneDirection="horizontal"
+        metricDirection="vertical"
       />
     );
   })
-  .add("vertical", () => {
+  .add("horizonal", () => {
     // number of pixels picked manually to make sure that YAxis fits on the screen
     const magicMargin = 60;
     return (
@@ -216,11 +216,11 @@ storiesOf("@operational/visualizations/2. Line chart", module)
         height={300}
         margin={magicMargin}
         data={frame}
-        monotoneDirection="vertical"
+        metricDirection="horizontal"
       />
     );
   })
-  .add("horizontal, multiple lines", () => {
+  .add("vertical, multiple lines", () => {
     // number of pixels picked manually to make sure that YAxis fits on the screen
     const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
 
@@ -232,7 +232,7 @@ storiesOf("@operational/visualizations/2. Line chart", module)
         height={300}
         margin={magicMargin}
         data={frame}
-        monotoneDirection="horizontal"
+        metricDirection="vertical"
       />
     );
   });
