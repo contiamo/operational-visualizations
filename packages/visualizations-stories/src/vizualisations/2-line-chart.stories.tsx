@@ -8,39 +8,39 @@ import {
   ChartProps,
   Line,
   useScaleBand,
-  useScaleLinear
+  useScaleLinear,
 } from "@operational/visualizations";
 
 const rawData = {
   columns: [
     {
       name: "Customer.Continent" as "Customer.Continent",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.Country" as "Customer.Country",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.City" as "Customer.City",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.AgeGroup" as "Customer.AgeGroup",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.Gender" as "Customer.Gender",
-      type: "string"
+      type: "string",
     },
     {
       name: "sales" as "sales",
-      type: "number"
+      type: "number",
     },
     {
       name: "revenue" as "revenue",
-      type: "number"
-    }
+      type: "number",
+    },
   ],
   rows: [
     ["Europe", "Germany", "Berlin", "<50", "Female", 101, 10.2],
@@ -49,8 +49,8 @@ const rawData = {
     ["Europe", "UK", "London", "<50", "Female", 401, 40.2],
     ["Europe", "UK", "Edinburgh", "<50", "Female", 501, 50.2],
     ["North America", "USA", "New York", "<50", "Female", 801, 80.2],
-    ["North America", "Canada", "Toronto", "<50", "Female", 801, 80.2]
-  ]
+    ["North America", "Canada", "Toronto", "<50", "Female", 801, 80.2],
+  ],
 };
 
 const frame = new DataFrame(rawData.columns, rawData.rows);
@@ -84,26 +84,21 @@ const LineChart = <Name extends string>({
   data,
   categorical,
   metric,
-  metricDirection
+  metricDirection,
 }: LineChartProps<Name>) => {
   const categoricalScale = useScaleBand({
     frame: data,
     column: data.getCursor(categorical),
-    range: metricDirection === "vertical" ? [0, width] : [0, height]
+    range: metricDirection === "vertical" ? [0, width] : [0, height],
   });
   const metricScale = useScaleLinear({
     frame: data,
     column: data.getCursor(metric),
-    range: metricDirection === "vertical" ? [height, 0] : [0, width]
+    range: metricDirection === "vertical" ? [height, 0] : [0, width],
   });
 
   return (
-    <Chart
-      width={width}
-      height={height}
-      margin={margin}
-      style={{ background: "#fff" }}
-    >
+    <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
       <Line
         metricDirection={metricDirection}
         data={data}
@@ -113,14 +108,8 @@ const LineChart = <Name extends string>({
         metricScale={metricScale}
         style={{ stroke: "#1f78b4" }}
       />
-      <Axis
-        scale={categoricalScale}
-        position={metricDirection === "vertical" ? "bottom" : "left"}
-      />
-      <Axis
-        scale={metricScale}
-        position={metricDirection === "vertical" ? "left" : "bottom"}
-      />
+      <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
+      <Axis scale={metricScale} position={metricDirection === "vertical" ? "left" : "bottom"} />
     </Chart>
   );
 };
@@ -135,7 +124,7 @@ const colors = [
   "#1D6199",
   "#D31F1F",
   "#AD329C",
-  "#006865"
+  "#006865",
 ];
 
 const MultipleLines = <Name extends string>({
@@ -145,26 +134,21 @@ const MultipleLines = <Name extends string>({
   data,
   categorical,
   metrics,
-  metricDirection
+  metricDirection,
 }: MultipleLinesProps<Name>) => {
   const categoricalScale = useScaleBand({
     frame: data,
     column: data.getCursor(categorical),
-    range: metricDirection === "vertical" ? [0, width] : [0, height]
+    range: metricDirection === "vertical" ? [0, width] : [0, height],
   });
   const metricScale = useScaleLinear({
     frame: data,
     column: data.getCursor(metrics[0]),
-    range: metricDirection === "vertical" ? [height, 0] : [0, width]
+    range: metricDirection === "vertical" ? [height, 0] : [0, width],
   });
 
   return (
-    <Chart
-      width={width}
-      height={height}
-      margin={margin}
-      style={{ background: "#fff" }}
-    >
+    <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
       {metrics.map((metric, i) => (
         <Line
           metricDirection={metricDirection}
@@ -176,14 +160,8 @@ const MultipleLines = <Name extends string>({
           style={{ stroke: colors[i] }}
         />
       ))}
-      <Axis
-        scale={categoricalScale}
-        position={metricDirection === "vertical" ? "bottom" : "left"}
-      />
-      <Axis
-        scale={metricScale}
-        position={metricDirection === "vertical" ? "left" : "bottom"}
-      />
+      <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
+      <Axis scale={metricScale} position={metricDirection === "vertical" ? "left" : "bottom"} />
     </Chart>
   );
 };

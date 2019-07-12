@@ -8,14 +8,7 @@ export const Bars: AxialChart<string> = props => {
   const styleProp = getStyleProp(props.style);
 
   if (props.metricDirection === "vertical") {
-    const {
-      data,
-      transform,
-      metric,
-      categorical,
-      metricScale,
-      categoricalScale
-    } = props;
+    const { data, transform, metric, categorical, metricScale, categoricalScale } = props;
     const height = metricScale(metricScale.domain()[0]);
 
     return (
@@ -33,14 +26,7 @@ export const Bars: AxialChart<string> = props => {
       </g>
     );
   } else {
-    const {
-      data,
-      transform,
-      metric,
-      categorical,
-      metricScale,
-      categoricalScale
-    } = props;
+    const { data, transform, metric, categorical, metricScale, categoricalScale } = props;
     return (
       <g transform={transform || defaultTransform}>
         {data.mapRows((row, i) => (

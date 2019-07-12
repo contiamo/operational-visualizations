@@ -9,11 +9,7 @@ export interface AxialChartProps<Name extends string> {
   metricScale: ScaleLinear<any, any>;
   categoricalScale: ScaleBand<string>;
   transform?: React.SVGAttributes<SVGRectElement>["transform"];
-  style?:
-    | React.SVGAttributes<SVGGElement>["style"]
-    | ((i: number) => React.SVGAttributes<SVGGElement>["style"]);
+  style?: React.SVGAttributes<SVGGElement>["style"] | ((i: number) => React.SVGAttributes<SVGGElement>["style"]);
 }
 
-export type AxialChart<Name extends string> = (
-  props: AxialChartProps<Name>
-) => React.ReactElement | null;
+export type AxialChart<Name extends string> = (props: AxialChartProps<Name>) => React.ReactElement | null;
