@@ -14,10 +14,11 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
   private readonly origin: WithCursor<Name>;
 
   constructor(origin: DataFrame<Name>, index: number[]) {
-    this.schema = origin[getData]()[0];
-    this.data = origin[getData]()[1];
-    this.index = index;
     this.origin = origin;
+    const [schema, data] = origin[getData]();
+    this.schema = schema;
+    this.data = data;
+    this.index = index;
   }
 
   public getCursor(column: Name) {

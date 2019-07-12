@@ -26,10 +26,11 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
   private readonly columnCache: Map<number, FragmentFrame<Name>>;
 
   constructor(origin: DataFrame<Name>, prop: PivotProps<Name, Name>) {
-    this.schema = origin[getData]()[0];
-    this.data = origin[getData]()[1];
-    this.prop = prop;
     this.origin = origin;
+    const [schema, data] = origin[getData]();
+    this.schema = schema;
+    this.data = data;
+    this.prop = prop;
     this.rowCache = new Map<number, FragmentFrame<Name>>();
     this.columnCache = new Map<number, FragmentFrame<Name>>();
   }
