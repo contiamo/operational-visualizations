@@ -1,5 +1,5 @@
-import { DataFrame, uniqueValues, IteratableFrame } from "@operational/frame";
-import { PivotGrid } from "@operational/grid";
+import { DataFrame, uniqueValues } from "@operational/frame";
+import { PivotGrid, RowProps, CellPropsWithMeasure } from "@operational/grid";
 import { Axis, Bars, useScaleBand, useScaleLinear } from "@operational/visualizations";
 import { storiesOf } from "@storybook/react";
 import * as React from "react";
@@ -216,7 +216,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
-            cell={({ measure }: { measure: string | undefined }) => <>${measure}</>}
+            cell={({ measure }: CellPropsWithMeasure) => <>${measure}</>}
           />
         )}
       </AutoSizer>
@@ -241,7 +241,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
-            cell={({ measure }: { measure: string | undefined }) => <>{measure}</>}
+            cell={({ measure }: CellPropsWithMeasure) => <>{measure}</>}
           />
         )}
       </AutoSizer>
@@ -312,7 +312,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
-            cell={({ measure }: { measure: string }) => <>Data for: {measure}</>}
+            cell={({ measure }: CellPropsWithMeasure) => <>Data for: {measure}</>}
           />
         )}
       </AutoSizer>
@@ -333,16 +333,10 @@ storiesOf("@operational/grid/1. Pivot table", module)
       columns: ["Customer.AgeGroup", "Customer.Gender"],
     });
 
-    // TODO: we need some utility to not have to redeclare types here
-    const Row: React.FC<{ row: number; width: number; height: number; data: typeof pivotedFrame }> = ({
-      row,
-      width,
-      height,
-      data,
-    }) => {
+    const Row: React.FC<RowProps> = ({ row, width, height, data }) => {
       const heightWithoutPadding = height - 2 * padding;
       const yScale = useScaleBand({
-        frame: data.row(row) as IteratableFrame<string>,
+        frame: data.row(row),
         column: cityCursor,
         range: [0, height],
       });
