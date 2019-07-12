@@ -1,4 +1,4 @@
-import { FragmentFrame, PivotFrame } from "@operational/frame";
+import { PivotFrame } from "@operational/frame";
 import React, { useCallback, useMemo } from "react";
 import { GridChildComponentProps, VariableSizeGrid } from "react-window";
 
@@ -34,8 +34,18 @@ const toString = (value: boolean | string) => {
   return value;
 };
 
-const defaultCell = <Name extends string = string>({ data, measure }: { data: FragmentFrame<Name>; measure: Name }) => {
-  const value = data.peak(measure);
+const defaultCell = <Name extends string = string>({
+  column,
+  row,
+  data,
+  measure,
+}: {
+  data: PivotFrame<Name>;
+  row: number;
+  column: number;
+  measure: Name;
+}) => {
+  const value = data.cell(row, column).peak(measure);
   return value === null ? null : <>{value}</>;
 };
 
@@ -76,7 +86,7 @@ type GeneralPivotGridProps<Name extends string> =
   | {
       type: "general";
       cell: (prop: {
-        data: FragmentFrame<Name>;
+        data: PivotFrame<Name>;
         width: number;
         height: number;
         row: number;
@@ -89,7 +99,7 @@ type GeneralPivotGridProps<Name extends string> =
       /** default value is "column" */
       measuresPlacement?: "row" | "column";
       cell: (prop: {
-        data: FragmentFrame<Name>;
+        data: PivotFrame<Name>;
         width: number;
         height: number;
         row: number;
@@ -103,9 +113,21 @@ interface Accessors<Name extends string> {
   height?: (p: HeightParam<Name>) => number;
 }
 
-interface Axes {
-  row?: (prop: { row: number; measure?: string; width: number; height: number }) => React.ReactElement | null;
-  column?: (prop: { column: number; measure?: string; width: number; height: number }) => React.ReactElement | null;
+interface Axes<Name extends string> {
+  row?: (prop: {
+    data: PivotFrame<Name>;
+    width: number;
+    height: number;
+    row: number;
+    measure?: string;
+  }) => React.ReactElement | null;
+  column?: (prop: {
+    data: PivotFrame<Name>;
+    width: number;
+    height: number;
+    column: number;
+    measure?: string;
+  }) => React.ReactElement | null;
 }
 
 interface PivotGridStyle {
@@ -121,9 +143,9 @@ type Props<Name extends string = string> = (TextOnlyPivotGridProps<Name> | Gener
   height: number;
   data: PivotFrame<Name>;
   style?: PivotGridStyle;
-  axes?: Axes;
+  axes?: Axes<Name>;
   accessors?: Accessors<Name>;
-  header?: (prop: { value: string; width: number; height: number }) => React.ReactElement | null;
+  header?: (prop: { width: number; height: number; value: string }) => React.ReactElement | null;
   dimensionLabels?: DimensionLabels | "top" | "left" | "none";
 };
 
@@ -142,7 +164,7 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
   const { data } = props;
   const cell = "cell" in props ? props.cell : defaultCell;
   const header = props.header || defaultHeader;
-  const axes = props.axes || (emptyObject as Axes);
+  const axes = props.axes || (emptyObject as Axes<Name>);
   const accessors = props.accessors || (emptyObject as Accessors<Name>);
   const heightAccessors = accessors.height || (defaultHeight as Defined<Accessors<Name>["height"]>);
   const widthAccessors = accessors.width || (defaultWidth as Defined<Accessors<Name>["width"]>);
@@ -240,12 +262,12 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
           };
 
           item = React.createElement(cell, {
-            data: data.cell(cellCoordinates.row, cellCoordinates.column),
+            data,
+            width,
+            height,
             measure: cellCoordinates.measure!,
             row: cellCoordinates.row,
             column: cellCoordinates.column,
-            height,
-            width,
           });
           break;
         case "RowHeader":
@@ -281,20 +303,22 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
         case "RowAxis":
           if (axes.row) {
             item = React.createElement(axes.row, {
+              data,
+              width,
+              height,
               row: cellCoordinates.row,
               measure: cellCoordinates.measure,
-              height,
-              width,
             });
           }
           break;
         case "ColumnAxis":
           if (axes.column) {
             item = React.createElement(axes.column, {
+              data,
+              width,
+              height,
               column: cellCoordinates.column,
               measure: cellCoordinates.measure,
-              height,
-              width,
             });
           }
           break;

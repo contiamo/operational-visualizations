@@ -376,16 +376,16 @@ storiesOf("@operational/grid/1. Pivot table", module)
               width: param =>
                 "rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : chartWidth,
             }}
-            cell={({ data, row, width, height, measure }) => {
+            cell={({ data, row, column, width, height, measure }) => {
               const widthWithoutPadding = width - 2 * padding;
               const heightWithoutPadding = height - 2 * padding;
               const yScale = useScaleBand({
-                frame: pivotedFrame.row(row) as IteratableFrame<string>,
+                frame: data.row(row),
                 column: cityCursor,
                 range: [0, heightWithoutPadding],
               });
               const xScale = useScaleLinear({
-                frame: frame as IteratableFrame<string>,
+                frame: data.unpivot(),
                 range: [0, widthWithoutPadding],
                 column: salesCursor,
               });
@@ -397,7 +397,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
                   style={{ margin: padding }}
                 >
                   <Bars
-                    data={data as IteratableFrame<string>}
+                    data={data.cell(row, column)}
                     metricScale={xScale}
                     categoricalScale={yScale}
                     metric={frame.getCursor(measure)}
