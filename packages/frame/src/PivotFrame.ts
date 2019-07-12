@@ -1,3 +1,4 @@
+// this is not circular dependency, because we use DataFrame as type
 import { DataFrame } from "./DataFrame";
 import { FragmentFrame } from "./FragmentFrame";
 import { PivotProps, WithCursor, Matrix, Schema } from "./types";

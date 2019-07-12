@@ -1,3 +1,4 @@
+// this is not circular dependency, because we use DataFrame as type
 import { DataFrame } from "./DataFrame";
 import { IteratableFrame, WithCursor, RawRow, ColumnCursor, Matrix, Schema } from "./types";
 import { getData } from "./secret";
@@ -37,6 +38,7 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
       throw new Error(`Only frame with exactly one row are good for peak`);
     }
     if (this.index.length === 0) {
+      // https://github.com/contiamo/operational-visualizations/issues/72
       // if (process.env.NODE_ENV === "development") {
       //   console.warn(`Trying to peak value of empty Frame`);
       // }
