@@ -109,8 +109,8 @@ type GeneralPivotGridProps<Name extends string> =
     };
 
 interface Accessors<Name extends string> {
-  width?: (p: WidthParam<Name>) => number;
-  height?: (p: HeightParam<Name>) => number;
+  width?: (p: WidthParam<Name> & { data: PivotFrame<Name> }) => number;
+  height?: (p: HeightParam<Name> & { data: PivotFrame<Name> }) => number;
 }
 
 interface Axes<Name extends string> {
@@ -216,14 +216,14 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
 
   const rowHeight = useCallback(
     (rowIndex: number) =>
-      heightAccessors(coordinateToHeightParam(indexToCoordinateMemoised({ rowIndex, columnIndex: 0 }))),
-    [heightAccessors, indexToCoordinateMemoised],
+      heightAccessors({ data, ...coordinateToHeightParam(indexToCoordinateMemoised({ rowIndex, columnIndex: 0 })) }),
+    [heightAccessors, indexToCoordinateMemoised, data],
   );
 
   const columnWidth = useCallback(
     (columnIndex: number) =>
-      widthAccessors(coordinateToWidthParam(indexToCoordinateMemoised({ rowIndex: 0, columnIndex }))),
-    [widthAccessors, indexToCoordinateMemoised],
+      widthAccessors({ data, ...coordinateToWidthParam(indexToCoordinateMemoised({ rowIndex: 0, columnIndex })) }),
+    [widthAccessors, indexToCoordinateMemoised, data],
   );
 
   /**

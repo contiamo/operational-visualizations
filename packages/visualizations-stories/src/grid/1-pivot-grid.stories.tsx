@@ -333,10 +333,16 @@ storiesOf("@operational/grid/1. Pivot table", module)
       columns: ["Customer.AgeGroup", "Customer.Gender"],
     });
 
-    const Row: React.FC<{ row: number; width: number; height: number }> = ({ row, width, height }) => {
+    // TODO: we need some utility to not have to redeclare types here
+    const Row: React.FC<{ row: number; width: number; height: number; data: typeof pivotedFrame }> = ({
+      row,
+      width,
+      height,
+      data,
+    }) => {
       const heightWithoutPadding = height - 2 * padding;
       const yScale = useScaleBand({
-        frame: pivotedFrame.row(row) as IteratableFrame<string>,
+        frame: data.row(row) as IteratableFrame<string>,
         column: cityCursor,
         range: [0, height],
       });
@@ -367,7 +373,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
               height: param => {
                 if ("row" in param) {
                   // number of bars in bar chart - one bar per unique city
-                  const numberOfBars = uniqueValues(pivotedFrame.row(param.row), cityCursor).length;
+                  const numberOfBars = uniqueValues(param.data.row(param.row), cityCursor).length;
                   // height of the cell is numberOfBars times barWidth plus padding
                   return numberOfBars * barWidth + padding * 2;
                 }
