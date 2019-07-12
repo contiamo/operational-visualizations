@@ -205,7 +205,7 @@ export type RowProps<Name extends string = string> = {
   width: number;
   height: number;
   row: number;
-  measure?: string;
+  measure?: Name;
 };
 
 export type ColumnProps<Name extends string = string> = {
@@ -213,5 +213,5 @@ export type ColumnProps<Name extends string = string> = {
   width: number;
   height: number;
   column: number;
-  measure?: string;
+  measure?: Name;
 };
