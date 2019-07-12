@@ -1,26 +1,13 @@
-import { ColumnCursor, DataFrame } from "@operational/frame";
-import { ScaleBand, ScaleLinear } from "d3-scale";
 import { line } from "d3-shape";
 import React from "react";
 import { useChartTransform } from "./Chart";
+import { AxialChart } from "./types";
+import { getStyleProp } from "./utils";
 
-export interface LineProps<Name extends string = string> {
-  metricDirection: "horizontal" | "vertical";
-  data: DataFrame<Name>;
-  metric: ColumnCursor<Name>;
-  categorical: ColumnCursor<Name>;
-  metricScale: ScaleLinear<any, any>;
-  categoricalScale: ScaleBand<string>;
-  transform?: React.SVGAttributes<SVGRectElement>["transform"];
-  style?: React.SVGAttributes<SVGGElement>["style"];
-}
-
-type LineComponent = <Name extends string>(
-  props: LineProps<Name>
-) => React.ReactElement | null;
-
-export const Line: LineComponent = React.memo(props => {
+export const Line: AxialChart<string> = React.memo(props => {
   const defaultTransform = useChartTransform();
+  const styleProp = getStyleProp(props.style);
+
   const {
     metricDirection,
     data,
@@ -51,7 +38,13 @@ export const Line: LineComponent = React.memo(props => {
 
   return (
     <g transform={transform || defaultTransform}>
-      <path d={path} style={{ fill: "none", ...style }} />
+      <path
+        d={path}
+        style={{
+          fill: "none",
+          ...(styleProp.isFunction ? styleProp.style(0) : style)
+        }}
+      />
     </g>
   );
 });
