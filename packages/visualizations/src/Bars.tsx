@@ -1,14 +1,13 @@
 import React from "react";
 import { useChartTransform } from "./Chart";
 import { AxialChart } from "./types";
-import { getStyleProp } from "./utils";
+import { isFunction } from "./utils";
 
 export const Bars: AxialChart<string> = props => {
   const defaultTransform = useChartTransform();
-  const styleProp = getStyleProp(props.style);
 
   if (props.metricDirection === "vertical") {
-    const { data, transform, metric, categorical, metricScale, categoricalScale } = props;
+    const { data, transform, metric, categorical, metricScale, categoricalScale, style } = props;
     const height = metricScale(metricScale.domain()[0]);
 
     return (
@@ -19,14 +18,14 @@ export const Bars: AxialChart<string> = props => {
             y={metricScale(metric(row))}
             width={categoricalScale.bandwidth()}
             height={height - metricScale(metric(row))}
-            style={styleProp.isFunction ? styleProp.style(i) : styleProp.style}
+            style={isFunction(style) ? style(i) : style}
             key={i}
           />
         ))}
       </g>
     );
   } else {
-    const { data, transform, metric, categorical, metricScale, categoricalScale } = props;
+    const { data, transform, metric, categorical, metricScale, categoricalScale, style } = props;
     return (
       <g transform={transform || defaultTransform}>
         {data.mapRows((row, i) => (
@@ -35,7 +34,7 @@ export const Bars: AxialChart<string> = props => {
             x={0}
             height={categoricalScale.bandwidth()}
             width={metricScale(metric(row))}
-            style={styleProp.isFunction ? styleProp.style(i) : styleProp.style}
+            style={isFunction(style) ? style(i) : style}
             key={i}
           />
         ))}

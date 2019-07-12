@@ -2,11 +2,10 @@ import { line } from "d3-shape";
 import React from "react";
 import { useChartTransform } from "./Chart";
 import { AxialChart } from "./types";
-import { getStyleProp } from "./utils";
+import { isFunction } from "./utils";
 
 export const Line: AxialChart<string> = React.memo(props => {
   const defaultTransform = useChartTransform();
-  const styleProp = getStyleProp(props.style);
 
   const { metricDirection, data, transform, metric, categorical, metricScale, categoricalScale, style } = props;
 
@@ -33,7 +32,7 @@ export const Line: AxialChart<string> = React.memo(props => {
         d={path}
         style={{
           fill: "none",
-          ...(styleProp.isFunction ? styleProp.style(0) : style),
+          ...(isFunction(style) ? style(0) : style),
         }}
       />
     </g>
