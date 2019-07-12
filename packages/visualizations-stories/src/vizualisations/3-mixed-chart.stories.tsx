@@ -4,11 +4,12 @@ import { DataFrame } from "@operational/frame";
 import {
   AxialChartProps,
   Axis,
-  Bars,
   Chart,
   ChartProps,
+  Line,
   useScaleBand,
   useScaleLinear,
+  Bars,
 } from "@operational/visualizations";
 
 const rawData = {
@@ -55,7 +56,7 @@ const rawData = {
 
 const frame = new DataFrame(rawData.columns, rawData.rows);
 
-interface BarChartProps<Name extends string> {
+interface MixedChartProps<Name extends string> {
   width: number;
   height: number;
   margin: ChartProps["margin"];
@@ -66,9 +67,9 @@ interface BarChartProps<Name extends string> {
 }
 
 /**
- * Example of how you can compose more complex charts out of 'atoms'
+ * Examples of how you can compose more complex charts out of 'atoms'
  */
-const BarChart = <Name extends string>({
+const MixedChart = <Name extends string>({
   width,
   height,
   margin,
@@ -76,16 +77,16 @@ const BarChart = <Name extends string>({
   categorical,
   metric,
   metricDirection,
-}: BarChartProps<Name>) => {
+}: MixedChartProps<Name>) => {
   const categoricalScale = useScaleBand({
     frame: data,
     column: data.getCursor(categorical),
-    range: metricDirection === "horizontal" ? [0, height] : [0, width],
+    range: metricDirection === "vertical" ? [0, width] : [0, height],
   });
   const metricScale = useScaleLinear({
     frame: data,
     column: data.getCursor(metric),
-    range: metricDirection === "horizontal" ? [0, width] : [height, 0],
+    range: metricDirection === "vertical" ? [height, 0] : [0, width],
   });
 
   return (
@@ -97,36 +98,30 @@ const BarChart = <Name extends string>({
         metric={data.getCursor(metric)}
         categoricalScale={categoricalScale}
         metricScale={metricScale}
-        style={{ fill: "#1f78b4" }}
+        style={{ fill: "#1499CE" }}
       />
-      <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
-      <Axis scale={metricScale} position={metricDirection === "horizontal" ? "bottom" : "left"} />
+      <Line
+        metricDirection={metricDirection}
+        data={data}
+        categorical={data.getCursor(categorical)}
+        metric={data.getCursor(metric)}
+        categoricalScale={categoricalScale}
+        metricScale={metricScale}
+        style={{ stroke: "#7C246F" }}
+      />
+      <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
+      <Axis scale={metricScale} position={metricDirection === "vertical" ? "left" : "bottom"} />
     </Chart>
   );
 };
 
-storiesOf("@operational/visualizations/1. Bar chart", module)
-  .add("horizontal", () => {
+storiesOf("@operational/visualizations/3. Mixed chart", module)
+  .add("vertical", () => {
     // number of pixels picked manually to make sure that YAxis fits on the screen
     const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
 
     return (
-      <BarChart
-        metric="sales"
-        categorical="Customer.City"
-        width={300}
-        height={300}
-        margin={magicMargin}
-        data={frame}
-        metricDirection="horizontal"
-      />
-    );
-  })
-  .add("vertical", () => {
-    // number of pixels picked manually to make sure that YAxis fits on the screen
-    const magicMargin = 60;
-    return (
-      <BarChart
+      <MixedChart
         metric="sales"
         categorical="Customer.City"
         width={300}
@@ -134,6 +129,21 @@ storiesOf("@operational/visualizations/1. Bar chart", module)
         margin={magicMargin}
         data={frame}
         metricDirection="vertical"
+      />
+    );
+  })
+  .add("horizonal", () => {
+    // number of pixels picked manually to make sure that YAxis fits on the screen
+    const magicMargin = 60;
+    return (
+      <MixedChart
+        metric="sales"
+        categorical="Customer.City"
+        width={300}
+        height={300}
+        margin={magicMargin}
+        data={frame}
+        metricDirection="horizontal"
       />
     );
   });

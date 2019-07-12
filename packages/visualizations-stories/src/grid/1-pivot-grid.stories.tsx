@@ -403,7 +403,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
                     metric={frame.getCursor(measure)}
                     categorical={frame.getCursor("Customer.City")}
                     style={{ fill: "#1f78b4" }}
-                    direction="horizontal"
+                    metricDirection="horizontal"
                   />
                 </svg>
               );

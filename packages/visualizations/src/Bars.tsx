@@ -1,31 +1,13 @@
-import { ColumnCursor, IteratableFrame } from "@operational/frame";
-import { ScaleBand, ScaleLinear } from "d3-scale";
 import React from "react";
 import { useChartTransform } from "./Chart";
+import { AxialChart } from "./types";
+import { getStyleProp } from "./utils";
 
-export interface BarsProps<Name extends string = string> {
-  direction: "horizontal" | "vertical";
-  data: IteratableFrame<Name>;
-  metric: ColumnCursor<Name>;
-  categorical: ColumnCursor<Name>;
-  metricScale: ScaleLinear<any, any>;
-  categoricalScale: ScaleBand<string>;
-  transform?: React.SVGAttributes<SVGRectElement>["transform"];
-  style?: React.SVGAttributes<SVGGElement>["style"] | ((i: number) => React.SVGAttributes<SVGGElement>["style"]);
-}
-
-type BarsComponent = <Name extends string>(props: BarsProps<Name>) => React.ReactElement | null;
-
-export const Bars: BarsComponent = props => {
+export const Bars: AxialChart<string> = props => {
   const defaultTransform = useChartTransform();
+  const styleProp = getStyleProp(props.style);
 
-  // TypeScript can't handle this case normally :/
-  const styleProp =
-    typeof props.style === "function"
-      ? { isFunction: true as true, style: props.style }
-      : { isFunction: false as false, style: props.style };
-
-  if (props.direction === "vertical") {
+  if (props.metricDirection === "vertical") {
     const { data, transform, metric, categorical, metricScale, categoricalScale } = props;
     const height = metricScale(metricScale.domain()[0]);
 
