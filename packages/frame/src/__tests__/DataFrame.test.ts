@@ -4,32 +4,32 @@ const rawData = {
   columns: [
     {
       name: "Customer.Continent" as "Customer.Continent",
-      type: "string",
+      type: "string"
     },
     {
       name: "Customer.Country" as "Customer.Country",
-      type: "string",
+      type: "string"
     },
     {
       name: "Customer.City" as "Customer.City",
-      type: "string",
+      type: "string"
     },
     {
       name: "Customer.AgeGroup" as "Customer.AgeGroup",
-      type: "string",
+      type: "string"
     },
     {
       name: "Customer.Gender" as "Customer.Gender",
-      type: "string",
+      type: "string"
     },
     {
       name: "sales" as "sales",
-      type: "number",
+      type: "number"
     },
     {
       name: "revenue" as "revenue",
-      type: "number",
-    },
+      type: "number"
+    }
   ],
   rows: [
     ["Europe", "Germany", "Berlin", "<50", "Female", 101, 10.2],
@@ -63,8 +63,8 @@ const rawData = {
     ["Europe", "UK", "Edinburgh", ">=50", "Male", 507, 50.8],
     ["Europe", "UK", "Dresden", ">=50", "Male", 707, 70.8],
     ["North America", "USA", "New York", ">=50", "Male", 807, 80.8],
-    ["North America", "Canada", "Toronto", ">=50", "Male", 907, 90.8],
-  ],
+    ["North America", "Canada", "Toronto", ">=50", "Male", 907, 90.8]
+  ]
 };
 
 describe("DataFrame", () => {

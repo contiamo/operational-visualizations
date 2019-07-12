@@ -227,7 +227,9 @@ storiesOf("@operational/grid/1. Pivot table", module)
             style={{
               cell: { padding: "10px", textAlign: "right" }
             }}
-            cell={({ measure }: { measure: string | undefined }) => <>${measure}</>}
+            cell={({ measure }: { measure: string | undefined }) => (
+              <>${measure}</>
+            )}
           />
         )}
       </AutoSizer>
@@ -252,7 +254,9 @@ storiesOf("@operational/grid/1. Pivot table", module)
             style={{
               cell: { padding: "10px", textAlign: "right" }
             }}
-            cell={({ measure }: { measure: string | undefined }) => <>{measure}</>}
+            cell={({ measure }: { measure: string | undefined }) => (
+              <>{measure}</>
+            )}
           />
         )}
       </AutoSizer>
@@ -323,7 +327,9 @@ storiesOf("@operational/grid/1. Pivot table", module)
             style={{
               cell: { padding: "10px", textAlign: "right" }
             }}
-            cell={({ measure }: { measure: string }) => <>Data for: {measure}</>}
+            cell={({ measure }: { measure: string }) => (
+              <>Data for: {measure}</>
+            )}
           />
         )}
       </AutoSizer>
@@ -344,12 +350,16 @@ storiesOf("@operational/grid/1. Pivot table", module)
       columns: ["Customer.AgeGroup", "Customer.Gender"]
     });
 
-    const Row: React.FC<{ row: number; width: number; height: number }> = ({ row, width, height }) => {
+    const Row: React.FC<{ row: number; width: number; height: number }> = ({
+      row,
+      width,
+      height
+    }) => {
       const heightWithoutPadding = height - 2 * padding;
       const yScale = useScaleBand({
         frame: pivotedFrame.row(row) as IteratableFrame<string>,
         column: cityCursor,
-        range: [0, height],
+        range: [0, height]
       });
       return (
         <svg
@@ -358,7 +368,11 @@ storiesOf("@operational/grid/1. Pivot table", module)
           viewBox={`0 0 ${width} ${heightWithoutPadding}`}
           style={{ margin: `${padding} 0` }}
         >
-          <Axis scale={yScale} transform={`translate(${width}, -${padding})`} position="left" />
+          <Axis
+            scale={yScale}
+            transform={`translate(${width}, -${padding})`}
+            position="left"
+          />
         </svg>
       );
     };
@@ -378,7 +392,10 @@ storiesOf("@operational/grid/1. Pivot table", module)
               height: param => {
                 if ("row" in param) {
                   // number of bars in bar chart - one bar per unique city
-                  const numberOfBars = uniqueValues(pivotedFrame.row(param.row), cityCursor).length;
+                  const numberOfBars = uniqueValues(
+                    pivotedFrame.row(param.row),
+                    cityCursor
+                  ).length;
                   // height of the cell is numberOfBars times barWidth plus padding
                   return numberOfBars * barWidth + padding * 2;
                 }
@@ -399,12 +416,12 @@ storiesOf("@operational/grid/1. Pivot table", module)
               const yScale = useScaleBand({
                 frame: pivotedFrame.row(row) as IteratableFrame<string>,
                 column: cityCursor,
-                range: [0, heightWithoutPadding],
+                range: [0, heightWithoutPadding]
               });
               const xScale = useScaleLinear({
                 frame: frame as IteratableFrame<string>,
                 range: [0, widthWithoutPadding],
-                column: salesCursor,
+                column: salesCursor
               });
               return (
                 <svg
