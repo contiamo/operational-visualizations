@@ -2,14 +2,14 @@ import * as React from "react";
 import { storiesOf } from "@storybook/react";
 import { DataFrame } from "@operational/frame";
 import {
+  AxialChartProps,
   Axis,
-  Line,
   Chart,
+  ChartProps,
+  Line,
   useScaleBand,
-  useScaleLinear,
-  LineProps
+  useScaleLinear
 } from "@operational/visualizations";
-import { ChartProps } from "@operational/visualizations/lib/Chart";
 
 const rawData = {
   columns: [
@@ -62,7 +62,7 @@ interface LineChartProps<Name extends string> {
   data: DataFrame<Name>;
   categorical: Name;
   metric: Name;
-  metricDirection: LineProps["metricDirection"];
+  metricDirection: AxialChartProps<string>["metricDirection"];
 }
 
 interface MultipleLinesProps<Name extends string> {
@@ -72,7 +72,7 @@ interface MultipleLinesProps<Name extends string> {
   data: DataFrame<Name>;
   categorical: Name;
   metrics: Name[];
-  metricDirection: LineProps["metricDirection"];
+  metricDirection: AxialChartProps<string>["metricDirection"];
 }
 /**
  * Examples of how you can compose more complex charts out of 'atoms'
@@ -88,12 +88,12 @@ const LineChart = <Name extends string>({
 }: LineChartProps<Name>) => {
   const categoricalScale = useScaleBand({
     frame: data,
-    column: categorical,
+    column: data.getCursor(categorical),
     range: metricDirection === "vertical" ? [0, width] : [0, height]
   });
   const metricScale = useScaleLinear({
     frame: data,
-    column: metric,
+    column: data.getCursor(metric),
     range: metricDirection === "vertical" ? [height, 0] : [0, width]
   });
 
@@ -149,12 +149,12 @@ const MultipleLines = <Name extends string>({
 }: MultipleLinesProps<Name>) => {
   const categoricalScale = useScaleBand({
     frame: data,
-    column: categorical,
+    column: data.getCursor(categorical),
     range: metricDirection === "vertical" ? [0, width] : [0, height]
   });
   const metricScale = useScaleLinear({
     frame: data,
-    column: metrics[0],
+    column: data.getCursor(metrics[0]),
     range: metricDirection === "vertical" ? [height, 0] : [0, width]
   });
 

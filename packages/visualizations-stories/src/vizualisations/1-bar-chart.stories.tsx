@@ -2,14 +2,14 @@ import * as React from "react";
 import { storiesOf } from "@storybook/react";
 import { DataFrame } from "@operational/frame";
 import {
+  AxialChartProps,
   Axis,
   Bars,
   Chart,
+  ChartProps,
   useScaleBand,
-  useScaleLinear,
-  BarsProps
+  useScaleLinear
 } from "@operational/visualizations";
-import { ChartProps } from "@operational/visualizations/lib/Chart";
 
 const rawData = {
   columns: [
@@ -62,7 +62,7 @@ interface BarChartProps<Name extends string> {
   data: DataFrame<Name>;
   categorical: Name;
   metric: Name;
-  metricDirection: BarsProps["metricDirection"];
+  metricDirection: AxialChartProps<string>["metricDirection"];
 }
 
 /**
@@ -80,12 +80,12 @@ const BarChart = <Name extends string>({
   const categoricalScale = useScaleBand({
     frame: data,
     column: data.getCursor(categorical),
-    range: metricDirection === "horizontal" ? [0, height] : [0, width],
+    range: metricDirection === "horizontal" ? [0, height] : [0, width]
   });
   const metricScale = useScaleLinear({
     frame: data,
     column: data.getCursor(metric),
-    range: metricDirection === "horizontal" ? [0, width] : [height, 0],
+    range: metricDirection === "horizontal" ? [0, width] : [height, 0]
   });
 
   return (
