@@ -13,10 +13,16 @@ import {
   indexToCoordinate,
 } from "./coordinateUtils";
 
-import { DimensionLabels, HeightParam, WidthParam } from "./types";
-
-type Diff<T, U> = T extends U ? never : T;
-type Defined<T> = Diff<T, undefined>;
+import {
+  DimensionLabels,
+  RowProps,
+  ColumnProps,
+  CellPropsWithMeasure,
+  CellPropsWithoutMeasure,
+  MeasuresPlacement,
+  WidthAccessor,
+  HeightAccessor,
+} from "./types";
 
 // Optimisation for hooks, because {} !== {}
 const emptyObject = Object.freeze({});
@@ -71,12 +77,12 @@ const defaultDimensionStyle: React.CSSProperties = {
  * We support text only pivot grid out of the box,
  * for this case you don't need to provide cell render prop, but you need to provide measures
  */
-interface TextOnlyPivotGridProps<Name extends string> {
+type TextOnlyPivotGridProps<Name extends string> = {
   type?: "text";
   measures: Name[];
   /** default value is "column" */
-  measuresPlacement?: "row" | "column";
-}
+  measuresPlacement?: MeasuresPlacement;
+};
 
 /**
  * This is props for general PivotGrid, you need to provide cell render prop.
@@ -85,58 +91,33 @@ interface TextOnlyPivotGridProps<Name extends string> {
 type GeneralPivotGridProps<Name extends string> =
   | {
       type: "general";
-      cell: (prop: {
-        data: PivotFrame<Name>;
-        width: number;
-        height: number;
-        row: number;
-        column: number;
-      }) => React.ReactElement | null;
+      cell: (prop: CellPropsWithoutMeasure<Name>) => React.ReactElement | null;
     }
   | {
       type: "generalWithMeasures";
       measures: Name[];
       /** default value is "column" */
-      measuresPlacement?: "row" | "column";
-      cell: (prop: {
-        data: PivotFrame<Name>;
-        width: number;
-        height: number;
-        row: number;
-        column: number;
-        measure: Name;
-      }) => React.ReactElement | null;
+      measuresPlacement?: MeasuresPlacement;
+      cell: (prop: CellPropsWithMeasure<Name>) => React.ReactElement | null;
     };
 
-interface Accessors<Name extends string> {
-  width?: (p: WidthParam<Name> & { data: PivotFrame<Name> }) => number;
-  height?: (p: HeightParam<Name> & { data: PivotFrame<Name> }) => number;
-}
+type Accessors<Name extends string> = {
+  width?: WidthAccessor<Name>;
+  height?: HeightAccessor<Name>;
+};
 
-interface Axes<Name extends string> {
-  row?: (prop: {
-    data: PivotFrame<Name>;
-    width: number;
-    height: number;
-    row: number;
-    measure?: string;
-  }) => React.ReactElement | null;
-  column?: (prop: {
-    data: PivotFrame<Name>;
-    width: number;
-    height: number;
-    column: number;
-    measure?: string;
-  }) => React.ReactElement | null;
-}
+type Axes<Name extends string> = {
+  row?: (prop: RowProps<Name>) => React.ReactElement | null;
+  column?: (prop: ColumnProps<Name>) => React.ReactElement | null;
+};
 
-interface PivotGridStyle {
+type PivotGridStyle = {
   cell?: React.CSSProperties;
   header?: React.CSSProperties;
   dimension?: React.CSSProperties;
   border?: string;
   background?: string;
-}
+};
 
 type Props<Name extends string = string> = (TextOnlyPivotGridProps<Name> | GeneralPivotGridProps<Name>) & {
   width: number;
@@ -166,8 +147,8 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
   const header = props.header || defaultHeader;
   const axes = props.axes || (emptyObject as Axes<Name>);
   const accessors = props.accessors || (emptyObject as Accessors<Name>);
-  const heightAccessors = accessors.height || (defaultHeight as Defined<Accessors<Name>["height"]>);
-  const widthAccessors = accessors.width || (defaultWidth as Defined<Accessors<Name>["width"]>);
+  const heightAccessors = accessors.height || (defaultHeight as HeightAccessor<Name>);
+  const widthAccessors = accessors.width || (defaultWidth as WidthAccessor<Name>);
   const dimensionLabels = useMemo(
     () => (dimensionLabelsShortcut(props.dimensionLabels) || { row: "none", column: "none" }) as DimensionLabels,
     [props.dimensionLabels],

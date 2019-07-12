@@ -371,16 +371,16 @@ storiesOf("@operational/grid/1. Pivot table", module)
             data={pivotedFrame}
             accessors={{
               height: param => {
-                if ("row" in param) {
+                if (param.type === "Cell") {
                   // number of bars in bar chart - one bar per unique city
                   const numberOfBars = uniqueValues(param.data.row(param.row), cityCursor).length;
                   // height of the cell is numberOfBars times barWidth plus padding
                   return numberOfBars * barWidth + padding * 2;
+                } else {
+                  return 35;
                 }
-                return "columnIndex" in param || ("measure" in param && param.measure === true) ? 35 : chartHeight;
               },
-              width: param =>
-                "rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : chartWidth,
+              width: param => (param.type === "Cell" ? chartWidth : 120),
             }}
             cell={({ data, row, column, width, height, measure }) => {
               const widthWithoutPadding = width - 2 * padding;
