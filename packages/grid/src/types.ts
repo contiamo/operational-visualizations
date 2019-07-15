@@ -175,22 +175,22 @@ export type DimensionLabels =
   | { row: "top" | "left"; column: "none" }
   | { row: "none"; column: "top" | "left" };
 
-export type CellPropsWithoutMeasure<Name extends string = string> = {
+export interface CellPropsWithoutMeasure<Name extends string = string> {
   data: PivotFrame<Name>;
   width: number;
   height: number;
   row: number;
   column: number;
-};
+}
 
-export type CellPropsWithMeasure<Name extends string = string> = {
+export interface CellPropsWithMeasure<Name extends string = string> {
   data: PivotFrame<Name>;
   width: number;
   height: number;
   row: number;
   column: number;
   measure: Name;
-};
+}
 
 export type CellProps<Name extends string = string> = CellPropsWithoutMeasure<Name> | CellPropsWithMeasure<Name>;
 
@@ -200,18 +200,18 @@ export type WidthAccessor<Name extends string = string> = (p: WidthProps<Name>) 
 export type HeightProps<Name extends string = string> = HeightParam<Name> & { data: PivotFrame<Name> };
 export type HeightAccessor<Name extends string = string> = (p: HeightProps<Name>) => number;
 
-export type RowProps<Name extends string = string> = {
+export interface RowProps<Name extends string = string> {
   data: PivotFrame<Name>;
   width: number;
   height: number;
   row: number;
   measure?: Name;
-};
+}
 
-export type ColumnProps<Name extends string = string> = {
+export interface ColumnProps<Name extends string = string> {
   data: PivotFrame<Name>;
   width: number;
   height: number;
   column: number;
   measure?: Name;
-};
+}

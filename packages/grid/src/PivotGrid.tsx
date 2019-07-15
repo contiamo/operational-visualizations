@@ -77,12 +77,12 @@ const defaultDimensionStyle: React.CSSProperties = {
  * We support text only pivot grid out of the box,
  * for this case you don't need to provide cell render prop, but you need to provide measures
  */
-type TextOnlyPivotGridProps<Name extends string> = {
+interface TextOnlyPivotGridProps<Name extends string> {
   type?: "text";
   measures: Name[];
   /** default value is "column" */
   measuresPlacement?: MeasuresPlacement;
-};
+}
 
 /**
  * This is props for general PivotGrid, you need to provide cell render prop.
@@ -101,23 +101,23 @@ type GeneralPivotGridProps<Name extends string> =
       cell: (prop: CellPropsWithMeasure<Name>) => React.ReactElement | null;
     };
 
-type Accessors<Name extends string> = {
+interface Accessors<Name extends string> {
   width?: WidthAccessor<Name>;
   height?: HeightAccessor<Name>;
-};
+}
 
-type Axes<Name extends string> = {
+interface Axes<Name extends string> {
   row?: (prop: RowProps<Name>) => React.ReactElement | null;
   column?: (prop: ColumnProps<Name>) => React.ReactElement | null;
-};
+}
 
-type PivotGridStyle = {
+interface PivotGridStyle {
   cell?: React.CSSProperties;
   header?: React.CSSProperties;
   dimension?: React.CSSProperties;
   border?: string;
   background?: string;
-};
+}
 
 type Props<Name extends string = string> = (TextOnlyPivotGridProps<Name> | GeneralPivotGridProps<Name>) & {
   width: number;
