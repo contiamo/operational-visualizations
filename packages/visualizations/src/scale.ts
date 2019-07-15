@@ -9,6 +9,10 @@ export interface ScaleProps<Name extends string> {
   padding?: number;
 }
 
+type LinearScaleProps<Name extends string> = ScaleProps<Name> & {
+  categorical?: ColumnCursor<Name>;
+};
+
 /**
  * Takes `frame`, `column` (values in the column supposed to be strings) and `size` of container and
  * returns ScaleBand
@@ -23,14 +27,14 @@ export const getScaleBand = <Name extends string>({ frame, column, range, paddin
  * Takes `frame`, `column` (values in the column supposed to be numbers) and `size` of container and
  * returns ScaleLinear
  */
-export const getScaleLinear = <Name extends string>({ frame, column, range }: ScaleProps<Name>) =>
+export const getScaleLinear = <Name extends string>({ frame, column, range, categorical }: LinearScaleProps<Name>) =>
   scaleLinear()
-    .domain([0, maxValue(frame, column)])
+    .domain([0, maxValue(frame, column, categorical)])
     .range(range);
 
 // Hook versions for convenience
 export const useScaleBand = <Name extends string>({ frame, column, range, padding }: ScaleProps<Name>) =>
   useMemo(() => getScaleBand({ frame, column, range, padding }), [frame, column, range, padding]);
 
-export const useScaleLinear = <Name extends string>({ frame, column, range }: ScaleProps<Name>) =>
-  useMemo(() => getScaleLinear({ frame, column, range }), [frame, column, range]);
+export const useScaleLinear = <Name extends string>({ frame, column, range, categorical }: LinearScaleProps<Name>) =>
+  useMemo(() => getScaleLinear({ frame, column, range, categorical }), [frame, column, range, categorical]);

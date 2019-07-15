@@ -83,14 +83,17 @@ const BarChart = <Name extends string>({
   metric,
   metricDirection,
 }: BarChartProps<Name>) => {
+  const categoricalCursor = data.getCursor(categorical);
+  const metricCursor = data.getCursor(metric);
   const categoricalScale = useScaleBand({
     frame: data,
-    column: data.getCursor(categorical),
+    column: categoricalCursor,
     range: metricDirection === "horizontal" ? [0, height] : [0, width],
   });
   const metricScale = useScaleLinear({
     frame: data,
-    column: data.getCursor(metric),
+    column: metricCursor,
+    categorical: categoricalCursor,
     range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
   const colorCursor = data.getCursor("Customer.Country" as Name);
@@ -100,8 +103,8 @@ const BarChart = <Name extends string>({
       <Bars
         metricDirection={metricDirection}
         data={data}
-        categorical={data.getCursor(categorical)}
-        metric={data.getCursor(metric)}
+        categorical={categoricalCursor}
+        metric={metricCursor}
         categoricalScale={categoricalScale}
         metricScale={metricScale}
         style={row => ({ fill: colors[colorCursor(row) as "Germany" | "UK" | "USA" | "Canada"] })}
@@ -136,6 +139,36 @@ storiesOf("@operational/visualizations/1. Bar chart", module)
       <BarChart
         metric="sales"
         categorical="Customer.City"
+        width={300}
+        height={300}
+        margin={magicMargin}
+        data={frame}
+        metricDirection="vertical"
+      />
+    );
+  })
+  .add("stacked horizontal", () => {
+    // number of pixels picked manually to make sure that YAxis fits on the screen
+    const magicMargin = 60;
+    return (
+      <BarChart
+        metric="sales"
+        categorical="Customer.Country"
+        width={300}
+        height={300}
+        margin={magicMargin}
+        data={frame}
+        metricDirection="horizontal"
+      />
+    );
+  })
+  .add("stacked vertical", () => {
+    // number of pixels picked manually to make sure that YAxis fits on the screen
+    const magicMargin = 60;
+    return (
+      <BarChart
+        metric="sales"
+        categorical="Customer.Country"
         width={300}
         height={300}
         margin={magicMargin}

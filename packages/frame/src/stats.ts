@@ -21,7 +21,11 @@ const getStatsCacheItem = <Name extends string>(
   return cacheEntry[column.index];
 };
 
-export const maxValue = <Name extends string>(frame: IterableFrame<Name>, column: ColumnCursor<Name>): number => {
+export const maxValue = <Name extends string>(
+  frame: IterableFrame<Name>,
+  column: ColumnCursor<Name>,
+  categorical?: ColumnCursor<Name>
+) => {
   const cacheItem = getStatsCacheItem(frame, column);
   if (cacheItem.max === undefined) {
     // https://github.com/contiamo/operational-visualizations/issues/72
@@ -34,9 +38,23 @@ export const maxValue = <Name extends string>(frame: IterableFrame<Name>, column
     //   throw new Error("Can't get max value of empty Frame")
     // }
     let max: number | undefined = undefined;
-    frame.mapRows(row => {
-      max = max === undefined ? row[column.index] : Math.max(max, row[column.index]);
-    });
+    if (categorical) {
+      const ticks = uniqueValues(frame, categorical);
+      ticks.forEach(tick => {
+        let total = 0;
+        frame.mapRows(row => {
+          if (categorical(row) === tick) {
+            total += column(row);
+          }
+          return total;
+        });
+        max = max === undefined ? total : Math.max(max, total);
+      });
+    } else {
+      frame.mapRows(row => {
+        max = max === undefined ? column(row) : Math.max(max, column(row));
+      });
+    }
     cacheItem.max = max!;
   }
   return cacheItem.max!;
