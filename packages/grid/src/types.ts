@@ -1,3 +1,9 @@
+import { PivotFrame } from "@operational/frame";
+
+// we can add "both" in the future https://github.com/contiamo/operational-visualizations/issues/73
+// undefined means "none"
+export type MeasuresPlacement = "row" | "column";
+
 // tslint:disable
 /**
  * ```
@@ -24,18 +30,20 @@ export type WidthParam<Name extends string = string> =
   | {
       // width of an empty cell or a row header
       // this can be row (dimension) name as well
+      type: "RowHeader";
       rowIndex: number;
     }
   | {
       // width of a measure column
-      measure: true;
+      type: "RowMeasure";
     }
   | {
       // width of an axis column
-      axis: true;
+      type: "RowAxis";
     }
   | {
       // width of a column header or a data cell
+      type: "Cell";
       column: number;
       measure?: Name;
     };
@@ -63,18 +71,20 @@ export type HeightParam<Name extends string = string> =
   | {
       // height of an empty cell or a column header
       // this can be column (dimension) name as well
+      type: "ColumnHeader";
       columnIndex: number;
     }
   | {
       // height of a measure column
-      measure: true;
+      type: "ColumnMeasure";
     }
   | {
       // height of an axis column
-      axis: true;
+      type: "ColumnAxis";
     }
   | {
       // height of a row header or a data cell
+      type: "Cell";
       row: number;
       measure?: Name;
     };
@@ -109,6 +119,8 @@ RowHeader -+--------+ |
                       |
 RowAxis --------------+
 ```
+
+TODO: rethink CellCoordinates. Maybe we can remove it in favour of WidthParam & HeightParam
   */
 export type CellCoordinates<Name extends string = string> =
   // tslint:enable
@@ -116,7 +128,7 @@ export type CellCoordinates<Name extends string = string> =
       type: "Empty";
       columnIndex?: number;
       rowIndex?: number;
-      measure?: "row" | "column";
+      measure?: MeasuresPlacement;
       axis?: boolean;
       dimensionLabel?: Name | ""; // empty string is for empty cell
     }
@@ -162,3 +174,44 @@ export type DimensionLabels =
   | { row: "left"; column: "top" }
   | { row: "top" | "left"; column: "none" }
   | { row: "none"; column: "top" | "left" };
+
+export interface CellPropsWithoutMeasure<Name extends string = string> {
+  data: PivotFrame<Name>;
+  width: number;
+  height: number;
+  row: number;
+  column: number;
+}
+
+export interface CellPropsWithMeasure<Name extends string = string> {
+  data: PivotFrame<Name>;
+  width: number;
+  height: number;
+  row: number;
+  column: number;
+  measure: Name;
+}
+
+export type CellProps<Name extends string = string> = CellPropsWithoutMeasure<Name> | CellPropsWithMeasure<Name>;
+
+export type WidthProps<Name extends string = string> = WidthParam<Name> & { data: PivotFrame<Name> };
+export type WidthAccessor<Name extends string = string> = (p: WidthProps<Name>) => number;
+
+export type HeightProps<Name extends string = string> = HeightParam<Name> & { data: PivotFrame<Name> };
+export type HeightAccessor<Name extends string = string> = (p: HeightProps<Name>) => number;
+
+export interface RowProps<Name extends string = string> {
+  data: PivotFrame<Name>;
+  width: number;
+  height: number;
+  row: number;
+  measure?: Name;
+}
+
+export interface ColumnProps<Name extends string = string> {
+  data: PivotFrame<Name>;
+  width: number;
+  height: number;
+  column: number;
+  measure?: Name;
+}

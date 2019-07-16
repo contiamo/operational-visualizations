@@ -1,5 +1,5 @@
-import { DataFrame, uniqueValues, IteratableFrame } from "@operational/frame";
-import { PivotGrid } from "@operational/grid";
+import { DataFrame, uniqueValues } from "@operational/frame";
+import { PivotGrid, RowProps, CellPropsWithMeasure } from "@operational/grid";
 import { Axis, Bars, useScaleBand, useScaleLinear } from "@operational/visualizations";
 import { storiesOf } from "@storybook/react";
 import * as React from "react";
@@ -216,7 +216,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
-            cell={({ measure }: { measure: string | undefined }) => <>${measure}</>}
+            cell={({ measure }: CellPropsWithMeasure) => <>${measure}</>}
           />
         )}
       </AutoSizer>
@@ -241,7 +241,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
-            cell={({ measure }: { measure: string | undefined }) => <>{measure}</>}
+            cell={({ measure }: CellPropsWithMeasure) => <>{measure}</>}
           />
         )}
       </AutoSizer>
@@ -312,7 +312,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
-            cell={({ measure }: { measure: string }) => <>Data for: {measure}</>}
+            cell={({ measure }: CellPropsWithMeasure) => <>Data for: {measure}</>}
           />
         )}
       </AutoSizer>
@@ -333,10 +333,10 @@ storiesOf("@operational/grid/1. Pivot table", module)
       columns: ["Customer.AgeGroup", "Customer.Gender"],
     });
 
-    const Row: React.FC<{ row: number; width: number; height: number }> = ({ row, width, height }) => {
+    const Row: React.FC<RowProps> = ({ row, width, height, data }) => {
       const heightWithoutPadding = height - 2 * padding;
       const yScale = useScaleBand({
-        frame: pivotedFrame.row(row) as IteratableFrame<string>,
+        frame: data.row(row),
         column: cityCursor,
         range: [0, height],
       });
@@ -365,27 +365,27 @@ storiesOf("@operational/grid/1. Pivot table", module)
             data={pivotedFrame}
             accessors={{
               height: param => {
-                if ("row" in param) {
+                if (param.type === "Cell") {
                   // number of bars in bar chart - one bar per unique city
-                  const numberOfBars = uniqueValues(pivotedFrame.row(param.row), cityCursor).length;
+                  const numberOfBars = uniqueValues(param.data.row(param.row), cityCursor).length;
                   // height of the cell is numberOfBars times barWidth plus padding
                   return numberOfBars * barWidth + padding * 2;
+                } else {
+                  return 35;
                 }
-                return "columnIndex" in param || ("measure" in param && param.measure === true) ? 35 : chartHeight;
               },
-              width: param =>
-                "rowIndex" in param || ("measure" in param && param.measure === true) ? 120 : chartWidth,
+              width: param => (param.type === "Cell" ? chartWidth : 120),
             }}
-            cell={({ data, row, width, height, measure }) => {
+            cell={({ data, row, column, width, height, measure }) => {
               const widthWithoutPadding = width - 2 * padding;
               const heightWithoutPadding = height - 2 * padding;
               const yScale = useScaleBand({
-                frame: pivotedFrame.row(row) as IteratableFrame<string>,
+                frame: data.row(row),
                 column: cityCursor,
                 range: [0, heightWithoutPadding],
               });
               const xScale = useScaleLinear({
-                frame: frame as IteratableFrame<string>,
+                frame: data.unpivot(),
                 range: [0, widthWithoutPadding],
                 column: salesCursor,
               });
@@ -397,7 +397,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
                   style={{ margin: padding }}
                 >
                   <Bars
-                    data={data as IteratableFrame<string>}
+                    data={data.cell(row, column)}
                     metricScale={xScale}
                     categoricalScale={yScale}
                     metric={frame.getCursor(measure)}

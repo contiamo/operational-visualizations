@@ -1,11 +1,11 @@
 import { PivotFrame } from "@operational/frame";
-import { CellCoordinates, DimensionLabels, HeightParam, WidthParam } from "./types";
+import { CellCoordinates, DimensionLabels, HeightParam, WidthParam, MeasuresPlacement } from "./types";
 
 export const exhaustiveCheck = (_: never) => undefined;
 
 export type IndexToCoordinate = <Name extends string = string>(prop: {
   rowHeadersCount: number;
-  measuresPlacement: "row" | "column";
+  measuresPlacement: MeasuresPlacement;
   columnHeadersCount: number;
   measuresCount: number;
   data: PivotFrame<Name>;
@@ -296,14 +296,15 @@ export const coordinateToWidthParam = <Name extends string = string>(prop: CellC
     case "Empty":
       if (prop.measure && prop.rowIndex === undefined) {
         return {
-          measure: true,
+          type: "RowMeasure",
         };
       } else if (prop.axis && prop.rowIndex === undefined) {
         return {
-          axis: true,
+          type: "RowAxis",
         };
       } else {
         return {
+          type: "RowHeader",
           rowIndex: prop.rowIndex!,
         };
       }
@@ -311,21 +312,23 @@ export const coordinateToWidthParam = <Name extends string = string>(prop: CellC
     case "ColumnAxis":
     case "ColumnHeader":
       return {
+        type: "Cell",
         column: prop.column,
         measure: prop.measure,
       };
     case "RowAxis":
       return {
-        axis: true,
+        type: "RowAxis",
       };
     case "RowHeader":
       if (prop.rowIndex !== undefined) {
         return {
+          type: "RowHeader",
           rowIndex: prop.rowIndex,
         };
       } else {
         return {
-          measure: true,
+          type: "RowMeasure",
         };
       }
     default:
@@ -341,14 +344,15 @@ export const coordinateToHeightParam = <Name extends string = string>(
     case "Empty":
       if (prop.measure && prop.columnIndex === undefined) {
         return {
-          measure: true,
+          type: "ColumnMeasure",
         };
       } else if (prop.axis && prop.columnIndex === undefined) {
         return {
-          axis: true,
+          type: "ColumnAxis",
         };
       } else {
         return {
+          type: "ColumnHeader",
           columnIndex: prop.columnIndex!,
         };
       }
@@ -356,21 +360,23 @@ export const coordinateToHeightParam = <Name extends string = string>(
     case "RowAxis":
     case "RowHeader":
       return {
+        type: "Cell",
         row: prop.row,
         measure: prop.measure,
       };
     case "ColumnAxis":
       return {
-        axis: true,
+        type: "ColumnAxis",
       };
     case "ColumnHeader":
       if (prop.columnIndex !== undefined) {
         return {
+          type: "ColumnHeader",
           columnIndex: prop.columnIndex,
         };
       } else {
         return {
-          measure: true,
+          type: "ColumnMeasure",
         };
       }
     default:
@@ -398,7 +404,7 @@ export const getRowHeadersCount = <Name extends string = string>({
   };
   data: PivotFrame<Name>;
   dimensionLabels: DimensionLabels;
-  measuresPlacement: "row" | "column";
+  measuresPlacement: MeasuresPlacement;
   measuresCount: number;
 }) => {
   const rowsDepth = data.getPivotRows().length;
@@ -440,7 +446,7 @@ export const getColumnHeadersCount = <Name extends string = string>({
   };
   data: PivotFrame<Name>;
   dimensionLabels: DimensionLabels;
-  measuresPlacement: "row" | "column";
+  measuresPlacement: MeasuresPlacement;
   measuresCount: number;
 }) => {
   const columnDepth = data.getPivotColumns().length;
@@ -469,7 +475,7 @@ export const getColumnCount = <Name extends string = string>({
   measuresCount,
 }: {
   data: PivotFrame<Name>;
-  measuresPlacement: "row" | "column";
+  measuresPlacement: MeasuresPlacement;
   measuresCount: number;
   rowHeadersCount: number;
 }) => {
@@ -491,7 +497,7 @@ export const getRowCount = <Name extends string = string>({
   measuresCount,
 }: {
   data: PivotFrame<Name>;
-  measuresPlacement: "row" | "column";
+  measuresPlacement: MeasuresPlacement;
   measuresCount: number;
   columnHeadersCount: number;
 }) => {
