@@ -1,4 +1,5 @@
-import { IterableFrame, ColumnCursor } from "./types";
+import { IterableFrame, ColumnCursor, RawRow } from "./types";
+import { stackRowBy } from "./utils";
 
 interface StatsCacheItem {
   max?: number;
@@ -38,23 +39,14 @@ export const maxValue = <Name extends string>(
     //   throw new Error("Can't get max value of empty Frame")
     // }
     let max: number | undefined = undefined;
-    if (categorical) {
-      const ticks = uniqueValues(frame, categorical);
-      ticks.forEach(tick => {
-        let total = 0;
-        frame.mapRows(row => {
-          if (categorical(row) === tick) {
-            total += column(row);
-          }
-          return total;
-        });
-        max = max === undefined ? total : Math.max(max, total);
-      });
-    } else {
-      frame.mapRows(row => {
-        max = max === undefined ? column(row) : Math.max(max, column(row));
-      });
-    }
+    const value = categorical
+      ? (row: RawRow) => stackRowBy(categorical, column)(row) + column(row)
+      : column;
+
+    frame.mapRows(row => {
+      max = max === undefined ? value(row) : Math.max(max, value(row))
+    })
+
     cacheItem.max = max!;
   }
   return cacheItem.max!;
