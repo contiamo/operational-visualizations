@@ -2,7 +2,6 @@ import { IterableFrame, ColumnCursor, RawRow } from "./types";
 import { stackRowBy } from "./utils";
 
 interface StatsCacheItem {
-  max?: number;
   unique?: string[];
 }
 
@@ -27,29 +26,28 @@ export const maxValue = <Name extends string>(
   column: ColumnCursor<Name>,
   categorical?: ColumnCursor<Name>
 ) => {
-  const cacheItem = getStatsCacheItem(frame, column);
-  if (cacheItem.max === undefined) {
-    // https://github.com/contiamo/operational-visualizations/issues/72
-    // if (process.env.NODE_ENV === "development") {
-    //   if (frame.schema[column.index].type !== "number") {
-    //     console.warn(`Trying to get max value of none-numeric column ${column.name}`);
-    //   }
-    // }
-    // if (frame.length() === 0) {
-    //   throw new Error("Can't get max value of empty Frame")
-    // }
-    let max: number | undefined = undefined;
-    const value = categorical
-      ? (row: RawRow) => stackRowBy(categorical, column)(row) + column(row)
-      : column;
-
-    frame.mapRows(row => {
-      max = max === undefined ? value(row) : Math.max(max, value(row))
-    })
-
-    cacheItem.max = max!;
+  // https://github.com/contiamo/operational-visualizations/issues/72
+  // if (process.env.NODE_ENV === "development") {
+  //   if (frame.schema[column.index].type !== "number") {
+  //     console.warn(`Trying to get max value of none-numeric column ${column.name}`);
+  //   }
+  // }
+  // if (frame.length() === 0) {
+  //   throw new Error("Can't get max value of empty Frame")
+  // }
+  let max: number | undefined = undefined;
+  let value: (row: any[]) => number;
+  if (categorical) {
+    const stackRow = stackRowBy(categorical, column);
+    value = (row: RawRow) => stackRow(row) + column(row);
+  } else {
+    value = column;
   }
-  return cacheItem.max!;
+  frame.mapRows(row => {
+    max = max === undefined ? value(row) : Math.max(max, value(row))
+  })
+
+  return max!
 };
 
 export const uniqueValues = <Name extends string>(
