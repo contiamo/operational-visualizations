@@ -2,6 +2,8 @@
 import { DataFrame } from "./DataFrame";
 import { IteratableFrame, RawRow, ColumnCursor, Matrix, Schema } from "./types";
 import { getData } from "./secret";
+import { isCursor } from "./utils";
+import { uniqueValueCombinations } from "./stats";
 
 const isColumnCursor = <Name extends string>(column: any): column is ColumnCursor<Name> => {
   return column.index !== undefined;
@@ -25,8 +27,24 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
     return this.origin.getCursor(column);
   }
 
-  public groupBy(columns: Array<Name> | Array<ColumnCursor<Name>>) {
-    return this.origin.groupBy(columns)
+  public groupBy(columns: Array<Name | ColumnCursor<Name>>): Array<FragmentFrame<Name>> {
+    // If no columns are provided, returns an array with the current frame as a FragmentFrame as the sole entry.
+    if (columns.length === 0) {
+      return [this];
+    }
+
+    const columnCursors = columns.map(c => isCursor(c) ? c : this.getCursor(c))
+    // Returns a FragmentFrame for every unique combination of column values.
+    return uniqueValueCombinations(this, columnCursors).map(u => {
+      const indices = this.data.reduce((arr, row, i): any => {
+        if (columnCursors.every((cursor, j) => cursor(row) === u[j]) && this.index.includes(i)) {
+          arr.push(i)
+        }
+        return arr
+      }, [])
+
+      return new FragmentFrame<Name>(this.origin, indices)
+    })
   }
 
   public mapRows<A>(callback: (row: RawRow, index: number) => A) {
