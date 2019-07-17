@@ -1,6 +1,8 @@
 import { PivotFrame } from "./PivotFrame";
 import { ColumnCursor, IteratableFrame, Matrix, PivotProps, Schema, RawRow } from "./types";
 import { getData } from "./secret";
+import { isCursor } from "./utils";
+import { uniqueValueCombinations } from "./stats";
 
 export class DataFrame<Name extends string = string> implements IteratableFrame<Name> {
   private readonly data: Matrix<any>;
@@ -37,6 +39,16 @@ export class DataFrame<Name extends string = string> implements IteratableFrame<
       this.cursorCache.set(column, cursor);
     }
     return this.cursorCache.get(column)!;
+  }
+
+  public groupBy(columns: Array<Name | ColumnCursor<Name>>): Array<DataFrame<Name>> {
+    const columnCursors = columns.map(c => isCursor(c) ? c : this.getCursor(c))
+    return uniqueValueCombinations(this, columnCursors).map(u =>
+      new DataFrame<Name>(
+        this.schema,
+        this.data.filter(row => columnCursors.every((cursor, i) => cursor(row) === u[i])),
+      )
+    )
   }
 
   public mapRows<A>(callback: (row: RawRow[], index: number) => A) {

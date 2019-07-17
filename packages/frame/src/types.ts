@@ -1,3 +1,5 @@
+import { DataFrame } from "./DataFrame";
+
 /**
  * Can represent array of arrays or list of tuples or tuple of lists
  */
@@ -16,15 +18,19 @@ export type Schema<Name extends string> = Array<{ name: Name; type?: any }>;
  */
 export type RawRow = any[];
 
-export interface WithCursor<Name extends string> {
+export interface WithColumnMethods<Name extends string> {
   getCursor(column: Name): ColumnCursor<Name>;
+  /** needed for visualizations */
+  groupBy(columns: Array<string | ColumnCursor<string>>): Array<DataFrame<Name>>
 }
 
-export interface IteratableFrame<Name extends string> extends WithCursor<Name> {
+export interface IteratableFrame<Name extends string> extends WithColumnMethods<Name> {
   /** needed for stats module */
   readonly schema: Schema<Name>;
   /** needed for visualisations */
   mapRows<Result>(callback: (row: RawRow, index: number) => Result): Result[];
+  /** needed for visualizations */
+  groupBy(columns: Array<string | ColumnCursor<string>>): Array<DataFrame<Name>>
 }
 
 export interface PivotProps<Column extends string, Row extends string> {

@@ -1,7 +1,7 @@
 // this is not circular dependency, because we use DataFrame as type
 import { DataFrame } from "./DataFrame";
 import { FragmentFrame } from "./FragmentFrame";
-import { PivotProps, WithCursor, Matrix, Schema } from "./types";
+import { PivotProps, WithColumnMethods, Matrix, Schema, ColumnCursor } from "./types";
 import { getData } from "./secret";
 
 const intersect = <T>(...arr: T[][]): T[] => arr.reduce((prev, curr) => prev.filter(x => curr.includes(x)));
@@ -9,7 +9,7 @@ const intersect = <T>(...arr: T[][]): T[] => arr.reduce((prev, curr) => prev.fil
 // theoretically it can be string | bool | number, but TS doesn't allow to use bool as index value
 export type DimensionValue = string;
 
-export class PivotFrame<Name extends string = string> implements WithCursor<Name> {
+export class PivotFrame<Name extends string = string> implements WithColumnMethods<Name> {
   private readonly data: Matrix<any>;
   private readonly schema: Schema<Name>;
   private readonly prop: PivotProps<Name, Name>;
@@ -67,6 +67,10 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
   public columnHeaders() {
     this.buildIndex();
     return this.columnHeadersInternal;
+  }
+
+  public groupBy(columns: Array<Name | ColumnCursor<Name>>) {
+    return this.origin.groupBy(columns)
   }
 
   public row(rowIdentifier: number) {

@@ -56,3 +56,21 @@ export const uniqueValues = <Name extends string>(
   }
   return cacheItem.unique!;
 };
+
+export const uniqueValueCombinations = <Name extends string>(
+  frame: IteratableFrame<Name>,
+  columns: Array<ColumnCursor<Name>>,
+): Array<string[]> => {
+  const columnValues = columns.map(c => uniqueValues(frame, c))
+
+  const combineValues = (i: number, values: string[]): Array<string[]> => {
+    return i === columns.length - 1
+      ? columnValues[i].map(val => [...values, val])
+      : columnValues[i].reduce((arr: Array<string[]>, val) => {
+          return [...arr, ...combineValues(i + 1, [...values, val])]
+        }, [])
+  }
+
+  return combineValues(0, [])
+}
+
