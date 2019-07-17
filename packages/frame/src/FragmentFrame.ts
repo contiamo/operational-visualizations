@@ -1,6 +1,6 @@
 // this is not circular dependency, because we use DataFrame as type
 import { DataFrame } from "./DataFrame";
-import { IteratableFrame, WithColumnMethods, RawRow, ColumnCursor, Matrix, Schema } from "./types";
+import { IteratableFrame, RawRow, ColumnCursor, Matrix, Schema } from "./types";
 import { getData } from "./secret";
 
 const isColumnCursor = <Name extends string>(column: any): column is ColumnCursor<Name> => {
@@ -11,7 +11,7 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
   private readonly data: Matrix<any>;
   public readonly schema: Schema<Name>;
   private readonly index: number[];
-  private readonly origin: WithColumnMethods<Name>;
+  private readonly origin: DataFrame<Name>;
 
   constructor(origin: DataFrame<Name>, index: number[]) {
     this.origin = origin;
@@ -25,7 +25,7 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
     return this.origin.getCursor(column);
   }
 
-  public groupBy(columns: Array<Name | ColumnCursor<Name>>) {
+  public groupBy(columns: Array<Name> | Array<ColumnCursor<Name>>) {
     return this.origin.groupBy(columns)
   }
 
