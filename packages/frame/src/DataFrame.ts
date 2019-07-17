@@ -43,7 +43,13 @@ export class DataFrame<Name extends string = string> implements IteratableFrame<
   }
 
   public groupBy(columns: Array<Name | ColumnCursor<Name>>): Array<FragmentFrame<Name>> {
+    // If no columns are provided, returns an array with the current frame as a FragmentFrame as the sole entry.
+    if (columns.length === 0) {
+      return [new FragmentFrame<Name>(this, this.data.map((_, i) => i))];
+    }
+
     const columnCursors = columns.map(c => isCursor(c) ? c : this.getCursor(c))
+    // Returns a FragmentFrame for every unique combination of column values.
     return uniqueValueCombinations(this, columnCursors).map(u => {
       const indices = this.data.reduce((arr, row, i): any => {
         if (columnCursors.every((cursor, j) => cursor(row) === u[j])) {
@@ -53,7 +59,7 @@ export class DataFrame<Name extends string = string> implements IteratableFrame<
       }, [])
 
       return new FragmentFrame<Name>(this, indices)
-      })
+    })
   }
 
   public mapRows<A>(callback: (row: RawRow[], index: number) => A) {
