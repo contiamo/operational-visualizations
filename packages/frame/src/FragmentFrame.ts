@@ -1,6 +1,6 @@
 // this is not circular dependency, because we use DataFrame as type
 import { DataFrame } from "./DataFrame";
-import { IteratableFrame, RawRow, ColumnCursor, Matrix, Schema } from "./types";
+import { IterableFrame, RawRow, ColumnCursor, Matrix, Schema } from "./types";
 import { getData } from "./secret";
 import { isCursor } from "./utils";
 import { uniqueValueCombinations } from "./stats";
@@ -9,7 +9,7 @@ const isColumnCursor = <Name extends string>(column: any): column is ColumnCurso
   return column.index !== undefined;
 };
 
-export class FragmentFrame<Name extends string = string> implements IteratableFrame<Name> {
+export class FragmentFrame<Name extends string = string> implements IterableFrame<Name> {
   private readonly data: Matrix<any>;
   public readonly schema: Schema<Name>;
   private readonly index: number[];
@@ -27,7 +27,7 @@ export class FragmentFrame<Name extends string = string> implements IteratableFr
     return this.origin.getCursor(column);
   }
 
-  public groupBy(columns: Array<Name | ColumnCursor<Name>>): Array<IteratableFrame<Name>> {
+  public groupBy(columns: Array<Name | ColumnCursor<Name>>): Array<IterableFrame<Name>> {
     // If no columns are provided, returns an array with the current frame as a FragmentFrame as the sole entry.
     if (columns.length === 0) {
       return [this];

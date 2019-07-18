@@ -20,13 +20,13 @@ export interface WithCursor<Name extends string> {
   getCursor(column: Name): ColumnCursor<Name>;
 }
 
-export interface IteratableFrame<Name extends string> extends WithCursor<Name> {
+export interface IterableFrame<Name extends string> extends WithCursor<Name> {
   /** needed for stats module */
   readonly schema: Schema<Name>;
   /** needed for visualisations */
   mapRows<Result>(callback: (row: RawRow, index: number) => Result): Result[];
   /** needed for visualizations */
-  groupBy(columns: Array<string | ColumnCursor<string>>): Array<IteratableFrame<Name>>
+  groupBy(columns: Array<string | ColumnCursor<string>>): Array<IterableFrame<Name>>
 }
 
 export interface PivotProps<Column extends string, Row extends string> {
@@ -35,7 +35,7 @@ export interface PivotProps<Column extends string, Row extends string> {
 }
 
 /**
- * Cursor is a function which gets row from the IteratableFrame.map
+ * Cursor is a function which gets row from the IterableFrame.map
  * and returns value from the corresponding column in the given row.
  *
  * As well it contains `column` name and index, so you can do `row[accessor.index]`,
