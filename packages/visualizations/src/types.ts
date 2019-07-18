@@ -1,4 +1,4 @@
-import { ColumnCursor, IteratableFrame } from "@operational/frame";
+import { ColumnCursor, IteratableFrame, RawRow } from "@operational/frame";
 import { ScaleBand, ScaleLinear } from "d3-scale";
 
 export interface BaseAxialChartProps<Name extends string> {
@@ -12,7 +12,7 @@ export interface BaseAxialChartProps<Name extends string> {
 }
 
 export type DiscreteAxialChartProps<Name extends string> = BaseAxialChartProps<Name> & {
-  style?: React.SVGAttributes<SVGGElement>["style"] | ((d: any[], i?: number) => React.SVGAttributes<SVGGElement>["style"]);
+  style?: React.SVGAttributes<SVGGElement>["style"] | ((row: RawRow, i: number) => React.SVGAttributes<SVGGElement>["style"]);
 }
 
 export type LinearAxialChartProps<Name extends string> = BaseAxialChartProps<Name> & {
