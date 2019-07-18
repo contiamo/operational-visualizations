@@ -42,10 +42,10 @@ export class DataFrame<Name extends string = string> implements IteratableFrame<
     return this.cursorCache.get(column)!;
   }
 
-  public groupBy(columns: Array<Name | ColumnCursor<Name>>): Array<FragmentFrame<Name>> {
-    // If no columns are provided, returns an array with the current frame as a FragmentFrame as the sole entry.
+  public groupBy(columns: Array<Name | ColumnCursor<Name>>): Array<IteratableFrame<Name>> {
+    // If no columns are provided, returns an array with the current frame as the sole entry.
     if (columns.length === 0) {
-      return [new FragmentFrame<Name>(this, this.data.map((_, i) => i))];
+      return [this];
     }
 
     const columnCursors = columns.map(c => isCursor(c) ? c : this.getCursor(c))
