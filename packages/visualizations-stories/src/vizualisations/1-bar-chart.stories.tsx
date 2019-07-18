@@ -64,6 +64,12 @@ interface BarChartProps<Name extends string> {
   metric: Name;
   metricDirection: AxialChartProps<string>["metricDirection"];
 }
+const colors = {
+  "Germany": "#1499CE",
+  "UK": "#7C246F",
+  "USA": "#EAD63F",
+  "Canada": "#343972",
+};
 
 /**
  * Example of how you can compose more complex charts out of 'atoms'
@@ -87,6 +93,7 @@ const BarChart = <Name extends string>({
     column: data.getCursor(metric),
     range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
+  const colorCursor = data.getCursor("Customer.Country" as Name);
 
   return (
     <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
@@ -97,7 +104,7 @@ const BarChart = <Name extends string>({
         metric={data.getCursor(metric)}
         categoricalScale={categoricalScale}
         metricScale={metricScale}
-        style={{ fill: "#1f78b4" }}
+        style={row => ({ fill: colors[colorCursor(row) as "Germany" | "UK" | "USA" | "Canada"] })}
       />
       <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
       <Axis scale={metricScale} position={metricDirection === "horizontal" ? "bottom" : "left"} />

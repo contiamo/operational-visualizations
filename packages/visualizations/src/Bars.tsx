@@ -1,9 +1,9 @@
 import React from "react";
 import { useChartTransform } from "./Chart";
-import { AxialChart } from "./types";
+import { DiscreteAxialChart } from "./types";
 import { isFunction } from "./utils";
 
-export const Bars: AxialChart<string> = props => {
+export const Bars: DiscreteAxialChart<string> = props => {
   const defaultTransform = useChartTransform();
 
   if (props.metricDirection === "vertical") {
@@ -18,7 +18,7 @@ export const Bars: AxialChart<string> = props => {
             y={metricScale(metric(row))}
             width={categoricalScale.bandwidth()}
             height={height - metricScale(metric(row))}
-            style={isFunction(style) ? style(i) : style}
+            style={isFunction(style) ? style(row, i) : style}
             key={i}
           />
         ))}
@@ -34,7 +34,7 @@ export const Bars: AxialChart<string> = props => {
             x={0}
             height={categoricalScale.bandwidth()}
             width={metricScale(metric(row))}
-            style={isFunction(style) ? style(i) : style}
+            style={isFunction(style) ? style(row, i) : style}
             key={i}
           />
         ))}

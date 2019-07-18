@@ -1,10 +1,9 @@
 import { line } from "d3-shape";
 import React from "react";
 import { useChartTransform } from "./Chart";
-import { AxialChart } from "./types";
-import { isFunction } from "./utils";
+import { LinearAxialChart } from "./types";
 
-export const Line: AxialChart<string> = React.memo(props => {
+export const Line: LinearAxialChart<string> = React.memo(props => {
   const defaultTransform = useChartTransform();
 
   const { metricDirection, data, transform, metric, categorical, metricScale, categoricalScale, style } = props;
@@ -15,10 +14,9 @@ export const Line: AxialChart<string> = React.memo(props => {
   const pathData = data.mapRows(row => {
     const categoricalValue = categoricalTickWidth / 2 + (categoricalScale(categorical(row)) as number);
     const metricValue = metricScale(metric(row));
-    return (metricDirection === "vertical" ? [categoricalValue, metricValue] : [metricValue, categoricalValue]) as [
-      number,
-      number
-    ];
+    return (metricDirection === "vertical"
+      ? [categoricalValue, metricValue]
+      : [metricValue, categoricalValue]) as [number, number];
   });
 
   const path =
@@ -32,7 +30,7 @@ export const Line: AxialChart<string> = React.memo(props => {
         d={path}
         style={{
           fill: "none",
-          ...(isFunction(style) ? style(0) : style),
+          ...style
         }}
       />
     </g>
