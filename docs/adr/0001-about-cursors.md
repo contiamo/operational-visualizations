@@ -8,7 +8,7 @@ Date: 2019-07-08
 
 ## Context
 
-In the grid in cell function we recieve `FragmentFrame` which is vertical slice of original `DataFrame` and then when we render visualaisation we iterate through raw data with `mapRows` method of `IteratableFrame` and then we need to access some exact value in raw row. One of the ideas on how to do this universally was to use some kind of **cursor**.
+In the grid in cell function we recieve `FragmentFrame` which is vertical slice of original `DataFrame` and then when we render visualaisation we iterate through raw data with `mapRows` method of `IterableFrame` and then we need to access some exact value in raw row. One of the ideas on how to do this universally was to use some kind of **cursor**.
 
 Current implementation of **cursor** looks like this
 

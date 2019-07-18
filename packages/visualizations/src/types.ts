@@ -1,9 +1,9 @@
-import { ColumnCursor, IteratableFrame, RawRow } from "@operational/frame";
+import { ColumnCursor, IterableFrame, RawRow } from "@operational/frame";
 import { ScaleBand, ScaleLinear } from "d3-scale";
 
 export interface BaseAxialChartProps<Name extends string> {
   metricDirection: "horizontal" | "vertical";
-  data: IteratableFrame<Name>;
+  data: IterableFrame<Name>;
   metric: ColumnCursor<Name>;
   categorical: ColumnCursor<Name>;
   metricScale: ScaleLinear<any, any>;

@@ -1,11 +1,11 @@
 import { PivotFrame } from "./PivotFrame";
-import { ColumnCursor, IteratableFrame, Matrix, PivotProps, Schema, RawRow } from "./types";
+import { ColumnCursor, IterableFrame, Matrix, PivotProps, Schema, RawRow } from "./types";
 import { getData } from "./secret";
 import { isCursor } from "./utils";
 import { uniqueValueCombinations } from "./stats";
 import { FragmentFrame } from "./FragmentFrame";
 
-export class DataFrame<Name extends string = string> implements IteratableFrame<Name> {
+export class DataFrame<Name extends string = string> implements IterableFrame<Name> {
   private readonly data: Matrix<any>;
   public readonly schema: Schema<Name>;
 
@@ -42,7 +42,7 @@ export class DataFrame<Name extends string = string> implements IteratableFrame<
     return this.cursorCache.get(column)!;
   }
 
-  public groupBy(columns: Array<Name | ColumnCursor<Name>>): Array<IteratableFrame<Name>> {
+  public groupBy(columns: Array<Name | ColumnCursor<Name>>): Array<IterableFrame<Name>> {
     // If no columns are provided, returns an array with the current frame as the sole entry.
     if (columns.length === 0) {
       return [this];

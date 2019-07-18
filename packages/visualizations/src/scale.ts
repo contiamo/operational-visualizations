@@ -1,9 +1,9 @@
-import { IteratableFrame, maxValue, uniqueValues, ColumnCursor } from "@operational/frame";
+import { IterableFrame, maxValue, uniqueValues, ColumnCursor } from "@operational/frame";
 import { scaleBand, scaleLinear } from "d3-scale";
 import { useMemo } from "react";
 
 export interface ScaleProps<Name extends string> {
-  frame: IteratableFrame<Name>;
+  frame: IterableFrame<Name>;
   column: ColumnCursor<Name>;
   range: [number, number];
   padding?: number;

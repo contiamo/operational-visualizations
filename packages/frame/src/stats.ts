@@ -1,14 +1,14 @@
-import { IteratableFrame, ColumnCursor } from "./types";
+import { IterableFrame, ColumnCursor } from "./types";
 
 interface StatsCacheItem {
   max?: number;
   unique?: string[];
 }
 
-const statsCache = new WeakMap<IteratableFrame<string>, Record<number, StatsCacheItem>>();
+const statsCache = new WeakMap<IterableFrame<string>, Record<number, StatsCacheItem>>();
 
 const getStatsCacheItem = <Name extends string>(
-  frame: IteratableFrame<Name>,
+  frame: IterableFrame<Name>,
   column: ColumnCursor<Name>,
 ): StatsCacheItem => {
   if (!statsCache.has(frame)) {
@@ -21,7 +21,7 @@ const getStatsCacheItem = <Name extends string>(
   return cacheEntry[column.index];
 };
 
-export const maxValue = <Name extends string>(frame: IteratableFrame<Name>, column: ColumnCursor<Name>): number => {
+export const maxValue = <Name extends string>(frame: IterableFrame<Name>, column: ColumnCursor<Name>): number => {
   const cacheItem = getStatsCacheItem(frame, column);
   if (cacheItem.max === undefined) {
     // https://github.com/contiamo/operational-visualizations/issues/72
@@ -43,7 +43,7 @@ export const maxValue = <Name extends string>(frame: IteratableFrame<Name>, colu
 };
 
 export const uniqueValues = <Name extends string>(
-  frame: IteratableFrame<Name>,
+  frame: IterableFrame<Name>,
   column: ColumnCursor<Name>,
 ): string[] => {
   const cacheItem = getStatsCacheItem(frame, column);
@@ -58,7 +58,7 @@ export const uniqueValues = <Name extends string>(
 };
 
 export const uniqueValueCombinations = <Name extends string>(
-  frame: IteratableFrame<Name>,
+  frame: IterableFrame<Name>,
   columns: Array<ColumnCursor<Name>>,
 ): Array<string[]> => {
   const columnValues = columns.map(c => uniqueValues(frame, c))
