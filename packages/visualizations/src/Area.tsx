@@ -1,10 +1,9 @@
 import { area } from "d3-shape";
 import React from "react";
 import { useChartTransform } from "./Chart";
-import { AxialChart } from "./types";
-import { isFunction } from "./utils";
+import { LinearAxialChart } from "./types";
 
-export const Area: AxialChart<string> = React.memo(props => {
+export const Area: LinearAxialChart<string> = React.memo(props => {
   const defaultTransform = useChartTransform();
 
   const { metricDirection, data, transform, metric, categorical, metricScale, categoricalScale, style } = props;
@@ -30,7 +29,7 @@ export const Area: AxialChart<string> = React.memo(props => {
 
   return (
     <g transform={transform || defaultTransform}>
-      <path d={path} style={isFunction(style) ? style(0) : style} />
+      <path d={path} style={style} />
     </g>
   );
 });

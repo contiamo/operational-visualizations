@@ -1,7 +1,7 @@
 import { ColumnCursor, IteratableFrame } from "@operational/frame";
 import { ScaleBand, ScaleLinear } from "d3-scale";
 
-export interface AxialChartProps<Name extends string> {
+export interface BaseAxialChartProps<Name extends string> {
   metricDirection: "horizontal" | "vertical";
   data: IteratableFrame<Name>;
   metric: ColumnCursor<Name>;
@@ -9,7 +9,20 @@ export interface AxialChartProps<Name extends string> {
   metricScale: ScaleLinear<any, any>;
   categoricalScale: ScaleBand<string>;
   transform?: React.SVGAttributes<SVGRectElement>["transform"];
-  style?: React.SVGAttributes<SVGGElement>["style"] | ((i: number) => React.SVGAttributes<SVGGElement>["style"]);
 }
+
+export type DiscreteAxialChartProps<Name extends string> = BaseAxialChartProps<Name> & {
+  style?: React.SVGAttributes<SVGGElement>["style"] | ((d: any[], i?: number) => React.SVGAttributes<SVGGElement>["style"]);
+}
+
+export type LinearAxialChartProps<Name extends string> = BaseAxialChartProps<Name> & {
+  style?: React.SVGAttributes<SVGGElement>["style"];
+}
+
+export type AxialChartProps<Name extends string> = DiscreteAxialChartProps<Name> | LinearAxialChartProps<Name>
+
+export type DiscreteAxialChart<Name extends string> = (props: DiscreteAxialChartProps<Name>) => React.ReactElement | null;
+
+export type LinearAxialChart<Name extends string> = (props: LinearAxialChartProps<Name>) => React.ReactElement | null;
 
 export type AxialChart<Name extends string> = (props: AxialChartProps<Name>) => React.ReactElement | null;
