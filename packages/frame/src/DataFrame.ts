@@ -1,6 +1,9 @@
 import { PivotFrame } from "./PivotFrame";
 import { ColumnCursor, IteratableFrame, Matrix, PivotProps, Schema, RawRow } from "./types";
 import { getData } from "./secret";
+import { isCursor } from "./utils";
+import { uniqueValueCombinations } from "./stats";
+import { FragmentFrame } from "./FragmentFrame";
 
 export class DataFrame<Name extends string = string> implements IteratableFrame<Name> {
   private readonly data: Matrix<any>;
@@ -37,6 +40,26 @@ export class DataFrame<Name extends string = string> implements IteratableFrame<
       this.cursorCache.set(column, cursor);
     }
     return this.cursorCache.get(column)!;
+  }
+
+  public groupBy(columns: Array<Name | ColumnCursor<Name>>): Array<IteratableFrame<Name>> {
+    // If no columns are provided, returns an array with the current frame as the sole entry.
+    if (columns.length === 0) {
+      return [this];
+    }
+
+    const columnCursors = columns.map(c => isCursor(c) ? c : this.getCursor(c))
+    // Returns a FragmentFrame for every unique combination of column values.
+    return uniqueValueCombinations(this, columnCursors).map(u => {
+      const indices = this.data.reduce((arr, row, i): any => {
+        if (columnCursors.every((cursor, j) => cursor(row) === u[j])) {
+          arr.push(i)
+        }
+        return arr
+      }, [])
+
+      return new FragmentFrame<Name>(this, indices)
+    })
   }
 
   public mapRows<A>(callback: (row: RawRow[], index: number) => A) {

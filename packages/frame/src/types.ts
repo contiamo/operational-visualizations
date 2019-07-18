@@ -25,6 +25,8 @@ export interface IteratableFrame<Name extends string> extends WithCursor<Name> {
   readonly schema: Schema<Name>;
   /** needed for visualisations */
   mapRows<Result>(callback: (row: RawRow, index: number) => Result): Result[];
+  /** needed for visualizations */
+  groupBy(columns: Array<string | ColumnCursor<string>>): Array<IteratableFrame<Name>>
 }
 
 export interface PivotProps<Column extends string, Row extends string> {

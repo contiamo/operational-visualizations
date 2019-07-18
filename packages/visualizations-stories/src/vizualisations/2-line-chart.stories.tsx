@@ -11,7 +11,37 @@ import {
   useScaleLinear,
 } from "@operational/visualizations";
 
-const rawData = {
+const rawDataSingleLine = {
+  columns: [
+    {
+      name: "Customer.Continent" as "Customer.Continent",
+      type: "string",
+    },
+    {
+      name: "Customer.Country" as "Customer.Country",
+      type: "string",
+    },
+    {
+      name: "Customer.City" as "Customer.City",
+      type: "string",
+    },
+    {
+      name: "sales" as "sales",
+      type: "number",
+    },
+  ],
+  rows: [
+    ["Europe", "Germany", "Berlin", 101],
+    ["Europe", "Germany", "Dresden", 201],
+    ["Europe", "Germany", "Hamburg", 301],
+    ["Europe", "UK", "London", 401],
+    ["Europe", "UK", "Edinburgh", 501],
+    ["North America", "USA", "New York", 801],
+    ["North America", "Canada", "Toronto", 801],
+  ],
+}
+
+const rawDataMultipleLines = {
   columns: [
     {
       name: "Customer.Continent" as "Customer.Continent",
@@ -43,17 +73,36 @@ const rawData = {
     },
   ],
   rows: [
-    ["Europe", "Germany", "Berlin", "<50", "Female", 101, 10.2],
-    ["Europe", "Germany", "Dresden", "<50", "Female", 201, 20.2],
-    ["Europe", "Germany", "Hamburg", "<50", "Female", 301, 30.2],
-    ["Europe", "UK", "London", "<50", "Female", 401, 40.2],
-    ["Europe", "UK", "Edinburgh", "<50", "Female", 501, 50.2],
-    ["North America", "USA", "New York", "<50", "Female", 801, 80.2],
-    ["North America", "Canada", "Toronto", "<50", "Female", 801, 80.2],
+    ["Europe", "Germany", "Berlin", "<50", "Female", 181],
+    ["Europe", "Germany", "Berlin", ">=50", "Female", 18],
+    ["Europe", "Germany", "Berlin", "<50", "Male", 101],
+    ["Europe", "Germany", "Berlin", ">=50", "Male", 10],
+    ["Europe", "Germany", "Dresden", "<50", "Female", 281],
+    ["Europe", "Germany", "Dresden", ">=50", "Female", 28],
+    ["Europe", "Germany", "Dresden", "<50", "Male", 201],
+    ["Europe", "Germany", "Dresden", ">=50", "Male", 20],
+    ["Europe", "Germany", "Hamburg", "<50", "Female", 381],
+    ["Europe", "Germany", "Hamburg", ">=50", "Female", 38],
+    ["Europe", "Germany", "Hamburg", "<50", "Male", 301],
+    ["Europe", "Germany", "Hamburg", ">=50", "Male", 30],
+    ["Europe", "UK", "London", "<50", "Female", 481],
+    ["Europe", "UK", "London", ">=50", "Female", 48],
+    ["Europe", "UK", "London", "<50", "Male", 401],
+    ["Europe", "UK", "London", ">=50", "Male", 40],
+    ["Europe", "UK", "Edinburgh", "<50", "Female", 581],
+    ["Europe", "UK", "Edinburgh", ">=50", "Female", 58],
+    ["Europe", "UK", "Edinburgh", "<50", "Male", 501],
+    ["Europe", "UK", "Edinburgh", ">=50", "Male", 50],
+    ["North America", "USA", "New York", "<50", "Female", 881],
+    ["North America", "USA", "New York", ">=50", "Female", 88],
+    ["North America", "USA", "New York", "<50", "Male", 801],
+    ["North America", "USA", "New York", ">=50", "Male", 80],
+    ["North America", "Canada", "Toronto", "<50", "Female", 881],
+    ["North America", "Canada", "Toronto", ">=50", "Female", 88],
+    ["North America", "Canada", "Toronto", "<50", "Male", 801],
+    ["North America", "Canada", "Toronto", ">=50", "Male", 80],
   ],
 };
-
-const frame = new DataFrame(rawData.columns, rawData.rows);
 
 interface LineChartProps<Name extends string> {
   width: number;
@@ -65,15 +114,6 @@ interface LineChartProps<Name extends string> {
   metricDirection: AxialChartProps<string>["metricDirection"];
 }
 
-interface MultipleLinesProps<Name extends string> {
-  width: number;
-  height: number;
-  margin: ChartProps["margin"];
-  data: DataFrame<Name>;
-  categorical: Name;
-  metrics: Name[];
-  metricDirection: AxialChartProps<string>["metricDirection"];
-}
 /**
  * Examples of how you can compose more complex charts out of 'atoms'
  */
@@ -127,13 +167,18 @@ const colors = [
   "#006865",
 ];
 
+type MultipleLinesProps<Name extends string> = LineChartProps<Name> & {
+  series: Name[]
+}
+
 const MultipleLines = <Name extends string>({
   width,
   height,
   margin,
   data,
   categorical,
-  metrics,
+  series,
+  metric,
   metricDirection,
 }: MultipleLinesProps<Name>) => {
   const categoricalScale = useScaleBand({
@@ -143,18 +188,18 @@ const MultipleLines = <Name extends string>({
   });
   const metricScale = useScaleLinear({
     frame: data,
-    column: data.getCursor(metrics[0]),
+    column: data.getCursor(metric),
     range: metricDirection === "vertical" ? [height, 0] : [0, width],
   });
 
   return (
     <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
-      {metrics.map((metric, i) => (
+      {data.groupBy(series).map((seriesData, i) => (
         <Line
           metricDirection={metricDirection}
-          data={data}
-          categorical={data.getCursor(categorical)}
-          metric={data.getCursor(metric)}
+          data={seriesData}
+          categorical={seriesData.getCursor(categorical)}
+          metric={seriesData.getCursor(metric)}
           categoricalScale={categoricalScale}
           metricScale={metricScale}
           style={{ stroke: colors[i] }}
@@ -165,6 +210,9 @@ const MultipleLines = <Name extends string>({
     </Chart>
   );
 };
+
+const singleFrame = new DataFrame(rawDataSingleLine.columns, rawDataSingleLine.rows);
+const multiplesFrame = new DataFrame(rawDataMultipleLines.columns, rawDataMultipleLines.rows);
 
 storiesOf("@operational/visualizations/2. Line chart", module)
   .add("vertical", () => {
@@ -178,7 +226,7 @@ storiesOf("@operational/visualizations/2. Line chart", module)
         width={300}
         height={300}
         margin={magicMargin}
-        data={frame}
+        data={singleFrame}
         metricDirection="vertical"
       />
     );
@@ -193,7 +241,7 @@ storiesOf("@operational/visualizations/2. Line chart", module)
         width={300}
         height={300}
         margin={magicMargin}
-        data={frame}
+        data={singleFrame}
         metricDirection="horizontal"
       />
     );
@@ -204,13 +252,31 @@ storiesOf("@operational/visualizations/2. Line chart", module)
 
     return (
       <MultipleLines
-        metrics={["sales", "revenue"]}
+        metric="sales"
         categorical="Customer.City"
+        series={["Customer.AgeGroup", "Customer.Gender"]}
         width={300}
         height={300}
         margin={magicMargin}
-        data={frame}
+        data={multiplesFrame}
         metricDirection="vertical"
+      />
+    );
+  })
+  .add("horizontal, multiple lines", () => {
+    // number of pixels picked manually to make sure that YAxis fits on the screen
+    const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
+
+    return (
+      <MultipleLines
+        metric="sales"
+        categorical="Customer.City"
+        series={["Customer.Gender", "Customer.AgeGroup"]}
+        width={300}
+        height={300}
+        margin={magicMargin}
+        data={multiplesFrame}
+        metricDirection="horizontal"
       />
     );
   });
