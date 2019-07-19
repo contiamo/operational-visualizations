@@ -25,4 +25,4 @@ export type DiscreteAxialChart<Name extends string> = (props: DiscreteAxialChart
 
 export type LinearAxialChart<Name extends string> = (props: LinearAxialChartProps<Name>) => React.ReactElement | null;
 
-export type AxialChart<Name extends string> = (props: AxialChartProps<Name>) => React.ReactElement | null;
+export type AxialChart<Name extends string> = DiscreteAxialChart<Name> | LinearAxialChart<Name>;
