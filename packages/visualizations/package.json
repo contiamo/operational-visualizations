@@ -1,6 +1,6 @@
 {
   "name": "@operational/visualizations",
-  "version": "7.0.13",
+  "version": "7.0.15",
   "description": "Contiamo visualization library.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
