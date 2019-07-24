@@ -47,6 +47,11 @@ export class FragmentFrame<Name extends string = string> implements IterableFram
     })
   }
 
+  public uniqueValues(columns: Array<Name | ColumnCursor<Name>>): string[][] {
+    const columnCursors = columns.map(c =>isCursor(c) ? c : this.getCursor(c));
+    return uniqueValueCombinations(this, columnCursors);
+  }
+
   public mapRows<A>(callback: (row: RawRow, index: number) => A) {
     return this.index.map((i, j) => callback(this.data[i], j));
   }
