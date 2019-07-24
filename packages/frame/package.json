@@ -1,6 +1,6 @@
 {
   "name": "@operational/frame",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Contiamo DataFrame.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
