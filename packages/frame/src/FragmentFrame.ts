@@ -57,7 +57,7 @@ export class FragmentFrame<Name extends string = string> implements IterableFram
   }
 
   public row(rowIndex: number) {
-    return this.data[rowIndex];
+    return this.data[this.index[rowIndex]];
   }
 
   // we need this function for table display

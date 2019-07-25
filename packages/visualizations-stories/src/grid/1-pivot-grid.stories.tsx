@@ -1,4 +1,4 @@
-import { DataFrame, uniqueValues } from "@operational/frame";
+import { DataFrame, uniqueValues, PivotFrame } from "@operational/frame";
 import { PivotGrid, RowProps, CellPropsWithMeasure } from "@operational/grid";
 import { Axis, Bars, useScaleBand, useScaleLinear } from "@operational/visualizations";
 import { storiesOf } from "@storybook/react";
@@ -418,6 +418,36 @@ storiesOf("@operational/grid/1. Pivot table", module)
       rows: ["Customer.Continent", "Customer.Country", "Customer.City"],
       columns: ["Customer.AgeGroup", "Customer.Gender"],
     });
+
+    const colorCell = <Name extends string = string>({
+      column,
+      row,
+      data,
+      measure,
+    }: {
+      data: PivotFrame<Name>;
+      row: number;
+      column: number;
+      measure: Name;
+    }) => {
+      const value = data.cell(row, column).peak(measure);
+
+      const countryCursor = pivotedFrame.getCursor("Customer.Country");
+      const genderCursor = pivotedFrame.getCursor("Customer.Gender");
+
+      const rawRow = data.cell(row, column).row(0);
+      const country = countryCursor(rawRow);
+      const gender = genderCursor(rawRow);
+
+      return <div style={{
+        padding: "10px",
+        textAlign: "right",
+        background: country === "UK"
+          ? "#f5b2b2"
+          : gender === "Male" ? "#eee" : "#fff"
+      }}>{value === null ? null : <>{value}</>}</div>
+    };
+
     return (
       <AutoSizer style={{ minHeight: "500px", height: "100%" }}>
         {({ width, height }) => (
@@ -426,19 +456,8 @@ storiesOf("@operational/grid/1. Pivot table", module)
             height={height}
             data={pivotedFrame}
             measures={["sales", "revenue"]}
+            cell={colorCell}
             style={{
-              cell: (rowIndex, columnIndex) => {
-                const rowHeaders = pivotedFrame.rowHeaders();
-                const columnHeaders = pivotedFrame.columnHeaders();
-                const countryCursor = pivotedFrame.getCursor("Customer.Country");
-                const genderIndex = pivotedFrame.getCursor("Customer.Gender").index - rowHeaders[0].length;
-                return {
-                  padding: "10px",
-                  textAlign: "right",
-                  background: countryCursor(rowHeaders[rowIndex]) === "UK"
-                    ? "#f5b2b2"
-                    : columnHeaders[columnIndex][genderIndex] === "Male" ? "#eee" : "#fff"
-              }},
               background: "rgb(246, 246, 246)",
               // background: "linear-gradient(to right, orange , yellow, green, cyan, blue, violet)",
               header: {

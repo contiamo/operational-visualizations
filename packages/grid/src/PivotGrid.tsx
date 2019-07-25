@@ -113,7 +113,8 @@ interface Axes<Name extends string> {
 }
 
 interface PivotGridStyle {
-  cell?: React.CSSProperties | ((rowIndex: number, columnIndex: number) => React.CSSProperties);
+  // Static cell styles
+  cell?: React.CSSProperties;
   header?: React.CSSProperties;
   dimension?: React.CSSProperties;
   border?: string;
@@ -239,7 +240,7 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
           break;
         case "Cell":
           border = {
-            ...cellStyle(cellCoordinates.row, cellCoordinates.column),
+            ...cellStyle,
             ...border,
           };
 
