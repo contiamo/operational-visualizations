@@ -412,4 +412,46 @@ storiesOf("@operational/grid/1. Pivot table", module)
         )}
       </AutoSizer>
     );
+  })
+  .add("with cell colors", () => {
+    const pivotedFrame = frame.pivot({
+      rows: ["Customer.Continent", "Customer.Country", "Customer.City"],
+      columns: ["Customer.AgeGroup", "Customer.Gender"],
+    });
+    return (
+      <AutoSizer style={{ minHeight: "500px", height: "100%" }}>
+        {({ width, height }) => (
+          <PivotGrid
+            width={width}
+            height={height}
+            data={pivotedFrame}
+            measures={["sales", "revenue"]}
+            style={{
+              cell: (rowIndex, columnIndex) => {
+                const rowHeaders = pivotedFrame.rowHeaders();
+                const columnHeaders = pivotedFrame.columnHeaders();
+                const countryCursor = pivotedFrame.getCursor("Customer.Country");
+                const genderIndex = pivotedFrame.getCursor("Customer.Gender").index - rowHeaders[0].length;
+                return {
+                  padding: "10px",
+                  textAlign: "right",
+                  background: countryCursor(rowHeaders[rowIndex]) === "UK"
+                    ? "#f5b2b2"
+                    : columnHeaders[columnIndex][genderIndex] === "Male" ? "#eee" : "#fff"
+              }},
+              background: "rgb(246, 246, 246)",
+              // background: "linear-gradient(to right, orange , yellow, green, cyan, blue, violet)",
+              header: {
+                padding: "10px",
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+              },
+            }}
+            measuresPlacement="column"
+            dimensionLabels="top"
+          />
+        )}
+      </AutoSizer>
+    );
   });

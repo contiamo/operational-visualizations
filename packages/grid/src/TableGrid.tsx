@@ -1,6 +1,7 @@
 import { DataFrame } from "@operational/frame";
 import React, { useMemo } from "react";
 import { GridChildComponentProps, VariableSizeGrid } from "react-window";
+import { isFunction } from "./utils";
 
 type Diff<T, U> = T extends U ? never : T;
 type Defined<T> = Diff<T, undefined>;
@@ -32,7 +33,7 @@ interface Props<Name extends string = string> {
   height: number;
   data: DataFrame<Name>;
   style?: {
-    cell?: React.CSSProperties;
+    cell?: React.CSSProperties | ((rowIndex: number, columnIndex: number) => React.CSSProperties);
     header?: React.CSSProperties;
     dimension?: React.CSSProperties;
     border?: string;
@@ -57,7 +58,7 @@ export function TableGrid<Name extends string = string>(props: Props<Name>) {
 
   const styleProp = props.style || (emptyObject as Defined<Props<Name>["style"]>);
   const borderStyle = styleProp.border || defaultBorderStyle;
-  const cellStyle = styleProp.cell || emptyObject;
+  const cellStyle = isFunction(styleProp.cell) ? styleProp.cell : () => (styleProp.cell || emptyObject);
   const backgroundStyle = styleProp.background || defaultBackground;
   const headerStyle = styleProp.header || defaultHeaderStyle;
 
@@ -78,7 +79,7 @@ export function TableGrid<Name extends string = string>(props: Props<Name>) {
         const value = data.schema[columnIndex].name;
         item = header({ value });
       } else {
-        border = { ...cellStyle, ...border };
+        border = { ...border, ...cellStyle(rowIndex - 1, columnIndex) };
         item = `${data.cell(rowIndex - 1, columnIndex)}`;
       }
 

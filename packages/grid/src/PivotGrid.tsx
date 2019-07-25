@@ -23,6 +23,7 @@ import {
   WidthAccessor,
   HeightAccessor,
 } from "./types";
+import { isFunction } from "./utils";
 
 // Optimisation for hooks, because {} !== {}
 const emptyObject = Object.freeze({});
@@ -112,7 +113,7 @@ interface Axes<Name extends string> {
 }
 
 interface PivotGridStyle {
-  cell?: React.CSSProperties;
+  cell?: React.CSSProperties | ((rowIndex: number, columnIndex: number) => React.CSSProperties);
   header?: React.CSSProperties;
   dimension?: React.CSSProperties;
   border?: string;
@@ -155,7 +156,7 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
   );
   const styleProp = props.style || (emptyObject as PivotGridStyle);
   const borderStyle = styleProp.border || defaultBorderStyle;
-  const cellStyle = styleProp.cell || emptyObject;
+  const cellStyle = isFunction(styleProp.cell) ? styleProp.cell : () => (styleProp.cell || emptyObject);
   const dimensionStyle = styleProp.dimension || defaultDimensionStyle;
   const headerStyle = styleProp.header || defaultHeaderStyle;
   const backgroundStyle = styleProp.background || defaultBackground;
@@ -238,7 +239,7 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
           break;
         case "Cell":
           border = {
-            ...cellStyle,
+            ...cellStyle(cellCoordinates.row, cellCoordinates.column),
             ...border,
           };
 

@@ -28,6 +28,10 @@ export class DataFrame<Name extends string = string> implements IterableFrame<Na
     return this.data[rowIndex][columnIndex];
   }
 
+  public row(rowIndex: number) {
+    return this.data[rowIndex];
+  }
+
   public getCursor(column: Name): ColumnCursor<Name> {
     if (!this.cursorCache.has(column)) {
       const index = this.schema.findIndex(x => x.name === column);
