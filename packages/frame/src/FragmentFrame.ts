@@ -56,6 +56,10 @@ export class FragmentFrame<Name extends string = string> implements IterableFram
     return this.index.map((i, j) => callback(this.data[i], j));
   }
 
+  public row(rowIndex: number) {
+    return this.data[rowIndex];
+  }
+
   // we need this function for table display
   public peak(column: Name | ColumnCursor<Name>) {
     const columnIndex = isColumnCursor(column) ? column.index : this.schema.findIndex(x => x.name === column);

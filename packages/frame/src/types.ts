@@ -29,6 +29,8 @@ export interface IterableFrame<Name extends string> extends WithCursor<Name> {
   groupBy(columns: Array<string | ColumnCursor<string>>): Array<IterableFrame<Name>>;
   /** needed for visualizations */
   uniqueValues(columns: Array<Name | ColumnCursor<Name>>): string[][];
+  /** needed for visualizations */
+  row(rowIndex: number): RawRow;
 }
 
 export interface PivotProps<Column extends string, Row extends string> {
