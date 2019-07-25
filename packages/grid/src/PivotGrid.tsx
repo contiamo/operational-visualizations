@@ -23,7 +23,6 @@ import {
   WidthAccessor,
   HeightAccessor,
 } from "./types";
-import { isFunction } from "./utils";
 
 // Optimisation for hooks, because {} !== {}
 const emptyObject = Object.freeze({});
@@ -157,7 +156,7 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
   );
   const styleProp = props.style || (emptyObject as PivotGridStyle);
   const borderStyle = styleProp.border || defaultBorderStyle;
-  const cellStyle = isFunction(styleProp.cell) ? styleProp.cell : () => (styleProp.cell || emptyObject);
+  const cellStyle = styleProp.cell;
   const dimensionStyle = styleProp.dimension || defaultDimensionStyle;
   const headerStyle = styleProp.header || defaultHeaderStyle;
   const backgroundStyle = styleProp.background || defaultBackground;
