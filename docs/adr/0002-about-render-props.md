@@ -58,14 +58,38 @@ This is because we need access to "root" `data` to get cursor (see previous disc
 
 I wonder if we overcomplicated our own life witout any benefit 🤔?
 
-Maybe it was premature optimisation to use hooks for scales, maybe it is very to cheap to calculate it again and again (on React re-render)? Maybe we need to remove hooks and instead worry about caching of components?
+Maybe it was premature optimisation to use hooks for scales, maybe it is very cheap to calculate it again and again (on React re-render)? Maybe we need to remove hooks and instead worry about caching of components?
 
 Limitation of not having `getCursor` on all sunstructures forces to pass root data everywhere. Either it shows that we are doing something wrong or this limitation was a bad idea.
 
+This code was premature optimisation - I thought it would be more performant than do pattern matching on some tag field (like `.type` in Redux actions):
+
+```ts
+case "Empty":
+  if (prop.measure && prop.rowIndex === undefined) {
+    return {
+      measure: true,
+    };
+  } else if (prop.axis && prop.rowIndex === undefined) {
+    return {
+      axis: true,
+    };
+  } else {
+    return {
+      rowIndex: prop.rowIndex!,
+    };
+  }
+```
+
+But it caused so much confusion in the code.
+
 ## Decision
 
-Decision here...
+- [We added getCursor everywhere](https://github.com/contiamo/operational-visualizations/pull/93)
+- [We added data to every sub-component](https://github.com/contiamo/operational-visualizations/pull/96)
+- We didn't touch scale hooks for now, let's see how it goes
+- We undid some of premature optimisation and simplified code
 
 ## Consequences
 
-Consequences here...
+N/A
