@@ -40,17 +40,7 @@ const toString = (value: boolean | string) => {
   return value;
 };
 
-const defaultCell = <Name extends string = string>({
-  column,
-  row,
-  data,
-  measure,
-}: {
-  data: PivotFrame<Name>;
-  row: number;
-  column: number;
-  measure: Name;
-}) => {
+const defaultCell = ({ column, row, data, measure }: CellPropsWithMeasure<string>) => {
   const value = data.cell(row, column).peak(measure);
   return value === null ? null : <>{value}</>;
 };

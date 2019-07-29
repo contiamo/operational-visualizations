@@ -1,4 +1,4 @@
-import { DataFrame, uniqueValues, PivotFrame } from "@operational/frame";
+import { DataFrame, uniqueValues } from "@operational/frame";
 import { PivotGrid, RowProps, CellPropsWithMeasure } from "@operational/grid";
 import { Axis, Bars, useScaleBand, useScaleLinear } from "@operational/visualizations";
 import { storiesOf } from "@storybook/react";
@@ -419,17 +419,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
       columns: ["Customer.AgeGroup", "Customer.Gender"],
     });
 
-    const colorCell = <Name extends string = string>({
-      column,
-      row,
-      data,
-      measure,
-    }: {
-      data: PivotFrame<Name>;
-      row: number;
-      column: number;
-      measure: Name;
-    }) => {
+    const colorCell = ({ column, row, data, measure }: CellPropsWithMeasure<string>) => {
       const value = data.cell(row, column).peak(measure);
 
       const countryCursor = pivotedFrame.getCursor("Customer.Country");

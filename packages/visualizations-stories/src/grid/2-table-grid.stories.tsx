@@ -95,6 +95,7 @@ storiesOf("@operational/grid/2. Table", module).add("basic", () => {
   );
 })
 .add("with colors", () => {
+  const countryCursor = frame.getCursor("Customer.Country")
   return (
     <AutoSizer style={{ minHeight: "500px", height: "100%" }}>
       {({ width, height }) => (
@@ -103,7 +104,10 @@ storiesOf("@operational/grid/2. Table", module).add("basic", () => {
           height={height}
           data={frame}
           style={{
-            cell: (rowIndex, columnIndex) => ({ padding: "10px", background: columnIndex > 0 ? colors[frame.row(rowIndex)[1] as "Germany" | "UK" | "USA" | "Canada"] : "#fff" }),
+            cell: (rowIndex, columnIndex) => ({
+              padding: "10px",
+              background: columnIndex > 0 ? colors[countryCursor(frame.row(rowIndex)) as "Germany" | "UK" | "USA" | "Canada"] : "#fff",
+            }),
             background: "#ddd"
           }}
         />
