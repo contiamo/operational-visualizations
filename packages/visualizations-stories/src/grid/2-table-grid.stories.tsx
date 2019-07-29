@@ -73,6 +73,13 @@ const rawData = {
 
 const frame = new DataFrame(rawData.columns, rawData.rows);
 
+const colors = {
+  "Germany": "#f5b2b2",
+  "UK": "#7ea2f5",
+  "USA": "#f5cb7e",
+  "Canada": "#eee",
+}
+
 storiesOf("@operational/grid/2. Table", module).add("basic", () => {
   return (
     <AutoSizer style={{ minHeight: "500px", height: "100%" }}>
@@ -81,8 +88,27 @@ storiesOf("@operational/grid/2. Table", module).add("basic", () => {
           width={width}
           height={height}
           data={frame}
+          style={{ cell: { padding: "10px" } }}
+        />
+      )}
+    </AutoSizer>
+  );
+})
+.add("with colors", () => {
+  const countryCursor = frame.getCursor("Customer.Country")
+  return (
+    <AutoSizer style={{ minHeight: "500px", height: "100%" }}>
+      {({ width, height }) => (
+        <TableGrid
+          width={width}
+          height={height}
+          data={frame}
           style={{
-            cell: { padding: "10px" },
+            cell: (rowIndex, columnIndex) => ({
+              padding: "10px",
+              background: columnIndex > 0 ? colors[countryCursor(frame.row(rowIndex)) as "Germany" | "UK" | "USA" | "Canada"] : "#fff",
+            }),
+            background: "#ddd"
           }}
         />
       )}

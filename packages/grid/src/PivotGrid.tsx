@@ -40,17 +40,7 @@ const toString = (value: boolean | string) => {
   return value;
 };
 
-const defaultCell = <Name extends string = string>({
-  column,
-  row,
-  data,
-  measure,
-}: {
-  data: PivotFrame<Name>;
-  row: number;
-  column: number;
-  measure: Name;
-}) => {
+const defaultCell = ({ column, row, data, measure }: CellPropsWithMeasure<string>) => {
   const value = data.cell(row, column).peak(measure);
   return value === null ? null : <>{value}</>;
 };
@@ -112,6 +102,7 @@ interface Axes<Name extends string> {
 }
 
 interface PivotGridStyle {
+  // Static cell styles
   cell?: React.CSSProperties;
   header?: React.CSSProperties;
   dimension?: React.CSSProperties;
@@ -155,7 +146,7 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
   );
   const styleProp = props.style || (emptyObject as PivotGridStyle);
   const borderStyle = styleProp.border || defaultBorderStyle;
-  const cellStyle = styleProp.cell || emptyObject;
+  const cellStyle = styleProp.cell;
   const dimensionStyle = styleProp.dimension || defaultDimensionStyle;
   const headerStyle = styleProp.header || defaultHeaderStyle;
   const backgroundStyle = styleProp.background || defaultBackground;

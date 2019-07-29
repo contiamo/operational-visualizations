@@ -412,4 +412,55 @@ storiesOf("@operational/grid/1. Pivot table", module)
         )}
       </AutoSizer>
     );
+  })
+  .add("with cell colors", () => {
+    const pivotedFrame = frame.pivot({
+      rows: ["Customer.Continent", "Customer.Country", "Customer.City"],
+      columns: ["Customer.AgeGroup", "Customer.Gender"],
+    });
+
+    const colorCell = ({ column, row, data, measure }: CellPropsWithMeasure<string>) => {
+      const value = data.cell(row, column).peak(measure);
+
+      const countryCursor = pivotedFrame.getCursor("Customer.Country");
+      const genderCursor = pivotedFrame.getCursor("Customer.Gender");
+
+      const rawRow = data.cell(row, column).row(0);
+      const country = countryCursor(rawRow);
+      const gender = genderCursor(rawRow);
+
+      return <div style={{
+        padding: "10px",
+        textAlign: "right",
+        background: country === "UK"
+          ? "#f5b2b2"
+          : gender === "Male" ? "#eee" : "#fff"
+      }}>{value === null ? null : <>{value}</>}</div>
+    };
+
+    return (
+      <AutoSizer style={{ minHeight: "500px", height: "100%" }}>
+        {({ width, height }) => (
+          <PivotGrid
+            width={width}
+            height={height}
+            data={pivotedFrame}
+            measures={["sales", "revenue"]}
+            cell={colorCell}
+            style={{
+              background: "rgb(246, 246, 246)",
+              // background: "linear-gradient(to right, orange , yellow, green, cyan, blue, violet)",
+              header: {
+                padding: "10px",
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+              },
+            }}
+            measuresPlacement="column"
+            dimensionLabels="top"
+          />
+        )}
+      </AutoSizer>
+    );
   });
