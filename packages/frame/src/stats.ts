@@ -69,16 +69,7 @@ export const uniqueValueCombinations = <Name extends string>(
   frame: IterableFrame<Name>,
   columns: Array<ColumnCursor<Name>>,
 ): Array<string[]> => {
-  const columnValues = columns.map(c => uniqueValues(frame, c))
-
-  const combineValues = (i: number, values: string[]): Array<string[]> => {
-    return i === columns.length - 1
-      ? columnValues[i].map(val => [...values, val])
-      : columnValues[i].reduce((arr: Array<string[]>, val) => {
-          return [...arr, ...combineValues(i + 1, [...values, val])]
-        }, [])
-  }
-
-  return combineValues(0, [])
+  const valueCombinations = frame.mapRows(row => columns.map(cursor => cursor(row)));
+  return Array.from(new Set(valueCombinations.map(combo => JSON.stringify(combo)))).map(s => JSON.parse(s));
 }
 
