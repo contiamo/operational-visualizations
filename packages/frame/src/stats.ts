@@ -3,6 +3,7 @@ import { DimensionValue } from "./PivotFrame";
 import { getData } from "./secret";
 import { DataFrame } from "./DataFrame";
 import { FragmentFrame } from "./FragmentFrame";
+import { GroupedFrame } from "./GroupedFrame";
 
 interface StatsCacheItem {
   max?: number;
@@ -10,10 +11,10 @@ interface StatsCacheItem {
   unique?: string[];
 }
 
-const statsCache = new WeakMap<IterableFrame<string>, Record<number, StatsCacheItem>>();
+const statsCache = new WeakMap<IterableFrame<string> | GroupedFrame<string>, Record<number, StatsCacheItem>>();
 
 const getStatsCacheItem = <Name extends string>(
-  frame: IterableFrame<Name>,
+  frame: IterableFrame<Name> | GroupedFrame<Name>,
   column: ColumnCursor<Name>,
 ): StatsCacheItem => {
   if (!statsCache.has(frame)) {
@@ -27,7 +28,10 @@ const getStatsCacheItem = <Name extends string>(
 };
 
 // rename to max
-export const maxValue = <Name extends string>(frame: IterableFrame<Name>, column: ColumnCursor<Name>): number => {
+export const maxValue = <Name extends string>(
+  frame: IterableFrame<Name> | GroupedFrame<Name>,
+  column: ColumnCursor<Name>,
+): number => {
   const cacheItem = getStatsCacheItem(frame, column);
   if (cacheItem.max === undefined) {
     // https://github.com/contiamo/operational-visualizations/issues/72
@@ -40,11 +44,21 @@ export const maxValue = <Name extends string>(frame: IterableFrame<Name>, column
     //   throw new Error("Can't get max value of empty Frame")
     // }
     let max: number | undefined = undefined;
-    frame.mapRows(row => {
-      if (row[column.index] != null) {
-        max = max === undefined ? row[column.index] : Math.max(max, row[column.index]);
-      }
-    });
+
+    if (frame instanceof GroupedFrame) {
+      // we use sum as aggregation function, but we can use average or mean
+      // we can pass information about which aggregation to use inside GroupedFrame
+      const aggregation = total;
+      frame.map(row => {
+        max = max === undefined ? aggregation(row, column) : Math.max(max, aggregation(row, column));
+      });
+    } else {
+      frame.mapRows(row => {
+        if (row[column.index] != null) {
+          max = max === undefined ? row[column.index] : Math.max(max, row[column.index]);
+        }
+      });
+    }
     cacheItem.max = max!;
   }
   return cacheItem.max!;

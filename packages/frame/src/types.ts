@@ -1,3 +1,5 @@
+import { GroupedFrame } from "./GroupedFrame";
+
 /**
  * Can represent array of arrays or list of tuples or tuple of lists
  */
@@ -44,7 +46,7 @@ export interface IterableFrame<Name extends string> extends WithCursor<Name> {
   /** needed for visualisations */
   mapRows<Result>(callback: (rowCursor: RowCursor, rowIndex: number) => Result): Result[];
   /** needed for visualizations */
-  groupBy(columns: Array<string | ColumnCursor<string>>): Array<IterableFrame<Name>>;
+  groupBy(columns: Array<Name | ColumnCursor<Name>>): GroupedFrame<Name>;
   /** needed for visualizations */
   uniqueValues(columns: Array<Name | ColumnCursor<Name>>): string[][];
   /** needed for visualizations */

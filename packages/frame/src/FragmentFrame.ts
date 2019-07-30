@@ -4,10 +4,7 @@ import { IterableFrame, RowCursor, ColumnCursor, Matrix, Schema } from "./types"
 import { getData } from "./secret";
 import { isCursor, hashCursors } from "./utils";
 import { buildIndex } from "./stats";
-
-const isColumnCursor = <Name extends string>(column: any): column is ColumnCursor<Name> => {
-  return column.index !== undefined;
-};
+import { GroupedFrame } from "./GroupedFrame";
 
 export class FragmentFrame<Name extends string = string> implements IterableFrame<Name> {
   private readonly data: Matrix<any>;
@@ -29,16 +26,16 @@ export class FragmentFrame<Name extends string = string> implements IterableFram
     return this.origin.getCursor(column);
   }
 
-  public groupBy(columns: Array<Name | ColumnCursor<Name>>): Array<IterableFrame<Name>> {
+  public groupBy(columns: Array<Name | ColumnCursor<Name>>): GroupedFrame<Name> {
     const columnCursors = columns.map(c => (isCursor(c) ? c : this.getCursor(c)));
     const hash = hashCursors(columnCursors);
     if (!this.groupByCache.has(hash)) {
       // If no columns are provided, returns an array with the current frame as the sole entry.
       if (columns.length === 0) {
-        this.groupByCache.set(hash, [this]);
+        this.groupByCache.set(hash, new GroupedFrame(this.origin, [this.data.map((_, i) => i)]));
       } else {
         const { index } = buildIndex(this, columnCursors);
-        this.groupByCache.set(hash, index.map(i => new FragmentFrame<Name>(this.origin, i)));
+        this.groupByCache.set(hash, new GroupedFrame(this.origin, index));
       }
     }
     return this.groupByCache.get(hash);
@@ -65,7 +62,7 @@ export class FragmentFrame<Name extends string = string> implements IterableFram
 
   // we need this function for table display
   public peak(column: Name | ColumnCursor<Name>) {
-    const columnIndex = isColumnCursor(column) ? column.index : this.schema.findIndex(x => x.name === column);
+    const columnIndex = isCursor(column) ? column.index : this.schema.findIndex(x => x.name === column);
     if (columnIndex < 0) {
       throw new Error(`Unknown column ${column}`);
     }

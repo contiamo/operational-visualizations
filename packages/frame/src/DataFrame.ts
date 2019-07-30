@@ -3,7 +3,7 @@ import { ColumnCursor, IterableFrame, Matrix, PivotProps, Schema, RowCursor } fr
 import { getData } from "./secret";
 import { isCursor, hashCursors } from "./utils";
 import { buildIndex } from "./stats";
-import { FragmentFrame } from "./FragmentFrame";
+import { GroupedFrame } from "./GroupedFrame";
 
 export class DataFrame<Name extends string = string> implements IterableFrame<Name> {
   private readonly data: Matrix<any>;
@@ -48,16 +48,16 @@ export class DataFrame<Name extends string = string> implements IterableFrame<Na
     return this.cursorCache.get(column)!;
   }
 
-  public groupBy(columns: Array<Name | ColumnCursor<Name>>): Array<IterableFrame<Name>> {
+  public groupBy(columns: Array<Name | ColumnCursor<Name>>): GroupedFrame<Name> {
     const columnCursors = columns.map(c => (isCursor(c) ? c : this.getCursor(c)));
     const hash = hashCursors(columnCursors);
     if (!this.groupByCache.has(hash)) {
       // If no columns are provided, returns an array with the current frame as the sole entry.
       if (columns.length === 0) {
-        this.groupByCache.set(hash, [this]);
+        this.groupByCache.set(hash, new GroupedFrame(this, [this.data.map((_, i) => i)]));
       } else {
         const { index } = buildIndex(this, columnCursors);
-        this.groupByCache.set(hash, index.map(i => new FragmentFrame<Name>(this, i)));
+        this.groupByCache.set(hash, new GroupedFrame(this, index));
       }
     }
     return this.groupByCache.get(hash)!;
