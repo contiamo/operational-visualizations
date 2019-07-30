@@ -16,9 +16,9 @@ We have 3 methods of caching:
 - WeakMaps in stats utils
 - hooks for scales
 
-### Referential transperency
+### Referential transparency
 
-React relies a lot on **referential transperency** when it decides if it needs to rerender or not e.g. it compares objects as reference (so called shallow comparison), it doesn't compare structure. It is a very cheap operation, because underneath it compares pointers.
+React relies a lot on **referential transparency** when it decides if it needs to rerender or not e.g. it compares objects as reference (so called shallow comparison), it doesn't compare structure. It is a very cheap operation, because underneath it compares pointers.
 
 For example, if you compare primitive values:
 
