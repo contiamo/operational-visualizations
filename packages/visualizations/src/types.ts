@@ -8,6 +8,7 @@ export interface BaseAxialChartProps<Name extends string> {
   categorical: ColumnCursor<Name>;
   metricScale: ScaleLinear<any, any>;
   categoricalScale: ScaleBand<string>;
+  stackRow?: (row: RawRow[]) => number;
   transform?: React.SVGAttributes<SVGRectElement>["transform"];
 }
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { storiesOf } from "@storybook/react";
-import { DataFrame } from "@operational/frame";
+import { DataFrame, ColumnCursor, IterableFrame, RawRow, stackRowBy } from "@operational/frame";
 import {
   AxialChartProps,
   Axis,
@@ -63,12 +63,37 @@ interface BarChartProps<Name extends string> {
   categorical: Name;
   metric: Name;
   metricDirection: AxialChartProps<string>["metricDirection"];
+  colorBy?: Name[];
+  stacked?: boolean;
 }
-const colors = {
-  "Germany": "#1499CE",
-  "UK": "#7C246F",
-  "USA": "#EAD63F",
-  "Canada": "#343972",
+
+const colorPalette = [
+  "#1499CE",
+  "#7C246F",
+  "#EAD63F",
+  "#343972",
+  "#ED5B17",
+  "#009691",
+  "#1D6199",
+  "#D31F1F",
+  "#AD329C",
+  "#006865",
+];
+
+export const joinArrayAsString = (array: string[]) => {
+  return (array || []).join("/");
+};
+
+export const getColorScale = (data: IterableFrame<string>, colorBy: Array<ColumnCursor<string>>) => {
+  if (colorBy.length === 0) {
+    return () => colorPalette[0];
+  }
+  const uniqueValues = data.uniqueValues(colorBy).map(joinArrayAsString);
+  return (row: RawRow) => {
+    const valuesString = joinArrayAsString(colorBy.map(cursor => cursor(row)));
+    const index = uniqueValues.indexOf(valuesString);
+    return colorPalette[index % colorPalette.length];
+  };
 };
 
 /**
@@ -80,6 +105,8 @@ const BarChart = <Name extends string>({
   margin,
   data,
   categorical,
+  colorBy,
+  stacked,
   metric,
   metricDirection,
 }: BarChartProps<Name>) => {
@@ -96,19 +123,24 @@ const BarChart = <Name extends string>({
     categorical: categoricalCursor,
     range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
-  const colorCursor = data.getCursor("Customer.Country" as Name);
+  const colorScale = getColorScale(data, (colorBy || []).map(c => data.getCursor(c)))
+
+  const stackRow = stackRowBy(categoricalCursor, metricCursor)
 
   return (
     <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
-      <Bars
-        metricDirection={metricDirection}
-        data={data}
-        categorical={categoricalCursor}
-        metric={metricCursor}
-        categoricalScale={categoricalScale}
-        metricScale={metricScale}
-        style={row => ({ fill: colors[colorCursor(row) as "Germany" | "UK" | "USA" | "Canada"] })}
-      />
+      {data.groupBy(colorBy || []).map(grouped =>
+        <Bars
+          metricDirection={metricDirection}
+          data={grouped}
+          categorical={categoricalCursor}
+          metric={metricCursor}
+          categoricalScale={categoricalScale}
+          metricScale={metricScale}
+          stackRow={stacked ? stackRow : undefined}
+          style={row => ({ fill: colorScale(row), opacity: 0.5 })}
+        />
+      )}
       <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
       <Axis scale={metricScale} position={metricDirection === "horizontal" ? "bottom" : "left"} />
     </Chart>
@@ -154,6 +186,8 @@ storiesOf("@operational/visualizations/1. Bar chart", module)
       <BarChart
         metric="sales"
         categorical="Customer.Country"
+        colorBy={["Customer.City"]}
+        stacked={true}
         width={300}
         height={300}
         margin={magicMargin}
@@ -168,7 +202,9 @@ storiesOf("@operational/visualizations/1. Bar chart", module)
     return (
       <BarChart
         metric="sales"
-        categorical="Customer.Country"
+        categorical="Customer.Continent"
+        colorBy={["Customer.Country", "Customer.City"]}
+        stacked={true}
         width={300}
         height={300}
         margin={magicMargin}

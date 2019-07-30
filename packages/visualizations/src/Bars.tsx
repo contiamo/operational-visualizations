@@ -2,13 +2,10 @@ import React from "react";
 import { useChartTransform } from "./Chart";
 import { DiscreteAxialChart } from "./types";
 import { isFunction } from "./utils";
-import { stackRowBy } from "@operational/frame";
 
 export const Bars: DiscreteAxialChart<string> = props => {
   const defaultTransform = useChartTransform();
-  const { data, transform, metric, categorical, metricScale, categoricalScale, style } = props;
-
-  const stackRow = stackRowBy(categorical, metric)
+  const { data, transform, metric, categorical, metricScale, categoricalScale, stackRow, style } = props;
 
   if (props.metricDirection === "vertical") {
     const height = metricScale(metricScale.domain()[0]);
@@ -17,7 +14,7 @@ export const Bars: DiscreteAxialChart<string> = props => {
         {data.mapRows((row, i) =>
           <rect
             x={categoricalScale(categorical(row))}
-            y={metricScale(metric(row) + stackRow(row))}
+            y={metricScale(metric(row) + (stackRow ? stackRow(row) : 0))}
             width={categoricalScale.bandwidth()}
             height={height - metricScale(metric(row))}
             style={isFunction(style) ? style(row, i) : style}
@@ -32,7 +29,7 @@ export const Bars: DiscreteAxialChart<string> = props => {
         {data.mapRows((row, i) =>
           <rect
             y={categoricalScale(categorical(row))}
-            x={metricScale(stackRow(row))}
+            x={metricScale((stackRow ? stackRow(row) : 0))}
             height={categoricalScale.bandwidth()}
             width={metricScale(metric(row))}
             style={isFunction(style) ? style(row, i) : style}
