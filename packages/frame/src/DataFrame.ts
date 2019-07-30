@@ -1,5 +1,5 @@
 import { PivotFrame } from "./PivotFrame";
-import { ColumnCursor, IterableFrame, Matrix, PivotProps, Schema, RawRow } from "./types";
+import { ColumnCursor, IterableFrame, Matrix, PivotProps, Schema, RowCursor } from "./types";
 import { getData } from "./secret";
 import { isCursor } from "./utils";
 import { uniqueValueCombinations } from "./stats";
@@ -38,7 +38,7 @@ export class DataFrame<Name extends string = string> implements IterableFrame<Na
       if (index === -1) {
         throw new Error(`Unknown column: ${column}`);
       }
-      const cursor = ((row: RawRow[]) => row[index]) as ColumnCursor<Name>;
+      const cursor = ((row: RowCursor[]) => row[index]) as ColumnCursor<Name>;
       cursor.column = column;
       cursor.index = index;
       this.cursorCache.set(column, cursor);
@@ -52,26 +52,26 @@ export class DataFrame<Name extends string = string> implements IterableFrame<Na
       return [this];
     }
 
-    const columnCursors = columns.map(c => isCursor(c) ? c : this.getCursor(c))
+    const columnCursors = columns.map(c => (isCursor(c) ? c : this.getCursor(c)));
     // Returns a FragmentFrame for every unique combination of column values.
     return uniqueValueCombinations(this, columnCursors).map(u => {
       const indices = this.data.reduce((arr, row, i): any => {
         if (columnCursors.every((cursor, j) => cursor(row) === u[j])) {
-          arr.push(i)
+          arr.push(i);
         }
-        return arr
-      }, [])
+        return arr;
+      }, []);
 
-      return new FragmentFrame<Name>(this, indices)
-    })
+      return new FragmentFrame<Name>(this, indices);
+    });
   }
 
   public uniqueValues(columns: Array<Name | ColumnCursor<Name>>): string[][] {
-    const columnCursors = columns.map(c => isCursor(c) ? c : this.getCursor(c));
+    const columnCursors = columns.map(c => (isCursor(c) ? c : this.getCursor(c)));
     return uniqueValueCombinations(this, columnCursors);
   }
 
-  public mapRows<A>(callback: (row: RawRow[], index: number) => A) {
+  public mapRows<A>(callback: (row: RowCursor[], index: number) => A) {
     return this.data.map(callback);
   }
 

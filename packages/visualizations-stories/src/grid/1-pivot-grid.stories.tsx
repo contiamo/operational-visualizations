@@ -425,17 +425,21 @@ storiesOf("@operational/grid/1. Pivot table", module)
       const countryCursor = pivotedFrame.getCursor("Customer.Country");
       const genderCursor = pivotedFrame.getCursor("Customer.Gender");
 
-      const rawRow = data.cell(row, column).row(0);
-      const country = countryCursor(rawRow);
-      const gender = genderCursor(rawRow);
+      const rowCursor = data.cell(row, column).row(0);
+      const country = countryCursor(rowCursor);
+      const gender = genderCursor(rowCursor);
 
-      return <div style={{
-        padding: "10px",
-        textAlign: "right",
-        background: country === "UK"
-          ? "#f5b2b2"
-          : gender === "Male" ? "#eee" : "#fff"
-      }}>{value === null ? null : <>{value}</>}</div>
+      return (
+        <div
+          style={{
+            padding: "10px",
+            textAlign: "right",
+            background: country === "UK" ? "#f5b2b2" : gender === "Male" ? "#eee" : "#fff",
+          }}
+        >
+          {value === null ? null : <>{value}</>}
+        </div>
+      );
     };
 
     return (

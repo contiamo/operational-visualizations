@@ -14,7 +14,7 @@ Current implementation of **cursor** looks like this
 
 ```tsx
 export interface ColumnCursor<Name extends string, ValueInRawRow = any> {
-  (row: RawRow): ValueInRawRow;
+  (row: RowCursor): ValueInRawRow;
   column: Name;
   index: number;
 }
