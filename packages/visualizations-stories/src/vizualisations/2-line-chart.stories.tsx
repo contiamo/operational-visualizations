@@ -136,14 +136,16 @@ const LineChart = <Name extends string>({
     column: data.getCursor(metric),
     range: metricDirection === "vertical" ? [height, 0] : [0, width],
   });
+  const categoricalCursor = data.getCursor(categorical);
+  const metricCursor = data.getCursor(metric);
 
   return (
     <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
       <Line
         metricDirection={metricDirection}
         data={data}
-        categorical={data.getCursor(categorical)}
-        metric={data.getCursor(metric)}
+        categorical={categoricalCursor}
+        metric={metricCursor}
         categoricalScale={categoricalScale}
         metricScale={metricScale}
         style={{ stroke: "#1f78b4" }}
@@ -167,6 +169,8 @@ const colors = [
   "#006865",
 ];
 
+const colorScale = (i: number) => colors[i % colors.length];
+
 type MultipleLinesProps<Name extends string> = LineChartProps<Name> & {
   series: Name[]
 }
@@ -181,14 +185,17 @@ const MultipleLines = <Name extends string>({
   metric,
   metricDirection,
 }: MultipleLinesProps<Name>) => {
+  const categoricalCursor = data.getCursor(categorical);
+  const metricCursor = data.getCursor(metric);
+
   const categoricalScale = useScaleBand({
     frame: data,
-    column: data.getCursor(categorical),
+    column: categoricalCursor,
     range: metricDirection === "vertical" ? [0, width] : [0, height],
   });
   const metricScale = useScaleLinear({
     frame: data,
-    column: data.getCursor(metric),
+    column: metricCursor,
     range: metricDirection === "vertical" ? [height, 0] : [0, width],
   });
 
@@ -198,11 +205,11 @@ const MultipleLines = <Name extends string>({
         <Line
           metricDirection={metricDirection}
           data={seriesData}
-          categorical={seriesData.getCursor(categorical)}
-          metric={seriesData.getCursor(metric)}
+          categorical={categoricalCursor}
+          metric={metricCursor}
           categoricalScale={categoricalScale}
           metricScale={metricScale}
-          style={{ stroke: colors[i] }}
+          style={{ stroke: colorScale(i) }}
         />
       ))}
       <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
