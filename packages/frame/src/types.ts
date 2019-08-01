@@ -8,7 +8,7 @@ export type Schema<Name extends string> = Array<{ name: Name; type?: any }>;
 /**
  * Initially it was tuple representing raw row in the frame and the implementation is still the same.
  *
- * But concentually it suppose to be `RowCursor`. So you take `RowCursor` and `ColumnCursor`
+ * But conceptually, it's supposed to be `RowCursor`. So you take `RowCursor` and `ColumnCursor`
  * and can get value at their crossing (like x and y cooordinate).
  *
  * The fact that this is an array exposes implementation detail - DataFrame is row oriented storage.
