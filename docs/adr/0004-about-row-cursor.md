@@ -30,11 +30,11 @@ At the moment we have all data loaded in the memory, so this distinction is not 
 The minimal improvement we can make is to rename `RawRow` to `RowCursor`, to shift away from mentality of row-oriented storage. To get the value from the table you would need to use two cursors, like x and y coordinates (or latitude and longitude):
 
 ```ts
-columnCursor(RowCursor); // this is what we have right now
+columnCursor(rowCursor); // this is what we have right now
 // or
-getValue(RowCursor, columnCursor);
+getValue(rowCursor, columnCursor);
 // or
-RowCursor(columnCursor);
+rowCursor(columnCursor);
 ```
 
 ### Hide implementation
@@ -49,7 +49,7 @@ The next step would be to hide implementation. We can:
 At the moment it is possible to write this:
 
 ```ts
-RowCursor[columnCursor.index];
+rowCursor[columnCursor.index];
 // which is the same as
 columnCursor(rowCursor);
 ```
