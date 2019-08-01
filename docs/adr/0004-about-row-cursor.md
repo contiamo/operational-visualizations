@@ -8,11 +8,11 @@ Date: 2019-08-01
 
 ## Context
 
-We use `RawRow` in `frame` library to expose rows from data stored in the `frame`. At the moment `RawRow` implemented as `export type RawRow = any[];`. This approach exposes implementation details - that `frame` is row oriented storage. If we would want to swap implementation from row oriented to column oriented staorage, we may need to change implementation details and it will break code for people who use our library. We need to hide implemntation details.
+We use `RawRow` in `frame` library to expose rows from data stored in the `frame`. At the moment `RawRow` implemented as `export type RawRow = any[];`. This approach exposes implementation details - that `frame` is row oriented storage. If we would want to swap implementation from row oriented to column oriented storage, we may need to change implementation details and it will break code for people who use our library. We need to hide implemntation details.
 
 ### Row-oriented storage vs Column-oriented storage
 
-The main differe betweeen two storages is the cost of accessing rows and columns:
+The main difference between two storages is the cost of accessing rows and columns:
 
 |            | row-oriented | column-oriented |
 | ---------- | ------------ | --------------- |
@@ -27,7 +27,7 @@ At the moment we have all data loaded in the memory, so this distinction is not 
 
 ### Rename
 
-The minimal improvement we can make is to rename `RawRow` to `RowCurosr`, to shift away from mentality of row-oriented storage. To get the value from the table you would need to use two cursors, like x and y coordinates (or latitude and longitude):
+The minimal improvement we can make is to rename `RawRow` to `RowCursor`, to shift away from mentality of row-oriented storage. To get the value from the table you would need to use two cursors, like x and y coordinates (or latitude and longitude):
 
 ```ts
 columnCursor(rowCurosr); // this is what we have right now
@@ -51,12 +51,12 @@ At the moment it is possible to write this:
 ```ts
 rowCurosr[columnCursor.index];
 // which is the same as
-columnCursor(rowCurosr);
+columnCursor(rowCursor);
 ```
 
 Assumption was that array access is faster than function call (which inside still will do array access). It may happen that it was premature optimisation and it exposes a lot of implementation details.
 
-Possible middle-ground here would be [macros](https://github.com/Microsoft/TypeScript/issues/4892): developer would write `columnCursor(rowCurosr);` but generated JS contains `rowCurosr[columnCursor.index];`, so in case we would change implmentation we can as well change implementation of macro. And user of our library doesn't need to worry about implemntation details.
+Possible middle-ground here would be [macros](https://github.com/Microsoft/TypeScript/issues/4892): developer would write `columnCursor(rowCursor);` but generated JS contains `rowCursor[columnCursor.index];`, so in case we would change implmentation we can as well change implementation of macro. And user of our library doesn't need to worry about implemntation details.
 
 ## Decision
 

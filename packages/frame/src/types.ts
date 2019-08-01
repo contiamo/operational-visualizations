@@ -14,7 +14,7 @@ export type Schema<Name extends string> = Array<{ name: Name; type?: any }>;
  * The fact that this is an array exposes implementation detail - DataFrame is row oriented storage.
  *
  * If we will keep exposing this implementation detail and rely on it a lot
- * at sompe point it would be hard to change implementation without breaking existing code.
+ * at some point it would be hard to change implementation without breaking existing code.
  */
 export type RowCursor = ReadonlyArray<any>;
 
