@@ -59,7 +59,13 @@ export const maxValue = <Name extends string>(
   return cacheItem.max!;
 };
 
-export const total = <Name extends string>(frame: IterableFrame<Name>, column: ColumnCursor<Name>): number => {
+export const total = <Name extends string>(
+  frame: IterableFrame<Name> | GroupFrame<Name>,
+  column: ColumnCursor<Name>,
+): number => {
+  if (frame instanceof GroupFrame) {
+    frame = frame.ungroup();
+  }
   const cacheItem = getStatsCacheItem(frame, column);
   if (cacheItem.total === undefined) {
     // https://github.com/contiamo/operational-visualizations/issues/72
@@ -76,9 +82,12 @@ export const total = <Name extends string>(frame: IterableFrame<Name>, column: C
 
 // rename to unique
 export const uniqueValues = <Name extends string>(
-  frame: IterableFrame<Name>,
+  frame: IterableFrame<Name> | GroupFrame<Name>,
   column: ColumnCursor<Name>,
 ): DimensionValue[] => {
+  if (frame instanceof GroupFrame) {
+    frame = frame.ungroup();
+  }
   const cacheItem = getStatsCacheItem(frame, column);
   if (cacheItem.unique === undefined) {
     const unique = new Set<string>();
