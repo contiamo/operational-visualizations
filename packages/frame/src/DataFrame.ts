@@ -38,7 +38,7 @@ export class DataFrame<Name extends string = string> implements IterableFrame<Na
       if (index === -1) {
         throw new Error(`Unknown column: ${column}`);
       }
-      const cursor = ((row: RowCursor[]) => row[index]) as ColumnCursor<Name>;
+      const cursor = (row => row[index]) as ColumnCursor<Name>;
       cursor.column = column;
       cursor.index = index;
       this.cursorCache.set(column, cursor);
