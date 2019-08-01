@@ -58,7 +58,7 @@ export function TableGrid<Name extends string = string>(props: Props<Name>) {
 
   const styleProp = props.style || (emptyObject as Defined<Props<Name>["style"]>);
   const borderStyle = styleProp.border || defaultBorderStyle;
-  const cellStyle = isFunction(styleProp.cell) ? styleProp.cell : () => (styleProp.cell || emptyObject);
+  const cellStyle = isFunction(styleProp.cell) ? styleProp.cell : () => styleProp.cell || emptyObject;
   const backgroundStyle = styleProp.background || defaultBackground;
   const headerStyle = styleProp.header || defaultHeaderStyle;
 
@@ -92,7 +92,7 @@ export function TableGrid<Name extends string = string>(props: Props<Name>) {
 
       return <div style={{ ...border, ...style }}>{item}</div>;
     },
-    [data, cellStyle, borderStyle, backgroundStyle, header, dimensionStyle],
+    [data, cellStyle, borderStyle, backgroundStyle, header, dimensionStyle, columnCount, rowCount, headerStyle],
   );
 
   return (
