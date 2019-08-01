@@ -3,17 +3,16 @@ import { DataFrame } from "./DataFrame";
 import { IterableFrame, RowCursor, ColumnCursor, Matrix, Schema } from "./types";
 import { getData } from "./secret";
 import { isCursor, hashCursors } from "./utils";
-import { buildIndex } from "./stats";
-import { GroupedFrame } from "./GroupedFrame";
+import { GroupFrame } from "./GroupFrame";
 
 export class FragmentFrame<Name extends string = string> implements IterableFrame<Name> {
   private readonly data: Matrix<any>;
   public readonly schema: Schema<Name>;
   private readonly index: number[];
-  private readonly origin: DataFrame<Name>;
+  private readonly origin: DataFrame<Name> | FragmentFrame<Name>;
   private readonly groupByCache: Map<string, any>;
 
-  constructor(origin: DataFrame<Name>, index: number[]) {
+  constructor(origin: DataFrame<Name> | FragmentFrame<Name>, index: number[]) {
     this.origin = origin;
     const [schema, data] = origin[getData]();
     this.schema = schema;
@@ -22,29 +21,21 @@ export class FragmentFrame<Name extends string = string> implements IterableFram
     this.groupByCache = new Map();
   }
 
-  public getCursor(column: Name) {
+  public getCursor(column: Name): ColumnCursor<Name> {
     return this.origin.getCursor(column);
   }
 
-  public groupBy(columns: Array<Name | ColumnCursor<Name>>): GroupedFrame<Name> {
+  public groupBy(columns: Array<Name | ColumnCursor<Name>>): GroupFrame<Name> {
     const columnCursors = columns.map(c => (isCursor(c) ? c : this.getCursor(c)));
     const hash = hashCursors(columnCursors);
     if (!this.groupByCache.has(hash)) {
-      // If no columns are provided, returns an array with the current frame as the sole entry.
-      if (columns.length === 0) {
-        this.groupByCache.set(hash, new GroupedFrame(this.origin, [this.data.map((_, i) => i)]));
-      } else {
-        const { index } = buildIndex(this, columnCursors);
-        this.groupByCache.set(hash, new GroupedFrame(this.origin, index));
-      }
+      this.groupByCache.set(hash, new GroupFrame(this, columnCursors));
     }
     return this.groupByCache.get(hash);
   }
 
-  public uniqueValues(columns: Array<Name | ColumnCursor<Name>>): string[][] {
-    const columnCursors = columns.map(c => (isCursor(c) ? c : this.getCursor(c)));
-    const { uniqueValues } = buildIndex(this, columnCursors);
-    return uniqueValues;
+  public uniqueValues(columns: Array<Name | ColumnCursor<Name>>) {
+    return this.groupBy(columns).unique();
   }
 
   public mapRows<A>(callback: (row: RowCursor, index: number) => A) {

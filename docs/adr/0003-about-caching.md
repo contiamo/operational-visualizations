@@ -106,7 +106,7 @@ cache.get(frame)[firstColumn]["max"];
 
 As soon as `frame` is removed by GC, the whole slot (`cache.get(frame)`) will be removed as well.
 
-This system works only with referentially transparent functions, so for example it will not work with FragmentFrames `groupBy`. (Maybe we need to change `groupBy` and return some kind of `GroupedFrame` 🤔).
+This system works only with referentially transparent functions, so for example it will not work with FragmentFrames `groupBy`. (Maybe we need to change `groupBy` and return some kind of `GroupFrame` 🤔).
 
 ### Hooks
 

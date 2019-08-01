@@ -2,21 +2,22 @@ import { PivotFrame } from "./PivotFrame";
 import { ColumnCursor, IterableFrame, Matrix, PivotProps, Schema, RowCursor } from "./types";
 import { getData } from "./secret";
 import { isCursor, hashCursors } from "./utils";
-import { buildIndex } from "./stats";
-import { GroupedFrame } from "./GroupedFrame";
+import { GroupFrame } from "./GroupFrame";
+import flru, { flruCache } from "flru";
 
 export class DataFrame<Name extends string = string> implements IterableFrame<Name> {
   private readonly data: Matrix<any>;
   public readonly schema: Schema<Name>;
 
   private readonly cursorCache: Map<Name, ColumnCursor<Name>>;
-  private readonly groupByCache: Map<string, Array<IterableFrame<Name>>>;
+  private readonly referentialCache: flruCache;
 
   constructor(schema: Schema<Name>, data: Matrix<any>) {
     this.schema = schema;
     this.data = data;
     this.cursorCache = new Map();
-    this.groupByCache = new Map();
+    // this one is small cache, because it is for rare operations
+    this.referentialCache = flru(5);
   }
 
   public stats() {
@@ -48,33 +49,31 @@ export class DataFrame<Name extends string = string> implements IterableFrame<Na
     return this.cursorCache.get(column)!;
   }
 
-  public groupBy(columns: Array<Name | ColumnCursor<Name>>): GroupedFrame<Name> {
-    const columnCursors = columns.map(c => (isCursor(c) ? c : this.getCursor(c)));
-    const hash = hashCursors(columnCursors);
-    if (!this.groupByCache.has(hash)) {
-      // If no columns are provided, returns an array with the current frame as the sole entry.
-      if (columns.length === 0) {
-        this.groupByCache.set(hash, new GroupedFrame(this, [this.data.map((_, i) => i)]));
-      } else {
-        const { index } = buildIndex(this, columnCursors);
-        this.groupByCache.set(hash, new GroupedFrame(this, index));
-      }
+  public pivot<Column extends Name, Row extends Name>(prop: PivotProps<Column, Row>): PivotFrame<Name> {
+    const columnCursors = prop.columns.map(c => (isCursor(c) ? c : this.getCursor(c)));
+    const rowCursors = prop.rows.map(c => (isCursor(c) ? c : this.getCursor(c)));
+    const hash = `${hashCursors(columnCursors)}x${hashCursors(rowCursors)}`;
+    if (!this.referentialCache.has(hash)) {
+      this.referentialCache.set(hash, new PivotFrame(this, prop));
     }
-    return this.groupByCache.get(hash)!;
+    return this.referentialCache.get(hash);
   }
 
-  public uniqueValues(columns: Array<Name | ColumnCursor<Name>>): string[][] {
+  public groupBy(columns: Array<Name | ColumnCursor<Name>>): GroupFrame<Name> {
     const columnCursors = columns.map(c => (isCursor(c) ? c : this.getCursor(c)));
-    const { uniqueValues } = buildIndex(this, columnCursors);
-    return uniqueValues;
+    const hash = hashCursors(columnCursors);
+    if (!this.referentialCache.has(hash)) {
+      this.referentialCache.set(hash, new GroupFrame(this, columnCursors));
+    }
+    return this.referentialCache.get(hash);
+  }
+
+  public uniqueValues(columns: Array<Name | ColumnCursor<Name>>) {
+    return this.groupBy(columns).unique();
   }
 
   public mapRows<A>(callback: (row: RowCursor[], index: number) => A) {
     return this.data.map(callback);
-  }
-
-  public pivot<Column extends Name, Row extends Name>(prop: PivotProps<Column, Row>): PivotFrame<Name> {
-    return new PivotFrame(this, prop);
   }
 
   // for internal use only

@@ -1,9 +1,9 @@
 import { IterableFrame, maxValue, uniqueValues, ColumnCursor } from "@operational/frame";
 import { scaleBand, scaleLinear } from "d3-scale";
 import { useMemo } from "react";
-import { GroupedFrame } from "@operational/frame";
+import { GroupFrame } from "@operational/frame";
 
-// for now band scale doesn't support GroupedFrame as an input,
+// for now band scale doesn't support GroupFrame as an input,
 // that is why we use two separate interfaces for band and linear
 export interface BandScaleProps<Name extends string> {
   frame: IterableFrame<Name>;
@@ -13,7 +13,7 @@ export interface BandScaleProps<Name extends string> {
 }
 
 export interface LinearScaleProps<Name extends string> {
-  frame: IterableFrame<Name> | GroupedFrame<Name>;
+  frame: IterableFrame<Name> | GroupFrame<Name>;
   column: ColumnCursor<Name>;
   range: [number, number];
   padding?: number;

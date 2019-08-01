@@ -2,33 +2,26 @@ import flru, { flruCache } from "flru";
 // this is not circular dependency, because we use DataFrame as type
 import { DataFrame } from "./DataFrame";
 import { FragmentFrame } from "./FragmentFrame";
-import { PivotProps, WithCursor, Matrix, Schema } from "./types";
+import { PivotProps, WithCursor, DimensionValue } from "./types";
 import { getData } from "./secret";
 
 const intersect = <T>(...arr: T[][]): T[] => arr.reduce((prev, curr) => prev.filter(x => curr.includes(x)));
 
-// theoretically it can be string | bool | number, but TS doesn't allow to use bool as index value
-export type DimensionValue = string;
-
 export class PivotFrame<Name extends string = string> implements WithCursor<Name> {
-  private readonly data: Matrix<any>;
-  private readonly schema: Schema<Name>;
   private readonly prop: PivotProps<Name, Name>;
   private readonly origin: DataFrame<Name>;
 
+  // protected because we expose them for PivotFramePreindexed
   protected rowHeadersInternal!: DimensionValue[][];
   protected columnHeadersInternal!: DimensionValue[][];
   protected columnIndex!: number[][];
   protected rowIndex!: number[][];
 
-  // we need those for referential transperancy
+  // we need this for referential transparency
   private readonly cache: flruCache<FragmentFrame<Name>>;
 
   constructor(origin: DataFrame<Name>, prop: PivotProps<Name, Name>) {
     this.origin = origin;
-    const [schema, data] = origin[getData]();
-    this.schema = schema;
-    this.data = data;
     this.prop = prop;
     this.cache = flru(1024);
   }
@@ -124,7 +117,8 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
   private getFrameWithoutPivoting() {
     const key = `0`;
     if (!this.cache.has(key)) {
-      this.cache.set(key, new FragmentFrame(this.origin, this.data.map((_, i) => i)));
+      const [, data] = this.origin[getData]();
+      this.cache.set(key, new FragmentFrame(this.origin, data.map((_, i) => i)));
     }
     return this.cache.get(key)!;
   }
@@ -133,8 +127,9 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
     if (this.columnIndex && this.rowIndex) {
       return;
     }
+    const [schema, data] = this.origin[getData]();
 
-    const nameToIndex = this.schema.reduce(
+    const nameToIndex = schema.reduce(
       (acc, columnDefinition, index) => {
         acc[columnDefinition.name] = index;
         return acc;
@@ -150,7 +145,7 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
      * It corresponds to `CREATE INDEX rowTreeIndex ON table (rowA, rowB, ...);` - in first level we will have unique values for [rowA],
      * in second level we will have unique values for [rowA, rowB] etc.
      * In the end there is a list of indexes of rows from original data.
-     * If we need to find what rows (from the `this.data`) correspond to [valueFromRowA, valueFromRowB ...]
+     * If we need to find what rows (from the `data`) correspond to [valueFromRowA, valueFromRowB ...]
      * we can do following rowTreeIndex[valueFromRowA][valueFromRowB][...] and we will get array on indexes
      */
     const rowTreeIndex = {} as Record<DimensionValue, any>;
@@ -162,7 +157,7 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
     const rowHeaders: DimensionValue[][] = [];
     /**
      * matrix structure implemented as array of arrays
-     * [[<numbers of rows in this.data with valueFromRowA, valueFromRowB ...>]]
+     * [[<numbers of rows in data with valueFromRowA, valueFromRowB ...>]]
      * first row in rowHeaders corresponds to first row in rowHeaders etc.
      */
     const rowIndex: number[][] = [];
@@ -176,7 +171,7 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
     // see rowIndex
     const columnIndex: number[][] = [];
 
-    this.data.forEach((dataRow, rowNumber) => {
+    data.forEach((dataRow, rowNumber) => {
       const rowHeader: DimensionValue[] = [];
       let previousRow: Record<DimensionValue, any> = rowTreeIndex;
 

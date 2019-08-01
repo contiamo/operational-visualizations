@@ -1,4 +1,4 @@
-import { GroupedFrame } from "./GroupedFrame";
+import { GroupFrame } from "./GroupFrame";
 
 /**
  * Can represent array of arrays or list of tuples or tuple of lists
@@ -40,15 +40,18 @@ export interface WithCursor<Name extends string> {
   getCursor(column: Name): ColumnCursor<Name>;
 }
 
+// theoretically it can be string | bool | number, but TS doesn't allow to use bool as index value
+export type DimensionValue = string;
+
 export interface IterableFrame<Name extends string> extends WithCursor<Name> {
   /** needed for stats module */
   readonly schema: Schema<Name>;
   /** needed for visualisations */
   mapRows<Result>(callback: (rowCursor: RowCursor, rowIndex: number) => Result): Result[];
   /** needed for visualizations */
-  groupBy(columns: Array<Name | ColumnCursor<Name>>): GroupedFrame<Name>;
+  groupBy(columns: Array<Name | ColumnCursor<Name>>): GroupFrame<Name>;
   /** needed for visualizations */
-  uniqueValues(columns: Array<Name | ColumnCursor<Name>>): string[][];
+  uniqueValues(columns: Array<Name | ColumnCursor<Name>>): DimensionValue[][];
   /** needed for visualizations */
   row(rowIndex: number): RowCursor;
 }
@@ -57,3 +60,5 @@ export interface PivotProps<Column extends string, Row extends string> {
   rows: Row[];
   columns: Column[];
 }
+
+export type GroupProps<Name extends string> = ReadonlyArray<Name | ColumnCursor<Name>>;
