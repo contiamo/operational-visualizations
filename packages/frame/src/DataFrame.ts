@@ -10,7 +10,7 @@ export class DataFrame<Name extends string = string> implements IterableFrame<Na
   public readonly schema: Schema<Name>;
 
   private readonly cursorCache: Map<Name, ColumnCursor<Name>>;
-  private readonly groupByCache: Map<string, any>;
+  private readonly groupByCache: Map<string, Array<IterableFrame<Name>>>;
 
   constructor(schema: Schema<Name>, data: Matrix<any>) {
     this.schema = schema;
@@ -60,7 +60,7 @@ export class DataFrame<Name extends string = string> implements IterableFrame<Na
         this.groupByCache.set(hash, index.map(i => new FragmentFrame<Name>(this, i)));
       }
     }
-    return this.groupByCache.get(hash);
+    return this.groupByCache.get(hash)!;
   }
 
   public uniqueValues(columns: Array<Name | ColumnCursor<Name>>): string[][] {
