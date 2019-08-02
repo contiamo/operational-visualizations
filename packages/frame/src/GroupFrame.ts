@@ -62,3 +62,9 @@ export class GroupFrame<Name extends string = string> {
     }
   }
 }
+
+// don't ask me why (facepalm)
+export const isGroupFrame =
+  typeof window === "undefined" || navigator.userAgent.includes("Node.js") || navigator.userAgent.includes("jsdom")
+    ? (x: any): x is GroupFrame => x.constructor.name === "GroupFrame"
+    : (x: any): x is GroupFrame => x instanceof GroupFrame;

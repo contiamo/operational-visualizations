@@ -1,5 +1,5 @@
 import { IterableFrame, ColumnCursor, DimensionValue } from "./types";
-import { GroupFrame } from "./GroupFrame";
+import { GroupFrame, isGroupFrame } from "./GroupFrame";
 
 interface StatsCacheItem {
   max?: number;
@@ -40,17 +40,21 @@ export const maxValue = <Name extends string>(
     //   throw new Error("Can't get max value of empty Frame")
     // }
     let max: number | undefined = undefined;
-    if (frame instanceof GroupFrame) {
+    if (isGroupFrame(frame)) {
       // we use sum as aggregation function, but we can use average or mean
       // we can pass information about which aggregation to use inside GroupFrame
       const aggregation = total;
       frame.map(row => {
-        max = max === undefined ? aggregation(row, column) : Math.max(max, aggregation(row, column));
+        const value = aggregation(row, column);
+        if (value != null) {
+          max = max === undefined ? value : Math.max(max, value);
+        }
       });
     } else {
       frame.mapRows(row => {
-        if (row[column.index] != null) {
-          max = max === undefined ? row[column.index] : Math.max(max, row[column.index]);
+        const value = row[column.index];
+        if (value != null) {
+          max = max === undefined ? value : Math.max(max, value);
         }
       });
     }
@@ -63,7 +67,7 @@ export const total = <Name extends string>(
   frame: IterableFrame<Name> | GroupFrame<Name>,
   column: ColumnCursor<Name>,
 ): number => {
-  if (frame instanceof GroupFrame) {
+  if (isGroupFrame(frame)) {
     frame = frame.ungroup();
   }
   const cacheItem = getStatsCacheItem(frame, column);
@@ -71,8 +75,9 @@ export const total = <Name extends string>(
     // https://github.com/contiamo/operational-visualizations/issues/72
     let total: number | undefined = undefined;
     frame.mapRows(row => {
-      if (row[column.index] != null) {
-        total = total === undefined ? parseFloat(row[column.index]) : total + parseFloat(row[column.index]);
+      const value = row[column.index];
+      if (value) {
+        total = total === undefined ? parseFloat(value) : total + parseFloat(value);
       }
     });
     cacheItem.total = total!;
@@ -85,7 +90,7 @@ export const uniqueValues = <Name extends string>(
   frame: IterableFrame<Name> | GroupFrame<Name>,
   column: ColumnCursor<Name>,
 ): DimensionValue[] => {
-  if (frame instanceof GroupFrame) {
+  if (isGroupFrame(frame)) {
     frame = frame.ungroup();
   }
   const cacheItem = getStatsCacheItem(frame, column);
