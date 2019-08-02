@@ -54,7 +54,7 @@ export const total = <Name extends string>(frame: IterableFrame<Name>, column: C
     // https://github.com/contiamo/operational-visualizations/issues/72
     let total: number | undefined = undefined;
     frame.mapRows(row => {
-      total = total === undefined ? row[column.index] : total + row[column.index];
+      total = total === undefined ? parseFloat(row[column.index]) : total + parseFloat(row[column.index]);
     });
     cacheItem.total = total!;
   }
