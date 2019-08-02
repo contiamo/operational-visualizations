@@ -11,6 +11,6 @@
     }
   },
   "moduleNameMapper": {
-    "@operational/(.*)$": "<rootDir>/packages/$1"
+    "@operational/(frame|grid|visualization)$": "<rootDir>/packages/$1"
   }
 }

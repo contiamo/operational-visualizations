@@ -2,8 +2,8 @@
 import { DataFrame } from "./DataFrame";
 import { IterableFrame, RowCursor, ColumnCursor, Matrix, Schema } from "./types";
 import { getData } from "./secret";
-import { isCursor } from "./utils";
-import { uniqueValueCombinations } from "./stats";
+import { isCursor, hashCursors } from "./utils";
+import { buildIndex } from "./stats";
 
 const isColumnCursor = <Name extends string>(column: any): column is ColumnCursor<Name> => {
   return column.index !== undefined;
@@ -14,6 +14,7 @@ export class FragmentFrame<Name extends string = string> implements IterableFram
   public readonly schema: Schema<Name>;
   private readonly index: number[];
   private readonly origin: DataFrame<Name>;
+  private readonly groupByCache: Map<string, any>;
 
   constructor(origin: DataFrame<Name>, index: number[]) {
     this.origin = origin;
@@ -21,6 +22,7 @@ export class FragmentFrame<Name extends string = string> implements IterableFram
     this.schema = schema;
     this.data = data;
     this.index = index;
+    this.groupByCache = new Map();
   }
 
   public getCursor(column: Name) {
@@ -28,28 +30,24 @@ export class FragmentFrame<Name extends string = string> implements IterableFram
   }
 
   public groupBy(columns: Array<Name | ColumnCursor<Name>>): Array<IterableFrame<Name>> {
-    // If no columns are provided, returns an array with the current frame as a FragmentFrame as the sole entry.
-    if (columns.length === 0) {
-      return [this];
-    }
-
     const columnCursors = columns.map(c => (isCursor(c) ? c : this.getCursor(c)));
-    // Returns a FragmentFrame for every unique combination of column values.
-    return uniqueValueCombinations(this, columnCursors).map(u => {
-      const indices = this.data.reduce((arr, row, i): any => {
-        if (columnCursors.every((cursor, j) => cursor(row) === u[j]) && this.index.includes(i)) {
-          arr.push(i);
-        }
-        return arr;
-      }, []);
-
-      return new FragmentFrame<Name>(this.origin, indices);
-    });
+    const hash = hashCursors(columnCursors);
+    if (!this.groupByCache.has(hash)) {
+      // If no columns are provided, returns an array with the current frame as the sole entry.
+      if (columns.length === 0) {
+        this.groupByCache.set(hash, [this]);
+      } else {
+        const { index } = buildIndex(this, columnCursors);
+        this.groupByCache.set(hash, index.map(i => new FragmentFrame<Name>(this.origin, i)));
+      }
+    }
+    return this.groupByCache.get(hash);
   }
 
   public uniqueValues(columns: Array<Name | ColumnCursor<Name>>): string[][] {
     const columnCursors = columns.map(c => (isCursor(c) ? c : this.getCursor(c)));
-    return uniqueValueCombinations(this, columnCursors);
+    const { uniqueValues } = buildIndex(this, columnCursors);
+    return uniqueValues;
   }
 
   public mapRows<A>(callback: (row: RowCursor, index: number) => A) {
@@ -58,6 +56,11 @@ export class FragmentFrame<Name extends string = string> implements IterableFram
 
   public row(rowIndex: number) {
     return this.data[this.index[rowIndex]];
+  }
+
+  // for internal use only
+  [getData]() {
+    return [this.schema, this.data, this.index] as const;
   }
 
   // we need this function for table display

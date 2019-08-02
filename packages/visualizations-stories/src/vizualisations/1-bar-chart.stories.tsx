@@ -64,12 +64,14 @@ interface BarChartProps<Name extends string> {
   metric: Name;
   metricDirection: AxialChartProps<string>["metricDirection"];
 }
-const colors = {
-  "Germany": "#1499CE",
-  "UK": "#7C246F",
-  "USA": "#EAD63F",
-  "Canada": "#343972",
+const colors: Record<string, string> = {
+  Germany: "#1499CE",
+  UK: "#7C246F",
+  USA: "#EAD63F",
+  Canada: "#343972",
 };
+
+const colorScale = (country: string) => colors[country];
 
 /**
  * Example of how you can compose more complex charts out of 'atoms'
@@ -83,28 +85,31 @@ const BarChart = <Name extends string>({
   metric,
   metricDirection,
 }: BarChartProps<Name>) => {
+  const categoricalCursor = data.getCursor(categorical);
+  const metricCursor = data.getCursor(metric);
+  const colorCursor = data.getCursor("Customer.Country" as Name);
+
   const categoricalScale = useScaleBand({
     frame: data,
-    column: data.getCursor(categorical),
+    column: categoricalCursor,
     range: metricDirection === "horizontal" ? [0, height] : [0, width],
   });
   const metricScale = useScaleLinear({
     frame: data,
-    column: data.getCursor(metric),
+    column: metricCursor,
     range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
-  const colorCursor = data.getCursor("Customer.Country" as Name);
 
   return (
     <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
       <Bars
         metricDirection={metricDirection}
         data={data}
-        categorical={data.getCursor(categorical)}
-        metric={data.getCursor(metric)}
+        categorical={categoricalCursor}
+        metric={metricCursor}
         categoricalScale={categoricalScale}
         metricScale={metricScale}
-        style={row => ({ fill: colors[colorCursor(row) as "Germany" | "UK" | "USA" | "Canada"] })}
+        style={row => ({ fill: colorScale(colorCursor(row)) })}
       />
       <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
       <Axis scale={metricScale} position={metricDirection === "horizontal" ? "bottom" : "left"} />
