@@ -46,7 +46,7 @@ const rawData = {
     ["Europe", "Germany", "Hamburg", "<50", "Male", 303, 30.4],
     ["Europe", "UK", "London", "<50", "Male", 403, 40.4],
     ["Europe", "UK", "Edinburgh", "<50", "Male", 503, 50.4],
-    ["Europe", "UK", "Dresden", "<50", "Male", 703, 70.4],
+    [null, "UK", "Dresden", "<50", "Male", null, 70.4],
     ["North America", "USA", "New York", "<50", "Male", 803, 80.4],
     ["North America", "Canada", "Toronto", "<50", "Male", 903, 90.4],
     ["Europe", "Germany", "Berlin", ">=50", "Female", 105, 10.6],
@@ -80,7 +80,7 @@ const continentCursor = frame.getCursor("Customer.Continent");
 describe("total()", () => {
   describe("DataFrame", () => {
     it("calculates total for the numeric column", () => {
-      expect(total(frame, salesCursor)).toEqual(15728);
+      expect(total(frame, salesCursor)).toEqual(15025);
     });
     it("does't calculate total for the string column", () => {
       expect(total(frame, continentCursor)).toBe(NaN);
@@ -132,7 +132,6 @@ describe("uniqueValues()", () => {
         303,
         403,
         503,
-        703,
         803,
         903,
         105,

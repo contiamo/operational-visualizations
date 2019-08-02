@@ -41,7 +41,9 @@ export const maxValue = <Name extends string>(frame: IterableFrame<Name>, column
     // }
     let max: number | undefined = undefined;
     frame.mapRows(row => {
-      max = max === undefined ? row[column.index] : Math.max(max, row[column.index]);
+      if (row[column.index] != null) {
+        max = max === undefined ? row[column.index] : Math.max(max, row[column.index]);
+      }
     });
     cacheItem.max = max!;
   }
@@ -54,7 +56,9 @@ export const total = <Name extends string>(frame: IterableFrame<Name>, column: C
     // https://github.com/contiamo/operational-visualizations/issues/72
     let total: number | undefined = undefined;
     frame.mapRows(row => {
-      total = total === undefined ? parseFloat(row[column.index]) : total + parseFloat(row[column.index]);
+      if (row[column.index] != null) {
+        total = total === undefined ? parseFloat(row[column.index]) : total + parseFloat(row[column.index]);
+      }
     });
     cacheItem.total = total!;
   }
@@ -67,7 +71,9 @@ export const uniqueValues = <Name extends string>(frame: IterableFrame<Name>, co
   if (cacheItem.unique === undefined) {
     const unique = new Set<string>();
     frame.mapRows(row => {
-      unique.add(row[column.index]);
+      if (row[column.index] != null) {
+        unique.add(row[column.index]);
+      }
     });
     cacheItem.unique = [...unique];
   }
