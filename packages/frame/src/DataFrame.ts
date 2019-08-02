@@ -51,7 +51,7 @@ export class DataFrame<Name extends string = string> implements IterableFrame<Na
 
   public pivot<Column extends Name, Row extends Name>(prop: PivotProps<Column, Row>): PivotFrame<Name> {
     const columnCursors = prop.columns.map(c => (isCursor(c) ? c : this.getCursor(c)));
-    const rowCursors = prop.rows.map(c => (isCursor(c) ? c : this.getCursor(c)));
+    const rowCursors = prop.rows.map(r => (isCursor(r) ? r : this.getCursor(r)));
     const hash = `${hashCursors(columnCursors)}x${hashCursors(rowCursors)}`;
     if (!this.referentialCache.has(hash)) {
       this.referentialCache.set(hash, new PivotFrame(this, prop));
