@@ -12,9 +12,9 @@ export class GroupFrame<Name extends string = string> {
   private readonly prop: GroupProps<Name>;
   private readonly origin: DataFrame<Name> | FragmentFrame<Name>;
 
-  private rowIndex!: number[][];
-  private uniqueValues!: DimensionValue[][];
-  private groups!: FragmentFrame<Name>[];
+  private rowIndex: number[][] | undefined;
+  private unique: DimensionValue[][] | undefined;
+  private groups: FragmentFrame<Name>[] | undefined;
 
   constructor(origin: DataFrame<Name> | FragmentFrame<Name>, prop: GroupProps<Name>) {
     this.origin = origin;
@@ -25,7 +25,7 @@ export class GroupFrame<Name extends string = string> {
     return this.origin.getCursor(column);
   }
 
-  // this is reverse operation of groupBy in the DataFrame
+  // reverse operation of groupBy in the DataFrame
   public ungroup() {
     return this.origin;
   }
@@ -34,17 +34,27 @@ export class GroupFrame<Name extends string = string> {
     if (!this.rowIndex) {
       this.buildIndex();
     }
+    if (!this.rowIndex) {
+      // we assign rowIndex inside buildIndex, but TS can't trace it
+      // so we need to proof to TS that rowIndex is not undefined
+      throw new Error("Never happens");
+    }
     if (!this.groups) {
       this.groups = this.rowIndex.map(i => new FragmentFrame(this.origin, i));
     }
     return this.groups.map(callback);
   }
 
-  public unique() {
-    if (!this.uniqueValues) {
+  public uniqueValues(): DimensionValue[][] {
+    if (!this.unique) {
       this.buildIndex();
     }
-    return this.uniqueValues;
+    if (!this.unique) {
+      // we assign unique inside buildIndex, but TS can't trace it
+      // so we need to proof to TS that unique is not undefined
+      throw new Error("Never happens");
+    }
+    return this.unique;
   }
 
   private buildIndex() {
@@ -54,16 +64,17 @@ export class GroupFrame<Name extends string = string> {
     if (columnCursors.length === 0) {
       const [, data, index] = this.origin[getData]();
       this.rowIndex = [index ? index : data.map((_, i) => i)];
-      this.uniqueValues = [];
+      this.unique = [];
     } else {
       const { index, uniqueValues } = buildIndex(this.origin, columnCursors);
       this.rowIndex = index;
-      this.uniqueValues = uniqueValues;
+      this.unique = uniqueValues;
     }
   }
 }
 
-// don't ask me why (facepalm)
+// For unknown for me reason `x instanceof GroupFrame` doesn't work in Node.js.
+// To fix this we check if we run inside Node.js or Jest and use alternative way to detect GroupFrame
 export const isGroupFrame =
   typeof window === "undefined" || navigator.userAgent.includes("Node.js") || navigator.userAgent.includes("jsdom")
     ? (x: any): x is GroupFrame => x.constructor.name === "GroupFrame"

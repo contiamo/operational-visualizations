@@ -7,10 +7,8 @@ export const buildIndex = <Name extends string>(
   frame: DataFrame<Name> | FragmentFrame<Name>,
   columns: Array<ColumnCursor<Name>>,
 ) => {
-  const [, data, sliceIndex] = frame[getData]();
-
-  const last = columns.length - 1;
-  const pivotBy = columns.map(column => column.index);
+  const lastColumnNumber = columns.length - 1;
+  const groupBy = columns.map(column => column.index);
   /**
    * tree structure implemented as nested records
    * {[valueFromRowA]: {[valueFromRowB]: {...: [<numbers of rows in this.data with valueFromRowA, valueFromRowB ...>] }}}
@@ -36,29 +34,30 @@ export const buildIndex = <Name extends string>(
 
   const rowIterator = (dataRow: RowCursor, rowNumber: number) => {
     const rowHeader: DimensionValue[] = [];
-    let previousRow: Record<DimensionValue, any> = treeIndex;
+    let previousTree: Record<DimensionValue, any> = treeIndex;
 
-    pivotBy.forEach((dimensionIndex, i) => {
+    groupBy.forEach((dimensionIndex, i) => {
       const dimensionValue = dataRow[dimensionIndex];
       rowHeader.push(dimensionValue);
 
-      if (previousRow[dimensionValue] === undefined) {
-        if (i === last) {
+      if (previousTree[dimensionValue] === undefined) {
+        if (i === lastColumnNumber) {
           uniqueValues.push(rowHeader);
-          index[uniqueValues.length - 1] = previousRow[dimensionValue] = [];
+          index[uniqueValues.length - 1] = previousTree[dimensionValue] = [];
         } else {
-          previousRow[dimensionValue] = {};
+          previousTree[dimensionValue] = {};
         }
       }
-      if (i === last) {
-        previousRow[dimensionValue].push(rowNumber);
+      if (i === lastColumnNumber) {
+        previousTree[dimensionValue].push(rowNumber);
       }
-      previousRow = previousRow[dimensionValue];
+      previousTree = previousTree[dimensionValue];
     });
   };
 
-  if (sliceIndex) {
-    sliceIndex.forEach(rowNumber => rowIterator(data[rowNumber], rowNumber));
+  const [, data, fragmentIndex] = frame[getData]();
+  if (fragmentIndex) {
+    fragmentIndex.forEach(rowNumber => rowIterator(data[rowNumber], rowNumber));
   } else {
     data.forEach(rowIterator);
   }

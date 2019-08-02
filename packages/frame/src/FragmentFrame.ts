@@ -35,7 +35,7 @@ export class FragmentFrame<Name extends string = string> implements IterableFram
   }
 
   public uniqueValues(columns: Array<Name | ColumnCursor<Name>>) {
-    return this.groupBy(columns).unique();
+    return this.groupBy(columns).uniqueValues();
   }
 
   public mapRows<A>(callback: (row: RowCursor, index: number) => A) {

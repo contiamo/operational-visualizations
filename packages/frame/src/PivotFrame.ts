@@ -30,7 +30,7 @@ export class PivotFrame<Name extends string = string> implements WithCursor<Name
     return this.origin.getCursor(column);
   }
 
-  // this is reverse operation of pivot in the DataFrame
+  // reverse operation of pivot in the DataFrame
   // in Pandas this called melt
   public unpivot() {
     return this.origin;
