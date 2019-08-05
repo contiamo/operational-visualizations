@@ -14,7 +14,7 @@ export const Bars: DiscreteAxialChart<string> = props => {
     return (
       <g transform={transform || defaultTransform}>
         {data.mapRows((row, i) => {
-          const result = (
+          const bar = (
             <rect
               x={categoricalScale(categorical(row))}
               y={metricScale(metric(row)) - accumulatedHeight}
@@ -25,7 +25,7 @@ export const Bars: DiscreteAxialChart<string> = props => {
             />
           );
           accumulatedHeight += height - metricScale(metric(row));
-          return result;
+          return bar;
         })}
       </g>
     );
@@ -36,7 +36,7 @@ export const Bars: DiscreteAxialChart<string> = props => {
     return (
       <g transform={transform || defaultTransform}>
         {data.mapRows((row, i) => {
-          const result = (
+          const bar = (
             <rect
               y={categoricalScale(categorical(row))}
               x={accumulatedWidth}
@@ -47,7 +47,7 @@ export const Bars: DiscreteAxialChart<string> = props => {
             />
           );
           accumulatedWidth += metricScale(metric(row));
-          return result;
+          return bar;
         })}
       </g>
     );
