@@ -1,6 +1,6 @@
 import * as React from "react";
 import { storiesOf } from "@storybook/react";
-import { DataFrame } from "@operational/frame";
+import { DataFrame, IterableFrame, ColumnCursor, RowCursor } from "@operational/frame";
 import {
   AxialChartProps,
   Axis,
@@ -63,15 +63,37 @@ interface BarChartProps<Name extends string> {
   categorical: Name;
   metric: Name;
   metricDirection: AxialChartProps<string>["metricDirection"];
+  colorBy?: Name[];
 }
-const colors: Record<string, string> = {
-  Germany: "#1499CE",
-  UK: "#7C246F",
-  USA: "#EAD63F",
-  Canada: "#343972",
+
+const colorPalette = [
+  "#1499CE",
+  "#7C246F",
+  "#EAD63F",
+  "#343972",
+  "#ED5B17",
+  "#009691",
+  "#1D6199",
+  "#D31F1F",
+  "#AD329C",
+  "#006865",
+];
+
+export const joinArrayAsString = (array: string[]) => {
+  return (array || []).join("/");
 };
 
-const colorScale = (country: string) => colors[country];
+export const getColorScale = (frame: IterableFrame<string>, colorBy: Array<ColumnCursor<string>>) => {
+  if (colorBy.length === 0) {
+    return () => colorPalette[0];
+  }
+  const uniqueValues = frame.uniqueValues(colorBy).map(joinArrayAsString);
+  return (row: RowCursor) => {
+    const valuesString = joinArrayAsString(colorBy.map(cursor => cursor(row)));
+    const index = uniqueValues.indexOf(valuesString);
+    return colorPalette[index % colorPalette.length];
+  };
+};
 
 /**
  * Example of how you can compose more complex charts out of 'atoms'
@@ -84,10 +106,12 @@ const BarChart = <Name extends string>({
   categorical,
   metric,
   metricDirection,
+  colorBy,
 }: BarChartProps<Name>) => {
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
-  const colorCursor = data.getCursor("Customer.Country" as Name);
+
+  const frame = data.groupBy([categoricalCursor]);
 
   const categoricalScale = useScaleBand({
     frame: data,
@@ -95,22 +119,27 @@ const BarChart = <Name extends string>({
     range: metricDirection === "horizontal" ? [0, height] : [0, width],
   });
   const metricScale = useScaleLinear({
-    frame: data,
+    frame,
     column: metricCursor,
     range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
 
+  const colorByCursor = (colorBy || []).map(x => data.getCursor(x));
+  const colorScale = getColorScale(data, colorByCursor);
+
   return (
     <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
-      <Bars
-        metricDirection={metricDirection}
-        data={data}
-        categorical={categoricalCursor}
-        metric={metricCursor}
-        categoricalScale={categoricalScale}
-        metricScale={metricScale}
-        style={row => ({ fill: colorScale(colorCursor(row)) })}
-      />
+      {frame.map(grouped => (
+        <Bars
+          metricDirection={metricDirection}
+          data={grouped}
+          categorical={categoricalCursor}
+          metric={metricCursor}
+          categoricalScale={categoricalScale}
+          metricScale={metricScale}
+          style={row => ({ fill: colorScale(row) })}
+        />
+      ))}
       <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
       <Axis scale={metricScale} position={metricDirection === "horizontal" ? "bottom" : "left"} />
     </Chart>
@@ -126,6 +155,7 @@ storiesOf("@operational/visualizations/1. Bar chart", module)
       <BarChart
         metric="sales"
         categorical="Customer.City"
+        colorBy={["Customer.City"]}
         width={300}
         height={300}
         margin={magicMargin}
@@ -141,6 +171,39 @@ storiesOf("@operational/visualizations/1. Bar chart", module)
       <BarChart
         metric="sales"
         categorical="Customer.City"
+        colorBy={["Customer.City"]}
+        width={300}
+        height={300}
+        margin={magicMargin}
+        data={frame}
+        metricDirection="vertical"
+      />
+    );
+  })
+  .add("stacked horizontal", () => {
+    // number of pixels picked manually to make sure that YAxis fits on the screen
+    const magicMargin = 60;
+    return (
+      <BarChart
+        metric="sales"
+        categorical="Customer.Country"
+        colorBy={["Customer.Country", "Customer.City"]}
+        width={300}
+        height={300}
+        margin={magicMargin}
+        data={frame}
+        metricDirection="horizontal"
+      />
+    );
+  })
+  .add("stacked vertical", () => {
+    // number of pixels picked manually to make sure that YAxis fits on the screen
+    const magicMargin = 60;
+    return (
+      <BarChart
+        metric="sales"
+        categorical="Customer.Continent"
+        colorBy={["Customer.City"]}
         width={300}
         height={300}
         margin={magicMargin}
