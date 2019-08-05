@@ -39,7 +39,7 @@ const rawDataSingleLine = {
     ["North America", "USA", "New York", 801],
     ["North America", "Canada", "Toronto", 801],
   ],
-}
+};
 
 const rawDataMultipleLines = {
   columns: [
@@ -172,8 +172,8 @@ const colors = [
 const colorScale = (i: number) => colors[i % colors.length];
 
 type MultipleLinesProps<Name extends string> = LineChartProps<Name> & {
-  series: Name[]
-}
+  series: Name[];
+};
 
 const MultipleLines = <Name extends string>({
   width,

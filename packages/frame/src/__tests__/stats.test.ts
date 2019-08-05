@@ -74,6 +74,7 @@ const pivotFrame = frame.pivot({
   columns: ["Customer.AgeGroup", "Customer.Gender"],
 });
 const fragment = pivotFrame.row(0);
+const group = frame.groupBy(["Customer.Continent", "Customer.Country", "Customer.City"]);
 const salesCursor = frame.getCursor("sales");
 const continentCursor = frame.getCursor("Customer.Continent");
 
@@ -94,6 +95,14 @@ describe("total()", () => {
       expect(total(fragment, continentCursor)).toBe(NaN);
     });
   });
+  describe("GroupFrame", () => {
+    it("calculates total for the numeric column", () => {
+      expect(total(group, salesCursor)).toEqual(15025);
+    });
+    it("does't calculate total for the string column", () => {
+      expect(total(group, continentCursor)).toBe(NaN);
+    });
+  });
 });
 
 describe("maxValue()", () => {
@@ -111,6 +120,14 @@ describe("maxValue()", () => {
     });
     it("does't calculate max for the string column", () => {
       expect(maxValue(fragment, continentCursor)).toBe(NaN);
+    });
+  });
+  describe("GroupFrame", () => {
+    it("calculates max for the numeric column", () => {
+      expect(maxValue(group, salesCursor)).toEqual(3616);
+    });
+    it("does't calculate max for the string column", () => {
+      expect(maxValue(group, continentCursor)).toBe(NaN);
     });
   });
 });
@@ -162,6 +179,46 @@ describe("uniqueValues()", () => {
     });
     it("calculates unique for the string column", () => {
       expect(uniqueValues(fragment, continentCursor)).toStrictEqual(["Europe"]);
+    });
+  });
+  describe("GroupFrame", () => {
+    it("calculates unique for the numeric column", () => {
+      expect(uniqueValues(frame, salesCursor)).toStrictEqual([
+        101,
+        201,
+        301,
+        401,
+        501,
+        701,
+        801,
+        901,
+        103,
+        203,
+        303,
+        403,
+        503,
+        803,
+        903,
+        105,
+        205,
+        305,
+        405,
+        505,
+        705,
+        805,
+        905,
+        107,
+        207,
+        307,
+        407,
+        507,
+        707,
+        807,
+        907,
+      ]);
+    });
+    it("calculates unique for the string column", () => {
+      expect(uniqueValues(frame, continentCursor)).toStrictEqual(["Europe", "North America"]);
     });
   });
 });

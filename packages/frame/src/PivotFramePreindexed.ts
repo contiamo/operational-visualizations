@@ -1,7 +1,7 @@
 // this is not circular dependency, because we use DataFrame as type
 import { DataFrame } from "./DataFrame";
-import { DimensionValue, PivotFrame } from "./PivotFrame";
-import { PivotProps } from "./types";
+import { PivotFrame } from "./PivotFrame";
+import { PivotProps, DimensionValue } from "./types";
 
 /**
  * This class exposes internal implementation of PivotFrame,
