@@ -111,15 +111,13 @@ const ScatterPlot = <Name extends string>({
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
 
-  const frame = data.groupBy([categoricalCursor]);
-
   const categoricalScale = useScaleBand({
     frame: data,
     column: categoricalCursor,
     range: metricDirection === "horizontal" ? [0, height] : [0, width],
   });
   const metricScale = useScaleLinear({
-    frame,
+    frame: data,
     column: metricCursor,
     range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
@@ -129,17 +127,15 @@ const ScatterPlot = <Name extends string>({
 
   return (
     <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
-      {frame.map(grouped => (
-        <Dots
-          metricDirection={metricDirection}
-          data={grouped}
-          categorical={categoricalCursor}
-          metric={metricCursor}
-          categoricalScale={categoricalScale}
-          metricScale={metricScale}
-          style={row => ({ fill: colorScale(row) })}
-        />
-      ))}
+      <Dots
+        metricDirection={metricDirection}
+        data={data}
+        categorical={categoricalCursor}
+        metric={metricCursor}
+        categoricalScale={categoricalScale}
+        metricScale={metricScale}
+        style={row => ({ fill: colorScale(row) })}
+      />
       <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
       <Axis scale={metricScale} position={metricDirection === "horizontal" ? "bottom" : "left"} />
     </Chart>
@@ -171,38 +167,6 @@ storiesOf("@operational/visualizations/5. Scatter plot", module)
       <ScatterPlot
         metric="sales"
         categorical="Customer.City"
-        colorBy={["Customer.City"]}
-        width={300}
-        height={300}
-        margin={magicMargin}
-        data={frame}
-        metricDirection="vertical"
-      />
-    );
-  })
-  .add("stacked horizontal", () => {
-    // number of pixels picked manually to make sure that YAxis fits on the screen
-    const magicMargin = 60;
-    return (
-      <ScatterPlot
-        metric="sales"
-        categorical="Customer.Country"
-        colorBy={["Customer.Country", "Customer.City"]}
-        width={300}
-        height={300}
-        margin={magicMargin}
-        data={frame}
-        metricDirection="horizontal"
-      />
-    );
-  })
-  .add("stacked vertical", () => {
-    // number of pixels picked manually to make sure that YAxis fits on the screen
-    const magicMargin = 60;
-    return (
-      <ScatterPlot
-        metric="sales"
-        categorical="Customer.Continent"
         colorBy={["Customer.City"]}
         width={300}
         height={300}
