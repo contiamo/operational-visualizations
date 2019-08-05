@@ -9,7 +9,6 @@ import {
   ChartProps,
   useScaleBand,
   useScaleLinear,
-  StackedBars,
 } from "@operational/visualizations";
 
 const rawData = {
@@ -109,12 +108,10 @@ const BarChart = <Name extends string>({
   metricDirection,
   colorBy,
 }: BarChartProps<Name>) => {
-  const stacked = colorBy && colorBy.length <= 1 ? colorBy[0] !== categorical : true;
-
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
 
-  const frame = stacked ? data.groupBy([categoricalCursor]) : data;
+  const frame = data.groupBy([categoricalCursor]);
 
   const categoricalScale = useScaleBand({
     frame: data,
@@ -127,35 +124,22 @@ const BarChart = <Name extends string>({
     range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
 
-  const colorScale = getColorScale(data, (colorBy || []).map(x => data.getCursor(x)));
+  const colorByCursor = (colorBy || []).map(x => data.getCursor(x));
+  const colorScale = getColorScale(data, colorByCursor);
 
   return (
     <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
-      {stacked ? (
-        data
-          .groupBy([categoricalCursor])
-          .map(grouped => (
-            <StackedBars
-              metricDirection={metricDirection}
-              data={grouped}
-              categorical={categoricalCursor}
-              metric={metricCursor}
-              categoricalScale={categoricalScale}
-              metricScale={metricScale}
-              style={row => ({ fill: colorScale(row) })}
-            />
-          ))
-      ) : (
+      {frame.map(grouped => (
         <Bars
           metricDirection={metricDirection}
-          data={data}
+          data={grouped}
           categorical={categoricalCursor}
           metric={metricCursor}
           categoricalScale={categoricalScale}
           metricScale={metricScale}
           style={row => ({ fill: colorScale(row) })}
         />
-      )}
+      ))}
       <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
       <Axis scale={metricScale} position={metricDirection === "horizontal" ? "bottom" : "left"} />
     </Chart>
