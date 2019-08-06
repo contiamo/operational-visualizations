@@ -4,5 +4,7 @@ export { Bars } from "./Bars";
 export { Line } from "./Line";
 export { Dots } from "./Dots";
 export { Chart, ChartProps } from "./Chart";
+export { Legend } from "./Legend";
 export { AxialChart, AxialChartProps } from "./types";
+export { default as theme } from "./theme";
 export * from "./scale";

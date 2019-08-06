@@ -1,12 +1,14 @@
 import * as React from "react";
 import { storiesOf } from "@storybook/react";
-import { DataFrame, IterableFrame, ColumnCursor, RowCursor } from "@operational/frame";
+import { DataFrame, IterableFrame, RowCursor } from "@operational/frame";
 import {
   AxialChartProps,
   Axis,
   Bars,
   Chart,
   ChartProps,
+  Legend,
+  theme,
   useScaleBand,
   useScaleLinear,
 } from "@operational/visualizations";
@@ -66,32 +68,49 @@ interface BarChartProps<Name extends string> {
   colorBy?: Name[];
 }
 
-const colorPalette = [
-  "#1499CE",
-  "#7C246F",
-  "#EAD63F",
-  "#343972",
-  "#ED5B17",
-  "#009691",
-  "#1D6199",
-  "#D31F1F",
-  "#AD329C",
-  "#006865",
-];
+const colorPalette = theme.palettes.qualitative.operational;
+
+type ColorCacheItem = Record<string, string>
+
+const colorCache = new WeakMap<IterableFrame<string>, Record<string, ColorCacheItem>>();
+
+const getColorCacheItem = (frame: IterableFrame<string>, key: string): ColorCacheItem => {
+  if (!colorCache.has(frame)) {
+    colorCache.set(frame, {})
+  }
+  const cacheEntry = colorCache.get(frame)!;
+  if (!cacheEntry[key]) {
+    cacheEntry[key] = {};
+  }
+  return cacheEntry[key];
+}
 
 export const joinArrayAsString = (array: string[]) => {
   return (array || []).join("/");
 };
 
-export const getColorScale = (frame: IterableFrame<string>, colorBy: Array<ColumnCursor<string>>) => {
-  if (colorBy.length === 0) {
-    return () => colorPalette[0];
+export const getColorScale = (frame: IterableFrame<string>, colorBy: Array<string>) => {
+  const colorByKey = joinArrayAsString(colorBy)
+  let cacheItem = getColorCacheItem(frame, colorByKey);
+  const colorByCursors = (colorBy || []).map(x => frame.getCursor(x));
+  const uniqueValues = frame.uniqueValues(colorBy || []).map(joinArrayAsString);
+  if (Object.entries(cacheItem).length === 0) {
+    if (colorBy.length === 0 || uniqueValues.length === 1) {
+      return () => colorPalette[0];
+    }
+    uniqueValues.forEach(value => {
+        const index = uniqueValues.indexOf(value);
+        cacheItem[value] = colorPalette[index % colorPalette.length]
+    })
   }
-  const uniqueValues = frame.uniqueValues(colorBy).map(joinArrayAsString);
+
   return (row: RowCursor) => {
-    const valuesString = joinArrayAsString(colorBy.map(cursor => cursor(row)));
-    const index = uniqueValues.indexOf(valuesString);
-    return colorPalette[index % colorPalette.length];
+    const valuesString = joinArrayAsString(colorByCursors.map(cursor => cursor(row)));
+    if (!cacheItem[valuesString]) {
+      const index = uniqueValues.indexOf(valuesString);
+      cacheItem[valuesString] = colorPalette[index % colorPalette.length]
+    }
+    return cacheItem[valuesString]
   };
 };
 
@@ -124,25 +143,34 @@ const BarChart = <Name extends string>({
     range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
 
-  const colorByCursor = (colorBy || []).map(x => data.getCursor(x));
-  const colorScale = getColorScale(data, colorByCursor);
+  const colorScale = getColorScale(data, colorBy || []);
+
+  const uniqueValues = data.uniqueValues(colorBy || []).map(joinArrayAsString);
+  const legendData = uniqueValues.map(key => ({
+    key,
+    label: key,
+    color: getColorCacheItem(data, joinArrayAsString(colorBy || []))[key]
+  }))
 
   return (
-    <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
-      {frame.map(grouped => (
-        <Bars
-          metricDirection={metricDirection}
-          data={grouped}
-          categorical={categoricalCursor}
-          metric={metricCursor}
-          categoricalScale={categoricalScale}
-          metricScale={metricScale}
-          style={row => ({ fill: colorScale(row) })}
-        />
-      ))}
-      <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
-      <Axis scale={metricScale} position={metricDirection === "horizontal" ? "bottom" : "left"} />
-    </Chart>
+    <div style={{ display: "inline-block" }}>
+      <Legend data={legendData}/>
+      <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
+        {frame.map(grouped => (
+          <Bars
+            metricDirection={metricDirection}
+            data={grouped}
+            categorical={categoricalCursor}
+            metric={metricCursor}
+            categoricalScale={categoricalScale}
+            metricScale={metricScale}
+            style={row => ({ fill: colorScale(row) })}
+          />
+        ))}
+        <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
+        <Axis scale={metricScale} position={metricDirection === "horizontal" ? "bottom" : "left"} />
+      </Chart>
+    </div>
   );
 };
 
