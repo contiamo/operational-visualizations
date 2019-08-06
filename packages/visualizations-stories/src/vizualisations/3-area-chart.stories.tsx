@@ -103,7 +103,7 @@ const rawDataStacked = {
 };
 
 const frame = new DataFrame(rawData.columns, rawData.rows);
-const stackedFrame = new DataFrame(rawDataStacked.columns, rawDataStacked.rows);
+const frameStacked = new DataFrame(rawDataStacked.columns, rawDataStacked.rows);
 
 interface AreaChartProps<Name extends string> {
   width: number;
@@ -247,7 +247,7 @@ storiesOf("@operational/visualizations/3. Area chart", module)
         width={300}
         height={300}
         margin={magicMargin}
-        data={stackedFrame}
+        data={frameStacked}
         metricDirection="horizontal"
       />
     );
@@ -263,7 +263,7 @@ storiesOf("@operational/visualizations/3. Area chart", module)
         width={300}
         height={300}
         margin={magicMargin}
-        data={stackedFrame}
+        data={frameStacked}
         metricDirection="vertical"
       />
     );

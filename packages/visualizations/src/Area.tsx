@@ -15,6 +15,10 @@ export const Area: LinearAxialChart<string> = props => {
 
   const accumulatedCache: Record<string, number> = {};
 
+  // The area path function takes an array of datum objects (here, called `d` for consistency with d3 naming conventions)
+  // with the following properties:
+  // `c` is the categorical tick value
+  // `m0` and `m1` are the lower and upper metric values
   const path = metricDirection === "vertical"
     ? area<{ c: string; m0: number; m1: number }>()
         .x(d => categoricalTickWidth / 2 + (categoricalScale(d.c) || 0))
