@@ -7,12 +7,12 @@ const radius = 3;
 
 export const Dots: DiscreteAxialChart<string> = props => {
   const defaultTransform = useChartTransform();
-  const { data, transform, metric, categorical, metricScale, categoricalScale, style } = props;
+  const { data, transform, metric, categorical, metricScale, categoricalScale, metricDirection, style } = props;
 
   const bandWidth = categoricalScale.bandwidth();
 
   // this doesn't make much sense for ScatterPlot, but this is temprorary solution for compatibility
-  if (props.metricDirection === "vertical") {
+  if (metricDirection === "vertical") {
     return (
       <g transform={transform || defaultTransform}>
         {data.mapRows((row, i) => (
