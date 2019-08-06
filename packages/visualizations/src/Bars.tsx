@@ -5,9 +5,9 @@ import { isFunction } from "./utils";
 
 export const Bars: DiscreteAxialChart<string> = props => {
   const defaultTransform = useChartTransform();
+  const { data, transform, metric, categorical, metricScale, categoricalScale, style } = props;
 
   if (props.metricDirection === "vertical") {
-    const { data, transform, metric, categorical, metricScale, categoricalScale, style } = props;
     const height = metricScale(metricScale.domain()[0]);
     let accumulatedHeight = 0;
 
@@ -30,7 +30,6 @@ export const Bars: DiscreteAxialChart<string> = props => {
       </g>
     );
   } else {
-    const { data, transform, metric, categorical, metricScale, categoricalScale, style } = props;
     let accumulatedWidth = 0;
 
     return (
