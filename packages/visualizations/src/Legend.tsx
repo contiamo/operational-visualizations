@@ -34,8 +34,8 @@ const titleStyle: React.CSSProperties = {
 }
 
 interface LegendDatum {
-	label: string
-	color: string
+  label: string
+  color: string
   key: string
 }
 
