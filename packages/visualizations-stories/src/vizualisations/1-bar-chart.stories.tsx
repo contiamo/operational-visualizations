@@ -9,6 +9,7 @@ import {
   ChartProps,
   getColorScale,
   Legend,
+  theme,
   useScaleBand,
   useScaleLinear,
 } from "@operational/visualizations";
@@ -66,6 +67,7 @@ interface BarChartProps<Name extends string> {
   metric: Name;
   metricDirection: AxialChartProps<string>["metricDirection"];
   colorBy?: Name[];
+  palette?: string[];
 }
 
 
@@ -81,6 +83,7 @@ const BarChart = <Name extends string>({
   metric,
   metricDirection,
   colorBy,
+  palette,
 }: BarChartProps<Name>) => {
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
@@ -98,7 +101,7 @@ const BarChart = <Name extends string>({
     range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
 
-  const colorScale = getColorScale(data, colorBy || []);
+  const colorScale = getColorScale(data, colorBy || [], palette);
 
   return (
     <div style={{ display: "inline-block" }}>
@@ -185,6 +188,7 @@ storiesOf("@operational/visualizations/1. Bar chart", module)
         margin={magicMargin}
         data={frame}
         metricDirection="vertical"
+        palette={theme.palettes.qualitative.pastel}
       />
     );
   });

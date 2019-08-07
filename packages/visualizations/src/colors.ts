@@ -2,7 +2,7 @@ import { IterableFrame, RowCursor } from "@operational/frame";
 import theme from "./theme";
 import { joinArrayAsString } from "./utils";
 
-const colorPalette = theme.palettes.qualitative.operational;
+const defaultPalette = theme.palettes.qualitative.operational;
 
 type ColorCacheItem = Record<string, string>
 
@@ -19,7 +19,7 @@ const getColorCacheItem = (frame: IterableFrame<string>, key: string): ColorCach
   return cacheEntry[key];
 }
 
-export const getColorScale = (frame: IterableFrame<string>, colorBy: Array<string>) => {
+export const getColorScale = (frame: IterableFrame<string>, colorBy: Array<string>, palette: string[] = defaultPalette) => {
   const colorByKey = joinArrayAsString(colorBy)
   let cacheItem = getColorCacheItem(frame, colorByKey);
   const colorByCursors = (colorBy || []).map(x => frame.getCursor(x));
@@ -27,11 +27,11 @@ export const getColorScale = (frame: IterableFrame<string>, colorBy: Array<strin
 
   if (Object.entries(cacheItem).length === 0) {
     if (colorBy.length === 0 || uniqueValues.length === 1) {
-      return () => colorPalette[0];
+      return () => palette[0];
     }
     uniqueValues.forEach(value => {
         const index = uniqueValues.indexOf(value);
-        cacheItem[value] = colorPalette[index % colorPalette.length]
+        cacheItem[value] = palette[index % palette.length]
     })
   }
 
@@ -39,7 +39,7 @@ export const getColorScale = (frame: IterableFrame<string>, colorBy: Array<strin
     const valuesString = joinArrayAsString(colorByCursors.map(cursor => cursor(row)));
     if (!cacheItem[valuesString]) {
       const index = uniqueValues.indexOf(valuesString);
-      cacheItem[valuesString] = colorPalette[index % colorPalette.length]
+      cacheItem[valuesString] = palette[index % palette.length]
     }
     return cacheItem[valuesString]
   };
