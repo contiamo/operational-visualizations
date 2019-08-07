@@ -1,5 +1,7 @@
 import * as React from "react"
 import theme from "./theme"
+import { IterableFrame, RowCursor, ColumnCursor } from "@operational/frame";
+import { joinArrayAsString } from "./utils";
 
 const legendStyle: React.CSSProperties = {
   padding: `${theme.space.small}px ${theme.space.default}px`,
@@ -33,28 +35,24 @@ const titleStyle: React.CSSProperties = {
   padding: `2px ${theme.space.small}px`,
 }
 
-interface LegendDatum {
-  label: string
-  color: string
-  key: string
-}
-
-type LegendData = LegendDatum[]
-
-export interface Props {
+export interface Props<Name extends string> {
+  data: IterableFrame<Name>;
+  colorScale: (() => string) | ((row: RowCursor) => string);
+  cursors: Array<ColumnCursor<Name>>;
   style?: {}
   title?: string
-  data: LegendData
 }
 
-export const Legend = (props: Props) => (
-  <div style={{...props.style, ...legendStyle}}>
+export const Legend = (props: Props<string>) => {
+  const uniqueValues = props.data.uniqueValues(props.cursors)
+  if (uniqueValues.length === 0 || props.colorScale.length === 0) { return null }
+  return <div style={{...props.style, ...legendStyle}}>
     {props.title && <div style={titleStyle}>{props.title}</div>}
-    {props.data.map((datum: LegendDatum) => {
-      return <div className={datum.key} key={datum.key} style={seriesLegendStyle}>
-        <div style={colorStyle(datum.color)}></div>
-        <div style={nameStyle}>{datum.label}</div>
+    {props.data.groupBy(props.cursors).map(grouped =>
+      <div style={seriesLegendStyle}>
+        <div style={colorStyle(props.colorScale(grouped.row(0)))}></div>
+        <div style={nameStyle}>{joinArrayAsString(props.cursors.map(cursor => cursor(grouped.row(0))))}</div>
       </div>
-    })}
+    )}
   </div>
-)
+}

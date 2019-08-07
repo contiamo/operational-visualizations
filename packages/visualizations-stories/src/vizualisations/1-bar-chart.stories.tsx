@@ -1,14 +1,14 @@
 import * as React from "react";
 import { storiesOf } from "@storybook/react";
-import { DataFrame, IterableFrame, RowCursor } from "@operational/frame";
+import { DataFrame, RowCursor } from "@operational/frame";
 import {
   AxialChartProps,
   Axis,
   Bars,
   Chart,
   ChartProps,
+  getColorScale,
   Legend,
-  theme,
   useScaleBand,
   useScaleLinear,
 } from "@operational/visualizations";
@@ -68,51 +68,6 @@ interface BarChartProps<Name extends string> {
   colorBy?: Name[];
 }
 
-const colorPalette = theme.palettes.qualitative.operational;
-
-type ColorCacheItem = Record<string, string>
-
-const colorCache = new WeakMap<IterableFrame<string>, Record<string, ColorCacheItem>>();
-
-const getColorCacheItem = (frame: IterableFrame<string>, key: string): ColorCacheItem => {
-  if (!colorCache.has(frame)) {
-    colorCache.set(frame, {})
-  }
-  const cacheEntry = colorCache.get(frame)!;
-  if (!cacheEntry[key]) {
-    cacheEntry[key] = {};
-  }
-  return cacheEntry[key];
-}
-
-export const joinArrayAsString = (array: string[]) => {
-  return (array || []).join("/");
-};
-
-export const getColorScale = (frame: IterableFrame<string>, colorBy: Array<string>) => {
-  const colorByKey = joinArrayAsString(colorBy)
-  let cacheItem = getColorCacheItem(frame, colorByKey);
-  const colorByCursors = (colorBy || []).map(x => frame.getCursor(x));
-  const uniqueValues = frame.uniqueValues(colorBy || []).map(joinArrayAsString);
-  if (Object.entries(cacheItem).length === 0) {
-    if (colorBy.length === 0 || uniqueValues.length === 1) {
-      return () => colorPalette[0];
-    }
-    uniqueValues.forEach(value => {
-        const index = uniqueValues.indexOf(value);
-        cacheItem[value] = colorPalette[index % colorPalette.length]
-    })
-  }
-
-  return (row: RowCursor) => {
-    const valuesString = joinArrayAsString(colorByCursors.map(cursor => cursor(row)));
-    if (!cacheItem[valuesString]) {
-      const index = uniqueValues.indexOf(valuesString);
-      cacheItem[valuesString] = colorPalette[index % colorPalette.length]
-    }
-    return cacheItem[valuesString]
-  };
-};
 
 /**
  * Example of how you can compose more complex charts out of 'atoms'
@@ -145,16 +100,9 @@ const BarChart = <Name extends string>({
 
   const colorScale = getColorScale(data, colorBy || []);
 
-  const uniqueValues = data.uniqueValues(colorBy || []).map(joinArrayAsString);
-  const legendData = uniqueValues.map(key => ({
-    key,
-    label: key,
-    color: getColorCacheItem(data, joinArrayAsString(colorBy || []))[key]
-  }))
-
   return (
     <div style={{ display: "inline-block" }}>
-      <Legend data={legendData}/>
+      <Legend data={data} colorScale={colorScale} cursors={(colorBy || []).map(c => data.getCursor(c))}/>
       <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
         {frame.map(grouped => (
           <Bars
@@ -164,7 +112,7 @@ const BarChart = <Name extends string>({
             metric={metricCursor}
             categoricalScale={categoricalScale}
             metricScale={metricScale}
-            style={row => ({ fill: colorScale(row) })}
+            style={(row: RowCursor) => ({ fill: colorScale(row) })}
           />
         ))}
         <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
