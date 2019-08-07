@@ -9,9 +9,9 @@ import {
   ChartProps,
   useColorScale,
   Legend,
-  theme,
   useScaleBand,
   useScaleLinear,
+  theme,
 } from "@operational/visualizations";
 
 const rawData = {
