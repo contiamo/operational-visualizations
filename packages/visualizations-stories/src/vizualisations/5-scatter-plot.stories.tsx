@@ -95,11 +95,12 @@ const ScatterPlot = <Name extends string>({
     range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
 
-  const colorScale = getColorScale(data, colorBy || []);
+  const colorCursors = (colorBy || []).map(c => data.getCursor(c))
+  const colorScale = getColorScale(data, colorCursors);
 
   return (
     <div style={{ display: "inline-block" }}>
-      <Legend data={data} colorScale={colorScale} cursors={(colorBy || []).map(c => data.getCursor(c))}/>
+      <Legend data={data} colorScale={colorScale} cursors={colorCursors}/>
       <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
         <Dots
           metricDirection={metricDirection}

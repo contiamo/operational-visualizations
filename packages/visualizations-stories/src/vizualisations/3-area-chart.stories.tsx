@@ -148,7 +148,7 @@ const AreaChart = <Name extends string>({
     range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
 
-  const colorScale = getColorScale(data, colorBy || []);
+  const colorScale = getColorScale(data, colorByCursors);
 
   return (
     <div style={{ display: "inline-block" }}>
