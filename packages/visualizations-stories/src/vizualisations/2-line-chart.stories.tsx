@@ -200,8 +200,9 @@ const MultipleLines = <Name extends string>({
     <div style={{ display: "inline-block" }}>
       <Legend data={data} colorScale={colorScale} cursors={colorCursors}/>
       <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
-        {data.groupBy(series).map((seriesData) => (
+        {data.groupBy(series).map((seriesData, i) => (
           <Line
+            key={i}
             metricDirection={metricDirection}
             data={seriesData}
             categorical={categoricalCursor}

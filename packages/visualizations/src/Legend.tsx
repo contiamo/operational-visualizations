@@ -48,8 +48,8 @@ export const Legend = (props: Props<string>) => {
   if (uniqueValues.length === 0 || props.colorScale.length === 0) { return null }
   return <div style={{...props.style, ...legendStyle}}>
     {props.title && <div style={titleStyle}>{props.title}</div>}
-    {props.data.groupBy(props.cursors).map(grouped =>
-      <div style={seriesLegendStyle}>
+    {props.data.groupBy(props.cursors).map((grouped, i) =>
+      <div style={seriesLegendStyle} key={i}>
         <div style={colorStyle(props.colorScale(grouped.row(0)))}></div>
         <div style={nameStyle}>{joinArrayAsString(props.cursors.map(cursor => cursor(grouped.row(0))))}</div>
       </div>

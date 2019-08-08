@@ -46,6 +46,7 @@ export const Area: LinearAxialChart<string> = props => {
           });
 
           return <path
+            key={i}
             d={path(pathData) || ""}
             style={isFunction(style) ? style(grouped.row(0), i) : style}
           />

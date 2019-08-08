@@ -154,8 +154,9 @@ const AreaChart = <Name extends string>({
     <div style={{ display: "inline-block" }}>
       <Legend data={data} colorScale={colorScale} cursors={colorByCursors}/>
       <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
-        {frame.map(grouped => (
+        {frame.map((grouped, i) => (
           <Area
+            key={i}
             metricDirection={metricDirection}
             data={grouped}
             categorical={categoricalCursor}
