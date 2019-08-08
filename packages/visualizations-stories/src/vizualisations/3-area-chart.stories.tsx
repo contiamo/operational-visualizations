@@ -152,7 +152,7 @@ const AreaChart = <Name extends string>({
 
   return (
     <div style={{ display: "inline-block" }}>
-      <Legend data={data} colorScale={colorScale} cursors={[]}/>
+      <Legend data={data} colorScale={colorScale} cursors={colorByCursors}/>
       <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
         {frame.map(grouped => (
           <Area
