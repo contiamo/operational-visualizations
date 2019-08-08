@@ -164,7 +164,7 @@ const AreaChart = <Name extends string>({
             stack={colorByCursors}
             categoricalScale={categoricalScale}
             metricScale={metricScale}
-            style={(row: RowCursor) => ({ fill: colorScale(row), stroke: "#fff" })}          />
+            style={(row: RowCursor) => ({ fill: colorScale(row), stroke: colorScale(row) })}          />
         ))}
         <Axis
           scale={categoricalScale}
@@ -235,6 +235,22 @@ storiesOf("@operational/visualizations/3. Area chart", module)
         metric="sales"
         categorical="Customer.City"
         colorBy={["Customer.Gender"]}
+        width={300}
+        height={300}
+        margin={magicMargin}
+        data={frameStacked}
+        metricDirection="vertical"
+      />
+    );
+  })
+  .add("stacked vertical, missing data", () => {
+    // number of pixels picked manually to make sure that YAxis fits on the screen
+    const magicMargin = 60;
+    return (
+      <AreaChart
+        metric="sales"
+        categorical="Customer.Country"
+        colorBy={["Customer.City", "Customer.Gender"]}
         width={300}
         height={300}
         margin={magicMargin}

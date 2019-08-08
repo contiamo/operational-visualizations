@@ -15,15 +15,14 @@ export const Line: LinearAxialChart<string> = React.memo(props => {
   const pathData = data.mapRows(row => {
     const categoricalValue = categoricalTickWidth / 2 + (categoricalScale(categorical(row)) as number);
     const metricValue = metricScale(metric(row));
-    return (metricDirection === "vertical"
-      ? [categoricalValue, metricValue]
-      : [metricValue, categoricalValue]) as [number, number];
+    return { m: metricValue, c: categoricalValue };
   });
 
   const path =
-    line()
-      .x(d => d[0])
-      .y(d => d[1])(pathData) || "";
+    line<{m: number, c: number}>()
+      .x(d => metricDirection === "vertical" ? d.c : d.m)
+      .y(d => metricDirection === "vertical" ? d.m : d.c)
+      .defined(d => Boolean(d.m) || d.m === 0)(pathData) || "";
 
   const pathStyle = (isFunction(style) ? style(data.row(0), 0) : style) || {}
 
@@ -33,6 +32,7 @@ export const Line: LinearAxialChart<string> = React.memo(props => {
         d={path}
         style={{
           fill: "none",
+          strokeLinecap: "round",
           ...pathStyle
         }}
       />

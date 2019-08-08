@@ -15,6 +15,8 @@ export const Area: LinearAxialChart<string> = props => {
 
   const accumulatedCache: Record<string, number> = {};
 
+  const isDefined = (value: number) => Boolean(value) || value === 0;
+
   // The area path function takes an array of datum objects (here, called `d` for consistency with d3 naming conventions)
   // with the following properties:
   // `c` is the categorical tick value
@@ -47,8 +49,11 @@ export const Area: LinearAxialChart<string> = props => {
 
           return <path
             key={i}
-            d={path(pathData) || ""}
-            style={isFunction(style) ? style(grouped.row(0), i) : style}
+            d={path.defined(d => isDefined(d.m0) && isDefined(d.m1))(pathData) || ""}
+            style={{
+              strokeLinecap: "round",
+              ...(isFunction(style) ? style(grouped.row(0), i) : style),
+            }}
           />
         })
       }

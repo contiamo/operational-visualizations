@@ -209,7 +209,7 @@ const MultipleLines = <Name extends string>({
             metric={metricCursor}
             categoricalScale={categoricalScale}
             metricScale={metricScale}
-            style={(row: RowCursor) => ({ stroke: colorScale(row) })}
+            style={(row: RowCursor) => ({ stroke: colorScale(row), strokeWidth: 2 })}
           />
         ))}
         <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
@@ -289,4 +289,22 @@ storiesOf("@operational/visualizations/2. Line chart", module)
         colorBy={["Customer.AgeGroup", "Customer.Gender"]}
       />
     );
-  });
+  })
+  .add("vertical, missing data", () => {
+    // number of pixels picked manually to make sure that YAxis fits on the screen
+    const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
+
+    return (
+      <MultipleLines
+        metric="sales"
+        categorical="Customer.Country"
+        series={["Customer.City", "Customer.Gender", "Customer.AgeGroup"]}
+        width={300}
+        height={300}
+        margin={magicMargin}
+        data={multiplesFrame}
+        metricDirection="vertical"
+        colorBy={["Customer.City"]}
+      />
+    );
+  });;
