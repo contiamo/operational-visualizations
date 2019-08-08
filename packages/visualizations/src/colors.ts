@@ -7,7 +7,7 @@ const defaultPalette = theme.palettes.qualitative.operational;
 
 export const getColorScale = (frame: IterableFrame<string>, colorBy: Array<ColumnCursor<string>>, palette: string[] = defaultPalette) => {
   const uniqueValues = frame.uniqueValues(colorBy).map(joinArrayAsString);
-  const scale = scaleOrdinal().range(palette).domain(uniqueValues);
+  const scale = scaleOrdinal<string>().range(palette).domain(uniqueValues);
 
   if (colorBy.length === 0 || uniqueValues.length === 1) {
     return () => palette[0];
