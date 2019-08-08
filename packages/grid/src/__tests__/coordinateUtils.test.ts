@@ -82,7 +82,7 @@ describe("coordinateUtils", () => {
         getColumnCount({
           rowHeadersCount: 2,
           data: pivotedFrame,
-          measuresPlacement: "row",
+          measuresPlacement: "column",
           measuresCount: 1,
         }),
       ).toEqual(6);

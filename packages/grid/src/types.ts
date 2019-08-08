@@ -2,7 +2,7 @@ import { PivotFrame } from "@operational/frame";
 
 // we can add "both" in the future https://github.com/contiamo/operational-visualizations/issues/73
 // undefined means "none"
-export type MeasuresPlacement = "column" | "row";
+export type MeasuresPlacement = "row" | "column";
 
 // tslint:disable
 /**

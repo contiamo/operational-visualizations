@@ -166,7 +166,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
                 whiteSpace: "nowrap",
               },
             }}
-            measuresPlacement="row"
+            measuresPlacement="column"
             dimensionLabels="top"
           />
         )}
@@ -211,7 +211,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             height={height}
             data={pivotedFrame}
             measures={["sales", "revenue"]}
-            measuresPlacement="column"
+            measuresPlacement="row"
             dimensionLabels="top"
             style={{
               cell: { padding: "10px", textAlign: "right" },
@@ -236,7 +236,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             height={height}
             data={pivotedFrame}
             measures={["sales", "revenue"]}
-            measuresPlacement="row"
+            measuresPlacement="column"
             dimensionLabels="top"
             style={{
               cell: { padding: "10px", textAlign: "right" },
@@ -284,7 +284,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             height={height}
             data={pivotedFrame}
             measures={["C"]}
-            measuresPlacement="column"
+            measuresPlacement="row"
             dimensionLabels="top"
             style={{
               cell: { padding: "10px", textAlign: "right" },
@@ -308,7 +308,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             height={height}
             data={pivotedFrame}
             measures={["A", "B", "C"]}
-            measuresPlacement="column"
+            measuresPlacement="row"
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
@@ -461,7 +461,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
                 whiteSpace: "nowrap",
               },
             }}
-            measuresPlacement="row"
+            measuresPlacement="column"
             dimensionLabels="top"
           />
         )}
