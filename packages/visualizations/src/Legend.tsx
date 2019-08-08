@@ -9,12 +9,12 @@ const legendStyle: React.CSSProperties = {
   fontSize: theme.font.size.default,
 }
 
-const seriesLegendStyle: React.CSSProperties = {
+const itemStyle: React.CSSProperties = {
   padding: `2px ${theme.space.small}px`,
   float: "left",
 }
 
-const colorStyle = (color: string): React.CSSProperties => ({
+const colorSquareStyle = (color: string): React.CSSProperties => ({
   width: 10,
   height: 10,
   marginRight: theme.space.small,
@@ -24,7 +24,7 @@ const colorStyle = (color: string): React.CSSProperties => ({
   backgroundColor: color,
 })
 
-const nameStyle: React.CSSProperties = {
+const labelStyle: React.CSSProperties = {
   float: "left",
   fontWeight: theme.font.weight.regular,
   lineHeight: 1,
@@ -49,9 +49,9 @@ export const Legend = (props: Props<string>) => {
   return <div style={{...props.style, ...legendStyle}}>
     {props.title && <div style={titleStyle}>{props.title}</div>}
     {props.data.groupBy(props.cursors).map((grouped, i) =>
-      <div style={seriesLegendStyle} key={i}>
-        <div style={colorStyle(props.colorScale(grouped.row(0)))}></div>
-        <div style={nameStyle}>{joinArrayAsString(props.cursors.map(cursor => cursor(grouped.row(0))))}</div>
+      <div style={itemStyle} key={i}>
+        <div style={colorSquareStyle(props.colorScale(grouped.row(0)))}></div>
+        <div style={labelStyle}>{joinArrayAsString(uniqueValues[i])}</div>
       </div>
     )}
   </div>
