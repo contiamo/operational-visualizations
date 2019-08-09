@@ -12,7 +12,24 @@ export const Line: LinearAxialChart<string> = React.memo(props => {
   // The categorical scale must be a band scale for composability with bar charts.
   // Half of the tick width must be added to align with the ticks.
   const categoricalTickWidth = categoricalScale.bandwidth();
-  const pathData = data.mapRows(row => {
+
+  const missingDatum = (tick: string) => {
+    const d = []
+    d[categorical.index] = tick;
+    d[metric.index] = undefined;
+    return d
+  }
+
+  const rawData = data.mapRows(row => row);
+
+  // Add missing data
+  const ticks = categoricalScale.domain()
+  const dataWithMissing = ticks.map(tick => {
+    const datum = rawData.find(d => categorical(d) === tick)
+    return datum || missingDatum(tick);
+  })
+
+  const pathData = dataWithMissing.map(row => {
     const categoricalValue = categoricalTickWidth / 2 + (categoricalScale(categorical(row)) as number);
     const metricValue = metricScale(metric(row));
     return { m: metricValue, c: categoricalValue };

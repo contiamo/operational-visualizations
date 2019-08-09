@@ -156,7 +156,7 @@ const rawDataMultipleLinesMissingData = {
     ["Europe", "UK", "London", ">=50", "Male", 40],
     ["Europe", "UK", "Edinburgh", "<50", "Female", 581],
     ["Europe", "UK", "Edinburgh", ">=50", "Female", 58],
-    ["Europe", "UK", "Edinburgh", "<50", "Male", undefined],
+    // ["Europe", "UK", "Edinburgh", "<50", "Male", undefined],
     ["Europe", "UK", "Edinburgh", ">=50", "Male", 50],
     ["North America", "USA", "New York", "<50", "Female", 881],
     ["North America", "USA", "New York", ">=50", "Female", undefined],

@@ -31,11 +31,28 @@ export const Area: LinearAxialChart<string> = props => {
         .x1(d => metricScale(d.m1))
         .y(d => categoricalTickWidth / 2 + (categoricalScale(d.c) || 0));
 
+  const missingDatum = (tick: string) => {
+    const d = []
+    d[categorical.index] = tick;
+    d[metric.index] = undefined;
+    return d
+  }
+
   return (
     <g transform={transform || defaultTransform}>
       {data.groupBy(stack || [])
         .map((grouped, i) => {
-          const pathData = grouped.mapRows(row => {
+          const rawPathData = grouped.mapRows(row => row)
+
+          // Add missing data
+          const ticks = categoricalScale.domain()
+          const dataWithMissing = ticks.map(tick => {
+            const datum = rawPathData.find(d => categorical(d) === tick)
+            return datum || missingDatum(tick)
+          }).sort(d => ticks.indexOf(categorical(d)))
+
+          // Stack
+          const pathData = dataWithMissing.map(row => {
             const metricValue = metric(row);
             const accumulatedValue = accumulatedCache[categorical(row)] || 0;
             accumulatedCache[categorical(row)] = accumulatedValue + (metricValue || 0)
