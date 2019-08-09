@@ -12,18 +12,36 @@ export const Line: LinearAxialChart<string> = React.memo(props => {
   // The categorical scale must be a band scale for composability with bar charts.
   // Half of the tick width must be added to align with the ticks.
   const categoricalTickWidth = categoricalScale.bandwidth();
-  const pathData = data.mapRows(row => {
+
+  const missingDatum = (tick: string) => {
+    const d = []
+    d[categorical.index] = tick;
+    d[metric.index] = undefined;
+    return d
+  }
+
+  const rawData = data.mapRows(row => row);
+
+  // Add missing data
+  const ticks = categoricalScale.domain()
+  const dataWithMissing = ticks.map(tick => {
+    const datum = rawData.find(d => categorical(d) === tick)
+    return datum || missingDatum(tick);
+  })
+
+  const pathData = dataWithMissing.map(row => {
     const categoricalValue = categoricalTickWidth / 2 + (categoricalScale(categorical(row)) as number);
     const metricValue = metricScale(metric(row));
-    return (metricDirection === "vertical"
-      ? [categoricalValue, metricValue]
-      : [metricValue, categoricalValue]) as [number, number];
+    return { m: metricValue, c: categoricalValue };
   });
 
+  const isDefined = (value: number | undefined) => value !==undefined;
+
   const path =
-    line()
-      .x(d => d[0])
-      .y(d => d[1])(pathData) || "";
+    line<{m: number, c: number}>()
+      .x(d => metricDirection === "vertical" ? d.c : d.m)
+      .y(d => metricDirection === "vertical" ? d.m : d.c)
+      .defined(d => isDefined(d.m))(pathData) || "";
 
   const pathStyle = (isFunction(style) ? style(data.row(0), 0) : style) || {}
 
@@ -33,6 +51,7 @@ export const Line: LinearAxialChart<string> = React.memo(props => {
         d={path}
         style={{
           fill: "none",
+          strokeLinecap: "round",
           ...pathStyle
         }}
       />

@@ -15,6 +15,8 @@ export const Area: LinearAxialChart<string> = props => {
 
   const accumulatedCache: Record<string, number> = {};
 
+  const isDefined = (value: number | undefined) => value !==undefined;
+
   // The area path function takes an array of datum objects (here, called `d` for consistency with d3 naming conventions)
   // with the following properties:
   // `c` is the categorical tick value
@@ -29,26 +31,45 @@ export const Area: LinearAxialChart<string> = props => {
         .x1(d => metricScale(d.m1))
         .y(d => categoricalTickWidth / 2 + (categoricalScale(d.c) || 0));
 
+  const missingDatum = (tick: string) => {
+    const d = []
+    d[categorical.index] = tick;
+    d[metric.index] = undefined;
+    return d
+  }
+
   return (
     <g transform={transform || defaultTransform}>
       {data.groupBy(stack || [])
         .map((grouped, i) => {
-          const pathData = grouped.mapRows(row => {
+          const rawPathData = grouped.mapRows(row => row)
+
+          // Add missing data
+          const ticks = categoricalScale.domain()
+          const dataWithMissing = ticks.map(tick => {
+            const datum = rawPathData.find(d => categorical(d) === tick)
+            return datum || missingDatum(tick)
+          }).sort(d => ticks.indexOf(categorical(d)))
+
+          // Stack
+          const pathData = dataWithMissing.map(row => {
             const metricValue = metric(row);
             const accumulatedValue = accumulatedCache[categorical(row)] || 0;
-            const newAccumulatedValue = accumulatedValue + metricValue
-            accumulatedCache[categorical(row)] = newAccumulatedValue
+            accumulatedCache[categorical(row)] = accumulatedValue + (metricValue || 0)
             return {
               c: categorical(row),
               m0: accumulatedValue,
-              m1: newAccumulatedValue,
+              m1: metricValue ? accumulatedValue + metricValue : undefined,
             }
           });
 
           return <path
             key={i}
-            d={path(pathData) || ""}
-            style={isFunction(style) ? style(grouped.row(0), i) : style}
+            d={path.defined(d => isDefined(d.m1))(pathData) || ""}
+            style={{
+              strokeLinecap: "round",
+              ...(isFunction(style) ? style(grouped.row(0), i) : style),
+            }}
           />
         })
       }
