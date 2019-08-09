@@ -1,6 +1,6 @@
 import React from "react";
 import { DataFrame, RowCursor, ColumnCursor } from "@operational/frame";
-import { arc, pie } from "d3-shape";
+import { arc, pie, PieArcDatum } from "d3-shape";
 import { isFunction } from "./utils";
 import { useChartTransform } from "./Chart";
 
@@ -20,6 +20,8 @@ export const PieChart = (props: PieChartProps<string>) => {
 
   const { data, width, height, metric, transform, style } = props;
   const pieData = pie<RowCursor>().value(metric)(data.mapRows(row => row))
+  const segmentPath = (datum: PieArcDatum<RowCursor>) =>
+    arc<any, PieArcDatum<RowCursor>>().innerRadius(0).outerRadius(Math.min(width, height) / 2)(datum) || "";
 
   return (
     <g transform={transform || defaultTransform}>
@@ -27,7 +29,7 @@ export const PieChart = (props: PieChartProps<string>) => {
         {pieData.map((datum, i) => (
           <path
             key={i}
-            d={arc().innerRadius(0).outerRadius(Math.min(width, height) / 2)(datum as any) as string}
+            d={segmentPath(datum)}
             style={isFunction(style) ? style(datum.data, i) : style}
           />
         ))}
