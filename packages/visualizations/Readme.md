@@ -2,6 +2,8 @@
 
 Set of visualisations primitives for building visualisations.
 
+⚠️ This is highly experimental package and doesn't follow semantic versioning yet.
+
 ## Installation
 
 ```
@@ -13,13 +15,7 @@ yarn add @operational/visualizations
 ```tsx
 import * as React from "react";
 import { DataFrame } from "@operational/frame";
-import {
-  Axis,
-  Bars,
-  Chart,
-  useScaleBand,
-  useScaleLinear
-} from "@operational/visualizations";
+import { Axis, Bars, Chart, useScaleBand, useScaleLinear } from "@operational/visualizations";
 
 const frame = new DataFrame(/* ... */);
 
@@ -35,32 +31,20 @@ interface BarChartProps<Name extends string> {
 /**
  * Example of how you can compose more complex charts out of 'atoms'
  */
-const BarChart = <Name extends string>({
-  width,
-  height,
-  margin,
-  data,
-  categorical,
-  metric
-}: BarChartProps<Name>) => {
+const BarChart = <Name extends string>({ width, height, margin, data, categorical, metric }: BarChartProps<Name>) => {
   const categoricalScale = useScaleBand({
     frame: data,
     column: categorical,
-    range: [height, 0]
+    range: [height, 0],
   });
   const metricScale = useScaleLinear({
     frame: data,
     column: metric,
-    range: [0, width]
+    range: [0, width],
   });
 
   return (
-    <Chart
-      width={width}
-      height={height}
-      margin={margin}
-      style={{ background: "#fff" }}
-    >
+    <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
       <Bars
         metricDirection={"horizontal"}
         data={data}
@@ -77,13 +61,6 @@ const BarChart = <Name extends string>({
 };
 
 const App = () => (
-  <BarChart
-    metric="sales"
-    categorical="Customer.City"
-    width={300}
-    height={300}
-    margin={[20, 60]}
-    data={frame}
-  />
+  <BarChart metric="sales" categorical="Customer.City" width={300} height={300} margin={[20, 60]} data={frame} />
 );
 ```
