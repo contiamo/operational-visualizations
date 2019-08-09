@@ -3,6 +3,7 @@ export { Area } from "./Area";
 export { Bars } from "./Bars";
 export { Line } from "./Line";
 export { Dots } from "./Dots";
+export { PieChart } from "./PieChart";
 export { Chart, ChartProps } from "./Chart";
 export { Legend } from "./Legend";
 export * from "./colors";
