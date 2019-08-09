@@ -21,7 +21,7 @@ export const PieChart = (props: PieChartProps<string>) => {
   const { data, width, height, metric, transform, style } = props;
   const pieData = pie<RowCursor>().value(metric)(data.mapRows(row => row))
   const segmentPath = (datum: PieArcDatum<RowCursor>) =>
-    arc<any, PieArcDatum<RowCursor>>().innerRadius(0).outerRadius(Math.min(width, height) / 2)(datum) || "";
+    arc<PieArcDatum<RowCursor>>().innerRadius(0).outerRadius(Math.min(width, height) / 2)(datum) || "";
 
   return (
     <g transform={transform || defaultTransform}>
