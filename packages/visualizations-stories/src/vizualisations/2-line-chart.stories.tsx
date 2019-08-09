@@ -106,6 +106,69 @@ const rawDataMultipleLines = {
   ],
 };
 
+const rawDataMultipleLinesMissingData = {
+  columns: [
+    {
+      name: "Customer.Continent" as "Customer.Continent",
+      type: "string",
+    },
+    {
+      name: "Customer.Country" as "Customer.Country",
+      type: "string",
+    },
+    {
+      name: "Customer.City" as "Customer.City",
+      type: "string",
+    },
+    {
+      name: "Customer.AgeGroup" as "Customer.AgeGroup",
+      type: "string",
+    },
+    {
+      name: "Customer.Gender" as "Customer.Gender",
+      type: "string",
+    },
+    {
+      name: "sales" as "sales",
+      type: "number",
+    },
+    {
+      name: "revenue" as "revenue",
+      type: "number",
+    },
+  ],
+  rows: [
+    ["Europe", "Germany", "Berlin", "<50", "Female", 181],
+    ["Europe", "Germany", "Berlin", ">=50", "Female", 18],
+    ["Europe", "Germany", "Berlin", "<50", "Male", 101],
+    ["Europe", "Germany", "Berlin", ">=50", "Male", 10],
+    ["Europe", "Germany", "Dresden", "<50", "Female", 281],
+    ["Europe", "Germany", "Dresden", ">=50", "Female", 28],
+    ["Europe", "Germany", "Dresden", "<50", "Male", 201],
+    ["Europe", "Germany", "Dresden", ">=50", "Male", 20],
+    ["Europe", "Germany", "Hamburg", "<50", "Female", 381],
+    ["Europe", "Germany", "Hamburg", ">=50", "Female", 38],
+    ["Europe", "Germany", "Hamburg", "<50", "Male", undefined],
+    ["Europe", "Germany", "Hamburg", ">=50", "Male", 30],
+    ["Europe", "UK", "London", "<50", "Female", 481],
+    ["Europe", "UK", "London", ">=50", "Female", 48],
+    ["Europe", "UK", "London", "<50", "Male", 401],
+    ["Europe", "UK", "London", ">=50", "Male", 40],
+    ["Europe", "UK", "Edinburgh", "<50", "Female", 581],
+    ["Europe", "UK", "Edinburgh", ">=50", "Female", 58],
+    ["Europe", "UK", "Edinburgh", "<50", "Male", undefined],
+    ["Europe", "UK", "Edinburgh", ">=50", "Male", 50],
+    ["North America", "USA", "New York", "<50", "Female", 881],
+    ["North America", "USA", "New York", ">=50", "Female", undefined],
+    ["North America", "USA", "New York", "<50", "Male", 801],
+    ["North America", "USA", "New York", ">=50", "Male", 80],
+    ["North America", "Canada", "Toronto", "<50", "Female", 881],
+    ["North America", "Canada", "Toronto", ">=50", "Female", 88],
+    ["North America", "Canada", "Toronto", "<50", "Male", 801],
+    ["North America", "Canada", "Toronto", ">=50", "Male", 80],
+  ],
+};
+
 interface LineChartProps<Name extends string> {
   width: number;
   height: number;
@@ -221,6 +284,7 @@ const MultipleLines = <Name extends string>({
 
 const singleFrame = new DataFrame(rawDataSingleLine.columns, rawDataSingleLine.rows);
 const multiplesFrame = new DataFrame(rawDataMultipleLines.columns, rawDataMultipleLines.rows);
+const multiplesWithMissingDataFrame = new DataFrame(rawDataMultipleLinesMissingData.columns, rawDataMultipleLinesMissingData.rows);
 
 storiesOf("@operational/visualizations/2. Line chart", module)
   .add("vertical", () => {
@@ -290,7 +354,7 @@ storiesOf("@operational/visualizations/2. Line chart", module)
       />
     );
   })
-  .add("vertical, missing data", () => {
+  .add("vertical, all missing data", () => {
     // number of pixels picked manually to make sure that YAxis fits on the screen
     const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
 
@@ -307,4 +371,22 @@ storiesOf("@operational/visualizations/2. Line chart", module)
         colorBy={["Customer.City"]}
       />
     );
-  });;
+  })
+  .add("vertical, some missing data", () => {
+    // number of pixels picked manually to make sure that YAxis fits on the screen
+    const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
+
+    return (
+      <MultipleLines
+        metric="sales"
+        categorical="Customer.City"
+        series={["Customer.Gender", "Customer.AgeGroup"]}
+        width={300}
+        height={300}
+        margin={magicMargin}
+        data={multiplesWithMissingDataFrame}
+        metricDirection="vertical"
+        colorBy={["Customer.Gender", "Customer.AgeGroup"]}
+      />
+    );
+  });

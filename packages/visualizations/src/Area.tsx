@@ -38,18 +38,17 @@ export const Area: LinearAxialChart<string> = props => {
           const pathData = grouped.mapRows(row => {
             const metricValue = metric(row);
             const accumulatedValue = accumulatedCache[categorical(row)] || 0;
-            const newAccumulatedValue = accumulatedValue + metricValue
-            accumulatedCache[categorical(row)] = newAccumulatedValue
+            accumulatedCache[categorical(row)] = accumulatedValue + (metricValue || 0)
             return {
               c: categorical(row),
               m0: accumulatedValue,
-              m1: newAccumulatedValue,
+              m1: metricValue ? accumulatedValue + metricValue : undefined,
             }
           });
 
           return <path
             key={i}
-            d={path.defined(d => isDefined(d.m0) && isDefined(d.m1))(pathData) || ""}
+            d={path.defined(d => isDefined(d.m1))(pathData) || ""}
             style={{
               strokeLinecap: "round",
               ...(isFunction(style) ? style(grouped.row(0), i) : style),
