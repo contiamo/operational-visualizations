@@ -1,6 +1,6 @@
 import * as React from "react";
 import { storiesOf } from "@storybook/react";
-import { DataFrame, IterableFrame, ColumnCursor, RowCursor } from "@operational/frame";
+import { DataFrame, RowCursor } from "@operational/frame";
 import {
   Area,
   AxialChartProps,
@@ -8,7 +8,9 @@ import {
   Chart,
   ChartProps,
   useScaleBand,
-  useScaleLinear
+  useScaleLinear,
+  Legend,
+  useColorScale
 } from "@operational/visualizations";
 
 const rawData = {
@@ -116,35 +118,6 @@ interface AreaChartProps<Name extends string> {
   colorBy?: Name[];
 }
 
-const colorPalette = [
-  "#1499CE",
-  "#7C246F",
-  "#EAD63F",
-  "#343972",
-  "#ED5B17",
-  "#009691",
-  "#1D6199",
-  "#D31F1F",
-  "#AD329C",
-  "#006865",
-];
-
-export const joinArrayAsString = (array: string[]) => {
-  return (array || []).join("/");
-};
-
-export const getColorScale = (frame: IterableFrame<string>, colorBy: Array<ColumnCursor<string>>) => {
-  if (colorBy.length === 0) {
-    return () => colorPalette[0];
-  }
-  const uniqueValues = frame.uniqueValues(colorBy).map(joinArrayAsString);
-  return (row: RowCursor) => {
-    const valuesString = joinArrayAsString(colorBy.map(cursor => cursor(row)));
-    const index = uniqueValues.indexOf(valuesString);
-    return colorPalette[index % colorPalette.length];
-  };
-};
-
 /**
  * Examples of how you can compose more complex charts out of 'atoms'
  */
@@ -175,32 +148,34 @@ const AreaChart = <Name extends string>({
     range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
 
-  const colorScale = getColorScale(data, colorByCursors);
-  console.log(colorScale)
+  const colorScale = useColorScale(data, colorByCursors);
 
   return (
-    <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
-      {frame.map(grouped => (
-        <Area
-          metricDirection={metricDirection}
-          data={grouped}
-          categorical={categoricalCursor}
-          metric={metricCursor}
-          stack={colorByCursors}
-          categoricalScale={categoricalScale}
-          metricScale={metricScale}
-          style={(row: RowCursor) => ({ fill: colorScale(row), stroke: "#fff" })}
+    <div style={{ display: "inline-block" }}>
+      <Legend data={data} colorScale={colorScale} cursors={colorByCursors}/>
+      <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
+        {frame.map((grouped, i) => (
+          <Area
+            key={i}
+            metricDirection={metricDirection}
+            data={grouped}
+            categorical={categoricalCursor}
+            metric={metricCursor}
+            stack={colorByCursors}
+            categoricalScale={categoricalScale}
+            metricScale={metricScale}
+            style={(row: RowCursor) => ({ fill: colorScale(row), stroke: "#fff" })}          />
+        ))}
+        <Axis
+          scale={categoricalScale}
+          position={metricDirection === "vertical" ? "bottom" : "left"}
         />
-      ))}
-      <Axis
-        scale={categoricalScale}
-        position={metricDirection === "vertical" ? "bottom" : "left"}
-      />
-      <Axis
-        scale={metricScale}
-        position={metricDirection === "vertical" ? "left" : "bottom"}
-      />
-    </Chart>
+        <Axis
+          scale={metricScale}
+          position={metricDirection === "vertical" ? "left" : "bottom"}
+        />
+      </Chart>
+    </div>
   );
 };
 

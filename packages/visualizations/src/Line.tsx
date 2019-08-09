@@ -2,6 +2,7 @@ import { line } from "d3-shape";
 import React from "react";
 import { useChartTransform } from "./Chart";
 import { LinearAxialChart } from "./types";
+import { isFunction } from "./utils";
 
 export const Line: LinearAxialChart<string> = React.memo(props => {
   const defaultTransform = useChartTransform();
@@ -24,13 +25,15 @@ export const Line: LinearAxialChart<string> = React.memo(props => {
       .x(d => d[0])
       .y(d => d[1])(pathData) || "";
 
+  const pathStyle = (isFunction(style) ? style(data.row(0), 0) : style) || {}
+
   return (
     <g transform={transform || defaultTransform}>
       <path
         d={path}
         style={{
           fill: "none",
-          ...style
+          ...pathStyle
         }}
       />
     </g>

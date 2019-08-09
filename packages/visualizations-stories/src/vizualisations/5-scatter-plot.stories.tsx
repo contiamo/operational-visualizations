@@ -1,6 +1,6 @@
 import * as React from "react";
 import { storiesOf } from "@storybook/react";
-import { DataFrame, IterableFrame, ColumnCursor, RowCursor } from "@operational/frame";
+import { DataFrame, RowCursor } from "@operational/frame";
 import {
   AxialChartProps,
   Axis,
@@ -9,6 +9,8 @@ import {
   ChartProps,
   useScaleBand,
   useScaleLinear,
+  useColorScale,
+  Legend,
 } from "@operational/visualizations";
 
 const rawData = {
@@ -66,35 +68,6 @@ interface ScatterPlotProps<Name extends string> {
   colorBy?: Name[];
 }
 
-const colorPalette = [
-  "#1499CE",
-  "#7C246F",
-  "#EAD63F",
-  "#343972",
-  "#ED5B17",
-  "#009691",
-  "#1D6199",
-  "#D31F1F",
-  "#AD329C",
-  "#006865",
-];
-
-export const joinArrayAsString = (array: string[]) => {
-  return (array || []).join("/");
-};
-
-export const getColorScale = (frame: IterableFrame<string>, colorBy: Array<ColumnCursor<string>>) => {
-  if (colorBy.length === 0) {
-    return () => colorPalette[0];
-  }
-  const uniqueValues = frame.uniqueValues(colorBy).map(joinArrayAsString);
-  return (row: RowCursor) => {
-    const valuesString = joinArrayAsString(colorBy.map(cursor => cursor(row)));
-    const index = uniqueValues.indexOf(valuesString);
-    return colorPalette[index % colorPalette.length];
-  };
-};
-
 /**
  * Example of how you can compose more complex charts out of 'atoms'
  */
@@ -122,23 +95,26 @@ const ScatterPlot = <Name extends string>({
     range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
 
-  const colorByCursor = (colorBy || []).map(x => data.getCursor(x));
-  const colorScale = getColorScale(data, colorByCursor);
+  const colorCursors = (colorBy || []).map(c => data.getCursor(c))
+  const colorScale = useColorScale(data, colorCursors);
 
   return (
-    <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
-      <Dots
-        metricDirection={metricDirection}
-        data={data}
-        categorical={categoricalCursor}
-        metric={metricCursor}
-        categoricalScale={categoricalScale}
-        metricScale={metricScale}
-        style={row => ({ fill: colorScale(row) })}
-      />
-      <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
-      <Axis scale={metricScale} position={metricDirection === "horizontal" ? "bottom" : "left"} />
-    </Chart>
+    <div style={{ display: "inline-block" }}>
+      <Legend data={data} colorScale={colorScale} cursors={colorCursors}/>
+      <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
+        <Dots
+          metricDirection={metricDirection}
+          data={data}
+          categorical={categoricalCursor}
+          metric={metricCursor}
+          categoricalScale={categoricalScale}
+          metricScale={metricScale}
+          style={(row: RowCursor) => ({ fill: colorScale(row) })}
+        />
+        <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
+        <Axis scale={metricScale} position={metricDirection === "horizontal" ? "bottom" : "left"} />
+      </Chart>
+    </div>
   );
 };
 

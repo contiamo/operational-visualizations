@@ -1,12 +1,15 @@
 import * as React from "react";
 import { storiesOf } from "@storybook/react";
-import { DataFrame, IterableFrame, ColumnCursor, RowCursor } from "@operational/frame";
+import { DataFrame, RowCursor } from "@operational/frame";
 import {
   AxialChartProps,
   Axis,
   Bars,
   Chart,
   ChartProps,
+  useColorScale,
+  Legend,
+  theme,
   useScaleBand,
   useScaleLinear,
 } from "@operational/visualizations";
@@ -64,36 +67,9 @@ interface BarChartProps<Name extends string> {
   metric: Name;
   metricDirection: AxialChartProps<string>["metricDirection"];
   colorBy?: Name[];
+  palette?: string[];
 }
 
-const colorPalette = [
-  "#1499CE",
-  "#7C246F",
-  "#EAD63F",
-  "#343972",
-  "#ED5B17",
-  "#009691",
-  "#1D6199",
-  "#D31F1F",
-  "#AD329C",
-  "#006865",
-];
-
-export const joinArrayAsString = (array: string[]) => {
-  return (array || []).join("/");
-};
-
-export const getColorScale = (frame: IterableFrame<string>, colorBy: Array<ColumnCursor<string>>) => {
-  if (colorBy.length === 0) {
-    return () => colorPalette[0];
-  }
-  const uniqueValues = frame.uniqueValues(colorBy).map(joinArrayAsString);
-  return (row: RowCursor) => {
-    const valuesString = joinArrayAsString(colorBy.map(cursor => cursor(row)));
-    const index = uniqueValues.indexOf(valuesString);
-    return colorPalette[index % colorPalette.length];
-  };
-};
 
 /**
  * Example of how you can compose more complex charts out of 'atoms'
@@ -107,6 +83,7 @@ const BarChart = <Name extends string>({
   metric,
   metricDirection,
   colorBy,
+  palette,
 }: BarChartProps<Name>) => {
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
@@ -124,25 +101,29 @@ const BarChart = <Name extends string>({
     range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
 
-  const colorByCursor = (colorBy || []).map(x => data.getCursor(x));
-  const colorScale = getColorScale(data, colorByCursor);
+  const colorCursors = (colorBy || []).map(c => data.getCursor(c));
+  const colorScale = useColorScale(data, colorCursors, palette);
 
   return (
-    <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
-      {frame.map(grouped => (
-        <Bars
-          metricDirection={metricDirection}
-          data={grouped}
-          categorical={categoricalCursor}
-          metric={metricCursor}
-          categoricalScale={categoricalScale}
-          metricScale={metricScale}
-          style={row => ({ fill: colorScale(row) })}
-        />
-      ))}
-      <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
-      <Axis scale={metricScale} position={metricDirection === "horizontal" ? "bottom" : "left"} />
-    </Chart>
+    <div style={{ display: "inline-block" }}>
+      <Legend data={data} colorScale={colorScale} cursors={colorCursors}/>
+      <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
+        {frame.map((grouped, i) => (
+          <Bars
+            key={i}
+            metricDirection={metricDirection}
+            data={grouped}
+            categorical={categoricalCursor}
+            metric={metricCursor}
+            categoricalScale={categoricalScale}
+            metricScale={metricScale}
+            style={(row: RowCursor) => ({ fill: colorScale(row) })}
+          />
+        ))}
+        <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
+        <Axis scale={metricScale} position={metricDirection === "horizontal" ? "bottom" : "left"} />
+      </Chart>
+    </div>
   );
 };
 
@@ -209,6 +190,7 @@ storiesOf("@operational/visualizations/1. Bar chart", module)
         margin={magicMargin}
         data={frame}
         metricDirection="vertical"
+        palette={theme.palettes.qualitative.pastel}
       />
     );
   });

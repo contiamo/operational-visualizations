@@ -1,6 +1,6 @@
 import * as React from "react";
 import { storiesOf } from "@storybook/react";
-import { DataFrame } from "@operational/frame";
+import { DataFrame, RowCursor } from "@operational/frame";
 import {
   AxialChartProps,
   Axis,
@@ -9,6 +9,8 @@ import {
   Line,
   useScaleBand,
   useScaleLinear,
+  Legend,
+  useColorScale,
 } from "@operational/visualizations";
 
 const rawDataSingleLine = {
@@ -139,40 +141,31 @@ const LineChart = <Name extends string>({
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
 
+  const colorScale = useColorScale(data, []);
+
   return (
-    <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
-      <Line
-        metricDirection={metricDirection}
-        data={data}
-        categorical={categoricalCursor}
-        metric={metricCursor}
-        categoricalScale={categoricalScale}
-        metricScale={metricScale}
-        style={{ stroke: "#1f78b4" }}
-      />
-      <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
-      <Axis scale={metricScale} position={metricDirection === "vertical" ? "left" : "bottom"} />
-    </Chart>
+    <div style={{ display: "inline-block" }}>
+      <Legend data={data} colorScale={colorScale} cursors={[]}/>
+      <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
+        <Line
+          metricDirection={metricDirection}
+          data={data}
+          categorical={categoricalCursor}
+          metric={metricCursor}
+          categoricalScale={categoricalScale}
+          metricScale={metricScale}
+          style={{ stroke: "#1f78b4" }}
+        />
+        <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
+        <Axis scale={metricScale} position={metricDirection === "vertical" ? "left" : "bottom"} />
+      </Chart>
+    </div>
   );
 };
 
-const colors = [
-  "#1499CE",
-  "#7C246F",
-  "#EAD63F",
-  "#343972",
-  "#ED5B17",
-  "#009691",
-  "#1D6199",
-  "#D31F1F",
-  "#AD329C",
-  "#006865",
-];
-
-const colorScale = (i: number) => colors[i % colors.length];
-
 type MultipleLinesProps<Name extends string> = LineChartProps<Name> & {
   series: Name[];
+  colorBy: Name[];
 };
 
 const MultipleLines = <Name extends string>({
@@ -184,6 +177,7 @@ const MultipleLines = <Name extends string>({
   series,
   metric,
   metricDirection,
+  colorBy,
 }: MultipleLinesProps<Name>) => {
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
@@ -199,22 +193,29 @@ const MultipleLines = <Name extends string>({
     range: metricDirection === "vertical" ? [height, 0] : [0, width],
   });
 
+  const colorCursors = (colorBy || []).map(c => data.getCursor(c))
+  const colorScale = useColorScale(data, colorCursors);
+
   return (
-    <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
-      {data.groupBy(series).map((seriesData, i) => (
-        <Line
-          metricDirection={metricDirection}
-          data={seriesData}
-          categorical={categoricalCursor}
-          metric={metricCursor}
-          categoricalScale={categoricalScale}
-          metricScale={metricScale}
-          style={{ stroke: colorScale(i) }}
-        />
-      ))}
-      <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
-      <Axis scale={metricScale} position={metricDirection === "vertical" ? "left" : "bottom"} />
-    </Chart>
+    <div style={{ display: "inline-block" }}>
+      <Legend data={data} colorScale={colorScale} cursors={colorCursors}/>
+      <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
+        {data.groupBy(series).map((seriesData, i) => (
+          <Line
+            key={i}
+            metricDirection={metricDirection}
+            data={seriesData}
+            categorical={categoricalCursor}
+            metric={metricCursor}
+            categoricalScale={categoricalScale}
+            metricScale={metricScale}
+            style={(row: RowCursor) => ({ stroke: colorScale(row) })}
+          />
+        ))}
+        <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
+        <Axis scale={metricScale} position={metricDirection === "vertical" ? "left" : "bottom"} />
+      </Chart>
+    </div>
   );
 };
 
@@ -267,6 +268,7 @@ storiesOf("@operational/visualizations/2. Line chart", module)
         margin={magicMargin}
         data={multiplesFrame}
         metricDirection="vertical"
+        colorBy={["Customer.AgeGroup"]}
       />
     );
   })
@@ -284,6 +286,7 @@ storiesOf("@operational/visualizations/2. Line chart", module)
         margin={magicMargin}
         data={multiplesFrame}
         metricDirection="horizontal"
+        colorBy={["Customer.AgeGroup", "Customer.Gender"]}
       />
     );
   });
