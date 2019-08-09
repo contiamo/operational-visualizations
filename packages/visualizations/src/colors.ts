@@ -2,6 +2,7 @@ import { IterableFrame, RowCursor, ColumnCursor } from "@operational/frame";
 import theme from "./theme";
 import { joinArrayAsString } from "./utils";
 import { scaleOrdinal } from "d3-scale";
+import { useMemo } from "react";
 
 const defaultPalette = theme.palettes.qualitative.operational;
 
@@ -18,3 +19,7 @@ export const getColorScale = (frame: IterableFrame<string>, colorBy: Array<Colum
     return scale(valuesString) || "#000"
   };
 };
+
+// Hook version for convenience
+export const useColorScale = (frame: IterableFrame<string>, colorBy: Array<ColumnCursor<string>>, palette?: string[]) =>
+  useMemo(() => getColorScale(frame, colorBy, palette), [frame, colorBy, palette]);

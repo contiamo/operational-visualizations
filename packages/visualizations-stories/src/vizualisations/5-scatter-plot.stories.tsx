@@ -9,7 +9,7 @@ import {
   ChartProps,
   useScaleBand,
   useScaleLinear,
-  getColorScale,
+  useColorScale,
   Legend,
 } from "@operational/visualizations";
 
@@ -96,7 +96,7 @@ const ScatterPlot = <Name extends string>({
   });
 
   const colorCursors = (colorBy || []).map(c => data.getCursor(c))
-  const colorScale = getColorScale(data, colorCursors);
+  const colorScale = useColorScale(data, colorCursors);
 
   return (
     <div style={{ display: "inline-block" }}>

@@ -7,7 +7,7 @@ import {
   Bars,
   Chart,
   ChartProps,
-  getColorScale,
+  useColorScale,
   Legend,
   theme,
   useScaleBand,
@@ -101,8 +101,8 @@ const BarChart = <Name extends string>({
     range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
 
-  const colorCursors = (colorBy || []).map(c => data.getCursor(c))
-  const colorScale = getColorScale(data, colorCursors, palette);
+  const colorCursors = (colorBy || []).map(c => data.getCursor(c));
+  const colorScale = useColorScale(data, colorCursors, palette);
 
   return (
     <div style={{ display: "inline-block" }}>

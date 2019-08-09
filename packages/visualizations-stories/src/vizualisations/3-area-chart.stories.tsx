@@ -10,7 +10,7 @@ import {
   useScaleBand,
   useScaleLinear,
   Legend,
-  getColorScale
+  useColorScale
 } from "@operational/visualizations";
 
 const rawData = {
@@ -148,7 +148,7 @@ const AreaChart = <Name extends string>({
     range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
 
-  const colorScale = getColorScale(data, colorByCursors);
+  const colorScale = useColorScale(data, colorByCursors);
 
   return (
     <div style={{ display: "inline-block" }}>

@@ -10,7 +10,7 @@ import {
   useScaleBand,
   useScaleLinear,
   Legend,
-  getColorScale,
+  useColorScale,
 } from "@operational/visualizations";
 
 const rawDataSingleLine = {
@@ -141,7 +141,7 @@ const LineChart = <Name extends string>({
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
 
-  const colorScale = getColorScale(data, []);
+  const colorScale = useColorScale(data, []);
 
   return (
     <div style={{ display: "inline-block" }}>
@@ -194,7 +194,7 @@ const MultipleLines = <Name extends string>({
   });
 
   const colorCursors = (colorBy || []).map(c => data.getCursor(c))
-  const colorScale = getColorScale(data, colorCursors);
+  const colorScale = useColorScale(data, colorCursors);
 
   return (
     <div style={{ display: "inline-block" }}>
