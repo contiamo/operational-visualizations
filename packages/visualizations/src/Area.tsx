@@ -15,7 +15,7 @@ export const Area: LinearAxialChart<string> = props => {
 
   const accumulatedCache: Record<string, number> = {};
 
-  const isDefined = (value: number) => Boolean(value) || value === 0;
+  const isDefined = (value: number | undefined) => value !==undefined;
 
   // The area path function takes an array of datum objects (here, called `d` for consistency with d3 naming conventions)
   // with the following properties:

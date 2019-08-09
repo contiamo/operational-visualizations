@@ -18,11 +18,13 @@ export const Line: LinearAxialChart<string> = React.memo(props => {
     return { m: metricValue, c: categoricalValue };
   });
 
+  const isDefined = (value: number | undefined) => value !==undefined;
+
   const path =
     line<{m: number, c: number}>()
       .x(d => metricDirection === "vertical" ? d.c : d.m)
       .y(d => metricDirection === "vertical" ? d.m : d.c)
-      .defined(d => Boolean(d.m) || d.m === 0)(pathData) || "";
+      .defined(d => isDefined(d.m))(pathData) || "";
 
   const pathStyle = (isFunction(style) ? style(data.row(0), 0) : style) || {}
 
