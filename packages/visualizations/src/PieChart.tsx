@@ -1,5 +1,5 @@
 import React from "react";
-import { DataFrame, RowCursor, ColumnCursor } from "@operational/frame";
+import { RowCursor, ColumnCursor, IterableFrame } from "@operational/frame";
 import { arc, pie, PieArcDatum } from "d3-shape";
 import { isFunction } from "./utils";
 import { useChartTransform } from "./Chart";
@@ -7,7 +7,7 @@ import { useChartTransform } from "./Chart";
 interface PieChartProps<Name extends string> {
   width: number;
   height: number;
-  data: DataFrame<Name>;
+  data: IterableFrame<Name>;
   metric: ColumnCursor<Name>;
   transform?: React.SVGAttributes<SVGRectElement>["transform"];
   style?:
