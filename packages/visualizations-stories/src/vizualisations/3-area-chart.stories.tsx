@@ -209,6 +209,7 @@ interface AreaChartProps<Name extends string> {
   metric: Name;
   metricDirection: AxialChartProps<string>["metricDirection"];
   colorBy?: Name[];
+  stackBy?: Name[];
 }
 
 /**
@@ -223,9 +224,11 @@ const AreaChart = <Name extends string>({
   metric,
   metricDirection,
   colorBy,
+  stackBy,
 }: AreaChartProps<Name>) => {
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
+  const stackByCursors = (stackBy || []).map(x => data.getCursor(x));
   const colorByCursors = (colorBy || []).map(x => data.getCursor(x));
 
   const frame = data.groupBy([]);
@@ -254,7 +257,7 @@ const AreaChart = <Name extends string>({
             data={grouped}
             categorical={categoricalCursor}
             metric={metricCursor}
-            stack={colorByCursors}
+            stack={stackByCursors}
             categoricalScale={categoricalScale}
             metricScale={metricScale}
             style={(row: RowCursor) => ({ fill: colorScale(row), stroke: colorScale(row) })}          />
@@ -312,6 +315,7 @@ storiesOf("@operational/visualizations/3. Area chart", module)
         metric="sales"
         categorical="Customer.City"
         colorBy={["Customer.Gender"]}
+        stackBy={["Customer.Gender"]}
         width={300}
         height={300}
         margin={magicMargin}
@@ -327,7 +331,8 @@ storiesOf("@operational/visualizations/3. Area chart", module)
       <AreaChart
         metric="sales"
         categorical="Customer.City"
-        colorBy={["Customer.Gender"]}
+        colorBy={[]}
+        stackBy={["Customer.Gender"]}
         width={300}
         height={300}
         margin={magicMargin}
@@ -344,6 +349,7 @@ storiesOf("@operational/visualizations/3. Area chart", module)
         metric="sales"
         categorical="Customer.Country"
         colorBy={["Customer.City", "Customer.Gender"]}
+        stackBy={["Customer.City", "Customer.Gender"]}
         width={300}
         height={300}
         margin={magicMargin}
@@ -360,6 +366,7 @@ storiesOf("@operational/visualizations/3. Area chart", module)
         metric="sales"
         categorical="Customer.City"
         colorBy={[]}
+        stackBy={[]}
         width={300}
         height={300}
         margin={magicMargin}
@@ -376,6 +383,7 @@ storiesOf("@operational/visualizations/3. Area chart", module)
         metric="sales"
         categorical="Customer.City"
         colorBy={["Customer.AgeGroup", "Customer.Gender"]}
+        stackBy={["Customer.AgeGroup", "Customer.Gender"]}
         width={300}
         height={300}
         margin={magicMargin}
