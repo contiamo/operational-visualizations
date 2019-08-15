@@ -1,4 +1,4 @@
-import { area } from "d3-shape";
+import { area, line } from "d3-shape";
 import React from "react";
 import { useChartTransform } from "./Chart";
 import { LinearAxialChart } from "./types";
@@ -31,6 +31,14 @@ export const Area: LinearAxialChart<string> = props => {
         .x1(d => metricScale(d.m1))
         .y(d => categoricalTickWidth / 2 + (categoricalScale(d.c) || 0));
 
+    const strokePath = metricDirection === "vertical"
+      ? line<{ c: string; m0: number; m1: number }>()
+        .x(d => categoricalTickWidth / 2 + (categoricalScale(d.c) || 0))
+        .y(d => metricScale(d.m1))
+      : line<{ c: string; m0: number; m1: number }>()
+        .x(d => metricScale(d.m1))
+        .y(d => categoricalTickWidth / 2 + (categoricalScale(d.c) || 0))
+
   const missingDatum = (tick: string) => {
     const d = []
     d[categorical.index] = tick;
@@ -38,41 +46,55 @@ export const Area: LinearAxialChart<string> = props => {
     return d
   }
 
+  const stackedData = data
+    .groupBy(stack || [])
+    .map((grouped) => {
+      const rawPathData = grouped.mapRows(row => row)
+
+      // Add missing data
+      const ticks = categoricalScale.domain()
+      const dataWithMissing = ticks.map(tick => {
+        const datum = rawPathData.find(d => categorical(d) === tick)
+        return datum || missingDatum(tick)
+      }).sort(d => ticks.indexOf(categorical(d)))
+
+      // Stack
+      return {
+        data: dataWithMissing.map(row => {
+          const metricValue = metric(row);
+          const accumulatedValue = accumulatedCache[categorical(row)] || 0;
+          accumulatedCache[categorical(row)] = accumulatedValue + (metricValue || 0)
+          return {
+            c: categorical(row),
+            m0: accumulatedValue,
+            m1: metricValue ? accumulatedValue + metricValue : undefined,
+          }
+        }),
+        firstRow: grouped.row(0)
+      }
+    });
+
   return (
     <g transform={transform || defaultTransform}>
-      {data.groupBy(stack || [])
-        .map((grouped, i) => {
-          const rawPathData = grouped.mapRows(row => row)
-
-          // Add missing data
-          const ticks = categoricalScale.domain()
-          const dataWithMissing = ticks.map(tick => {
-            const datum = rawPathData.find(d => categorical(d) === tick)
-            return datum || missingDatum(tick)
-          }).sort(d => ticks.indexOf(categorical(d)))
-
-          // Stack
-          const pathData = dataWithMissing.map(row => {
-            const metricValue = metric(row);
-            const accumulatedValue = accumulatedCache[categorical(row)] || 0;
-            accumulatedCache[categorical(row)] = accumulatedValue + (metricValue || 0)
-            return {
-              c: categorical(row),
-              m0: accumulatedValue,
-              m1: metricValue ? accumulatedValue + metricValue : undefined,
-            }
-          });
-
-          return <path
-            key={i}
-            d={path.defined(d => isDefined(d.m1))(pathData) || ""}
-            style={{
-              strokeLinecap: "round",
-              ...(isFunction(style) ? style(grouped.row(0), i) : style),
-            }}
-          />
-        })
-      }
+      {/* Render area segments */}
+      {stackedData.map((stack, i) =>
+        <path
+          key={`Area-${i}`}
+          d={path.defined(d => isDefined(d.m1))(stack.data) || ""}
+          style={{
+            strokeLinecap: "round",
+            ...(isFunction(style) ? style(stack.firstRow, i) : style),
+          }}
+        />
+      )}
+      {/* Render white lines between each area segment. This is done afterwards to ensure the lines are visible */}
+      {stackedData.map((stack, i) =>
+        <path
+          key={`Line-${i}`}
+          d={strokePath.defined(d => isDefined(d.m1))(stack.data) || ""}
+          style={{ stroke: "#fff", fill: "none" }}
+        />
+      )}
     </g>
   );
 };
