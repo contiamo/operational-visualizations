@@ -106,7 +106,7 @@ const BarChart = <Name extends string>({
 
   return (
     <div style={{ width: 420 }}>
-      <Legend data={data} colorScale={colorScale} cursors={colorCursors} itemWidth={colorCursors.length * 80}/>
+      <Legend data={data} colorScale={colorScale} cursors={colorCursors} itemWidth={colorCursors.length * 80} style={{ height: 40, overflow: "scroll" }}/>
       <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
         {frame.map((grouped, i) => (
           <Bars
