@@ -105,8 +105,8 @@ const BarChart = <Name extends string>({
   const colorScale = useColorScale(data, colorCursors, palette);
 
   return (
-    <div style={{ display: "inline-block" }}>
-      <Legend data={data} colorScale={colorScale} cursors={colorCursors}/>
+    <div style={{ width: 420 }}>
+      <Legend data={data} colorScale={colorScale} cursors={colorCursors} itemWidth={colorCursors.length * 80} style={{ height: 40, overflowY: "scroll" }}/>
       <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
         {frame.map((grouped, i) => (
           <Bars

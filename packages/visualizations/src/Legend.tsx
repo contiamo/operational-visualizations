@@ -3,16 +3,21 @@ import theme from "./theme"
 import { IterableFrame, RowCursor, ColumnCursor } from "@operational/frame";
 import { joinArrayAsString } from "./utils";
 
+const defaultItemWidth = 100;
+
 const legendStyle: React.CSSProperties = {
   padding: `${theme.space.small}px ${theme.space.default}px`,
   color: theme.font.color,
   fontSize: theme.font.size.default,
+  display: "flex",
+  flexWrap: "wrap",
 }
 
-const itemStyle: React.CSSProperties = {
+const itemStyle = (itemWidth?: number): React.CSSProperties => ({
   padding: `2px ${theme.space.small}px`,
-  float: "left",
-}
+  flexBasis: itemWidth || defaultItemWidth,
+  minWidth: 0,
+})
 
 const colorSquareStyle = (color: string): React.CSSProperties => ({
   width: 10,
@@ -25,9 +30,11 @@ const colorSquareStyle = (color: string): React.CSSProperties => ({
 })
 
 const labelStyle: React.CSSProperties = {
-  float: "left",
   fontWeight: theme.font.weight.regular,
   lineHeight: 1,
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
 }
 
 const titleStyle: React.CSSProperties = {
@@ -39,6 +46,7 @@ export interface Props<Name extends string> {
   data: IterableFrame<Name>;
   colorScale: (() => string) | ((row: RowCursor) => string);
   cursors: Array<ColumnCursor<Name>>;
+  itemWidth?: number;
   style?: {}
   title?: string
 }
@@ -49,7 +57,7 @@ export const Legend = (props: Props<string>) => {
   return <div style={{...props.style, ...legendStyle}}>
     {props.title && <div style={titleStyle}>{props.title}</div>}
     {props.data.groupBy(props.cursors).map((grouped, i) =>
-      <div style={itemStyle} key={i}>
+      <div style={itemStyle(props.itemWidth)} key={i} title={joinArrayAsString(uniqueValues[i])}>
         <div style={colorSquareStyle(props.colorScale(grouped.row(0)))}></div>
         <div style={labelStyle}>{joinArrayAsString(uniqueValues[i])}</div>
       </div>
