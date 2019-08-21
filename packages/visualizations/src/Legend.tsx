@@ -57,7 +57,7 @@ export const Legend = (props: Props<string>) => {
   return <div style={{...props.style, ...legendStyle}}>
     {props.title && <div style={titleStyle}>{props.title}</div>}
     {props.data.groupBy(props.cursors).map((grouped, i) =>
-      <div style={itemStyle(props.itemWidth)} key={i}>
+      <div style={itemStyle(props.itemWidth)} key={i} title={joinArrayAsString(uniqueValues[i])}>
         <div style={colorSquareStyle(props.colorScale(grouped.row(0)))}></div>
         <div style={labelStyle}>{joinArrayAsString(uniqueValues[i])}</div>
       </div>
