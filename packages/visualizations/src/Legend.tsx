@@ -16,6 +16,7 @@ const legendStyle: React.CSSProperties = {
 const itemStyle = (itemWidth?: number): React.CSSProperties => ({
   padding: `2px ${theme.space.small}px`,
   flexBasis: itemWidth || defaultItemWidth,
+  minWidth: 0,
 })
 
 const colorSquareStyle = (color: string): React.CSSProperties => ({
