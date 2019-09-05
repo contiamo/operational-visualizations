@@ -1,4 +1,5 @@
 export { Axis } from "./Axis";
+export { AxisRules } from "./AxisRules";
 export { Area } from "./Area";
 export { Bars } from "./Bars";
 export { Line } from "./Line";
