@@ -4,6 +4,7 @@ export { Area } from "./Area";
 export { Bars } from "./Bars";
 export { Line } from "./Line";
 export { Dots } from "./Dots";
+export { Labels } from "./Labels";
 export { PieChart } from "./PieChart";
 export { Chart, ChartProps } from "./Chart";
 export { Legend } from "./Legend";

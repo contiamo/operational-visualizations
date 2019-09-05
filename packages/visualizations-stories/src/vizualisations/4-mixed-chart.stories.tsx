@@ -10,7 +10,8 @@ import {
   Line,
   useScaleBand,
   useScaleLinear,
-  Bars
+  Bars,
+  Labels
 } from "@operational/visualizations";
 
 const rawData = {
@@ -89,6 +90,8 @@ const MixedChart = <Name extends string>({
     column: data.getCursor(metric),
     range: metricDirection === "vertical" ? [height, 0] : [0, width]
   });
+  const categoricalCursor = data.getCursor(categorical);
+  const metricCursor = data.getCursor(metric);
 
   return (
     <Chart
@@ -100,29 +103,40 @@ const MixedChart = <Name extends string>({
       <Area
         metricDirection={metricDirection}
         data={data}
-        categorical={data.getCursor(categorical)}
-        metric={data.getCursor(metric)}
+        categorical={categoricalCursor}
+        metric={metricCursor}
         categoricalScale={categoricalScale}
         metricScale={metricScale}
         style={{ fill: "#ddd" }}
       />
-      <Bars
-        metricDirection={metricDirection}
-        data={data}
-        categorical={data.getCursor(categorical)}
-        metric={data.getCursor(metric)}
-        categoricalScale={categoricalScale}
-        metricScale={metricScale}
-        style={{ fill: "#1499CE" }}
-      />
+      {data.groupBy([categoricalCursor]).map((grouped, i) => (
+        <Bars
+          key={i}
+          metricDirection={metricDirection}
+          data={grouped}
+          categorical={categoricalCursor}
+          metric={metricCursor}
+          categoricalScale={categoricalScale}
+          metricScale={metricScale}
+          style={{ fill: "#1499CE" }}
+        />
+      ))}
       <Line
         metricDirection={metricDirection}
         data={data}
-        categorical={data.getCursor(categorical)}
-        metric={data.getCursor(metric)}
+        categorical={categoricalCursor}
+        metric={metricCursor}
         categoricalScale={categoricalScale}
         metricScale={metricScale}
         style={{ stroke: "#7C246F" }}
+      />
+      <Labels
+        metricDirection={metricDirection}
+        data={data}
+        categorical={categoricalCursor}
+        metric={metricCursor}
+        categoricalScale={categoricalScale}
+        metricScale={metricScale}
       />
       <Axis
         scale={categoricalScale}
