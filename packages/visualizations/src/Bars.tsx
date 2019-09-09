@@ -72,7 +72,7 @@ export const Bars: DiscreteAxialChart<string> = props => {
               dx={4}
               dy={"0.35em"}
               style={baseLabelStyle}
-              key={`label=${i}`}
+              key={`label-${i}`}
             >
               {metric(row)}
             </text>
