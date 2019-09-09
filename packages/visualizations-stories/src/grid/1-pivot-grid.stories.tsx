@@ -396,15 +396,18 @@ storiesOf("@operational/grid/1. Pivot table", module)
                   viewBox={`0 0 ${widthWithoutPadding} ${heightWithoutPadding}`}
                   style={{ margin: padding }}
                 >
-                  <Bars
-                    data={data.cell(row, column)}
-                    metricScale={xScale}
-                    categoricalScale={yScale}
-                    metric={frame.getCursor(measure)}
-                    categorical={frame.getCursor("Customer.City")}
-                    style={{ fill: "#1f78b4" }}
-                    metricDirection="horizontal"
-                  />
+                  {data.cell(row, column).groupBy([cityCursor]).map((grouped, i) => (
+                    <Bars
+                      key={i}
+                      data={grouped}
+                      metricScale={xScale}
+                      categoricalScale={yScale}
+                      metric={frame.getCursor(measure)}
+                      categorical={frame.getCursor("Customer.City")}
+                      style={{ fill: "#1f78b4" }}
+                      metricDirection="horizontal"
+                    />
+                  ))}
                 </svg>
               );
             }}
