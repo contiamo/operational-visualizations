@@ -3,11 +3,12 @@ import React from "react";
 import { useChartTransform } from "./Chart";
 import { LinearAxialChart } from "./types";
 import { isFunction } from "./utils";
+import { baseStyle as baseLabelStyle, verticalStyle as verticalLabelStyle } from "./Labels";
 
 export const Area: LinearAxialChart<string> = props => {
   const defaultTransform = useChartTransform();
 
-  const { metricDirection, data, transform, metric, categorical, metricScale, categoricalScale, stack, style } = props;
+  const { metricDirection, data, transform, metric, categorical, metricScale, categoricalScale, stack, displayLabels, style } = props;
 
   // The categorical scale must be a band scale for composability with bar charts.
   // Half of the tick width must be added to align with the ticks.
@@ -94,6 +95,37 @@ export const Area: LinearAxialChart<string> = props => {
           d={strokePath.defined(d => isDefined(d.m1))(stack.data) || ""}
           style={{ stroke: "#fff", fill: "none" }}
         />
+      )}
+      {/* Render text labels. This is done at the end to ensure they are visible */}
+      {displayLabels && stackedData.map((stack, i) =>
+        stack.data.map((d, j) =>
+          metricDirection === "vertical"
+            ? <text
+              key={`Label-${i}-${j}`}
+              x={(categoricalScale(d.c) || 0) + categoricalTickWidth / 2}
+              y={metricScale(d.m1)}
+              dy={"-0.35em"}
+              style={{
+                ...verticalLabelStyle,
+                // ...(isFunction(style) ? style(stack.firstRow, i) : style)
+              }}
+            >
+              {d.m1 - d.m0}
+            </text>
+            : <text
+              key={`Label-${i}-${j}`}
+              x={metricScale(d.m1)}
+              y={(categoricalScale(d.c) || 0) + categoricalTickWidth / 2}
+              dx={4}
+              dy={"0.35em"}
+              style={{
+                ...baseLabelStyle,
+                // ...(isFunction(style) ? style(stack.firstRow, i) : style)
+              }}
+            >
+              {d.m1 - d.m0}
+            </text>
+        )
       )}
     </g>
   );

@@ -4,12 +4,12 @@ import { DiscreteAxialChart } from "./types";
 import { isFunction } from "./utils";
 import theme from "./theme";
 
-const baseStyle: React.CSSProperties = {
+export const baseStyle: React.CSSProperties = {
   fontSize: theme.font.size.small,
-  color: theme.colors.axis.label
+  fill: theme.font.color,
 };
 
-const verticalStyle: React.CSSProperties = {
+export const verticalStyle: React.CSSProperties = {
   ...baseStyle,
   textAnchor: "middle"
 };
@@ -54,7 +54,7 @@ export const Labels: DiscreteAxialChart<string> = props => {
           <text
             x={metricScale(metric(row))}
             y={categoricalScale(categorical(row))! + bandWidth / 2}
-            dx={4}
+            dx={"0.35em"}
             dy={"0.35em"}
             style={{
               ...baseStyle,
