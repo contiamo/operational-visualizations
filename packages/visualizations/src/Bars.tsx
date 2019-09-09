@@ -33,7 +33,7 @@ export const Bars: DiscreteAxialChart<string> = props => {
             <text
               x={categoricalScale(categorical(row))! + bandWidth / 2}
               y={metricScale(metric(row)) - accumulatedHeight}
-              dy={"-0.35em"}
+              dy="-0.35em"
               style={verticalLabelStyle}
               key={`label-${i}`}
             >
@@ -69,8 +69,8 @@ export const Bars: DiscreteAxialChart<string> = props => {
             <text
               x={metricScale(metric(row)) + accumulatedWidth}
               y={categoricalScale(categorical(row))! + bandWidth / 2}
-              dx={4}
-              dy={"0.35em"}
+              dx="0.35em"
+              dy="0.35em"
               style={baseLabelStyle}
               key={`label-${i}`}
             >

@@ -16,7 +16,7 @@ export const Area: LinearAxialChart<string> = props => {
 
   const accumulatedCache: Record<string, number> = {};
 
-  const isDefined = (value: number | undefined) => value !==undefined;
+  const isDefined = (value: number | undefined) => value !== undefined;
 
   // The area path function takes an array of datum objects (here, called `d` for consistency with d3 naming conventions)
   // with the following properties:
@@ -68,7 +68,7 @@ export const Area: LinearAxialChart<string> = props => {
           return {
             c: categorical(row),
             m0: accumulatedValue,
-            m1: metricValue ? accumulatedValue + metricValue : undefined,
+            m1: isDefined(metricValue) ? accumulatedValue + metricValue : undefined,
           }
         }),
         firstRow: grouped.row(0)
@@ -99,25 +99,25 @@ export const Area: LinearAxialChart<string> = props => {
       {/* Render text labels. This is done at the end to ensure they are visible */}
       {showLabels && stackedData.map((stack, i) =>
         stack.data.map((d, j) =>
-          metricDirection === "vertical"
+           metricDirection === "vertical"
             ? <text
               key={`Label-${i}-${j}`}
               x={(categoricalScale(d.c) || 0) + categoricalTickWidth / 2}
               y={metricScale(d.m1)}
-              dy={"-0.35em"}
+              dy="-0.35em"
               style={verticalLabelStyle}
             >
-              {d.m1 - d.m0 || ""}
+              {isDefined(d.m1) && isDefined(d.m0) ? d.m1 - d.m0 : ""}
             </text>
             : <text
               key={`Label-${i}-${j}`}
               x={metricScale(d.m1)}
               y={(categoricalScale(d.c) || 0) + categoricalTickWidth / 2}
-              dx={4}
-              dy={"0.35em"}
+              dx="0.35em"
+              dy="0.35em"
               style={baseLabelStyle}
             >
-              {d.m1 - d.m0 || ""}
+              {isDefined(d.m1) && isDefined(d.m0) ? d.m1 - d.m0 : ""}
             </text>
         )
       )}

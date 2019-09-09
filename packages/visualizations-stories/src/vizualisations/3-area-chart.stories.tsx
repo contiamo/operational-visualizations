@@ -183,7 +183,7 @@ const rawDataStackedWithMissing = {
     ["Europe", "Germany", "Hamburg", "<50", "Female", 301, 30.2],
     ["Europe", "UK", "London", "<50", "Female", 401, 40.2],
     // ["Europe", "UK", "Edinburgh", "<50", "Female", 501, 50.2],
-    ["North America", "USA", "New York", "<50", "Female", 801, 80.2],
+    ["North America", "USA", "New York", "<50", "Female", 0, 80.2],
     ["North America", "Canada", "Toronto", "<50", "Female", 801, 80.2],
     ["Europe", "Germany", "Berlin", "<50", "Male", 101, 10.2],
     ["Europe", "Germany", "Dresden", "<50", "Male", undefined, 20.2],

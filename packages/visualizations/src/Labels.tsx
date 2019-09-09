@@ -35,7 +35,7 @@ export const Labels: DiscreteAxialChart<string> = props => {
           <text
             x={categoricalScale(categorical(row))! + bandWidth / 2}
             y={metricScale(metric(row))}
-            dy={"-0.35em"}
+            dy="-0.35em"
             style={{
               ...verticalStyle,
               ...(isFunction(style) ? style(row, i) : style)
@@ -54,8 +54,8 @@ export const Labels: DiscreteAxialChart<string> = props => {
           <text
             x={metricScale(metric(row))}
             y={categoricalScale(categorical(row))! + bandWidth / 2}
-            dx={"0.35em"}
-            dy={"0.35em"}
+            dx="0.35em"
+            dy="0.35em"
             style={{
               ...baseStyle,
               ...(isFunction(style) ? style(row, i) : style)
