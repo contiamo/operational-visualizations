@@ -261,7 +261,7 @@ const AreaChart = <Name extends string>({
             categoricalScale={categoricalScale}
             metricScale={metricScale}
             displayLabels={true}
-            style={(row: RowCursor) => ({ fill: colorScale(row) })}          />
+            style={(row: RowCursor) => ({ fill: colorScale(row), stroke: colorScale(row) })}          />
         ))}
         <Axis
           scale={categoricalScale}

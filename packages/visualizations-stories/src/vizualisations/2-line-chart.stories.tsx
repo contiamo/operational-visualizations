@@ -340,7 +340,7 @@ storiesOf("@operational/visualizations/2. Line chart", module)
   })
   .add("horizontal, multiple lines", () => {
     // number of pixels picked manually to make sure that YAxis fits on the screen
-    const magicMargin = [20, 10, 20, 60] as ChartProps["margin"];
+    const magicMargin = [20, 30, 20, 60] as ChartProps["margin"];
 
     return (
       <MultipleLines

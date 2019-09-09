@@ -158,7 +158,7 @@ const BarChart = <Name extends string>({
 storiesOf("@operational/visualizations/1. Bar chart", module)
   .add("horizontal", () => {
     // number of pixels picked manually to make sure that YAxis fits on the screen
-    const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
+    const magicMargin = [5, 30, 20, 60] as ChartProps["margin"];
 
     return (
       <BarChart

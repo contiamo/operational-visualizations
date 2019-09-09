@@ -105,12 +105,9 @@ export const Area: LinearAxialChart<string> = props => {
               x={(categoricalScale(d.c) || 0) + categoricalTickWidth / 2}
               y={metricScale(d.m1)}
               dy={"-0.35em"}
-              style={{
-                ...verticalLabelStyle,
-                // ...(isFunction(style) ? style(stack.firstRow, i) : style)
-              }}
+              style={verticalLabelStyle}
             >
-              {d.m1 - d.m0}
+              {d.m1 - d.m0 || ""}
             </text>
             : <text
               key={`Label-${i}-${j}`}
@@ -118,12 +115,9 @@ export const Area: LinearAxialChart<string> = props => {
               y={(categoricalScale(d.c) || 0) + categoricalTickWidth / 2}
               dx={4}
               dy={"0.35em"}
-              style={{
-                ...baseLabelStyle,
-                // ...(isFunction(style) ? style(stack.firstRow, i) : style)
-              }}
+              style={baseLabelStyle}
             >
-              {d.m1 - d.m0}
+              {d.m1 - d.m0 || ""}
             </text>
         )
       )}
