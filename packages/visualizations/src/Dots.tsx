@@ -8,7 +8,7 @@ const radius = 3;
 
 export const Dots: DiscreteAxialChart<string> = props => {
   const defaultTransform = useChartTransform();
-  const { data, transform, metric, categorical, metricScale, categoricalScale, metricDirection, displayLabels, style } = props;
+  const { data, transform, metric, categorical, metricScale, categoricalScale, metricDirection, showLabels, style } = props;
 
   const bandWidth = categoricalScale.bandwidth();
 
@@ -38,7 +38,7 @@ export const Dots: DiscreteAxialChart<string> = props => {
           ))}
         </g>
     }
-    {displayLabels && <Labels
+    {showLabels && <Labels
       data={data}
       transform={transform}
       metric={metric}

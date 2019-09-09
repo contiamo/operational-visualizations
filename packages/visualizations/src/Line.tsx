@@ -8,7 +8,7 @@ import { Labels } from "./Labels";
 export const Line: LinearAxialChart<string> = React.memo(props => {
   const defaultTransform = useChartTransform();
 
-  const { metricDirection, data, transform, metric, categorical, metricScale, categoricalScale, displayLabels, style } = props;
+  const { metricDirection, data, transform, metric, categorical, metricScale, categoricalScale, showLabels, style } = props;
 
   // The categorical scale must be a band scale for composability with bar charts.
   // Half of the tick width must be added to align with the ticks.
@@ -58,7 +58,7 @@ export const Line: LinearAxialChart<string> = React.memo(props => {
           }}
         />
       </g>
-      {displayLabels && <Labels
+      {showLabels && <Labels
         data={data}
         transform={transform}
         metric={metric}

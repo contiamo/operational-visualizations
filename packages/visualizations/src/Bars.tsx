@@ -6,7 +6,7 @@ import { baseStyle as baseLabelStyle, verticalStyle as verticalLabelStyle } from
 
 export const Bars: DiscreteAxialChart<string> = props => {
   const defaultTransform = useChartTransform();
-  const { data, transform, metric, categorical, metricScale, categoricalScale, displayLabels, style } = props;
+  const { data, transform, metric, categorical, metricScale, categoricalScale, showLabels, style } = props;
   const bandWidth = categoricalScale.bandwidth();
 
   if (props.metricDirection === "vertical") {
@@ -44,7 +44,7 @@ export const Bars: DiscreteAxialChart<string> = props => {
           accumulatedHeight += height - metricScale(metric(row));
           return bar;
         })}
-        {displayLabels && labels}
+        {showLabels && labels}
       </g>
     );
   } else {
@@ -81,7 +81,7 @@ export const Bars: DiscreteAxialChart<string> = props => {
           accumulatedWidth += metricScale(metric(row));
           return bar;
         })}
-        {displayLabels && labels}
+        {showLabels && labels}
       </g>
     );
   }

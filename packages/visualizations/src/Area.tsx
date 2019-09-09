@@ -8,7 +8,7 @@ import { baseStyle as baseLabelStyle, verticalStyle as verticalLabelStyle } from
 export const Area: LinearAxialChart<string> = props => {
   const defaultTransform = useChartTransform();
 
-  const { metricDirection, data, transform, metric, categorical, metricScale, categoricalScale, stack, displayLabels, style } = props;
+  const { metricDirection, data, transform, metric, categorical, metricScale, categoricalScale, stack, showLabels, style } = props;
 
   // The categorical scale must be a band scale for composability with bar charts.
   // Half of the tick width must be added to align with the ticks.
@@ -97,7 +97,7 @@ export const Area: LinearAxialChart<string> = props => {
         />
       )}
       {/* Render text labels. This is done at the end to ensure they are visible */}
-      {displayLabels && stackedData.map((stack, i) =>
+      {showLabels && stackedData.map((stack, i) =>
         stack.data.map((d, j) =>
           metricDirection === "vertical"
             ? <text

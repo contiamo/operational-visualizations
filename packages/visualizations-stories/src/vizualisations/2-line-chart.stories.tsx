@@ -217,7 +217,7 @@ const LineChart = <Name extends string>({
           metric={metricCursor}
           categoricalScale={categoricalScale}
           metricScale={metricScale}
-          displayLabels={true}
+          showLabels={true}
           style={{ stroke: "#1f78b4" }}
         />
         <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
@@ -273,7 +273,7 @@ const MultipleLines = <Name extends string>({
             metric={metricCursor}
             categoricalScale={categoricalScale}
             metricScale={metricScale}
-            displayLabels={true}
+            showLabels={true}
             style={(row: RowCursor) => ({ stroke: colorScale(row), strokeWidth: 2 })}
           />
         ))}

@@ -10,7 +10,7 @@ interface PieChartProps<Name extends string> {
   height: number;
   data: IterableFrame<Name>;
   metric: ColumnCursor<Name>;
-  displayLabels: boolean;
+  showLabels: boolean;
   transform?: React.SVGAttributes<SVGRectElement>["transform"];
   style?:
     | React.SVGAttributes<SVGGElement>["style"]
@@ -20,7 +20,7 @@ interface PieChartProps<Name extends string> {
 export const PieChart = (props: PieChartProps<string>) => {
   const defaultTransform = useChartTransform();
 
-  const { data, width, height, metric, displayLabels, transform, style } = props;
+  const { data, width, height, metric, showLabels, transform, style } = props;
   const pieData = pie<RowCursor>().value(metric)(data.mapRows(row => row));
   const radius = Math.min(width, height) / 2;
   const segmentArc = arc<PieArcDatum<RowCursor>>().innerRadius(0).outerRadius(radius);
@@ -38,7 +38,7 @@ export const PieChart = (props: PieChartProps<string>) => {
                 d={segmentArc(datum) || ""}
                 style={isFunction(style) ? style(datum.data, i) : style}
               />
-              {displayLabels && <text
+              {showLabels && <text
                 x={labelPosition[0]}
                 y={labelPosition[1]}
                 style={{

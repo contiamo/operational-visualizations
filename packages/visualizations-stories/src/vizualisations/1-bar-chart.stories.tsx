@@ -138,7 +138,7 @@ const BarChart = <Name extends string>({
             metric={metricCursor}
             categoricalScale={categoricalScale}
             metricScale={metricScale}
-            displayLabels={true}
+            showLabels={true}
             style={(row: RowCursor) => ({ fill: colorScale(row) })}
           />
         ))}

@@ -7,7 +7,7 @@ The visualization library contains a `Labels` component, which can be used in th
 </Chart>
 ```
 
-However, the user can also display labels by passing a `displayLabels` flag. This solves multiple problems:
+However, the user can also display labels by passing a `showLabels` flag. This solves multiple problems:
 
 - In the case of stacked bars or area charts, using the above API does not take stacking into account, so the labels will be in the wrong places.
 
