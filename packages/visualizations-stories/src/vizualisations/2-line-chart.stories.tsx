@@ -217,6 +217,7 @@ const LineChart = <Name extends string>({
           metric={metricCursor}
           categoricalScale={categoricalScale}
           metricScale={metricScale}
+          showLabels={true}
           style={{ stroke: "#1f78b4" }}
         />
         <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
@@ -272,6 +273,7 @@ const MultipleLines = <Name extends string>({
             metric={metricCursor}
             categoricalScale={categoricalScale}
             metricScale={metricScale}
+            showLabels={true}
             style={(row: RowCursor) => ({ stroke: colorScale(row), strokeWidth: 2 })}
           />
         ))}
@@ -289,7 +291,7 @@ const multiplesWithMissingDataFrame = new DataFrame(rawDataMultipleLinesMissingD
 storiesOf("@operational/visualizations/2. Line chart", module)
   .add("vertical", () => {
     // number of pixels picked manually to make sure that YAxis fits on the screen
-    const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
+    const magicMargin = [20, 10, 20, 60] as ChartProps["margin"];
 
     return (
       <LineChart
@@ -320,7 +322,7 @@ storiesOf("@operational/visualizations/2. Line chart", module)
   })
   .add("vertical, multiple lines", () => {
     // number of pixels picked manually to make sure that YAxis fits on the screen
-    const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
+    const magicMargin = [20, 10, 20, 60] as ChartProps["margin"];
 
     return (
       <MultipleLines
@@ -338,7 +340,7 @@ storiesOf("@operational/visualizations/2. Line chart", module)
   })
   .add("horizontal, multiple lines", () => {
     // number of pixels picked manually to make sure that YAxis fits on the screen
-    const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
+    const magicMargin = [20, 30, 20, 60] as ChartProps["margin"];
 
     return (
       <MultipleLines
@@ -356,7 +358,7 @@ storiesOf("@operational/visualizations/2. Line chart", module)
   })
   .add("vertical, all missing data", () => {
     // number of pixels picked manually to make sure that YAxis fits on the screen
-    const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
+    const magicMargin = [20, 10, 20, 60] as ChartProps["margin"];
 
     return (
       <MultipleLines
@@ -374,7 +376,7 @@ storiesOf("@operational/visualizations/2. Line chart", module)
   })
   .add("vertical, some missing data", () => {
     // number of pixels picked manually to make sure that YAxis fits on the screen
-    const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
+    const magicMargin = [20, 10, 20, 60] as ChartProps["margin"];
 
     return (
       <MultipleLines

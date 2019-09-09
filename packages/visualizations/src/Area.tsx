@@ -3,11 +3,12 @@ import React from "react";
 import { useChartTransform } from "./Chart";
 import { LinearAxialChart } from "./types";
 import { isFunction } from "./utils";
+import { baseStyle as baseLabelStyle, verticalStyle as verticalLabelStyle } from "./Labels";
 
 export const Area: LinearAxialChart<string> = props => {
   const defaultTransform = useChartTransform();
 
-  const { metricDirection, data, transform, metric, categorical, metricScale, categoricalScale, stack, style } = props;
+  const { metricDirection, data, transform, metric, categorical, metricScale, categoricalScale, stack, showLabels, style } = props;
 
   // The categorical scale must be a band scale for composability with bar charts.
   // Half of the tick width must be added to align with the ticks.
@@ -15,7 +16,7 @@ export const Area: LinearAxialChart<string> = props => {
 
   const accumulatedCache: Record<string, number> = {};
 
-  const isDefined = (value: number | undefined) => value !==undefined;
+  const isDefined = (value: number | undefined) => value !== undefined;
 
   // The area path function takes an array of datum objects (here, called `d` for consistency with d3 naming conventions)
   // with the following properties:
@@ -67,7 +68,7 @@ export const Area: LinearAxialChart<string> = props => {
           return {
             c: categorical(row),
             m0: accumulatedValue,
-            m1: metricValue ? accumulatedValue + metricValue : undefined,
+            m1: isDefined(metricValue) ? accumulatedValue + metricValue : undefined,
           }
         }),
         firstRow: grouped.row(0)
@@ -94,6 +95,31 @@ export const Area: LinearAxialChart<string> = props => {
           d={strokePath.defined(d => isDefined(d.m1))(stack.data) || ""}
           style={{ stroke: "#fff", fill: "none" }}
         />
+      )}
+      {/* Render text labels. This is done at the end to ensure they are visible */}
+      {showLabels && stackedData.map((stack, i) =>
+        stack.data.map((d, j) =>
+           metricDirection === "vertical"
+            ? <text
+              key={`Label-${i}-${j}`}
+              x={(categoricalScale(d.c) || 0) + categoricalTickWidth / 2}
+              y={metricScale(d.m1)}
+              dy="-0.35em"
+              style={verticalLabelStyle}
+            >
+              {isDefined(d.m1) && isDefined(d.m0) ? d.m1 - d.m0 : ""}
+            </text>
+            : <text
+              key={`Label-${i}-${j}`}
+              x={metricScale(d.m1)}
+              y={(categoricalScale(d.c) || 0) + categoricalTickWidth / 2}
+              dx="0.35em"
+              dy="0.35em"
+              style={baseLabelStyle}
+            >
+              {isDefined(d.m1) && isDefined(d.m0) ? d.m1 - d.m0 : ""}
+            </text>
+        )
       )}
     </g>
   );

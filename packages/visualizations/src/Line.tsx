@@ -3,11 +3,12 @@ import React from "react";
 import { useChartTransform } from "./Chart";
 import { LinearAxialChart } from "./types";
 import { isFunction } from "./utils";
+import { Labels } from "./Labels";
 
 export const Line: LinearAxialChart<string> = React.memo(props => {
   const defaultTransform = useChartTransform();
 
-  const { metricDirection, data, transform, metric, categorical, metricScale, categoricalScale, style } = props;
+  const { metricDirection, data, transform, metric, categorical, metricScale, categoricalScale, showLabels, style } = props;
 
   // The categorical scale must be a band scale for composability with bar charts.
   // Half of the tick width must be added to align with the ticks.
@@ -46,15 +47,26 @@ export const Line: LinearAxialChart<string> = React.memo(props => {
   const pathStyle = (isFunction(style) ? style(data.row(0), 0) : style) || {}
 
   return (
-    <g transform={transform || defaultTransform}>
-      <path
-        d={path}
-        style={{
-          fill: "none",
-          strokeLinecap: "round",
-          ...pathStyle
-        }}
-      />
-    </g>
+    <>
+      <g transform={transform || defaultTransform}>
+        <path
+          d={path}
+          style={{
+            fill: "none",
+            strokeLinecap: "round",
+            ...pathStyle
+          }}
+        />
+      </g>
+      {showLabels && <Labels
+        data={data}
+        transform={transform}
+        metric={metric}
+        categorical={categorical}
+        metricScale={metricScale}
+        categoricalScale={categoricalScale}
+        metricDirection={metricDirection}
+      />}
+    </>
   );
 });

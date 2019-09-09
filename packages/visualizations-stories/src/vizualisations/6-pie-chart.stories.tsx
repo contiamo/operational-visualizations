@@ -80,6 +80,7 @@ const Pie = <Name extends string>({
           height={height}
           data={data}
           metric={metricCursor}
+          showLabels={true}
           style={(row: RowCursor) => ({ fill: colorScale(row), stroke: "#fff" })}
         />
       ))}
