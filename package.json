@@ -21,7 +21,7 @@
     "clean_modules": "rm -rf node_modules packages/*/node_modules && yarn",
     "lint": "eslint packages/**/src/**/*.{ts,tsx}",
     "commit": "git-cz",
-    "release-canary": "lerna publish --canary --preid --conventional-commits --scope '{frame,grid,visualizations}'",
+    "release-canary": "lerna publish --canary --conventional-commits --scope '{frame,grid,visualizations}'",
     "release": "lerna publish --conventional-commits --scope '{frame,grid,visualizations}'"
   },
   "devDependencies": {
