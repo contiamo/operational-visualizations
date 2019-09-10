@@ -1,0 +1,9 @@
+{
+  "automerge": true,
+  "major": {
+    "automerge": false
+  },
+  "schedule": "before 5am on every wednesday",
+  "automergeType": "branch",
+  "commitMessagePrefix": "chore(All):"
+}
