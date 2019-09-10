@@ -15,12 +15,9 @@ jobs:
       - run: yarn test
       - uses: actions/npm@master
       - run: echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}'>.npmrc
-      - run: cd packages/frame
-      - run: npm version $(npm show . version)-$(git rev-parse --short HEAD) --no-git-tag-version --unsafe-perm
-      - run: npm publish --tag next
-      - run: cd ../grid
-      - run: npm version $(npm show . version)-$(git rev-parse --short HEAD) --no-git-tag-version --unsafe-perm
-      - run: npm publish --tag next
-      - run: cd ../visualizations
-      - run: npm version $(npm show . version)-$(git rev-parse --short HEAD) --no-git-tag-version --unsafe-perm
-      - run: npm publish --tag next
+      - run: cd packages/frame && npm version $(npm show . version)-$(git rev-parse --short HEAD) --no-git-tag-version --unsafe-perm
+      - run: cd packages/frame && npm publish --tag next
+      - run: cd packages/grid && npm version $(npm show . version)-$(git rev-parse --short HEAD) --no-git-tag-version --unsafe-perm
+      - run: cd packages/grid && npm publish --tag next
+      - run: cd packages/visualizations && npm version $(npm show . version)-$(git rev-parse --short HEAD) --no-git-tag-version --unsafe-perm
+      - run: cd packages/visualizations && npm publish --tag next
