@@ -15,6 +15,7 @@
     "pretest": "yarn build",
     "test": "jest --config=jest.json",
     "test:stories": "lerna run test --stream --scope=@operational/visualizations-stories",
+    "test:stories-auto": "lerna run test-auto --stream --scope=@operational/visualizations-stories",
     "build": "tsc --build",
     "build:stories": "lerna run build --stream --scope=@operational/visualizations-stories",
     "clean": "rimraf packages/*/{tsconfig.tsbuildinfo,lib,dist}",

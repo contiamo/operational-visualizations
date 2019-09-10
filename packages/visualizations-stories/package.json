@@ -8,6 +8,7 @@
     "start": "start-storybook -p 7000",
     "storybook": "start-storybook -p 7000",
     "test": "./node_modules/.bin/chromatic test --app-code=\"lh0tyo268i\"",
+    "test-auto": "./node_modules/.bin/chromatic test --app-code=\"lh0tyo268i\" --auto-accept-changes",
     "build": "build-storybook -o dist",
     "clean": "rimraf tsconfig.tsbuildinfo lib dist"
   },
