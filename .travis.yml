@@ -4,13 +4,9 @@ node_js:
 cache: yarn
 notifications:
   email: false
-env:
-  matrix:
-    - CHROMATIC: "false"
-      JEST_MAX_WORKERS: 4
-    - CHROMATIC: "true"
 
 script:
-  - if [ $CHROMATIC == "false" ];                                   then  yarn lint  && yarn test                               ; fi
-  - if [ $CHROMATIC == "true"  ] && [ $TRAVIS_BRANCH == "master" ]; then  yarn build && yarn test:stories --auto-accept-changes ; fi
-  - if [ $CHROMATIC == "true"  ] && [ $TRAVIS_BRANCH != "master" ]; then  yarn build && yarn test:stories                       ; fi
+  - yarn lint
+  - yarn test
+  - if [ $TRAVIS_BRANCH == "master" ]; then  yarn build && yarn test:stories --auto-accept-changes ; fi
+  - if [ $TRAVIS_BRANCH != "master" ]; then  yarn build && yarn test:stories                       ; fi
