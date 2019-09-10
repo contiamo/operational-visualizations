@@ -1,0 +1,25 @@
+name: Master Pipeline
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build_test_and_deploy:
+    name: Build, Test and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: nuxt/actions-yarn@97f98f200b7fd42a001f88e7bdfc14d64d695ab2
+      - run: yarn install
+      - run: yarn test
+      - uses: actions/npm@master
+      - run: echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}'>.npmrc
+      - run: cd packages/frame
+      - run: npm version $(npm show . version)-$(git rev-parse --short HEAD) --no-git-tag-version --unsafe-perm
+      - run: npm publish --tag next
+      - run: cd ../grid
+      - run: npm version $(npm show . version)-$(git rev-parse --short HEAD) --no-git-tag-version --unsafe-perm
+      - run: npm publish --tag next
+      - run: cd ../visualizations
+      - run: npm version $(npm show . version)-$(git rev-parse --short HEAD) --no-git-tag-version --unsafe-perm
+      - run: npm publish --tag next
