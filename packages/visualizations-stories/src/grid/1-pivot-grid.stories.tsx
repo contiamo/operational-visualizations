@@ -1,6 +1,6 @@
 import { DataFrame, uniqueValues, total } from "@operational/frame";
-import { PivotGrid, RowProps, CellPropsWithMeasure } from "@operational/grid";
-import { Axis, Bars, useScaleBand, useScaleLinear } from "@operational/visualizations";
+import { PivotGrid, RowProps, CellPropsWithMeasure, ColumnProps } from "@operational/grid";
+import { Axis, Bars, useScaleBand, useScaleLinear, useScale, Dots } from "@operational/visualizations";
 import { storiesOf } from "@storybook/react";
 import * as React from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -317,7 +317,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
       </AutoSizer>
     );
   })
-  .add("with vizualisation", () => {
+  .add("with bars", () => {
     const padding = 5;
     const chartWidth = 100;
     const chartHeight = 100;
@@ -404,6 +404,119 @@ storiesOf("@operational/grid/1. Pivot table", module)
                     categorical={frame.getCursor("Customer.City")}
                     style={{ fill: "#1f78b4" }}
                     metricDirection="horizontal"
+                  />
+                </svg>
+              );
+            }}
+          />
+        )}
+      </AutoSizer>
+    );
+  })
+  .add("with scatter plot", () => {
+    const padding = 5;
+    const chartWidth = 100;
+    const chartHeight = 100;
+    const width = chartWidth;
+    const height = chartHeight;
+
+    const pivotedFrame = frame.pivot({
+      rows: ["Customer.Continent", "Customer.Country"],
+      columns: ["Customer.AgeGroup", "Customer.Gender"],
+    });
+
+    const Row: React.FC<RowProps> = ({ data, measure }) => {
+      const heightWithoutPadding = height - 2 * padding;
+      const yScale = useScale({
+        type: "linear",
+        frame: data.unpivot(),
+        column: data.getCursor(measure!),
+        range: [0, heightWithoutPadding],
+      });
+      return (
+        <svg
+          width={120}
+          height={heightWithoutPadding}
+          viewBox={`0 0 ${width} ${heightWithoutPadding}`}
+          style={{ margin: `${padding} 0` }}
+        >
+          <Axis scale={yScale} transform={`translate(${120 - padding * 2}, -${padding})`} position="left" />
+        </svg>
+      );
+    };
+
+    const Column: React.FC<ColumnProps> = ({ data, measure }) => {
+      const widthWithoutPadding = width - 2 * padding;
+      const xScale = useScale({
+        type: "linear",
+        frame: data.unpivot(),
+        column: data.getCursor(measure!),
+        range: [0, widthWithoutPadding],
+      });
+      return (
+        <svg
+          width={widthWithoutPadding}
+          height={height}
+          viewBox={`0 0 ${widthWithoutPadding} ${height}`}
+          style={{ margin: `${padding} 0` }}
+        >
+          <Axis scale={xScale} transform={`translate(${padding}, ${35 - padding - 1})`} position="top" />
+        </svg>
+      );
+    };
+
+    const axes = { row: Row, column: Column };
+
+    return (
+      <AutoSizer style={{ minHeight: "500px", height: "100%" }}>
+        {size => (
+          <PivotGrid
+            type="generalWithMeasures"
+            rowMeasures={["sales"]}
+            columnMeasures={["revenue"]}
+            width={size.width}
+            height={size.height}
+            axes={axes}
+            data={pivotedFrame}
+            accessors={{
+              height: param => {
+                if (param.type === "Cell") {
+                  return chartHeight;
+                } else {
+                  return 35;
+                }
+              },
+              width: param => (param.type === "Cell" ? chartWidth : 120),
+            }}
+            cell={({ data, row, column, rowMeasure, columnMeasure }) => {
+              const widthWithoutPadding = width - 2 * padding;
+              const heightWithoutPadding = height - 2 * padding;
+              const yScale = useScale({
+                type: "linear",
+                frame: data.unpivot(),
+                column: data.getCursor(rowMeasure),
+                range: [0, heightWithoutPadding],
+              });
+              const xScale = useScale({
+                type: "linear",
+                frame: data.unpivot(),
+                column: data.getCursor(columnMeasure),
+                range: [0, widthWithoutPadding],
+              });
+              return (
+                <svg
+                  width={widthWithoutPadding}
+                  height={heightWithoutPadding}
+                  viewBox={`0 0 ${widthWithoutPadding} ${heightWithoutPadding}`}
+                  style={{ margin: padding }}
+                >
+                  <Dots
+                    data={data.cell(row, column)}
+                    xScale={xScale}
+                    yScale={yScale}
+                    y={data.getCursor(rowMeasure)}
+                    x={data.getCursor(columnMeasure)}
+                    style={{ fill: "#1f78b4" }}
                   />
                 </svg>
               );
