@@ -1,4 +1,4 @@
-import { DataFrame, uniqueValues } from "@operational/frame";
+import { DataFrame, uniqueValues, total } from "@operational/frame";
 import { PivotGrid, RowProps, CellPropsWithMeasure } from "@operational/grid";
 import { Axis, Bars, useScaleBand, useScaleLinear } from "@operational/visualizations";
 import { storiesOf } from "@storybook/react";
@@ -154,7 +154,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             width={width}
             height={height}
             data={pivotedFrame}
-            measures={["sales", "revenue"]}
+            rowMeasures={["sales", "revenue"]}
             style={{
               cell: { padding: "10px", textAlign: "right", background: "#fff" },
               background: "rgb(246, 246, 246)",
@@ -166,7 +166,6 @@ storiesOf("@operational/grid/1. Pivot table", module)
                 whiteSpace: "nowrap",
               },
             }}
-            measuresPlacement="column"
             dimensionLabels="top"
           />
         )}
@@ -186,7 +185,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             width={width}
             height={height}
             data={pivotedFrame}
-            measures={["unitSales"]}
+            rowMeasures={["unitSales"]}
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
@@ -210,13 +209,14 @@ storiesOf("@operational/grid/1. Pivot table", module)
             width={width}
             height={height}
             data={pivotedFrame}
-            measures={["sales", "revenue"]}
-            measuresPlacement="row"
+            rowMeasures={["sales", "revenue"]}
             dimensionLabels="top"
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
-            cell={({ measure }: CellPropsWithMeasure) => <>${measure}</>}
+            cell={({ rowMeasure, columnMeasure, data, row, column }: CellPropsWithMeasure) => (
+              <>${total(data.cell(row, column), data.getCursor(rowMeasure || columnMeasure)).toFixed(2)}</>
+            )}
           />
         )}
       </AutoSizer>
@@ -235,13 +235,14 @@ storiesOf("@operational/grid/1. Pivot table", module)
             width={width}
             height={height}
             data={pivotedFrame}
-            measures={["sales", "revenue"]}
-            measuresPlacement="column"
+            columnMeasures={["sales", "revenue"]}
             dimensionLabels="top"
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
-            cell={({ measure }: CellPropsWithMeasure) => <>{measure}</>}
+            cell={({ rowMeasure, columnMeasure, data, row, column }: CellPropsWithMeasure) => (
+              <>${total(data.cell(row, column), data.getCursor(rowMeasure || columnMeasure)).toFixed(2)}</>
+            )}
           />
         )}
       </AutoSizer>
@@ -260,7 +261,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             width={width}
             height={height}
             data={pivotedFrame}
-            measures={["sales"]}
+            rowMeasures={["sales"]}
             dimensionLabels="left"
             style={{
               cell: { padding: "10px", textAlign: "right" },
@@ -283,8 +284,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             width={width}
             height={height}
             data={pivotedFrame}
-            measures={["C"]}
-            measuresPlacement="row"
+            columnMeasures={["C"]}
             dimensionLabels="top"
             style={{
               cell: { padding: "10px", textAlign: "right" },
@@ -307,12 +307,11 @@ storiesOf("@operational/grid/1. Pivot table", module)
             width={width}
             height={height}
             data={pivotedFrame}
-            measures={["A", "B", "C"]}
-            measuresPlacement="row"
+            columnMeasures={["A", "B", "C"]}
             style={{
               cell: { padding: "10px", textAlign: "right" },
             }}
-            cell={({ measure }: CellPropsWithMeasure) => <>Data for: {measure}</>}
+            cell={({ rowMeasure, columnMeasure }: CellPropsWithMeasure) => <>Data for: {rowMeasure || columnMeasure}</>}
           />
         )}
       </AutoSizer>
@@ -358,7 +357,8 @@ storiesOf("@operational/grid/1. Pivot table", module)
         {size => (
           <PivotGrid
             type="generalWithMeasures"
-            measures={["sales", "revenue"]}
+            rowMeasures={["sales", "revenue"]}
+            columnMeasures={[]}
             width={size.width}
             height={size.height}
             axes={axes}
@@ -376,7 +376,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
               },
               width: param => (param.type === "Cell" ? chartWidth : 120),
             }}
-            cell={({ data, row, column, width, height, measure }) => {
+            cell={({ data, row, column, width, height, rowMeasure, columnMeasure }) => {
               const widthWithoutPadding = width - 2 * padding;
               const heightWithoutPadding = height - 2 * padding;
               const yScale = useScaleBand({
@@ -400,7 +400,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
                     data={data.cell(row, column)}
                     metricScale={xScale}
                     categoricalScale={yScale}
-                    metric={frame.getCursor(measure)}
+                    metric={frame.getCursor(rowMeasure || columnMeasure)}
                     categorical={frame.getCursor("Customer.City")}
                     style={{ fill: "#1f78b4" }}
                     metricDirection="horizontal"
@@ -419,8 +419,8 @@ storiesOf("@operational/grid/1. Pivot table", module)
       columns: ["Customer.AgeGroup", "Customer.Gender"],
     });
 
-    const colorCell = ({ column, row, data, measure }: CellPropsWithMeasure<string>) => {
-      const value = data.cell(row, column).peak(measure);
+    const colorCell = ({ column, row, data, rowMeasure, columnMeasure }: CellPropsWithMeasure<string>) => {
+      const value = data.cell(row, column).peak(rowMeasure || columnMeasure);
 
       const countryCursor = pivotedFrame.getCursor("Customer.Country");
       const genderCursor = pivotedFrame.getCursor("Customer.Gender");
@@ -449,7 +449,7 @@ storiesOf("@operational/grid/1. Pivot table", module)
             width={width}
             height={height}
             data={pivotedFrame}
-            measures={["sales", "revenue"]}
+            rowMeasures={["sales", "revenue"]}
             cell={colorCell}
             style={{
               background: "rgb(246, 246, 246)",
@@ -461,7 +461,6 @@ storiesOf("@operational/grid/1. Pivot table", module)
                 whiteSpace: "nowrap",
               },
             }}
-            measuresPlacement="column"
             dimensionLabels="top"
           />
         )}

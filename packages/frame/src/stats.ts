@@ -49,6 +49,8 @@ export const maxValue = <Name extends string>(
         if (value != null) {
           max = max === undefined ? value : Math.max(max, value);
         }
+        // to make linter happy, shall we add reduce and use it instead of map?
+        return null;
       });
     } else {
       frame.mapRows(row => {
