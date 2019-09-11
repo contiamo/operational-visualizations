@@ -1,17 +1,7 @@
 import * as React from "react";
 import { storiesOf } from "@storybook/react";
-import { DataFrame, RowCursor } from "@operational/frame";
-import {
-  AxialChartProps,
-  Axis,
-  Dots,
-  Chart,
-  ChartProps,
-  useScaleBand,
-  useScaleLinear,
-  useColorScale,
-  Legend,
-} from "@operational/visualizations";
+import { DataFrame } from "@operational/frame";
+import { Axis, Dots, Chart, ChartProps, Legend, useScale, ScaleType, useColorScale } from "@operational/visualizations";
 
 const rawData = {
   columns: [
@@ -62,9 +52,10 @@ interface ScatterPlotProps<Name extends string> {
   height: number;
   margin: ChartProps["margin"];
   data: DataFrame<Name>;
-  categorical: Name;
-  metric: Name;
-  metricDirection: AxialChartProps<string>["metricDirection"];
+  x: Name;
+  y: Name;
+  xType: ScaleType;
+  yType: ScaleType;
   colorBy?: Name[];
 }
 
@@ -76,80 +67,114 @@ const ScatterPlot = <Name extends string>({
   height,
   margin,
   data,
-  categorical,
-  metric,
-  metricDirection,
+  x,
+  y,
+  xType,
+  yType,
   colorBy,
 }: ScatterPlotProps<Name>) => {
-  const categoricalCursor = data.getCursor(categorical);
-  const metricCursor = data.getCursor(metric);
+  const xCursor = data.getCursor(x);
+  const yCursor = data.getCursor(y);
 
-  const categoricalScale = useScaleBand({
+  const xScale = useScale({
+    type: xType,
     frame: data,
-    column: categoricalCursor,
-    range: metricDirection === "horizontal" ? [0, height] : [0, width],
+    column: xCursor,
+    range: [0, width],
   });
-  const metricScale = useScaleLinear({
+  const yScale = useScale({
+    type: yType,
     frame: data,
-    column: metricCursor,
-    range: metricDirection === "horizontal" ? [0, width] : [height, 0],
+    column: yCursor,
+    range: [height, 0],
   });
 
-  const colorCursors = (colorBy || []).map(c => data.getCursor(c))
+  const colorCursors = (colorBy || []).map(c => data.getCursor(c));
   const colorScale = useColorScale(data, colorCursors);
 
   return (
     <div style={{ display: "inline-block" }}>
-      <Legend data={data} colorScale={colorScale} cursors={colorCursors}/>
+      <Legend data={data} colorScale={colorScale} cursors={colorCursors} />
       <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
         <Dots
-          metricDirection={metricDirection}
           data={data}
-          categorical={categoricalCursor}
-          metric={metricCursor}
-          categoricalScale={categoricalScale}
-          metricScale={metricScale}
-          showLabels={true}
-          style={(row: RowCursor) => ({ fill: colorScale(row) })}
+          x={xCursor}
+          y={yCursor}
+          xScale={xScale}
+          yScale={yScale}
+          style={row => ({ fill: colorScale(row) })}
         />
-        <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
-        <Axis scale={metricScale} position={metricDirection === "horizontal" ? "bottom" : "left"} />
+        <Axis scale={xScale} position="bottom" />
+        <Axis scale={yScale} position="left" />
       </Chart>
     </div>
   );
 };
 
 storiesOf("@operational/visualizations/5. Scatter plot", module)
-  .add("horizontal", () => {
+  .add("band x linear", () => {
     // number of pixels picked manually to make sure that YAxis fits on the screen
     const magicMargin = [5, 10, 20, 60] as ChartProps["margin"];
-
     return (
       <ScatterPlot
-        metric="sales"
-        categorical="Customer.City"
+        x="Customer.City"
+        y="sales"
+        xType="band"
+        yType="linear"
         colorBy={["Customer.City"]}
         width={300}
         height={300}
         margin={magicMargin}
         data={frame}
-        metricDirection="horizontal"
       />
     );
   })
-  .add("vertical", () => {
+  .add("linear x band", () => {
     // number of pixels picked manually to make sure that YAxis fits on the screen
     const magicMargin = 60;
     return (
       <ScatterPlot
-        metric="sales"
-        categorical="Customer.City"
+        y="Customer.City"
+        x="sales"
+        yType="band"
+        xType="linear"
         colorBy={["Customer.City"]}
         width={300}
         height={300}
         margin={magicMargin}
         data={frame}
-        metricDirection="vertical"
+      />
+    );
+  })
+  .add("band x band", () => {
+    const magicMargin = 60;
+    return (
+      <ScatterPlot
+        y="Customer.City"
+        x="Customer.Continent"
+        yType="band"
+        xType="band"
+        colorBy={["Customer.City"]}
+        width={300}
+        height={300}
+        margin={magicMargin}
+        data={frame}
+      />
+    );
+  })
+  .add("linear x linear", () => {
+    const magicMargin = 60;
+    return (
+      <ScatterPlot
+        y="revenue"
+        x="sales"
+        yType="linear"
+        xType="linear"
+        colorBy={["Customer.City"]}
+        width={300}
+        height={300}
+        margin={magicMargin}
+        data={frame}
       />
     );
   });

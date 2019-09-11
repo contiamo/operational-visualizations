@@ -1,5 +1,5 @@
+import { scaleBand, scaleLinear, ScaleBand, ScaleTime, ScaleLinear } from "d3-scale";
 import { IterableFrame, maxValue, uniqueValues, ColumnCursor } from "@operational/frame";
-import { scaleBand, scaleLinear } from "d3-scale";
 import { useMemo } from "react";
 import { GroupFrame } from "@operational/frame";
 
@@ -35,3 +35,30 @@ export const useScaleBand = <Name extends string>({ frame, column, range, paddin
 
 export const useScaleLinear = <Name extends string>({ frame, column, range }: ScaleProps<Name>) =>
   useMemo(() => getScaleLinear({ frame, column, range }), [frame, column, range]);
+
+export type ScaleType = "linear" | "band"; // | "time" | "point"
+
+export const useScale = <Name extends string>({
+  frame,
+  column,
+  range,
+  padding,
+  type,
+}: ScaleProps<Name> & { type: ScaleType }) =>
+  useMemo(
+    () =>
+      type === "band" ? getScaleBand({ frame, column, range, padding }) : getScaleLinear({ frame, column, range }),
+    [frame, column, range, padding, type],
+  );
+
+type ScaleAny = ScaleBand<any> | ScaleTime<any, any> | ScaleLinear<any, any>;
+
+export const isScaleBand = (unknownScale: ScaleAny): unknownScale is ScaleBand<any> => {
+  return "paddingInner" in unknownScale;
+};
+
+export const isScaleContinious = (
+  unknownScale: ScaleAny,
+): unknownScale is ScaleLinear<any, any> | ScaleTime<any, any> => {
+  return "invert" in unknownScale;
+};

@@ -3,7 +3,7 @@ export { AxisRules } from "./AxisRules";
 export { Area } from "./Area";
 export { Bars } from "./Bars";
 export { Line } from "./Line";
-export { Dots } from "./Dots";
+export { Dots, DotsProps } from "./Dots";
 export { Labels } from "./Labels";
 export { PieChart } from "./PieChart";
 export { Chart, ChartProps } from "./Chart";
