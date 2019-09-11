@@ -22,19 +22,24 @@
     "clean_modules": "rm -rf node_modules packages/*/node_modules && yarn",
     "lint": "eslint packages/**/src/**/*.{ts,tsx}",
     "commit": "git-cz",
-    "release-canary": "lerna publish --canary --conventional-commits",
-    "release": "lerna publish --conventional-commits"
+    "release:canary": "lerna publish --canary --conventional-commits --yes",
+    "release:auto": "lerna publish from-git",
+    "release:version": "lerna version --conventional-commits --yes --message \"chore(All): Bump version %v\""
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-react": "^7.0.0",
+    "@commitlint/cli": "^7.6.1",
     "@types/jest": "^24.0.13",
     "@types/react": "^16.8.19",
     "@types/react-dom": "^16.8.4",
     "@types/react-test-renderer": "^16.8.1",
     "adr": "^1.1.2",
     "babel-jest": "^24.8.0",
+    "commitizen": "^3.1.1",
+    "commitlint-config-seek": "^1.0.0",
+    "cz-conventional-changelog": "^2.1.0",
     "husky": "^2.3.0",
     "jest": "^24.8.0",
     "lerna": "^3.14.1",
@@ -47,11 +52,7 @@
     "react-test-renderer": "^16.8.6",
     "rimraf": "^2.6.3",
     "ts-jest": "^24.0.2",
-    "typescript": "^3.5.1",
-    "@commitlint/cli": "^7.6.1",
-    "cz-conventional-changelog": "^2.1.0",
-    "commitizen": "^3.1.1",
-    "commitlint-config-seek": "^1.0.0"
+    "typescript": "^3.5.1"
   },
   "husky": {
     "hooks": {
