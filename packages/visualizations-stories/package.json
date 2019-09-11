@@ -1,6 +1,7 @@
 {
   "name": "@operational/visualizations-stories",
   "private": true,
+  "version": "0.0.0",
   "description": "Stories of @operational/visualizations rendering libraries for E2E tests",
   "license": "MIT",
   "scripts": {
