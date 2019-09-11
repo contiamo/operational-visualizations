@@ -73,9 +73,11 @@ type TextOnlyPivotGridProps<Name extends string> =
   | {
       type?: "text";
       rowMeasures: Name[];
+      columnMeasures?: undefined;
     }
   | {
       type?: "text";
+      rowMeasures?: undefined;
       columnMeasures: Name[];
     };
 
