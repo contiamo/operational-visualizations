@@ -12,24 +12,36 @@ This project is structured as a [monorepo](https://www.atlassian.com/git/tutoria
 
 ## Running locally
 
-```
+```sh
 yarn
 yarn start
 ```
 
 to run tests
 
-```
+```sh
 yarn test --watch
 ```
 
 Open http://localhost:7000/
 
-## Building for Production
+## Commiting changes
 
+We follow [Conventional Changelog](https://www.conventionalcommits.org/en/). To simplify commit process you can use `yarn commit`.
+
+## Releasing
+
+Every commit to master is automatically released to canary channel.
+
+To release to stable chanel use following commands:
+
+```sh
+git checkout master
+git pull
+yarn release:version
 ```
-yarn build
-```
+
+This command will bump versions of packages and push it to master (together with tags). CI server will do actual release.
 
 ## Thanks
 
