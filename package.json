@@ -24,7 +24,7 @@
     "commit": "git-cz",
     "release:canary": "lerna publish --canary --conventional-commits --yes",
     "release:auto": "lerna publish from-git",
-    "release:version": "lerna version --conventional-commits --yes --message \"chore(All): Bump version %v\""
+    "release:version": "lerna version --conventional-commits --yes --message \"chore(All): Bump version\""
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",

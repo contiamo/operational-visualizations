@@ -17,3 +17,4 @@ jobs:
       - uses: actions/npm@master
       - run: echo '//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN }}' > .npmrc
       - run: yarn release:canary
+      - run: yarn release:auto
