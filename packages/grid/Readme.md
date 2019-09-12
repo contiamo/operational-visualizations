@@ -36,7 +36,7 @@ PivotGrid expects `width` and `height` as params, because it uses virtual scroll
 
 PivotGrid expects `PivotFrame` as `data` param. It will provide information about which values to use as rows and columns and the actual data.
 
-PivotGrid expects `measures` as param. For text-based pivot table it is required, for pivot table of charts it is optional.
+PivotGrid expects `rowMeasures` xor `columnMeasures` as param. For text-based pivot table it is required, for pivot table of charts it is optional.
 
 PivotGrid expects `cell` render property, which will render content of cells. For text-based pivot table it is optional.
 
@@ -47,5 +47,3 @@ PivotGrid expects `cell` render property, which will render content of cells. Fo
 `style.cell` - styles of cell, you can use it to provide padding for example
 
 `style.border` - style of border
-
-`measuresPlacement` - if we want to place measures in rows or columns. Defaults to column.

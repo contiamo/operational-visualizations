@@ -19,7 +19,6 @@ import {
   ColumnProps,
   CellPropsWithMeasure,
   CellPropsWithoutMeasure,
-  MeasuresPlacement,
   WidthAccessor,
   HeightAccessor,
 } from "./types";
@@ -40,13 +39,16 @@ const toString = (value: boolean | string) => {
   return value;
 };
 
-const defaultCell = ({ column, row, data, measure }: CellPropsWithMeasure<string>) => {
-  const value = data.cell(row, column).peak(measure);
+const defaultCell = ({ column, row, data, rowMeasure, columnMeasure }: CellPropsWithMeasure<string>) => {
+  if (rowMeasure && columnMeasure) {
+    throw new Error("Can't use two measures for text based grid");
+  }
+  const value = data.cell(row, column).peak(rowMeasure || columnMeasure);
   return value === null ? null : <>{value}</>;
 };
 
 const defaultHeader = ({ value }: { value: string; width: number; height: number }) => (
-  <span title={value}>{toString(value)}</span>
+  <span title={toString(value)}>{toString(value)}</span>
 );
 
 const defaultWidth = () => 120;
@@ -67,12 +69,17 @@ const defaultDimensionStyle: React.CSSProperties = {
  * We support text only pivot grid out of the box,
  * for this case you don't need to provide cell render prop, but you need to provide measures
  */
-interface TextOnlyPivotGridProps<Name extends string> {
-  type?: "text";
-  measures: Name[];
-  /** default value is "column" */
-  measuresPlacement?: MeasuresPlacement;
-}
+type TextOnlyPivotGridProps<Name extends string> =
+  | {
+      type?: "text";
+      rowMeasures: Name[];
+      columnMeasures?: undefined;
+    }
+  | {
+      type?: "text";
+      rowMeasures?: undefined;
+      columnMeasures: Name[];
+    };
 
 /**
  * This is props for general PivotGrid, you need to provide cell render prop.
@@ -85,9 +92,8 @@ type GeneralPivotGridProps<Name extends string> =
     }
   | {
       type: "generalWithMeasures";
-      measures: Name[];
-      /** default value is "column" */
-      measuresPlacement?: MeasuresPlacement;
+      rowMeasures?: Name[];
+      columnMeasures?: Name[];
       cell: (prop: CellPropsWithMeasure<Name>) => React.ReactElement | null;
     };
 
@@ -134,7 +140,7 @@ const dimensionLabelsShortcut = (dimensionLabels?: DimensionLabels | "top" | "le
 export const PivotGrid = React.memo(<Name extends string = string>(props: Props<Name>) => {
   // assigning default values
   const { data } = props;
-  const cell = "cell" in props ? props.cell : defaultCell;
+  const cell = "cell" in props && props.cell ? props.cell : defaultCell;
   const header = props.header || defaultHeader;
   const axes = props.axes || (emptyObject as Axes<Name>);
   const accessors = props.accessors || (emptyObject as Accessors<Name>);
@@ -150,40 +156,46 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
   const dimensionStyle = styleProp.dimension || defaultDimensionStyle;
   const headerStyle = styleProp.header || defaultHeaderStyle;
   const backgroundStyle = styleProp.background || defaultBackground;
-  const measures = "measures" in props ? props.measures : [];
-  const measuresPlacement = ("measures" in props ? props.measuresPlacement : undefined) || "column";
+  const rowMeasures = "rowMeasures" in props && props.rowMeasures ? props.rowMeasures : [];
+  const columnMeasures = "columnMeasures" in props && props.columnMeasures ? props.columnMeasures : [];
+  const rowMeasuresCount = rowMeasures.length;
+  const columnMeasuresCount = columnMeasures.length;
 
   // calculating size of the grid
-  const measuresCount = measures.length === 0 ? 1 : measures.length;
-  const rowHeadersCount = getRowHeadersCount({ axes, data, dimensionLabels, measuresPlacement, measuresCount });
+  const rowHeadersCount = getRowHeadersCount({
+    axes,
+    data,
+    dimensionLabels,
+    rowMeasuresCount,
+    columnMeasuresCount,
+  });
   const columnHeadersCount = getColumnHeadersCount({
     axes,
     data,
     dimensionLabels,
-    measuresPlacement,
-    measuresCount,
+    rowMeasuresCount,
+    columnMeasuresCount,
   });
-  const columnCount = getColumnCount({ rowHeadersCount, data, measuresPlacement, measuresCount });
+  const columnCount = getColumnCount({ rowHeadersCount, data, rowMeasuresCount, columnMeasuresCount });
   const rowCount = getRowCount({
     columnHeadersCount,
     data,
-    measuresPlacement,
-    measuresCount,
+    rowMeasuresCount,
+    columnMeasuresCount,
   });
 
   const indexToCoordinateMemoised = useMemo(
     () =>
       indexToCoordinate({
         rowHeadersCount,
-        measuresPlacement,
         columnHeadersCount,
-        measuresCount,
         data,
         axes,
-        measures,
+        rowMeasures,
+        columnMeasures,
         dimensionLabels,
       }),
-    [rowHeadersCount, measuresPlacement, columnHeadersCount, measuresCount, data, axes, measures, dimensionLabels],
+    [rowHeadersCount, columnHeadersCount, data, axes, dimensionLabels, rowMeasures, columnMeasures],
   );
 
   const rowHeight = useCallback(
@@ -237,7 +249,8 @@ export const PivotGrid = React.memo(<Name extends string = string>(props: Props<
             data,
             width,
             height,
-            measure: cellCoordinates.measure!,
+            rowMeasure: cellCoordinates.rowMeasure!,
+            columnMeasure: cellCoordinates.columnMeasure!,
             row: cellCoordinates.row,
             column: cellCoordinates.column,
           });

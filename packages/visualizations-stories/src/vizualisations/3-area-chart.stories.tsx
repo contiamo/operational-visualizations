@@ -10,39 +10,39 @@ import {
   useScaleBand,
   useScaleLinear,
   Legend,
-  useColorScale
+  useColorScale,
 } from "@operational/visualizations";
 
 const rawData = {
   columns: [
     {
       name: "Customer.Continent" as "Customer.Continent",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.Country" as "Customer.Country",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.City" as "Customer.City",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.AgeGroup" as "Customer.AgeGroup",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.Gender" as "Customer.Gender",
-      type: "string"
+      type: "string",
     },
     {
       name: "sales" as "sales",
-      type: "number"
+      type: "number",
     },
     {
       name: "revenue" as "revenue",
-      type: "number"
-    }
+      type: "number",
+    },
   ],
   rows: [
     ["Europe", "Germany", "Berlin", "<50", "Female", 101, 10.2],
@@ -51,40 +51,40 @@ const rawData = {
     ["Europe", "UK", "London", "<50", "Female", 401, 40.2],
     ["Europe", "UK", "Edinburgh", "<50", "Female", 501, 50.2],
     ["North America", "USA", "New York", "<50", "Female", 801, 80.2],
-    ["North America", "Canada", "Toronto", "<50", "Female", 801, 80.2]
-  ]
+    ["North America", "Canada", "Toronto", "<50", "Female", 801, 80.2],
+  ],
 };
 
 const rawDataStacked = {
   columns: [
     {
       name: "Customer.Continent" as "Customer.Continent",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.Country" as "Customer.Country",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.City" as "Customer.City",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.AgeGroup" as "Customer.AgeGroup",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.Gender" as "Customer.Gender",
-      type: "string"
+      type: "string",
     },
     {
       name: "sales" as "sales",
-      type: "number"
+      type: "number",
     },
     {
       name: "revenue" as "revenue",
-      type: "number"
-    }
+      type: "number",
+    },
   ],
   rows: [
     ["Europe", "Germany", "Berlin", "<50", "Female", 101, 10.2],
@@ -100,40 +100,40 @@ const rawDataStacked = {
     ["Europe", "UK", "London", "<50", "Male", 401, 40.2],
     ["Europe", "UK", "Edinburgh", "<50", "Male", 501, 50.2],
     ["North America", "USA", "New York", "<50", "Male", 801, 80.2],
-    ["North America", "Canada", "Toronto", "<50", "Male", 801, 80.2]
-  ]
+    ["North America", "Canada", "Toronto", "<50", "Male", 801, 80.2],
+  ],
 };
 
 const rawDataWithMissing = {
   columns: [
     {
       name: "Customer.Continent" as "Customer.Continent",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.Country" as "Customer.Country",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.City" as "Customer.City",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.AgeGroup" as "Customer.AgeGroup",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.Gender" as "Customer.Gender",
-      type: "string"
+      type: "string",
     },
     {
       name: "sales" as "sales",
-      type: "number"
+      type: "number",
     },
     {
       name: "revenue" as "revenue",
-      type: "number"
-    }
+      type: "number",
+    },
   ],
   rows: [
     ["Europe", "Germany", "Berlin", "<50", "Female", 101, 10.2],
@@ -142,40 +142,40 @@ const rawDataWithMissing = {
     ["Europe", "UK", "London", "<50", "Female", 401, 40.2],
     ["Europe", "UK", "Edinburgh", "<50", "Female", undefined, 50.2],
     ["North America", "USA", "New York", "<50", "Female", 801, 80.2],
-    ["North America", "Canada", "Toronto", "<50", "Female", 801, 80.2]
-  ]
+    ["North America", "Canada", "Toronto", "<50", "Female", 801, 80.2],
+  ],
 };
 
 const rawDataStackedWithMissing = {
   columns: [
     {
       name: "Customer.Continent" as "Customer.Continent",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.Country" as "Customer.Country",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.City" as "Customer.City",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.AgeGroup" as "Customer.AgeGroup",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.Gender" as "Customer.Gender",
-      type: "string"
+      type: "string",
     },
     {
       name: "sales" as "sales",
-      type: "number"
+      type: "number",
     },
     {
       name: "revenue" as "revenue",
-      type: "number"
-    }
+      type: "number",
+    },
   ],
   rows: [
     ["Europe", "Germany", "Berlin", "<50", "Female", 101, 10.2],
@@ -191,8 +191,8 @@ const rawDataStackedWithMissing = {
     ["Europe", "UK", "London", "<50", "Male", 401, 40.2],
     ["Europe", "UK", "Edinburgh", "<50", "Male", 501, 50.2],
     ["North America", "USA", "New York", "<50", "Male", 801, 80.2],
-    ["North America", "Canada", "Toronto", "<50", "Male", 801, 80.2]
-  ]
+    ["North America", "Canada", "Toronto", "<50", "Male", 801, 80.2],
+  ],
 };
 
 const frame = new DataFrame(rawData.columns, rawData.rows);
@@ -248,7 +248,7 @@ const AreaChart = <Name extends string>({
 
   return (
     <div style={{ display: "inline-block" }}>
-      <Legend data={data} colorScale={colorScale} cursors={colorByCursors}/>
+      <Legend data={data} colorScale={colorScale} cursors={colorByCursors} />
       <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
         {frame.map((grouped, i) => (
           <Area
@@ -261,16 +261,13 @@ const AreaChart = <Name extends string>({
             categoricalScale={categoricalScale}
             metricScale={metricScale}
             showLabels={true}
-            style={(row: RowCursor) => ({ fill: colorScale(row), stroke: colorScale(row) })}          />
+            style={(row: RowCursor) => ({ fill: colorScale(row), stroke: colorScale(row) })}
+          />
         ))}
-        <Axis
-          scale={categoricalScale}
-          position={metricDirection === "vertical" ? "bottom" : "left"}
-        />
-        <Axis
-          scale={metricScale}
-          position={metricDirection === "vertical" ? "left" : "bottom"}
-        />
+        <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
+        ))}
+        <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
+        <Axis scale={metricScale} position={metricDirection === "vertical" ? "left" : "bottom"} />
       </Chart>
     </div>
   );

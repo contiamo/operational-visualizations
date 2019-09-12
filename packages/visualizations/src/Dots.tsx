@@ -1,52 +1,58 @@
 import React from "react";
 import { useChartTransform } from "./Chart";
-import { DiscreteAxialChart } from "./types";
 import { isFunction } from "./utils";
-import { Labels } from "./Labels";
+import { IterableFrame, ColumnCursor, RowCursor } from "@operational/frame";
+import { ScaleLinear, ScaleBand } from "d3-scale";
+import { isScaleBand } from "./scale";
+// import { Labels } from "./Labels";
 
 const radius = 3;
 
-export const Dots: DiscreteAxialChart<string> = props => {
+export interface DotsProps<Name extends string> {
+  data: IterableFrame<Name>;
+  x: ColumnCursor<Name>;
+  y: ColumnCursor<Name>;
+  xScale: ScaleLinear<any, any> | ScaleBand<string>;
+  yScale: ScaleLinear<any, any> | ScaleBand<string>;
+  transform?: React.SVGAttributes<SVGRectElement>["transform"];
+  style?:
+    | React.SVGAttributes<SVGGElement>["style"]
+    | ((row: RowCursor, i: number) => React.SVGAttributes<SVGGElement>["style"]);
+  showLabels?: boolean;
+}
+
+export const Dots = <Name extends string>(props: DotsProps<Name>) => {
   const defaultTransform = useChartTransform();
-  const { data, transform, metric, categorical, metricScale, categoricalScale, metricDirection, showLabels, style } = props;
-
-  const bandWidth = categoricalScale.bandwidth();
-
-  // this doesn't make much sense for ScatterPlot, but this is temprorary solution for compatibility
-  return <>
-    {metricDirection === "vertical"
-       ? <g transform={transform || defaultTransform}>
-          {data.mapRows((row, i) => (
-            <circle
-              cx={categoricalScale(categorical(row))! + bandWidth / 2}
-              cy={metricScale(metric(row))}
-              r={radius}
-              style={isFunction(style) ? style(row, i) : style}
-              key={i}
-            />
-          ))}
-        </g>
-        : <g transform={transform || defaultTransform}>
-          {data.mapRows((row, i) => (
-            <circle
-              cx={metricScale(metric(row))}
-              cy={categoricalScale(categorical(row))! + bandWidth / 2}
-              r={radius}
-              style={isFunction(style) ? style(row, i) : style}
-              key={i}
-            />
-          ))}
-        </g>
-    }
-    {showLabels && <Labels
-      data={data}
-      transform={transform}
-      metric={metric}
-      categorical={categorical}
-      metricScale={metricScale}
-      categoricalScale={categoricalScale}
-      metricDirection={metricDirection}
-      style={{ transform: metricDirection === "vertical" ?`translate(0, -${radius}px)` : `translate(${radius}px, 0)` }}
-    />}
-  </>
+  const { data, transform, x, y, xScale, yScale, style /*, showLabels*/ } = props;
+  const xBandWidth = isScaleBand(xScale) ? xScale.bandwidth() : 0;
+  const yBandWidth = isScaleBand(yScale) ? yScale.bandwidth() : 0;
+  return (
+    <>
+      <g transform={transform || defaultTransform}>
+        {data.mapRows((row, i) => (
+          <circle
+            cx={xScale(x(row)) + xBandWidth / 2}
+            cy={yScale(y(row)) + yBandWidth / 2}
+            r={radius}
+            style={isFunction(style) ? style(row, i) : style}
+            key={i}
+          />
+        ))}
+      </g>
+      {/* {showLabels && (
+        <Labels
+          data={data}
+          transform={transform}
+          metric={metric}
+          categorical={categorical}
+          metricScale={metricScale}
+          categoricalScale={categoricalScale}
+          metricDirection={metricDirection}
+          style={{
+            transform: metricDirection === "vertical" ? `translate(0, -${radius}px)` : `translate(${radius}px, 0)`,
+          }}
+        />
+      )} */}
+    </>
+  );
 };

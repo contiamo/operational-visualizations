@@ -1,5 +1,5 @@
 import { DataFrame } from "@operational/frame";
-import { getColumnCount } from "../coordinateUtils";
+import { getColumnCount, getRowCount } from "../coordinateUtils";
 
 const rawData = {
   columns: [
@@ -82,10 +82,22 @@ describe("coordinateUtils", () => {
         getColumnCount({
           rowHeadersCount: 2,
           data: pivotedFrame,
-          measuresPlacement: "column",
-          measuresCount: 1,
+          rowMeasuresCount: 1,
+          columnMeasuresCount: 0,
         }),
       ).toEqual(6);
+    });
+  });
+  describe("getRowCount()", () => {
+    it("2 slots for row header + 4 slots for AgeGroup × Gender", () => {
+      expect(
+        getRowCount({
+          columnHeadersCount: 2,
+          data: pivotedFrame,
+          rowMeasuresCount: 1,
+          columnMeasuresCount: 0,
+        }),
+      ).toEqual(10);
     });
   });
 });

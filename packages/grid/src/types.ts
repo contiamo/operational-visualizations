@@ -1,9 +1,5 @@
 import { PivotFrame } from "@operational/frame";
 
-// we can add "both" in the future https://github.com/contiamo/operational-visualizations/issues/73
-// undefined means "none"
-export type MeasuresPlacement = "row" | "column";
-
 // tslint:disable
 /**
  * ```
@@ -45,7 +41,8 @@ export type WidthParam<Name extends string = string> =
       // width of a column header or a data cell
       type: "Cell";
       column: number;
-      measure?: Name;
+      columnMeasure?: Name;
+      rowMeasure?: Name;
     };
 
 // tslint:disable
@@ -86,7 +83,8 @@ export type HeightParam<Name extends string = string> =
       // height of a row header or a data cell
       type: "Cell";
       row: number;
-      measure?: Name;
+      columnMeasure?: Name;
+      rowMeasure?: Name;
     };
 
 // tslint:disable
@@ -128,13 +126,14 @@ export type CellCoordinates<Name extends string = string> =
       type: "Empty";
       columnIndex?: number;
       rowIndex?: number;
-      measure?: MeasuresPlacement;
+      measure?: boolean; // do we need this one?
       axis?: boolean;
       dimensionLabel?: Name | ""; // empty string is for empty cell
     }
   | {
       type: "Cell";
-      measure?: Name;
+      rowMeasure?: Name;
+      columnMeasure?: Name;
       row: number;
       column: number;
     }
@@ -183,14 +182,25 @@ export interface CellPropsWithoutMeasure<Name extends string = string> {
   column: number;
 }
 
-export interface CellPropsWithMeasure<Name extends string = string> {
+export type CellPropsWithMeasure<Name extends string = string> = {
   data: PivotFrame<Name>;
   width: number;
   height: number;
   row: number;
   column: number;
-  measure: Name;
-}
+} & (
+  | {
+      rowMeasure: Name;
+      columnMeasure: never;
+    }
+  | {
+      rowMeasure: never;
+      columnMeasure: Name;
+    }
+  | {
+      rowMeasure: Name;
+      columnMeasure: Name;
+    });
 
 export type CellProps<Name extends string = string> = CellPropsWithoutMeasure<Name> | CellPropsWithMeasure<Name>;
 
