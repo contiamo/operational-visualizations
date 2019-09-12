@@ -3,7 +3,6 @@ import { storiesOf } from "@storybook/react";
 import { DataFrame, RowCursor } from "@operational/frame";
 import {
   Area,
-  AxialChartProps,
   Axis,
   Chart,
   ChartProps,
@@ -207,7 +206,7 @@ interface AreaChartProps<Name extends string> {
   data: DataFrame<Name>;
   categorical: Name;
   metric: Name;
-  metricDirection: AxialChartProps<string>["metricDirection"];
+  metricDirection: "horizontal" | "vertical";
   colorBy?: Name[];
   stackBy?: Name[];
 }
@@ -253,15 +252,17 @@ const AreaChart = <Name extends string>({
         {frame.map((grouped, i) => (
           <Area
             key={i}
-            metricDirection={metricDirection}
             data={grouped}
-            categorical={categoricalCursor}
-            metric={metricCursor}
             stack={stackByCursors}
-            categoricalScale={categoricalScale}
-            metricScale={metricScale}
+            x={metricDirection === "horizontal" ? categoricalCursor : metricCursor}
+            y={metricDirection === "horizontal" ? metricCursor : categoricalCursor}
+            xScale={metricDirection === "horizontal" ? categoricalScale : metricScale}
+            yScale={metricDirection === "horizontal" ? metricScale : categoricalScale}
             showLabels={true}
-            style={(row: RowCursor) => ({ fill: colorScale(row), stroke: colorScale(row) })}
+            style={(row: RowCursor) => ({
+              fill: colorScale(row),
+              stroke: colorScale(row),
+            })}
           />
         ))}
         <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />

@@ -3,6 +3,9 @@ import { useChartTransform } from "./Chart";
 import { DiscreteAxialChart } from "./types";
 import { isFunction } from "./utils";
 import theme from "./theme";
+import { ColumnCursor } from "@operational/frame";
+import { ScaleBand, ScaleLinear } from "d3-scale";
+import { isScaleBand } from "./scale";
 
 export const baseStyle: React.CSSProperties = {
   fontSize: theme.font.size.small,
@@ -11,21 +14,20 @@ export const baseStyle: React.CSSProperties = {
 
 export const verticalStyle: React.CSSProperties = {
   ...baseStyle,
-  textAnchor: "middle"
+  textAnchor: "middle",
 };
 
 export const Labels: DiscreteAxialChart<string> = props => {
   const defaultTransform = useChartTransform();
-  const {
-    data,
-    transform,
-    metric,
-    categorical,
-    metricScale,
-    categoricalScale,
-    metricDirection,
-    style
-  } = props;
+  const { data, transform, x, y, xScale, yScale, style } = props;
+  const [categorical, metric, categoricalScale, metricScale, metricDirection]: [
+    ColumnCursor<string>,
+    ColumnCursor<string>,
+    ScaleBand<string>,
+    ScaleLinear<number, number>,
+    "vertical" | "horizontal"
+  ] = isScaleBand(xScale) ? [x, y, xScale, yScale, "horizontal"] : ([y, x, yScale, xScale, "vertical"] as any);
+
   const bandWidth = categoricalScale.bandwidth();
 
   if (metricDirection === "vertical") {
@@ -38,7 +40,7 @@ export const Labels: DiscreteAxialChart<string> = props => {
             dy="-0.35em"
             style={{
               ...verticalStyle,
-              ...(isFunction(style) ? style(row, i) : style)
+              ...(isFunction(style) ? style(row, i) : style),
             }}
             key={i}
           >
@@ -58,7 +60,7 @@ export const Labels: DiscreteAxialChart<string> = props => {
             dy="0.35em"
             style={{
               ...baseStyle,
-              ...(isFunction(style) ? style(row, i) : style)
+              ...(isFunction(style) ? style(row, i) : style),
             }}
             key={i}
           >

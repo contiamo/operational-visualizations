@@ -4,7 +4,7 @@ import { isFunction } from "./utils";
 import { IterableFrame, ColumnCursor, RowCursor } from "@operational/frame";
 import { ScaleLinear, ScaleBand } from "d3-scale";
 import { isScaleBand } from "./scale";
-// import { Labels } from "./Labels";
+import { Labels } from "./Labels";
 
 const radius = 3;
 
@@ -23,7 +23,8 @@ export interface DotsProps<Name extends string> {
 
 export const Dots = <Name extends string>(props: DotsProps<Name>) => {
   const defaultTransform = useChartTransform();
-  const { data, transform, x, y, xScale, yScale, style /*, showLabels*/ } = props;
+  const { data, transform, x, y, xScale, yScale, style, showLabels } = props;
+  const metricDirection = isScaleBand(xScale) ? "horizontal" : "vertical";
   const xBandWidth = isScaleBand(xScale) ? xScale.bandwidth() : 0;
   const yBandWidth = isScaleBand(yScale) ? yScale.bandwidth() : 0;
   return (
@@ -46,20 +47,19 @@ export const Dots = <Name extends string>(props: DotsProps<Name>) => {
           );
         })}
       </g>
-      {/* {showLabels && (
+      {showLabels && (
         <Labels
           data={data}
           transform={transform}
-          metric={metric}
-          categorical={categorical}
-          metricScale={metricScale}
-          categoricalScale={categoricalScale}
-          metricDirection={metricDirection}
+          x={x}
+          y={y}
+          yScale={yScale}
+          xScale={xScale}
           style={{
             transform: metricDirection === "vertical" ? `translate(0, -${radius}px)` : `translate(${radius}px, 0)`,
           }}
         />
-      )} */}
+      )}
     </>
   );
 };

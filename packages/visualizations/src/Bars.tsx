@@ -3,18 +3,28 @@ import { useChartTransform } from "./Chart";
 import { DiscreteAxialChart } from "./types";
 import { isFunction } from "./utils";
 import { baseStyle as baseLabelStyle, verticalStyle as verticalLabelStyle } from "./Labels";
+import { ColumnCursor } from "@operational/frame";
+import { ScaleBand, ScaleLinear } from "d3-scale";
+import { isScaleBand } from "./scale";
 
-export const Bars: DiscreteAxialChart<string> = props => {
+export const Bars: DiscreteAxialChart<string> = ({ data, transform, x, y, xScale, yScale, showLabels, style }) => {
   const defaultTransform = useChartTransform();
-  const { data, transform, metric, categorical, metricScale, categoricalScale, showLabels, style } = props;
+  const [categorical, metric, categoricalScale, metricScale, metricDirection]: [
+    ColumnCursor<string>,
+    ColumnCursor<string>,
+    ScaleBand<string>,
+    ScaleLinear<number, number>,
+    "vertical" | "horizontal"
+  ] = isScaleBand(xScale) ? [x, y, xScale, yScale, "horizontal"] : ([y, x, yScale, xScale, "vertical"] as any);
+
   const bandWidth = categoricalScale.bandwidth();
 
-  if (props.metricDirection === "vertical") {
+  if (metricDirection === "vertical") {
     const height = metricScale(metricScale.domain()[0]);
     let accumulatedHeight = 0;
     // The `Labels` component can't be used here due to stacking
     // labels need to be computed per row, but then rendered at the end to avoid being hidden by stacked bar segments
-    const labels: JSX.Element[] = []
+    const labels: JSX.Element[] = [];
 
     return (
       <g transform={transform || defaultTransform}>
@@ -39,8 +49,8 @@ export const Bars: DiscreteAxialChart<string> = props => {
             >
               {metric(row)}
             </text>
-          )
-          labels.push(label)
+          );
+          labels.push(label);
           accumulatedHeight += height - metricScale(metric(row));
           return bar;
         })}
@@ -51,7 +61,7 @@ export const Bars: DiscreteAxialChart<string> = props => {
     let accumulatedWidth = 0;
     // The `Labels` component can't be used here due to stacking
     // labels need to be computed per row, but then rendered at the end to avoid being hidden by stacked bar segments
-    const labels: JSX.Element[] = []
+    const labels: JSX.Element[] = [];
     return (
       <g transform={transform || defaultTransform}>
         {data.mapRows((row, i) => {
@@ -76,8 +86,8 @@ export const Bars: DiscreteAxialChart<string> = props => {
             >
               {metric(row)}
             </text>
-          )
-          labels.push(label)
+          );
+          labels.push(label);
           accumulatedWidth += metricScale(metric(row));
           return bar;
         })}

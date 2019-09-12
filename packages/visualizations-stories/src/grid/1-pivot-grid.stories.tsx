@@ -398,12 +398,11 @@ storiesOf("@operational/grid/1. Pivot table", module)
                 >
                   <Bars
                     data={data.cell(row, column)}
-                    metricScale={xScale}
-                    categoricalScale={yScale}
-                    metric={frame.getCursor(rowMeasure || columnMeasure)}
-                    categorical={frame.getCursor("Customer.City")}
+                    xScale={xScale}
+                    yScale={yScale}
+                    x={frame.getCursor(rowMeasure || columnMeasure)}
+                    y={frame.getCursor("Customer.City")}
                     style={{ fill: "#1f78b4" }}
-                    metricDirection="horizontal"
                   />
                 </svg>
               );

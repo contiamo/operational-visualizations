@@ -46,7 +46,6 @@ const BarChart = <Name extends string>({ width, height, margin, data, categorica
   return (
     <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
       <Bars
-        metricDirection={"horizontal"}
         data={data}
         categorical={categorical}
         metric={metric}

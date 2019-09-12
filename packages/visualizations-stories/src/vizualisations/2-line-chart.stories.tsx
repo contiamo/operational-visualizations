@@ -2,7 +2,6 @@ import * as React from "react";
 import { storiesOf } from "@storybook/react";
 import { DataFrame, RowCursor } from "@operational/frame";
 import {
-  AxialChartProps,
   Axis,
   Chart,
   ChartProps,
@@ -176,7 +175,7 @@ interface LineChartProps<Name extends string> {
   data: DataFrame<Name>;
   categorical: Name;
   metric: Name;
-  metricDirection: AxialChartProps<string>["metricDirection"];
+  metricDirection: "horizontal" | "vertical";
 }
 
 /**
@@ -208,15 +207,14 @@ const LineChart = <Name extends string>({
 
   return (
     <div style={{ display: "inline-block" }}>
-      <Legend data={data} colorScale={colorScale} cursors={[]}/>
+      <Legend data={data} colorScale={colorScale} cursors={[]} />
       <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
         <Line
-          metricDirection={metricDirection}
           data={data}
-          categorical={categoricalCursor}
-          metric={metricCursor}
-          categoricalScale={categoricalScale}
-          metricScale={metricScale}
+          x={categoricalCursor}
+          y={metricCursor}
+          xScale={categoricalScale}
+          yScale={metricScale}
           showLabels={true}
           style={{ stroke: "#1f78b4" }}
         />
@@ -257,24 +255,26 @@ const MultipleLines = <Name extends string>({
     range: metricDirection === "vertical" ? [height, 0] : [0, width],
   });
 
-  const colorCursors = (colorBy || []).map(c => data.getCursor(c))
+  const colorCursors = (colorBy || []).map(c => data.getCursor(c));
   const colorScale = useColorScale(data, colorCursors);
 
   return (
     <div style={{ display: "inline-block" }}>
-      <Legend data={data} colorScale={colorScale} cursors={colorCursors}/>
+      <Legend data={data} colorScale={colorScale} cursors={colorCursors} />
       <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
         {data.groupBy(series).map((seriesData, i) => (
           <Line
             key={i}
-            metricDirection={metricDirection}
             data={seriesData}
-            categorical={categoricalCursor}
-            metric={metricCursor}
-            categoricalScale={categoricalScale}
-            metricScale={metricScale}
+            x={metricDirection === "horizontal" ? categoricalCursor : metricCursor}
+            y={metricDirection === "horizontal" ? metricCursor : categoricalCursor}
+            xScale={metricDirection === "horizontal" ? categoricalScale : metricScale}
+            yScale={metricDirection === "horizontal" ? metricScale : categoricalScale}
             showLabels={true}
-            style={(row: RowCursor) => ({ stroke: colorScale(row), strokeWidth: 2 })}
+            style={(row: RowCursor) => ({
+              stroke: colorScale(row),
+              strokeWidth: 2,
+            })}
           />
         ))}
         <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
@@ -286,7 +286,10 @@ const MultipleLines = <Name extends string>({
 
 const singleFrame = new DataFrame(rawDataSingleLine.columns, rawDataSingleLine.rows);
 const multiplesFrame = new DataFrame(rawDataMultipleLines.columns, rawDataMultipleLines.rows);
-const multiplesWithMissingDataFrame = new DataFrame(rawDataMultipleLinesMissingData.columns, rawDataMultipleLinesMissingData.rows);
+const multiplesWithMissingDataFrame = new DataFrame(
+  rawDataMultipleLinesMissingData.columns,
+  rawDataMultipleLinesMissingData.rows,
+);
 
 storiesOf("@operational/visualizations/2. Line chart", module)
   .add("vertical", () => {

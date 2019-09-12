@@ -4,31 +4,41 @@ import { useChartTransform } from "./Chart";
 import { LinearAxialChart } from "./types";
 import { isFunction } from "./utils";
 import { Labels } from "./Labels";
+import { ScaleBand, ScaleLinear } from "d3-scale";
+import { ColumnCursor } from "@operational/frame";
+import { isScaleBand } from "./scale";
 
 export const Line: LinearAxialChart<string> = React.memo(props => {
   const defaultTransform = useChartTransform();
 
-  const { metricDirection, data, transform, metric, categorical, metricScale, categoricalScale, showLabels, style } = props;
+  const { data, transform, x, y, xScale, yScale, showLabels, style } = props;
+  const [categorical, metric, categoricalScale, metricScale, metricDirection]: [
+    ColumnCursor<string>,
+    ColumnCursor<string>,
+    ScaleBand<string>,
+    ScaleLinear<number, number>,
+    "vertical" | "horizontal"
+  ] = isScaleBand(xScale) ? [x, y, xScale, yScale, "horizontal"] : ([y, x, yScale, xScale, "vertical"] as any);
 
   // The categorical scale must be a band scale for composability with bar charts.
   // Half of the tick width must be added to align with the ticks.
   const categoricalTickWidth = categoricalScale.bandwidth();
 
   const missingDatum = (tick: string) => {
-    const d = []
+    const d = [];
     d[categorical.index] = tick;
     d[metric.index] = undefined;
-    return d
-  }
+    return d;
+  };
 
   const rawData = data.mapRows(row => row);
 
   // Add missing data
-  const ticks = categoricalScale.domain()
+  const ticks = categoricalScale.domain();
   const dataWithMissing = ticks.map(tick => {
-    const datum = rawData.find(d => categorical(d) === tick)
+    const datum = rawData.find(d => categorical(d) === tick);
     return datum || missingDatum(tick);
-  })
+  });
 
   const pathData = dataWithMissing.map(row => {
     const categoricalValue = categoricalTickWidth / 2 + (categoricalScale(categorical(row)) as number);
@@ -36,15 +46,15 @@ export const Line: LinearAxialChart<string> = React.memo(props => {
     return { m: metricValue, c: categoricalValue };
   });
 
-  const isDefined = (value: number | undefined) => value !==undefined;
+  const isDefined = (value: number | undefined) => value !== undefined;
 
   const path =
-    line<{m: number, c: number}>()
-      .x(d => metricDirection === "vertical" ? d.c : d.m)
-      .y(d => metricDirection === "vertical" ? d.m : d.c)
+    line<{ m: number; c: number }>()
+      .x(d => (metricDirection === "vertical" ? d.c : d.m))
+      .y(d => (metricDirection === "vertical" ? d.m : d.c))
       .defined(d => isDefined(d.m))(pathData) || "";
 
-  const pathStyle = (isFunction(style) ? style(data.row(0), 0) : style) || {}
+  const pathStyle = (isFunction(style) ? style(data.row(0), 0) : style) || {};
 
   return (
     <>
@@ -54,19 +64,11 @@ export const Line: LinearAxialChart<string> = React.memo(props => {
           style={{
             fill: "none",
             strokeLinecap: "round",
-            ...pathStyle
+            ...pathStyle,
           }}
         />
       </g>
-      {showLabels && <Labels
-        data={data}
-        transform={transform}
-        metric={metric}
-        categorical={categorical}
-        metricScale={metricScale}
-        categoricalScale={categoricalScale}
-        metricDirection={metricDirection}
-      />}
+      {showLabels && <Labels data={data} transform={transform} x={x} y={y} yScale={yScale} xScale={xScale} />}
     </>
   );
 });

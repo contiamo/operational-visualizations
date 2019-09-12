@@ -2,7 +2,6 @@ import * as React from "react";
 import { storiesOf } from "@storybook/react";
 import { DataFrame, RowCursor } from "@operational/frame";
 import {
-  AxialChartProps,
   Axis,
   AxisRules,
   Bars,
@@ -12,39 +11,39 @@ import {
   Legend,
   theme,
   useScaleBand,
-  useScaleLinear
+  useScaleLinear,
 } from "@operational/visualizations";
 
 const rawData = {
   columns: [
     {
       name: "Customer.Continent" as "Customer.Continent",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.Country" as "Customer.Country",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.City" as "Customer.City",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.AgeGroup" as "Customer.AgeGroup",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.Gender" as "Customer.Gender",
-      type: "string"
+      type: "string",
     },
     {
       name: "sales" as "sales",
-      type: "number"
+      type: "number",
     },
     {
       name: "revenue" as "revenue",
-      type: "number"
-    }
+      type: "number",
+    },
   ],
   rows: [
     ["Europe", "Germany", "Berlin", "<50", "Female", 101, 10.2],
@@ -53,8 +52,8 @@ const rawData = {
     ["Europe", "UK", "London", "<50", "Female", 401, 40.2],
     ["Europe", "UK", "Edinburgh", "<50", "Female", 501, 50.2],
     ["North America", "USA", "New York", "<50", "Female", 801, 80.2],
-    ["North America", "Canada", "Toronto", "<50", "Female", 801, 80.2]
-  ]
+    ["North America", "Canada", "Toronto", "<50", "Female", 801, 80.2],
+  ],
 };
 
 const frame = new DataFrame(rawData.columns, rawData.rows);
@@ -66,7 +65,7 @@ interface BarChartProps<Name extends string> {
   data: DataFrame<Name>;
   categorical: Name;
   metric: Name;
-  metricDirection: AxialChartProps<string>["metricDirection"];
+  metricDirection: "horizontal" | "vertical";
   colorBy?: Name[];
   palette?: string[];
 }
@@ -83,7 +82,7 @@ const BarChart = <Name extends string>({
   metric,
   metricDirection,
   colorBy,
-  palette
+  palette,
 }: BarChartProps<Name>) => {
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
@@ -93,12 +92,12 @@ const BarChart = <Name extends string>({
   const categoricalScale = useScaleBand({
     frame: data,
     column: categoricalCursor,
-    range: metricDirection === "horizontal" ? [0, height] : [0, width]
+    range: metricDirection === "horizontal" ? [0, height] : [0, width],
   });
   const metricScale = useScaleLinear({
     frame,
     column: metricCursor,
-    range: metricDirection === "horizontal" ? [0, width] : [height, 0]
+    range: metricDirection === "horizontal" ? [0, width] : [height, 0],
   });
 
   const colorCursors = (colorBy || []).map(c => data.getCursor(c));
@@ -113,12 +112,7 @@ const BarChart = <Name extends string>({
         itemWidth={colorCursors.length * 80}
         style={{ height: 40, overflowY: "scroll" }}
       />
-      <Chart
-        width={width}
-        height={height}
-        margin={margin}
-        style={{ background: "#fff" }}
-      >
+      <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
         <AxisRules
           scale={metricScale}
           position={metricDirection === "horizontal" ? "bottom" : "left"}
@@ -132,24 +126,17 @@ const BarChart = <Name extends string>({
         {frame.map((grouped, i) => (
           <Bars
             key={i}
-            metricDirection={metricDirection}
             data={grouped}
-            categorical={categoricalCursor}
-            metric={metricCursor}
-            categoricalScale={categoricalScale}
-            metricScale={metricScale}
+            x={metricDirection === "horizontal" ? categoricalCursor : metricCursor}
+            y={metricDirection === "horizontal" ? metricCursor : categoricalCursor}
+            xScale={metricDirection === "horizontal" ? categoricalScale : metricScale}
+            yScale={metricDirection === "horizontal" ? metricScale : categoricalScale}
             showLabels={true}
             style={(row: RowCursor) => ({ fill: colorScale(row) })}
           />
         ))}
-        <Axis
-          scale={categoricalScale}
-          position={metricDirection === "horizontal" ? "left" : "bottom"}
-        />
-        <Axis
-          scale={metricScale}
-          position={metricDirection === "horizontal" ? "bottom" : "left"}
-        />
+        <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
+        <Axis scale={metricScale} position={metricDirection === "horizontal" ? "bottom" : "left"} />
       </Chart>
     </div>
   );
