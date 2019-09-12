@@ -20,7 +20,7 @@ export const AxisRules = React.memo((props: AxisRulesProps) => {
 
   const { scale, position, length, transform, style } = props;
 
-  const ticks: any[] = isScaleContinious(scale) ? scale.ticks() : scale.domain();
+  const ticks: Array<string | number> = isScaleContinious(scale) ? scale.ticks() : scale.domain();
 
   const offset = isScaleContinious(scale) ? 0 : -(scale.paddingOuter() * scale.bandwidth()) / 2;
 
@@ -28,7 +28,7 @@ export const AxisRules = React.memo((props: AxisRulesProps) => {
     <g transform={transform || defaultTransform}>
       {rulesAreHorizontal(position)
         ? ticks.map(tick => {
-            const y = scale(tick);
+            const y = scale(tick as any);
             if (y === undefined) return null;
             return (
               <line
@@ -45,7 +45,7 @@ export const AxisRules = React.memo((props: AxisRulesProps) => {
             );
           })
         : ticks.map(tick => {
-            const x = scale(tick);
+            const x = scale(tick as any);
             if (x === undefined) return null;
             return (
               <line

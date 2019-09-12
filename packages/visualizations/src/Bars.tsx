@@ -3,13 +3,13 @@ import { useChartTransform } from "./Chart";
 import { DiscreteAxialChart } from "./types";
 import { isFunction } from "./utils";
 import { baseStyle as baseLabelStyle, verticalStyle as verticalLabelStyle } from "./Labels";
-import { isScaleBand } from "./scale";
+import { isScaleBand, isScaleContinious } from "./scale";
 
 export const Bars: DiscreteAxialChart<string> = ({ data, transform, x, y, xScale, yScale, showLabels, style }) => {
   const defaultTransform = useChartTransform();
 
-  if (isScaleBand(xScale)) {
-    const height = yScale(yScale.domain()[0] as any)!;
+  if (isScaleBand(xScale) && isScaleContinious(yScale)) {
+    const height = yScale(yScale.domain()[0]);
     const bandWidth = xScale.bandwidth();
     let accumulatedHeight = 0;
     // The `Labels` component can't be used here due to stacking
@@ -22,9 +22,9 @@ export const Bars: DiscreteAxialChart<string> = ({ data, transform, x, y, xScale
           const bar = (
             <rect
               x={xScale(x(row))}
-              y={(yScale(y(row)) as number) - accumulatedHeight}
+              y={(yScale(y(row)) || 0) - accumulatedHeight}
               width={xScale.bandwidth()}
-              height={height - (yScale(y(row)) as number)}
+              height={height - yScale(y(row))}
               style={isFunction(style) ? style(row, i) : style}
               key={`bar-${i}`}
             />
@@ -32,7 +32,7 @@ export const Bars: DiscreteAxialChart<string> = ({ data, transform, x, y, xScale
           const label = (
             <text
               x={xScale(x(row))! + bandWidth / 2}
-              y={(yScale(y(row)) as number) - accumulatedHeight}
+              y={yScale(y(row)) - accumulatedHeight}
               dy="-0.35em"
               style={verticalLabelStyle}
               key={`label-${i}`}
@@ -41,13 +41,13 @@ export const Bars: DiscreteAxialChart<string> = ({ data, transform, x, y, xScale
             </text>
           );
           labels.push(label);
-          accumulatedHeight += height - (yScale(y(row)) as number);
+          accumulatedHeight += height - yScale(y(row));
           return bar;
         })}
         {showLabels && labels}
       </g>
     );
-  } else if (isScaleBand(yScale)) {
+  } else if (isScaleBand(yScale) && isScaleContinious(xScale)) {
     let accumulatedWidth = 0;
     const bandWidth = yScale.bandwidth();
     // The `Labels` component can't be used here due to stacking

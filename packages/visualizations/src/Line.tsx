@@ -49,8 +49,8 @@ export const Line: LinearAxialChart<string> = React.memo(
 
     const path = useMemo(() => {
       const pathData = dataWithHoles.map(row => {
-        const xCoordinate = isScaleBand(xScale) ? xScale.bandwidth() / 2 + (xScale(x(row)) as number) : xScale(x(row));
-        const yCoordinate = isScaleBand(yScale) ? yScale.bandwidth() / 2 + (yScale(y(row)) as number) : yScale(y(row));
+        const xCoordinate = isScaleBand(xScale) ? xScale.bandwidth() / 2 + (xScale(x(row)) || 0) : xScale(x(row));
+        const yCoordinate = isScaleBand(yScale) ? yScale.bandwidth() / 2 + (yScale(y(row)) || 0) : yScale(y(row));
         return { xCoordinate, yCoordinate };
       });
 
