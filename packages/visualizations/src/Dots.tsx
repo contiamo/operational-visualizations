@@ -12,8 +12,8 @@ export interface DotsProps<Name extends string> {
   data: IterableFrame<Name>;
   x: ColumnCursor<Name>;
   y: ColumnCursor<Name>;
-  xScale: ScaleLinear<any, any> | ScaleBand<string>;
-  yScale: ScaleLinear<any, any> | ScaleBand<string>;
+  xScale: ScaleLinear<number, number> | ScaleBand<string>;
+  yScale: ScaleLinear<number, number> | ScaleBand<string>;
   transform?: React.SVGAttributes<SVGRectElement>["transform"];
   style?:
     | React.SVGAttributes<SVGGElement>["style"]
@@ -29,15 +29,22 @@ export const Dots = <Name extends string>(props: DotsProps<Name>) => {
   return (
     <>
       <g transform={transform || defaultTransform}>
-        {data.mapRows((row, i) => (
-          <circle
-            cx={xScale(x(row)) + xBandWidth / 2}
-            cy={yScale(y(row)) + yBandWidth / 2}
-            r={radius}
-            style={isFunction(style) ? style(row, i) : style}
-            key={i}
-          />
-        ))}
+        {data.mapRows((row, i) => {
+          const cx = xScale(x(row));
+          const cy = xScale(y(row));
+          if (cx === undefined || cy === undefined) {
+            return null;
+          }
+          return (
+            <circle
+              cx={cx + xBandWidth / 2}
+              cy={cy + yBandWidth / 2}
+              r={radius}
+              style={isFunction(style) ? style(row, i) : style}
+              key={i}
+            />
+          );
+        })}
       </g>
       {/* {showLabels && (
         <Labels
