@@ -21,18 +21,33 @@ export interface DotsProps<Name extends string> {
   showLabels?: boolean;
 }
 
-export const Dots = <Name extends string>(props: DotsProps<Name>) => {
+export const Dots = <Name extends string>({
+  data,
+  transform,
+  x,
+  y,
+  xScale,
+  yScale,
+  style,
+  showLabels,
+}: DotsProps<Name>) => {
   const defaultTransform = useChartTransform();
-  const { data, transform, x, y, xScale, yScale, style, showLabels } = props;
-  const metricDirection = isScaleBand(xScale) ? "horizontal" : "vertical";
   const xBandWidth = isScaleBand(xScale) ? xScale.bandwidth() : 0;
   const yBandWidth = isScaleBand(yScale) ? yScale.bandwidth() : 0;
+
+  if (isScaleBand(xScale) && isScaleBand(yScale)) {
+    showLabels = false;
+  }
+  if (!isScaleBand(xScale) && !isScaleBand(yScale)) {
+    showLabels = false;
+  }
+
   return (
     <>
       <g transform={transform || defaultTransform}>
         {data.mapRows((row, i) => {
           const cx = xScale(x(row));
-          const cy = xScale(y(row));
+          const cy = yScale(y(row));
           if (cx === undefined || cy === undefined) {
             return null;
           }
@@ -55,9 +70,7 @@ export const Dots = <Name extends string>(props: DotsProps<Name>) => {
           y={y}
           yScale={yScale}
           xScale={xScale}
-          style={{
-            transform: metricDirection === "vertical" ? `translate(0, -${radius}px)` : `translate(${radius}px, 0)`,
-          }}
+          style={{ transform: `translate(-${radius}px, -${radius}px)` }}
         />
       )}
     </>

@@ -18,7 +18,7 @@ export const Line: LinearAxialChart<string> = React.memo(props => {
     ScaleBand<string>,
     ScaleLinear<number, number>,
     "vertical" | "horizontal"
-  ] = isScaleBand(xScale) ? [x, y, xScale, yScale, "horizontal"] : ([y, x, yScale, xScale, "vertical"] as any);
+  ] = isScaleBand(xScale) ? [x, y, xScale, yScale, "vertical"] : ([y, x, yScale, xScale, "horizontal"] as any);
 
   // The categorical scale must be a band scale for composability with bar charts.
   // Half of the tick width must be added to align with the ticks.

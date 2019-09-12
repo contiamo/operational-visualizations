@@ -26,7 +26,7 @@ export const Labels: DiscreteAxialChart<string> = props => {
     ScaleBand<string>,
     ScaleLinear<number, number>,
     "vertical" | "horizontal"
-  ] = isScaleBand(xScale) ? [x, y, xScale, yScale, "horizontal"] : ([y, x, yScale, xScale, "vertical"] as any);
+  ] = isScaleBand(xScale) ? [x, y, xScale, yScale, "vertical"] : ([y, x, yScale, xScale, "horizontal"] as any);
 
   const bandWidth = categoricalScale.bandwidth();
 

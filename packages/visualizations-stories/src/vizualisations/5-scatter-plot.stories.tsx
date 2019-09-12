@@ -103,6 +103,7 @@ const ScatterPlot = <Name extends string>({
           xScale={xScale}
           yScale={yScale}
           style={row => ({ fill: colorScale(row) })}
+          showLabels={true}
         />
         <Axis scale={xScale} position="bottom" />
         <Axis scale={yScale} position="left" />
