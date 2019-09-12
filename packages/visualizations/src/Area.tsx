@@ -4,7 +4,6 @@ import { useChartTransform } from "./Chart";
 import { LinearAxialChart } from "./types";
 import { isFunction } from "./utils";
 import { baseStyle as baseLabelStyle, verticalStyle as verticalLabelStyle } from "./Labels";
-import { ColumnCursor } from "@operational/frame";
 import { isScaleBand, isScaleContinious } from "./scale";
 
 export const Area: LinearAxialChart<string> = ({ data, transform, x, y, xScale, yScale, stack, showLabels, style }) => {
@@ -91,30 +90,17 @@ export const Area: LinearAxialChart<string> = ({ data, transform, x, y, xScale, 
         {/* Render text labels. This is done at the end to ensure they are visible */}
         {showLabels &&
           stackedData.map((stack, i) =>
-            stack.data.map((d, j) =>
-              isScaleBand(xScale) ? (
-                <text
-                  key={`Label-${i}-${j}`}
-                  x={(xScale(d.c) || 0) + categoricalTickWidth / 2}
-                  y={yScale(d.m1)}
-                  dy="-0.35em"
-                  style={verticalLabelStyle}
-                >
-                  {isDefined(d.m1) && isDefined(d.m0) ? d.m1 - d.m0 : ""}
-                </text>
-              ) : (
-                <text
-                  key={`Label-${i}-${j}`}
-                  x={xScale(d.m1)}
-                  y={(yScale(d.c) || 0) + categoricalTickWidth / 2}
-                  dx="0.35em"
-                  dy="0.35em"
-                  style={baseLabelStyle}
-                >
-                  {isDefined(d.m1) && isDefined(d.m0) ? d.m1 - d.m0 : ""}
-                </text>
-              ),
-            ),
+            stack.data.map((d, j) => (
+              <text
+                key={`Label-${i}-${j}`}
+                x={(xScale(d.c) || 0) + categoricalTickWidth / 2}
+                y={yScale(d.m1)}
+                dy="-0.35em"
+                style={verticalLabelStyle}
+              >
+                {isDefined(d.m1) && isDefined(d.m0) ? d.m1 - d.m0 : ""}
+              </text>
+            )),
           )}
       </g>
     );
@@ -189,30 +175,18 @@ export const Area: LinearAxialChart<string> = ({ data, transform, x, y, xScale, 
         {/* Render text labels. This is done at the end to ensure they are visible */}
         {showLabels &&
           stackedData.map((stack, i) =>
-            stack.data.map((d, j) =>
-              isScaleBand(xScale) ? (
-                <text
-                  key={`Label-${i}-${j}`}
-                  x={(xScale(d.c) || 0) + categoricalTickWidth / 2}
-                  y={yScale(d.m1)}
-                  dy="-0.35em"
-                  style={verticalLabelStyle}
-                >
-                  {isDefined(d.m1) && isDefined(d.m0) ? d.m1 - d.m0 : ""}
-                </text>
-              ) : (
-                <text
-                  key={`Label-${i}-${j}`}
-                  x={xScale(d.m1)}
-                  y={(yScale(d.c) || 0) + categoricalTickWidth / 2}
-                  dx="0.35em"
-                  dy="0.35em"
-                  style={baseLabelStyle}
-                >
-                  {isDefined(d.m1) && isDefined(d.m0) ? d.m1 - d.m0 : ""}
-                </text>
-              ),
-            ),
+            stack.data.map((d, j) => (
+              <text
+                key={`Label-${i}-${j}`}
+                x={xScale(d.m1)}
+                y={(yScale(d.c) || 0) + categoricalTickWidth / 2}
+                dx="0.35em"
+                dy="0.35em"
+                style={baseLabelStyle}
+              >
+                {isDefined(d.m1) && isDefined(d.m0) ? d.m1 - d.m0 : ""}
+              </text>
+            )),
           )}
       </g>
     );
