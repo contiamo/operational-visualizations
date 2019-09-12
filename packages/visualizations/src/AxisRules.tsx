@@ -32,6 +32,7 @@ export const AxisRules = React.memo((props: AxisRulesProps) => {
             if (y === undefined) return null;
             return (
               <line
+                key={y}
                 x1={0}
                 x2={length}
                 y1={y + offset}
@@ -48,6 +49,7 @@ export const AxisRules = React.memo((props: AxisRulesProps) => {
             if (x === undefined) return null;
             return (
               <line
+                key={x}
                 x1={x + offset}
                 x2={x + offset}
                 y1={0}

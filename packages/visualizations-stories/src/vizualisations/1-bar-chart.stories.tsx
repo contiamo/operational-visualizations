@@ -127,10 +127,10 @@ const BarChart = <Name extends string>({
           <Bars
             key={i}
             data={grouped}
-            x={metricDirection === "horizontal" ? categoricalCursor : metricCursor}
-            y={metricDirection === "horizontal" ? metricCursor : categoricalCursor}
-            xScale={metricDirection === "horizontal" ? categoricalScale : metricScale}
-            yScale={metricDirection === "horizontal" ? metricScale : categoricalScale}
+            x={metricDirection === "vertical" ? categoricalCursor : metricCursor}
+            y={metricDirection === "vertical" ? metricCursor : categoricalCursor}
+            xScale={metricDirection === "vertical" ? categoricalScale : metricScale}
+            yScale={metricDirection === "vertical" ? metricScale : categoricalScale}
             showLabels={true}
             style={(row: RowCursor) => ({ fill: colorScale(row) })}
           />
