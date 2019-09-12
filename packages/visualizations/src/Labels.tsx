@@ -3,8 +3,6 @@ import { useChartTransform } from "./Chart";
 import { DiscreteAxialChart } from "./types";
 import { isFunction } from "./utils";
 import theme from "./theme";
-import { ColumnCursor } from "@operational/frame";
-import { ScaleBand, ScaleLinear } from "d3-scale";
 import { isScaleBand } from "./scale";
 
 export const baseStyle: React.CSSProperties = {
@@ -17,26 +15,17 @@ export const verticalStyle: React.CSSProperties = {
   textAnchor: "middle",
 };
 
-export const Labels: DiscreteAxialChart<string> = props => {
+export const Labels: DiscreteAxialChart<string> = ({ data, transform, x, y, xScale, yScale, style }) => {
   const defaultTransform = useChartTransform();
-  const { data, transform, x, y, xScale, yScale, style } = props;
-  const [categorical, metric, categoricalScale, metricScale, metricDirection]: [
-    ColumnCursor<string>,
-    ColumnCursor<string>,
-    ScaleBand<string>,
-    ScaleLinear<number, number>,
-    "vertical" | "horizontal"
-  ] = isScaleBand(xScale) ? [x, y, xScale, yScale, "vertical"] : ([y, x, yScale, xScale, "horizontal"] as any);
 
-  const bandWidth = categoricalScale.bandwidth();
-
-  if (metricDirection === "vertical") {
+  if (isScaleBand(xScale)) {
+    const bandWidth = xScale.bandwidth();
     return (
       <g transform={transform || defaultTransform}>
         {data.mapRows((row, i) => (
           <text
-            x={categoricalScale(categorical(row))! + bandWidth / 2}
-            y={metricScale(metric(row))}
+            x={xScale(x(row))! + bandWidth / 2}
+            y={yScale(y(row))}
             dy="-0.35em"
             style={{
               ...verticalStyle,
@@ -44,18 +33,19 @@ export const Labels: DiscreteAxialChart<string> = props => {
             }}
             key={i}
           >
-            {metric(row)}
+            {y(row)}
           </text>
         ))}
       </g>
     );
-  } else {
+  } else if (isScaleBand(yScale)) {
+    const bandWidth = yScale.bandwidth();
     return (
       <g transform={transform || defaultTransform}>
         {data.mapRows((row, i) => (
           <text
-            x={metricScale(metric(row))}
-            y={categoricalScale(categorical(row))! + bandWidth / 2}
+            x={xScale(x(row))}
+            y={yScale(y(row))! + bandWidth / 2}
             dx="0.35em"
             dy="0.35em"
             style={{
@@ -64,10 +54,12 @@ export const Labels: DiscreteAxialChart<string> = props => {
             }}
             key={i}
           >
-            {metric(row)}
+            {x(row)}
           </text>
         ))}
       </g>
     );
+  } else {
+    throw new Error("Unsupported case of scales");
   }
 };
