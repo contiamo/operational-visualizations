@@ -1,50 +1,66 @@
 import { line } from "d3-shape";
-import React from "react";
+import React, { useMemo } from "react";
 import { useChartTransform } from "./Chart";
 import { LinearAxialChart } from "./types";
 import { isFunction } from "./utils";
 import { Labels } from "./Labels";
 import { isScaleBand } from "./scale";
+import { IterableFrame, ColumnCursor } from "@operational/frame";
+import { ScaleBand, ScaleLinear } from "d3-scale";
+
+const useHoles = (
+  data: IterableFrame<string>,
+  x: ColumnCursor<string>,
+  y: ColumnCursor<string>,
+  xScale: ScaleBand<string> | ScaleLinear<number, number>,
+  yScale: ScaleBand<string> | ScaleLinear<number, number>,
+) =>
+  useMemo(() => {
+    const xTicks = isScaleBand(xScale) ? xScale.domain() : [];
+    const yTicks = isScaleBand(yScale) ? yScale.domain() : [];
+
+    // TODO: check if arrays of the same length and don't try to "fill holes"
+    let offset = 0;
+    return xTicks.length > 0
+      ? xTicks.map((z, i) => {
+          let row = data.row(i + offset) || [];
+          if (z !== x(row)) {
+            offset -= 1;
+            return [];
+          }
+          return row;
+        })
+      : yTicks.map((z, i) => {
+          let row = data.row(i + offset) || [];
+          if (z !== y(row)) {
+            offset -= 1;
+            return [];
+          }
+          return row;
+        });
+  }, [data, x, y, xScale, yScale]);
 
 export const Line: LinearAxialChart<string> = React.memo(
   ({ data, transform, x, y, xScale, yScale, showLabels, style }) => {
     const defaultTransform = useChartTransform();
 
     // TODO add check that scales are correct
-    const xTicks = isScaleBand(xScale) ? xScale.domain() : [];
-    const yTicks = isScaleBand(yScale) ? yScale.domain() : [];
+    const dataWithHoles = useHoles(data, x, y, xScale, yScale);
 
-    let offset = 0;
-    const dataWithHoles =
-      xTicks.length > 0
-        ? xTicks.map((z, i) => {
-            let row = data.row(i + offset) || [];
-            if (z !== x(row)) {
-              offset -= 1;
-              return [];
-            }
-            return row;
-          })
-        : yTicks.map((z, i) => {
-            let row = data.row(i + offset) || [];
-            if (z !== y(row)) {
-              offset -= 1;
-              return [];
-            }
-            return row;
-          });
+    const path = useMemo(() => {
+      const pathData = dataWithHoles.map(row => {
+        const xCoordinate = isScaleBand(xScale) ? xScale.bandwidth() / 2 + (xScale(x(row)) as number) : xScale(x(row));
+        const yCoordinate = isScaleBand(yScale) ? yScale.bandwidth() / 2 + (yScale(y(row)) as number) : yScale(y(row));
+        return { xCoordinate, yCoordinate };
+      });
 
-    const pathData = dataWithHoles.map(row => {
-      const xCoordinate = isScaleBand(xScale) ? xScale.bandwidth() / 2 + (xScale(x(row)) as number) : xScale(x(row));
-      const yCoordinate = isScaleBand(yScale) ? yScale.bandwidth() / 2 + (yScale(y(row)) as number) : yScale(y(row));
-      return { xCoordinate, yCoordinate };
-    });
-
-    const path =
-      line<{ xCoordinate: number; yCoordinate: number }>()
-        .x(d => d.xCoordinate)
-        .y(d => d.yCoordinate)
-        .defined(d => d.xCoordinate !== undefined && d.yCoordinate !== undefined)(pathData) || "";
+      return (
+        line<{ xCoordinate: number; yCoordinate: number }>()
+          .x(d => d.xCoordinate)
+          .y(d => d.yCoordinate)
+          .defined(d => d.xCoordinate !== undefined && d.yCoordinate !== undefined)(pathData) || ""
+      );
+    }, [dataWithHoles, x, y, xScale, yScale]);
 
     const pathStyle = (isFunction(style) ? style(data.row(0), 0) : style) || {};
 
