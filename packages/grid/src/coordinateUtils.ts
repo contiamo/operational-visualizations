@@ -1,13 +1,13 @@
 import { PivotFrame } from "@operational/frame";
-import { CellCoordinates, DimensionLabels, HeightParam, WidthParam, MeasuresPlacement } from "./types";
+import { CellCoordinates, DimensionLabels, HeightParam, WidthParam } from "./types";
 
 export const exhaustiveCheck = (_: never) => undefined;
 
 export type IndexToCoordinate = <Name extends string = string>(prop: {
   rowHeadersCount: number;
-  measuresPlacement: MeasuresPlacement;
   columnHeadersCount: number;
-  measuresCount: number;
+  rowMeasures: Name[];
+  columnMeasures: Name[];
   data: PivotFrame<Name>;
   axes: {
     // we don't care about exact types, we care if render props are present or not
@@ -16,7 +16,6 @@ export type IndexToCoordinate = <Name extends string = string>(prop: {
     // tslint:disable-next-line
     column?: Function;
   };
-  measures: Name[];
   dimensionLabels: DimensionLabels;
 }) => (prop: { columnIndex: number; rowIndex: number }) => CellCoordinates<Name>;
 
@@ -60,20 +59,20 @@ RowAxis --------------+
 export const indexToCoordinate: IndexToCoordinate = ({
   // tslint:enable
   rowHeadersCount,
-  measuresPlacement,
   columnHeadersCount,
-  measuresCount,
   data,
   axes,
-  measures,
+  rowMeasures,
+  columnMeasures,
   dimensionLabels,
 }) => ({ columnIndex, rowIndex }) => {
-  const columnIndexReal = Math.floor(
-    (columnIndex - rowHeadersCount) / (measuresPlacement === "column" ? measuresCount : 1),
-  );
-  const rowIndexReal = Math.floor((rowIndex - columnHeadersCount) / (measuresPlacement === "row" ? measuresCount : 1));
-  const measuresIndex =
-    (measuresPlacement === "column" ? columnIndex - rowHeadersCount : rowIndex - columnHeadersCount) % measuresCount;
+  const rowMeasuresCount = rowMeasures.length;
+  const columnMeasuresCount = columnMeasures.length;
+
+  const columnIndexReal = Math.floor((columnIndex - rowHeadersCount) / (columnMeasuresCount || 1));
+  const rowIndexReal = Math.floor((rowIndex - columnHeadersCount) / (rowMeasuresCount || 1));
+  const columnMeasuresIndex = (columnIndex - rowHeadersCount) % (columnMeasuresCount || 1);
+  const rowMeasuresIndex = (rowIndex - columnHeadersCount) % (rowMeasuresCount || 1);
 
   /** column headers, columns measures, column axis */
   const isRowHeaders = columnIndex < rowHeadersCount;
@@ -106,9 +105,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
     // if this the row with column measure
     if (
       // show measures in column headers
-      measuresPlacement === "column" &&
-      // and we have more than one measure
-      measuresCount > 1 &&
+      rowMeasuresCount > 1 &&
       // and we are in the row exactly above data cells or exactly above axes
       rowIndex === columnHeadersCount - 1 - (axes.column ? 1 : 0)
     ) {
@@ -116,22 +113,20 @@ export const indexToCoordinate: IndexToCoordinate = ({
       if (axes.row && columnIndex === rowHeadersCount - 1) {
         return {
           type: "Empty",
-          measure: "column",
+          measure: true,
           axis: true,
         };
       } else {
         return {
           type: "Empty",
-          measure: "column",
+          measure: true,
         };
       }
     }
 
     if (
       // show measures in row headers
-      measuresPlacement === "row" &&
-      // and we have more than one measure
-      measuresCount > 1 &&
+      columnMeasuresCount > 1 &&
       // and we are in the column exactly before data cells or exactly before axes
       columnIndex === rowHeadersCount - 1 - (axes.row ? 1 : 0)
     ) {
@@ -139,13 +134,13 @@ export const indexToCoordinate: IndexToCoordinate = ({
       if (axes.column && rowIndex === columnHeadersCount - 1) {
         return {
           type: "Empty",
-          measure: "row",
+          measure: true,
           axis: true,
         };
       } else {
         return {
           type: "Empty",
-          measure: "row",
+          measure: true,
         };
       }
     }
@@ -195,7 +190,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
         type: "RowHeader",
         row: rowIndexReal,
         measure: data.getPivotRows()[rowDepth],
-        empty: rowIndexReal > 0 || measuresIndex > 0,
+        empty: rowIndexReal > 0 || rowMeasuresIndex > 0,
       };
     }
 
@@ -207,14 +202,14 @@ export const indexToCoordinate: IndexToCoordinate = ({
         return {
           type: "RowAxis",
           row: rowIndexReal,
-          measure: measures[measuresIndex],
+          measure: rowMeasures[rowMeasuresIndex],
         };
       } else {
         // or with measure labels
         return {
           type: "RowHeader",
           row: rowIndexReal,
-          measure: measures[measuresIndex],
+          measure: rowMeasures[rowMeasuresIndex],
         };
       }
     } else {
@@ -222,9 +217,9 @@ export const indexToCoordinate: IndexToCoordinate = ({
         type: "RowHeader",
         row: rowIndexReal,
         label: data.rowHeaders()[rowIndexReal][rowDepth],
-        measure: measures[measuresIndex],
+        measure: rowMeasures[rowMeasuresIndex],
         rowIndex: rowDepth,
-        empty: (prevRow && prevRow[rowDepth] === dimension) || (measuresIndex > 0 && measuresPlacement === "row"),
+        empty: (prevRow && prevRow[rowDepth] === dimension) || columnMeasuresIndex > 0,
       };
     }
   } else if (isColumnHeaders) {
@@ -244,7 +239,7 @@ export const indexToCoordinate: IndexToCoordinate = ({
         type: "ColumnHeader",
         column: columnIndexReal,
         measure: data.getPivotColumns()[columnDepth],
-        empty: columnIndexReal > 0 || measuresIndex > 0,
+        empty: columnIndexReal > 0 || columnMeasuresIndex > 0,
       };
     }
 
@@ -256,14 +251,15 @@ export const indexToCoordinate: IndexToCoordinate = ({
         return {
           type: "ColumnAxis",
           column: columnIndexReal,
-          measure: measures[measuresIndex],
+          measure: columnMeasures[columnMeasuresIndex],
         };
       } else {
         // or with measure labels
         return {
           type: "ColumnHeader",
+          x: 1,
           column: columnIndexReal,
-          measure: measures[measuresIndex],
+          measure: columnMeasures[columnMeasuresIndex],
         };
       }
     } else {
@@ -271,11 +267,9 @@ export const indexToCoordinate: IndexToCoordinate = ({
         type: "ColumnHeader",
         column: columnIndexReal,
         label: data.columnHeaders()[columnIndexReal][columnDepth],
-        measure: measures[measuresIndex],
+        measure: columnMeasures[columnMeasuresIndex],
         columnIndex: columnDepth,
-        empty:
-          (prevColumn && prevColumn[columnDepth] === dimension) ||
-          (measuresIndex > 0 && measuresPlacement === "column"),
+        empty: (prevColumn && prevColumn[columnDepth] === dimension) || rowMeasuresIndex > 0,
       };
     }
   } else {
@@ -283,7 +277,8 @@ export const indexToCoordinate: IndexToCoordinate = ({
       type: "Cell",
       row: rowIndexReal,
       column: columnIndexReal,
-      measure: measures[measuresIndex],
+      rowMeasure: rowMeasures[rowMeasuresIndex],
+      columnMeasure: columnMeasures[columnMeasuresIndex],
     };
   }
 };
@@ -309,12 +304,18 @@ export const coordinateToWidthParam = <Name extends string = string>(prop: CellC
         };
       }
     case "Cell":
+      return {
+        type: "Cell",
+        column: prop.column,
+        columnMeasure: prop.columnMeasure,
+        rowMeasure: prop.rowMeasure,
+      };
     case "ColumnAxis":
     case "ColumnHeader":
       return {
         type: "Cell",
         column: prop.column,
-        measure: prop.measure,
+        columnMeasure: prop.measure,
       };
     case "RowAxis":
       return {
@@ -357,12 +358,18 @@ export const coordinateToHeightParam = <Name extends string = string>(
         };
       }
     case "Cell":
+      return {
+        type: "Cell",
+        row: prop.row,
+        columnMeasure: prop.columnMeasure,
+        rowMeasure: prop.rowMeasure,
+      };
     case "RowAxis":
     case "RowHeader":
       return {
         type: "Cell",
         row: prop.row,
-        measure: prop.measure,
+        rowMeasure: prop.measure,
       };
     case "ColumnAxis":
       return {
@@ -392,8 +399,7 @@ export const getRowHeadersCount = <Name extends string = string>({
   axes,
   data,
   dimensionLabels,
-  measuresPlacement,
-  measuresCount,
+  rowMeasuresCount,
 }: {
   axes: {
     // we don't care about exact types, we care if render props are present or not
@@ -404,18 +410,16 @@ export const getRowHeadersCount = <Name extends string = string>({
   };
   data: PivotFrame<Name>;
   dimensionLabels: DimensionLabels;
-  measuresPlacement: MeasuresPlacement;
-  measuresCount: number;
+  rowMeasuresCount: number;
+  columnMeasuresCount: number;
 }) => {
   const rowsDepth = data.getPivotRows().length;
-  const showMeasureLabelsInRows = measuresPlacement === "row";
-
   let rowHeadersCount =
     // if we place labels on the left in rows we need to double number of slots
     // because it will look like: labelA | valueA | labelB | valueB
     rowsDepth * (dimensionLabels.row === "left" ? 2 : 1) +
     // if we show measure labels and there is more than one measure add one slot for it
-    (showMeasureLabelsInRows && measuresCount > 1 ? 1 : 0) +
+    (rowMeasuresCount > 1 ? 1 : 0) +
     // add one slot for axes
     (axes.row ? 1 : 0);
 
@@ -434,8 +438,7 @@ export const getColumnHeadersCount = <Name extends string = string>({
   axes,
   data,
   dimensionLabels,
-  measuresPlacement,
-  measuresCount,
+  columnMeasuresCount,
 }: {
   axes: {
     // we don't care about exact types, we care if render props are present or not
@@ -446,16 +449,14 @@ export const getColumnHeadersCount = <Name extends string = string>({
   };
   data: PivotFrame<Name>;
   dimensionLabels: DimensionLabels;
-  measuresPlacement: MeasuresPlacement;
-  measuresCount: number;
+  rowMeasuresCount: number;
+  columnMeasuresCount: number;
 }) => {
   const columnDepth = data.getPivotColumns().length;
-  const showMeasureLabelsInColumns = measuresPlacement === "column";
-
   // see getRowHeadersCount for explanation
   let columnHeadersCount =
     columnDepth * (dimensionLabels.column === "top" ? 2 : 1) +
-    (showMeasureLabelsInColumns && measuresCount > 1 ? 1 : 0) +
+    (columnMeasuresCount > 1 ? 1 : 0) +
     (axes.column ? 1 : 0);
 
   if (columnHeadersCount === 0 && dimensionLabels.row === "top") {
@@ -471,18 +472,17 @@ export const getColumnHeadersCount = <Name extends string = string>({
 export const getColumnCount = <Name extends string = string>({
   rowHeadersCount,
   data,
-  measuresPlacement,
-  measuresCount,
+  columnMeasuresCount,
 }: {
   data: PivotFrame<Name>;
-  measuresPlacement: MeasuresPlacement;
-  measuresCount: number;
   rowHeadersCount: number;
+  rowMeasuresCount: number;
+  columnMeasuresCount: number;
 }) => {
   if (data.columnHeaders().length === 0) {
-    return rowHeadersCount + (measuresPlacement === "column" ? measuresCount : 1);
+    return rowHeadersCount + (columnMeasuresCount || 1);
   } else {
-    return rowHeadersCount + data.columnHeaders().length * (measuresPlacement === "column" ? measuresCount : 1);
+    return rowHeadersCount + data.columnHeaders().length * (columnMeasuresCount || 1);
   }
 };
 
@@ -493,17 +493,16 @@ export const getColumnCount = <Name extends string = string>({
 export const getRowCount = <Name extends string = string>({
   columnHeadersCount,
   data,
-  measuresPlacement,
-  measuresCount,
+  rowMeasuresCount,
 }: {
   data: PivotFrame<Name>;
-  measuresPlacement: MeasuresPlacement;
-  measuresCount: number;
   columnHeadersCount: number;
+  rowMeasuresCount: number;
+  columnMeasuresCount: number;
 }) => {
   if (data.rowHeaders().length === 0) {
-    return columnHeadersCount + (measuresPlacement === "row" ? measuresCount : 1);
+    return columnHeadersCount + (rowMeasuresCount || 1);
   } else {
-    return columnHeadersCount + data.rowHeaders().length * (measuresPlacement === "row" ? measuresCount : 1);
+    return columnHeadersCount + data.rowHeaders().length * (rowMeasuresCount || 1);
   }
 };
