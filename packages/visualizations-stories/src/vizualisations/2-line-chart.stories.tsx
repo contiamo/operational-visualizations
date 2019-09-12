@@ -211,10 +211,10 @@ const LineChart = <Name extends string>({
       <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
         <Line
           data={data}
-          x={categoricalCursor}
-          y={metricCursor}
-          xScale={categoricalScale}
-          yScale={metricScale}
+          x={metricDirection === "vertical" ? categoricalCursor : metricCursor}
+          y={metricDirection === "vertical" ? metricCursor : categoricalCursor}
+          xScale={metricDirection === "vertical" ? categoricalScale : metricScale}
+          yScale={metricDirection === "vertical" ? metricScale : categoricalScale}
           showLabels={true}
           style={{ stroke: "#1f78b4" }}
         />
@@ -266,10 +266,10 @@ const MultipleLines = <Name extends string>({
           <Line
             key={i}
             data={seriesData}
-            x={metricDirection === "horizontal" ? categoricalCursor : metricCursor}
-            y={metricDirection === "horizontal" ? metricCursor : categoricalCursor}
-            xScale={metricDirection === "horizontal" ? categoricalScale : metricScale}
-            yScale={metricDirection === "horizontal" ? metricScale : categoricalScale}
+            x={metricDirection === "vertical" ? categoricalCursor : metricCursor}
+            y={metricDirection === "vertical" ? metricCursor : categoricalCursor}
+            xScale={metricDirection === "vertical" ? categoricalScale : metricScale}
+            yScale={metricDirection === "vertical" ? metricScale : categoricalScale}
             showLabels={true}
             style={(row: RowCursor) => ({
               stroke: colorScale(row),

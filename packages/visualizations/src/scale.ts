@@ -54,7 +54,6 @@ export const useScale = <Name extends string>({
 type ScaleAny = ScaleBand<string> | ScaleTime<any, any> | ScaleLinear<number, number>;
 
 export const isScaleBand = (unknownScale: ScaleAny): unknownScale is ScaleBand<string> => {
-  console.log(unknownScale);
   return "paddingInner" in unknownScale;
 };
 

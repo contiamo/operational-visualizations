@@ -4,71 +4,64 @@ import { useChartTransform } from "./Chart";
 import { LinearAxialChart } from "./types";
 import { isFunction } from "./utils";
 import { Labels } from "./Labels";
-import { ScaleBand, ScaleLinear } from "d3-scale";
-import { ColumnCursor } from "@operational/frame";
 import { isScaleBand } from "./scale";
 
-export const Line: LinearAxialChart<string> = React.memo(props => {
-  const defaultTransform = useChartTransform();
+export const Line: LinearAxialChart<string> = React.memo(
+  ({ data, transform, x, y, xScale, yScale, showLabels, style }) => {
+    const defaultTransform = useChartTransform();
 
-  const { data, transform, x, y, xScale, yScale, showLabels, style } = props;
-  const [categorical, metric, categoricalScale, metricScale, metricDirection]: [
-    ColumnCursor<string>,
-    ColumnCursor<string>,
-    ScaleBand<string>,
-    ScaleLinear<number, number>,
-    "vertical" | "horizontal"
-  ] = isScaleBand(xScale) ? [x, y, xScale, yScale, "vertical"] : ([y, x, yScale, xScale, "horizontal"] as any);
+    // TODO add check that scales are correct
+    const xTicks = isScaleBand(xScale) ? xScale.domain() : [];
+    const yTicks = isScaleBand(yScale) ? yScale.domain() : [];
 
-  // The categorical scale must be a band scale for composability with bar charts.
-  // Half of the tick width must be added to align with the ticks.
-  const categoricalTickWidth = categoricalScale.bandwidth();
+    let offset = 0;
+    const dataWithHoles =
+      xTicks.length > 0
+        ? xTicks.map((z, i) => {
+            let row = data.row(i + offset) || [];
+            if (z !== x(row)) {
+              offset -= 1;
+              return [];
+            }
+            return row;
+          })
+        : yTicks.map((z, i) => {
+            let row = data.row(i + offset) || [];
+            if (z !== y(row)) {
+              offset -= 1;
+              return [];
+            }
+            return row;
+          });
 
-  const missingDatum = (tick: string) => {
-    const d = [];
-    d[categorical.index] = tick;
-    d[metric.index] = undefined;
-    return d;
-  };
+    const pathData = dataWithHoles.map(row => {
+      const xCoordinate = isScaleBand(xScale) ? xScale.bandwidth() / 2 + (xScale(x(row)) as number) : xScale(x(row));
+      const yCoordinate = isScaleBand(yScale) ? yScale.bandwidth() / 2 + (yScale(y(row)) as number) : yScale(y(row));
+      return { xCoordinate, yCoordinate };
+    });
 
-  const rawData = data.mapRows(row => row);
+    const path =
+      line<{ xCoordinate: number; yCoordinate: number }>()
+        .x(d => d.xCoordinate)
+        .y(d => d.yCoordinate)
+        .defined(d => d.xCoordinate !== undefined && d.yCoordinate !== undefined)(pathData) || "";
 
-  // Add missing data
-  const ticks = categoricalScale.domain();
-  const dataWithMissing = ticks.map(tick => {
-    const datum = rawData.find(d => categorical(d) === tick);
-    return datum || missingDatum(tick);
-  });
+    const pathStyle = (isFunction(style) ? style(data.row(0), 0) : style) || {};
 
-  const pathData = dataWithMissing.map(row => {
-    const categoricalValue = categoricalTickWidth / 2 + (categoricalScale(categorical(row)) as number);
-    const metricValue = metricScale(metric(row));
-    return { m: metricValue, c: categoricalValue };
-  });
-
-  const isDefined = (value: number | undefined) => value !== undefined;
-
-  const path =
-    line<{ m: number; c: number }>()
-      .x(d => (metricDirection === "vertical" ? d.c : d.m))
-      .y(d => (metricDirection === "vertical" ? d.m : d.c))
-      .defined(d => isDefined(d.m))(pathData) || "";
-
-  const pathStyle = (isFunction(style) ? style(data.row(0), 0) : style) || {};
-
-  return (
-    <>
-      <g transform={transform || defaultTransform}>
-        <path
-          d={path}
-          style={{
-            fill: "none",
-            strokeLinecap: "round",
-            ...pathStyle,
-          }}
-        />
-      </g>
-      {showLabels && <Labels data={data} transform={transform} x={x} y={y} yScale={yScale} xScale={xScale} />}
-    </>
-  );
-});
+    return (
+      <>
+        <g transform={transform || defaultTransform}>
+          <path
+            d={path}
+            style={{
+              fill: "none",
+              strokeLinecap: "round",
+              ...pathStyle,
+            }}
+          />
+        </g>
+        {showLabels && <Labels data={data} transform={transform} x={x} y={y} yScale={yScale} xScale={xScale} />}
+      </>
+    );
+  },
+);
