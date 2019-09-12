@@ -118,8 +118,8 @@ export const Area: LinearAxialChart<string> = ({ data, transform, x, y, xScale, 
 
     const missingDatum = (tick: string) => {
       const d = [];
-      d[isScaleBand(xScale) ? x.index : y.index] = tick;
-      d[isScaleBand(xScale) ? y.index : x.index] = undefined;
+      d[y.index] = tick;
+      d[x.index] = undefined;
       return d;
     };
 
