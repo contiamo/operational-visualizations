@@ -5,25 +5,14 @@ import { LinearAxialChart } from "./types";
 import { isFunction } from "./utils";
 import { baseStyle as baseLabelStyle, verticalStyle as verticalLabelStyle } from "./Labels";
 import { ColumnCursor } from "@operational/frame";
-import { ScaleBand, ScaleLinear } from "d3-scale";
 import { isScaleBand } from "./scale";
 
-export const Area: LinearAxialChart<string> = props => {
+export const Area: LinearAxialChart<string> = ({ data, transform, x, y, xScale, yScale, stack, showLabels, style }) => {
   const defaultTransform = useChartTransform();
-
-  const { data, transform, x, y, xScale, yScale, stack, showLabels, style } = props;
-
-  const [categorical, metric, categoricalScale, metricScale, metricDirection]: [
-    ColumnCursor<string>,
-    ColumnCursor<string>,
-    ScaleBand<string>,
-    ScaleLinear<number, number>,
-    "vertical" | "horizontal"
-  ] = isScaleBand(xScale) ? [x, y, xScale, yScale, "horizontal"] : ([y, x, yScale, xScale, "vertical"] as any);
 
   // The categorical scale must be a band scale for composability with bar charts.
   // Half of the tick width must be added to align with the ticks.
-  const categoricalTickWidth = categoricalScale.bandwidth();
+  const categoricalTickWidth = isScaleBand(xScale) ? xScale.bandwidth() : (yScale as any).bandwidth();
 
   const accumulatedCache: Record<string, number> = {};
 
@@ -33,38 +22,38 @@ export const Area: LinearAxialChart<string> = props => {
   // with the following properties:
   // `c` is the categorical tick value
   // `m0` and `m1` are the lower and upper metric values
-  const path =
-    metricDirection === "vertical"
-      ? area<{ c: string; m0: number; m1: number }>()
-          .x(d => categoricalTickWidth / 2 + (categoricalScale(d.c) || 0))
-          .y0(d => metricScale(d.m0))
-          .y1(d => metricScale(d.m1))
-      : area<{ c: string; m0: number; m1: number }>()
-          .x0(d => metricScale(d.m0))
-          .x1(d => metricScale(d.m1))
-          .y(d => categoricalTickWidth / 2 + (categoricalScale(d.c) || 0));
+  const path = isScaleBand(xScale)
+    ? area<{ c: string; m0: number; m1: number }>()
+        .x(d => categoricalTickWidth / 2 + (xScale(d.c) || 0))
+        .y0(d => yScale(d.m0 as any) as number)
+        .y1(d => yScale(d.m1 as any) as number)
+    : area<{ c: string; m0: number; m1: number }>()
+        .x0(d => xScale(d.m0))
+        .x1(d => xScale(d.m1))
+        .y(d => categoricalTickWidth / 2 + (yScale(d.c as any) || 0));
 
-  const strokePath =
-    metricDirection === "vertical"
-      ? line<{ c: string; m0: number; m1: number }>()
-          .x(d => categoricalTickWidth / 2 + (categoricalScale(d.c) || 0))
-          .y(d => metricScale(d.m1))
-      : line<{ c: string; m0: number; m1: number }>()
-          .x(d => metricScale(d.m1))
-          .y(d => categoricalTickWidth / 2 + (categoricalScale(d.c) || 0));
+  const strokePath = isScaleBand(xScale)
+    ? line<{ c: string; m0: number; m1: number }>()
+        .x(d => categoricalTickWidth / 2 + (xScale(d.c) || 0))
+        .y(d => yScale(d.m1 as any) as number)
+    : line<{ c: string; m0: number; m1: number }>()
+        .x(d => xScale(d.m1))
+        .y(d => categoricalTickWidth / 2 + (yScale(d.c as any) || 0));
 
   const missingDatum = (tick: string) => {
     const d = [];
-    d[categorical.index] = tick;
-    d[metric.index] = undefined;
+    d[isScaleBand(xScale) ? x.index : y.index] = tick;
+    d[isScaleBand(xScale) ? y.index : x.index] = undefined;
     return d;
   };
+
+  const [categorical, metric]: [ColumnCursor<string>, ColumnCursor<string>] = isScaleBand(xScale) ? [x, y] : [y, x];
 
   const stackedData = data.groupBy(stack || []).map(grouped => {
     const rawPathData = grouped.mapRows(row => row);
 
     // Add missing data
-    const ticks = categoricalScale.domain();
+    const ticks = isScaleBand(xScale) ? xScale.domain() : ((yScale as any).domain() as string[]);
     const dataWithMissing = ticks
       .map(tick => {
         const datum = rawPathData.find(d => categorical(d) === tick);
@@ -113,11 +102,11 @@ export const Area: LinearAxialChart<string> = props => {
       {showLabels &&
         stackedData.map((stack, i) =>
           stack.data.map((d, j) =>
-            metricDirection === "vertical" ? (
+            isScaleBand(xScale) ? (
               <text
                 key={`Label-${i}-${j}`}
-                x={(categoricalScale(d.c) || 0) + categoricalTickWidth / 2}
-                y={metricScale(d.m1)}
+                x={(xScale(d.c) || 0) + categoricalTickWidth / 2}
+                y={yScale(d.m1)}
                 dy="-0.35em"
                 style={verticalLabelStyle}
               >
@@ -126,8 +115,8 @@ export const Area: LinearAxialChart<string> = props => {
             ) : (
               <text
                 key={`Label-${i}-${j}`}
-                x={metricScale(d.m1)}
-                y={(categoricalScale(d.c) || 0) + categoricalTickWidth / 2}
+                x={xScale(d.m1)}
+                y={(yScale(d.c) || 0) + categoricalTickWidth / 2}
                 dx="0.35em"
                 dy="0.35em"
                 style={baseLabelStyle}
