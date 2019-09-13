@@ -5,3 +5,4 @@
 - [3. about-caching](0003-about-caching.md)
 - [4. about-row-cursor](0004-about-row-cursor.md)
 - [5. about-measure-labels](0005-about-measure-labels.md)
+- [6. static-vs-dynamic-check](0006-static-vs-dynamic-check.md)

@@ -31,7 +31,7 @@ export const Bars: DiscreteAxialChart<string> = ({ data, transform, x, y, xScale
           );
           const label = (
             <text
-              x={xScale(x(row))! + bandWidth / 2}
+              x={(xScale(x(row)) || 0) + bandWidth / 2}
               y={yScale(y(row)) - accumulatedHeight}
               dy="-0.35em"
               style={verticalLabelStyle}
@@ -69,7 +69,7 @@ export const Bars: DiscreteAxialChart<string> = ({ data, transform, x, y, xScale
           const label = (
             <text
               x={xScale(x(row)) + accumulatedWidth}
-              y={yScale(y(row))! + bandWidth / 2}
+              y={(yScale(y(row)) || 0) + bandWidth / 2}
               dx="0.35em"
               dy="0.35em"
               style={baseLabelStyle}

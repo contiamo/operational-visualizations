@@ -4,7 +4,7 @@ import { useChartTransform } from "./Chart";
 import { LinearAxialChart } from "./types";
 import { isFunction } from "./utils";
 import { Labels } from "./Labels";
-import { isScaleBand } from "./scale";
+import { isScaleBand, isScaleContinious } from "./scale";
 import { IterableFrame, ColumnCursor } from "@operational/frame";
 import { ScaleBand, ScaleLinear } from "d3-scale";
 
@@ -44,7 +44,14 @@ export const Line: LinearAxialChart<string> = React.memo(
   ({ data, transform, x, y, xScale, yScale, showLabels, style }) => {
     const defaultTransform = useChartTransform();
 
-    // TODO add check that scales are correct
+    if (isScaleBand(xScale) && isScaleContinious(yScale)) {
+      // do nothing
+    } else if (isScaleBand(yScale) && isScaleContinious(xScale)) {
+      // do nothing
+    } else {
+      throw new Error("Unsupported case of scales");
+    }
+
     const dataWithHoles = useHoles(data, x, y, xScale, yScale);
 
     const path = useMemo(() => {

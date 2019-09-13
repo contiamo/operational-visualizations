@@ -3,7 +3,7 @@ import { useChartTransform } from "./Chart";
 import { DiscreteAxialChart } from "./types";
 import { isFunction } from "./utils";
 import theme from "./theme";
-import { isScaleBand } from "./scale";
+import { isScaleBand, isScaleContinious } from "./scale";
 
 export const baseStyle: React.CSSProperties = {
   fontSize: theme.font.size.small,
@@ -18,13 +18,13 @@ export const verticalStyle: React.CSSProperties = {
 export const Labels: DiscreteAxialChart<string> = ({ data, transform, x, y, xScale, yScale, style }) => {
   const defaultTransform = useChartTransform();
 
-  if (isScaleBand(xScale)) {
+  if (isScaleBand(xScale) && isScaleContinious(yScale)) {
     const bandWidth = xScale.bandwidth();
     return (
       <g transform={transform || defaultTransform}>
         {data.mapRows((row, i) => (
           <text
-            x={xScale(x(row))! + bandWidth / 2}
+            x={(xScale(x(row)) || 0) + bandWidth / 2}
             y={yScale(y(row))}
             dy="-0.35em"
             style={{
@@ -38,14 +38,14 @@ export const Labels: DiscreteAxialChart<string> = ({ data, transform, x, y, xSca
         ))}
       </g>
     );
-  } else if (isScaleBand(yScale)) {
+  } else if (isScaleBand(yScale) && isScaleContinious(xScale)) {
     const bandWidth = yScale.bandwidth();
     return (
       <g transform={transform || defaultTransform}>
         {data.mapRows((row, i) => (
           <text
             x={xScale(x(row))}
-            y={yScale(y(row))! + bandWidth / 2}
+            y={(yScale(y(row)) || 0) + bandWidth / 2}
             dx="0.35em"
             dy="0.35em"
             style={{
