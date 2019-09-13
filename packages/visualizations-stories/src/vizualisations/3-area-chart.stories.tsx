@@ -225,6 +225,7 @@ const AreaChart = <Name extends string>({
   colorBy,
   stackBy,
 }: AreaChartProps<Name>) => {
+  const isVertical = metricDirection === "vertical";
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
   const stackByCursors = (stackBy || []).map(x => data.getCursor(x));
@@ -235,12 +236,12 @@ const AreaChart = <Name extends string>({
   const categoricalScale = useScaleBand({
     frame: data,
     column: categoricalCursor,
-    range: metricDirection === "horizontal" ? [0, height] : [0, width],
+    range: !isVertical ? [0, height] : [0, width],
   });
   const metricScale = useScaleLinear({
     frame: data.groupBy([categoricalCursor]),
     column: metricCursor,
-    range: metricDirection === "horizontal" ? [0, width] : [height, 0],
+    range: !isVertical ? [0, width] : [height, 0],
   });
 
   const colorScale = useColorScale(data, colorByCursors);
@@ -254,10 +255,10 @@ const AreaChart = <Name extends string>({
             key={i}
             data={grouped}
             stack={stackByCursors}
-            x={metricDirection === "vertical" ? categoricalCursor : metricCursor}
-            y={metricDirection === "vertical" ? metricCursor : categoricalCursor}
-            xScale={metricDirection === "vertical" ? categoricalScale : metricScale}
-            yScale={metricDirection === "vertical" ? metricScale : categoricalScale}
+            x={isVertical ? categoricalCursor : metricCursor}
+            y={isVertical ? metricCursor : categoricalCursor}
+            xScale={isVertical ? categoricalScale : metricScale}
+            yScale={isVertical ? metricScale : categoricalScale}
             showLabels={true}
             style={(row: RowCursor) => ({
               fill: colorScale(row),
@@ -265,8 +266,8 @@ const AreaChart = <Name extends string>({
             })}
           />
         ))}
-        <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
-        <Axis scale={metricScale} position={metricDirection === "vertical" ? "left" : "bottom"} />
+        <Axis scale={categoricalScale} position={isVertical ? "bottom" : "left"} />
+        <Axis scale={metricScale} position={isVertical ? "left" : "bottom"} />
       </Chart>
     </div>
   );

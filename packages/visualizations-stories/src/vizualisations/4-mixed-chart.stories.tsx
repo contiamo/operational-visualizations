@@ -79,15 +79,16 @@ const MixedChart = <Name extends string>({
   metric,
   metricDirection,
 }: MixedChartProps<Name>) => {
+  const isVertical = metricDirection === "vertical";
   const categoricalScale = useScaleBand({
     frame: data,
     column: data.getCursor(categorical),
-    range: metricDirection === "vertical" ? [0, width] : [0, height],
+    range: isVertical ? [0, width] : [0, height],
   });
   const metricScale = useScaleLinear({
     frame: data,
     column: data.getCursor(metric),
-    range: metricDirection === "vertical" ? [height, 0] : [0, width],
+    range: isVertical ? [height, 0] : [0, width],
   });
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
@@ -96,40 +97,40 @@ const MixedChart = <Name extends string>({
     <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
       <Area
         data={data}
-        x={metricDirection === "vertical" ? categoricalCursor : metricCursor}
-        y={metricDirection === "vertical" ? metricCursor : categoricalCursor}
-        xScale={metricDirection === "vertical" ? categoricalScale : metricScale}
-        yScale={metricDirection === "vertical" ? metricScale : categoricalScale}
+        x={isVertical ? categoricalCursor : metricCursor}
+        y={isVertical ? metricCursor : categoricalCursor}
+        xScale={isVertical ? categoricalScale : metricScale}
+        yScale={isVertical ? metricScale : categoricalScale}
         style={{ fill: "#ddd" }}
       />
       {data.groupBy([categoricalCursor]).map((grouped, i) => (
         <Bars
           key={i}
           data={grouped}
-          x={metricDirection === "vertical" ? categoricalCursor : metricCursor}
-          y={metricDirection === "vertical" ? metricCursor : categoricalCursor}
-          xScale={metricDirection === "vertical" ? categoricalScale : metricScale}
-          yScale={metricDirection === "vertical" ? metricScale : categoricalScale}
+          x={isVertical ? categoricalCursor : metricCursor}
+          y={isVertical ? metricCursor : categoricalCursor}
+          xScale={isVertical ? categoricalScale : metricScale}
+          yScale={isVertical ? metricScale : categoricalScale}
           style={{ fill: "#1499CE" }}
         />
       ))}
       <Line
         data={data}
-        x={metricDirection === "vertical" ? categoricalCursor : metricCursor}
-        y={metricDirection === "vertical" ? metricCursor : categoricalCursor}
-        xScale={metricDirection === "vertical" ? categoricalScale : metricScale}
-        yScale={metricDirection === "vertical" ? metricScale : categoricalScale}
+        x={isVertical ? categoricalCursor : metricCursor}
+        y={isVertical ? metricCursor : categoricalCursor}
+        xScale={isVertical ? categoricalScale : metricScale}
+        yScale={isVertical ? metricScale : categoricalScale}
         style={{ stroke: "#7C246F" }}
       />
       <Labels
         data={data}
-        x={metricDirection === "vertical" ? categoricalCursor : metricCursor}
-        y={metricDirection === "vertical" ? metricCursor : categoricalCursor}
-        xScale={metricDirection === "vertical" ? categoricalScale : metricScale}
-        yScale={metricDirection === "vertical" ? metricScale : categoricalScale}
+        x={isVertical ? categoricalCursor : metricCursor}
+        y={isVertical ? metricCursor : categoricalCursor}
+        xScale={isVertical ? categoricalScale : metricScale}
+        yScale={isVertical ? metricScale : categoricalScale}
       />
-      <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
-      <Axis scale={metricScale} position={metricDirection === "vertical" ? "left" : "bottom"} />
+      <Axis scale={categoricalScale} position={isVertical ? "bottom" : "left"} />
+      <Axis scale={metricScale} position={isVertical ? "left" : "bottom"} />
     </Chart>
   );
 };

@@ -190,15 +190,16 @@ const LineChart = <Name extends string>({
   metric,
   metricDirection,
 }: LineChartProps<Name>) => {
+  const isVertical = metricDirection === "vertical";
   const categoricalScale = useScaleBand({
     frame: data,
     column: data.getCursor(categorical),
-    range: metricDirection === "vertical" ? [0, width] : [0, height],
+    range: isVertical ? [0, width] : [0, height],
   });
   const metricScale = useScaleLinear({
     frame: data,
     column: data.getCursor(metric),
-    range: metricDirection === "vertical" ? [height, 0] : [0, width],
+    range: isVertical ? [height, 0] : [0, width],
   });
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
@@ -211,15 +212,15 @@ const LineChart = <Name extends string>({
       <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
         <Line
           data={data}
-          x={metricDirection === "vertical" ? categoricalCursor : metricCursor}
-          y={metricDirection === "vertical" ? metricCursor : categoricalCursor}
-          xScale={metricDirection === "vertical" ? categoricalScale : metricScale}
-          yScale={metricDirection === "vertical" ? metricScale : categoricalScale}
+          x={isVertical ? categoricalCursor : metricCursor}
+          y={isVertical ? metricCursor : categoricalCursor}
+          xScale={isVertical ? categoricalScale : metricScale}
+          yScale={isVertical ? metricScale : categoricalScale}
           showLabels={true}
           style={{ stroke: "#1f78b4" }}
         />
-        <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
-        <Axis scale={metricScale} position={metricDirection === "vertical" ? "left" : "bottom"} />
+        <Axis scale={categoricalScale} position={isVertical ? "bottom" : "left"} />
+        <Axis scale={metricScale} position={isVertical ? "left" : "bottom"} />
       </Chart>
     </div>
   );
@@ -241,18 +242,19 @@ const MultipleLines = <Name extends string>({
   metricDirection,
   colorBy,
 }: MultipleLinesProps<Name>) => {
+  const isVertical = metricDirection === "vertical";
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
 
   const categoricalScale = useScaleBand({
     frame: data,
     column: categoricalCursor,
-    range: metricDirection === "vertical" ? [0, width] : [0, height],
+    range: isVertical ? [0, width] : [0, height],
   });
   const metricScale = useScaleLinear({
     frame: data,
     column: metricCursor,
-    range: metricDirection === "vertical" ? [height, 0] : [0, width],
+    range: isVertical ? [height, 0] : [0, width],
   });
 
   const colorCursors = (colorBy || []).map(c => data.getCursor(c));
@@ -266,10 +268,10 @@ const MultipleLines = <Name extends string>({
           <Line
             key={i}
             data={seriesData}
-            x={metricDirection === "vertical" ? categoricalCursor : metricCursor}
-            y={metricDirection === "vertical" ? metricCursor : categoricalCursor}
-            xScale={metricDirection === "vertical" ? categoricalScale : metricScale}
-            yScale={metricDirection === "vertical" ? metricScale : categoricalScale}
+            x={isVertical ? categoricalCursor : metricCursor}
+            y={isVertical ? metricCursor : categoricalCursor}
+            xScale={isVertical ? categoricalScale : metricScale}
+            yScale={isVertical ? metricScale : categoricalScale}
             showLabels={true}
             style={(row: RowCursor) => ({
               stroke: colorScale(row),
@@ -277,8 +279,8 @@ const MultipleLines = <Name extends string>({
             })}
           />
         ))}
-        <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
-        <Axis scale={metricScale} position={metricDirection === "vertical" ? "left" : "bottom"} />
+        <Axis scale={categoricalScale} position={isVertical ? "bottom" : "left"} />
+        <Axis scale={metricScale} position={isVertical ? "left" : "bottom"} />
       </Chart>
     </div>
   );

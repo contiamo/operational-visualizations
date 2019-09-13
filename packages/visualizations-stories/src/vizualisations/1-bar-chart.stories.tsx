@@ -84,6 +84,7 @@ const BarChart = <Name extends string>({
   colorBy,
   palette,
 }: BarChartProps<Name>) => {
+  const isVertical = metricDirection === "vertical";
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
 
@@ -92,12 +93,12 @@ const BarChart = <Name extends string>({
   const categoricalScale = useScaleBand({
     frame: data,
     column: categoricalCursor,
-    range: metricDirection === "horizontal" ? [0, height] : [0, width],
+    range: !isVertical ? [0, height] : [0, width],
   });
   const metricScale = useScaleLinear({
     frame,
     column: metricCursor,
-    range: metricDirection === "horizontal" ? [0, width] : [height, 0],
+    range: !isVertical ? [0, width] : [height, 0],
   });
 
   const colorCursors = (colorBy || []).map(c => data.getCursor(c));
@@ -115,28 +116,28 @@ const BarChart = <Name extends string>({
       <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
         <AxisRules
           scale={metricScale}
-          position={metricDirection === "horizontal" ? "bottom" : "left"}
-          length={metricDirection === "horizontal" ? height : width}
+          position={!isVertical ? "bottom" : "left"}
+          length={!isVertical ? height : width}
         />
         <AxisRules
           scale={categoricalScale}
-          position={metricDirection === "horizontal" ? "left" : "bottom"}
-          length={metricDirection === "horizontal" ? width : height}
+          position={!isVertical ? "left" : "bottom"}
+          length={!isVertical ? width : height}
         />
         {frame.map((grouped, i) => (
           <Bars
             key={i}
             data={grouped}
-            x={metricDirection === "vertical" ? categoricalCursor : metricCursor}
-            y={metricDirection === "vertical" ? metricCursor : categoricalCursor}
-            xScale={metricDirection === "vertical" ? categoricalScale : metricScale}
-            yScale={metricDirection === "vertical" ? metricScale : categoricalScale}
+            x={isVertical ? categoricalCursor : metricCursor}
+            y={isVertical ? metricCursor : categoricalCursor}
+            xScale={isVertical ? categoricalScale : metricScale}
+            yScale={isVertical ? metricScale : categoricalScale}
             showLabels={true}
             style={(row: RowCursor) => ({ fill: colorScale(row) })}
           />
         ))}
-        <Axis scale={categoricalScale} position={metricDirection === "horizontal" ? "left" : "bottom"} />
-        <Axis scale={metricScale} position={metricDirection === "horizontal" ? "bottom" : "left"} />
+        <Axis scale={categoricalScale} position={!isVertical ? "left" : "bottom"} />
+        <Axis scale={metricScale} position={!isVertical ? "bottom" : "left"} />
       </Chart>
     </div>
   );
