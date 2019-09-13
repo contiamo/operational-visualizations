@@ -87,6 +87,17 @@ export const total = <Name extends string>(
   return cacheItem.total!;
 };
 
+// const sorfCallback = (a: any, b: any) => {
+//   if (a < b) {
+//     return -1;
+//   }
+//   if (a > b) {
+//     return 1;
+//   }
+//   // a must be equal to b
+//   return 0;
+// };
+
 // rename to unique
 export const uniqueValues = <Name extends string>(
   frame: IterableFrame<Name> | GroupFrame<Name>,
@@ -104,6 +115,7 @@ export const uniqueValues = <Name extends string>(
       }
     });
     cacheItem.unique = [...unique];
+    // cacheItem.unique = [...unique].sort(sorfCallback);
   }
   return cacheItem.unique!;
 };

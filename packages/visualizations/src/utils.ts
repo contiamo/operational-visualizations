@@ -29,7 +29,7 @@ export const fillHoles = (
   let offset = 0;
   return xTicks.length > 0
     ? xTicks.map((z, i) => {
-        let row = data.row(i + offset) || [];
+        const row = data.row(i + offset) || [];
         if (z !== x(row)) {
           offset -= 1;
           const reuslt: any[] = [];
@@ -39,7 +39,7 @@ export const fillHoles = (
         return row;
       })
     : yTicks.map((z, i) => {
-        let row = data.row(i + offset) || [];
+        const row = data.row(i + offset) || [];
         if (z !== y(row)) {
           offset -= 1;
           const reuslt: any[] = [];
