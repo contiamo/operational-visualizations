@@ -1,5 +1,5 @@
 import { scaleBand, scaleLinear } from "d3-scale";
-import { isScaleBand, isScaleContinious } from "../scale";
+import { isScaleBand, isScaleContinuous } from "../scale";
 
 describe("isScaleBand()", () => {
   it("detects ScaleBand", () => {
@@ -10,11 +10,11 @@ describe("isScaleBand()", () => {
   });
 });
 
-describe("isScaleContinious()", () => {
+describe("isScaleContinuous()", () => {
   it("detects ScaleContinious", () => {
     const scaleB = scaleBand().domain(["0", "1"]);
     const scaleL = scaleLinear().domain([0, 1]);
-    expect(isScaleContinious(scaleB)).toEqual(false);
-    expect(isScaleContinious(scaleL)).toEqual(true);
+    expect(isScaleContinuous(scaleB)).toEqual(false);
+    expect(isScaleContinuous(scaleL)).toEqual(true);
   });
 });

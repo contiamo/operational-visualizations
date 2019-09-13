@@ -109,9 +109,9 @@ We want to refuse from static check and instead rely on dynamic type check for c
 
 ```tsx
 export const Bars: DiscreteAxialChart<string> = ({ xScale, yScale }) => {
-  if (isScaleBand(xScale) && isScaleContinious(yScale)) {
+  if (isScaleBand(xScale) && isScaleContinuous(yScale)) {
     return <g>{bars}</g>;
-  } else if (isScaleBand(yScale) && isScaleContinious(xScale)) {
+  } else if (isScaleBand(yScale) && isScaleContinuous(xScale)) {
     return <g>{bars}</g>;
   } else {
     throw new Error("Unsupported case of scales");

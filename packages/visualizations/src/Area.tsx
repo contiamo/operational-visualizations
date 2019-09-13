@@ -4,7 +4,7 @@ import { useChartTransform } from "./Chart";
 import { LinearAxialChart } from "./types";
 import { isFunction, fillHoles } from "./utils";
 import { baseStyle as baseLabelStyle, verticalStyle as verticalLabelStyle } from "./Labels";
-import { isScaleBand, isScaleContinious } from "./scale";
+import { isScaleBand, isScaleContinuous } from "./scale";
 import { GroupFrame, ColumnCursor } from "@operational/frame";
 import { ScaleBand, ScaleLinear } from "d3-scale";
 
@@ -24,16 +24,16 @@ const useFillHoles = (
     [data, x, y, xScale, yScale],
   );
 
+const isDefined = (value: number | undefined) => value !== undefined;
+
 export const Area: LinearAxialChart<string> = ({ data, transform, x, y, xScale, yScale, stack, showLabels, style }) => {
   const defaultTransform = useChartTransform();
 
   const accumulatedCache: Record<string, number> = {};
 
-  const isDefined = (value: number | undefined) => value !== undefined;
-
   const dataWithMissing = useFillHoles(data.groupBy(stack || []), x, y, xScale, yScale);
 
-  if (isScaleBand(xScale) && isScaleContinious(yScale)) {
+  if (isScaleBand(xScale) && isScaleContinuous(yScale)) {
     // The categorical scale must be a band scale for composability with bar charts.
     // Half of the tick width must be added to align with the ticks.
     const categoricalTickWidth = xScale.bandwidth();
@@ -103,7 +103,7 @@ export const Area: LinearAxialChart<string> = ({ data, transform, x, y, xScale, 
           )}
       </g>
     );
-  } else if (isScaleBand(yScale) && isScaleContinious(xScale)) {
+  } else if (isScaleBand(yScale) && isScaleContinuous(xScale)) {
     const categoricalTickWidth = yScale.bandwidth();
 
     const path = area<{ c: string; m0: number; m1: number }>()

@@ -3,12 +3,12 @@ import { useChartTransform } from "./Chart";
 import { DiscreteAxialChart } from "./types";
 import { isFunction } from "./utils";
 import { baseStyle as baseLabelStyle, verticalStyle as verticalLabelStyle } from "./Labels";
-import { isScaleBand, isScaleContinious } from "./scale";
+import { isScaleBand, isScaleContinuous } from "./scale";
 
 export const Bars: DiscreteAxialChart<string> = ({ data, transform, x, y, xScale, yScale, showLabels, style }) => {
   const defaultTransform = useChartTransform();
 
-  if (isScaleBand(xScale) && isScaleContinious(yScale)) {
+  if (isScaleBand(xScale) && isScaleContinuous(yScale)) {
     const height = yScale(yScale.domain()[0]);
     const bandWidth = xScale.bandwidth();
     let accumulatedHeight = 0;
@@ -47,7 +47,7 @@ export const Bars: DiscreteAxialChart<string> = ({ data, transform, x, y, xScale
         {showLabels && labels}
       </g>
     );
-  } else if (isScaleBand(yScale) && isScaleContinious(xScale)) {
+  } else if (isScaleBand(yScale) && isScaleContinuous(xScale)) {
     let accumulatedWidth = 0;
     const bandWidth = yScale.bandwidth();
     // The `Labels` component can't be used here due to stacking

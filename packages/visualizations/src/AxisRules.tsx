@@ -2,7 +2,7 @@ import React from "react";
 import { useChartTransform } from "./Chart";
 import { ScaleBand, ScaleLinear } from "d3-scale";
 import theme from "./theme";
-import { isScaleContinious } from "./scale";
+import { isScaleContinuous } from "./scale";
 
 interface AxisRulesProps {
   scale: ScaleLinear<number, number> | ScaleBand<string>;
@@ -20,9 +20,9 @@ export const AxisRules = React.memo((props: AxisRulesProps) => {
 
   const { scale, position, length, transform, style } = props;
 
-  const ticks: Array<string | number> = isScaleContinious(scale) ? scale.ticks() : scale.domain();
+  const ticks: Array<string | number> = isScaleContinuous(scale) ? scale.ticks() : scale.domain();
 
-  const offset = isScaleContinious(scale) ? 0 : -(scale.paddingOuter() * scale.bandwidth()) / 2;
+  const offset = isScaleContinuous(scale) ? 0 : -(scale.paddingOuter() * scale.bandwidth()) / 2;
 
   return (
     <g transform={transform || defaultTransform}>

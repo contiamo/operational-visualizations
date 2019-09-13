@@ -3,7 +3,7 @@ import { useChartTransform } from "./Chart";
 import { DiscreteAxialChart } from "./types";
 import { isFunction } from "./utils";
 import theme from "./theme";
-import { isScaleBand, isScaleContinious } from "./scale";
+import { isScaleBand, isScaleContinuous } from "./scale";
 
 export const baseStyle: React.CSSProperties = {
   fontSize: theme.font.size.small,
@@ -18,7 +18,7 @@ export const verticalStyle: React.CSSProperties = {
 export const Labels: DiscreteAxialChart<string> = ({ data, transform, x, y, xScale, yScale, style }) => {
   const defaultTransform = useChartTransform();
 
-  if (isScaleBand(xScale) && isScaleContinious(yScale)) {
+  if (isScaleBand(xScale) && isScaleContinuous(yScale)) {
     const bandWidth = xScale.bandwidth();
     return (
       <g transform={transform || defaultTransform}>
@@ -38,7 +38,7 @@ export const Labels: DiscreteAxialChart<string> = ({ data, transform, x, y, xSca
         ))}
       </g>
     );
-  } else if (isScaleBand(yScale) && isScaleContinious(xScale)) {
+  } else if (isScaleBand(yScale) && isScaleContinuous(xScale)) {
     const bandWidth = yScale.bandwidth();
     return (
       <g transform={transform || defaultTransform}>

@@ -4,13 +4,13 @@ import { useChartTransform } from "./Chart";
 import { LinearAxialChart } from "./types";
 import { isFunction, fillHoles } from "./utils";
 import { Labels } from "./Labels";
-import { isScaleBand, isScaleContinious } from "./scale";
+import { isScaleBand, isScaleContinuous } from "./scale";
 
 export const Line: LinearAxialChart<string> = React.memo(
   ({ data, transform, x, y, xScale, yScale, showLabels, style }) => {
-    if (isScaleBand(xScale) && isScaleContinious(yScale)) {
+    if (isScaleBand(xScale) && isScaleContinuous(yScale)) {
       // do nothing
-    } else if (isScaleBand(yScale) && isScaleContinious(xScale)) {
+    } else if (isScaleBand(yScale) && isScaleContinuous(xScale)) {
       // do nothing
     } else {
       throw new Error("Unsupported case of scales");

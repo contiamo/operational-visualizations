@@ -57,7 +57,7 @@ export const isScaleBand = (unknownScale: ScaleAny): unknownScale is ScaleBand<s
   return "paddingInner" in unknownScale;
 };
 
-export const isScaleContinious = (
+export const isScaleContinuous = (
   unknownScale: ScaleAny,
 ): unknownScale is ScaleLinear<number, number> | ScaleTime<any, any> => {
   return "invert" in unknownScale;

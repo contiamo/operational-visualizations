@@ -13,10 +13,18 @@ export const fillHoles = (
   xScale: ScaleBand<string> | ScaleLinear<number, number>,
   yScale: ScaleBand<string> | ScaleLinear<number, number>,
 ) => {
+  if (isScaleBand(xScale) && isScaleBand(yScale)) {
+    throw new Error("Unsupported case of scales");
+  }
   const xTicks = isScaleBand(xScale) ? xScale.domain() : [];
   const yTicks = isScaleBand(yScale) ? yScale.domain() : [];
 
   // TODO: check if arrays of the same length and don't try to "fill holes"
+  // if (data instanceof FragmentFrame) {
+  //   const [, , index] = data[getData]();
+  //   if (index.length === (xTicks.length || yTicks.length)) return data;
+  // }
+
   // TODO: this algorithm doesn't work with "unsorted" data
   let offset = 0;
   return xTicks.length > 0
