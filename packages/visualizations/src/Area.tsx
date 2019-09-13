@@ -1,10 +1,28 @@
 import { area, line } from "d3-shape";
-import React from "react";
+import React, { useMemo } from "react";
 import { useChartTransform } from "./Chart";
 import { LinearAxialChart } from "./types";
-import { isFunction } from "./utils";
+import { isFunction, fillHoles } from "./utils";
 import { baseStyle as baseLabelStyle, verticalStyle as verticalLabelStyle } from "./Labels";
 import { isScaleBand, isScaleContinious } from "./scale";
+import { GroupFrame, ColumnCursor } from "@operational/frame";
+import { ScaleBand, ScaleLinear } from "d3-scale";
+
+const useFillHoles = (
+  data: GroupFrame<string>,
+  x: ColumnCursor<string>,
+  y: ColumnCursor<string>,
+  xScale: ScaleBand<string> | ScaleLinear<number, number>,
+  yScale: ScaleBand<string> | ScaleLinear<number, number>,
+) =>
+  useMemo(
+    () =>
+      data.map(grouped => ({
+        data: fillHoles(grouped, x, y, xScale, yScale),
+        firstRow: grouped.row(0),
+      })),
+    [data, x, y, xScale, yScale],
+  );
 
 export const Area: LinearAxialChart<string> = ({ data, transform, x, y, xScale, yScale, stack, showLabels, style }) => {
   const defaultTransform = useChartTransform();
@@ -12,6 +30,8 @@ export const Area: LinearAxialChart<string> = ({ data, transform, x, y, xScale, 
   const accumulatedCache: Record<string, number> = {};
 
   const isDefined = (value: number | undefined) => value !== undefined;
+
+  const dataWithMissing = useFillHoles(data.groupBy(stack || []), x, y, xScale, yScale);
 
   if (isScaleBand(xScale) && isScaleContinious(yScale)) {
     // The categorical scale must be a band scale for composability with bar charts.
@@ -31,40 +51,19 @@ export const Area: LinearAxialChart<string> = ({ data, transform, x, y, xScale, 
       .x(d => categoricalTickWidth / 2 + (xScale(d.c) || 0))
       .y(d => yScale(d.m1));
 
-    const missingDatum = (tick: string) => {
-      const d = [];
-      d[x.index] = tick;
-      d[y.index] = undefined;
-      return d;
-    };
-
-    const stackedData = data.groupBy(stack || []).map(grouped => {
-      const rawPathData = grouped.mapRows(row => row);
-
-      // Add missing data
-      const ticks = xScale.domain();
-      const dataWithMissing = ticks
-        .map(tick => {
-          const datum = rawPathData.find(d => x(d) === tick);
-          return datum || missingDatum(tick);
-        })
-        .sort(d => ticks.indexOf(x(d)));
-
-      // Stack
-      return {
-        data: dataWithMissing.map(row => {
-          const metricValue = y(row);
-          const accumulatedValue = accumulatedCache[x(row)] || 0;
-          accumulatedCache[x(row)] = accumulatedValue + (metricValue || 0);
-          return {
-            c: x(row),
-            m0: accumulatedValue,
-            m1: isDefined(metricValue) ? accumulatedValue + metricValue : undefined,
-          };
-        }),
-        firstRow: grouped.row(0),
-      };
-    });
+    const stackedData = dataWithMissing.map(row => ({
+      data: row.data.map(row => {
+        const metricValue = y(row);
+        const accumulatedValue = accumulatedCache[x(row)] || 0;
+        accumulatedCache[x(row)] = accumulatedValue + (metricValue || 0);
+        return {
+          c: x(row),
+          m0: accumulatedValue,
+          m1: isDefined(metricValue) ? accumulatedValue + metricValue : undefined,
+        };
+      }),
+      firstRow: row.firstRow,
+    }));
 
     return (
       <g transform={transform || defaultTransform}>
@@ -116,40 +115,19 @@ export const Area: LinearAxialChart<string> = ({ data, transform, x, y, xScale, 
       .x(d => xScale(d.m1))
       .y(d => categoricalTickWidth / 2 + (yScale(d.c) || 0));
 
-    const missingDatum = (tick: string) => {
-      const d = [];
-      d[y.index] = tick;
-      d[x.index] = undefined;
-      return d;
-    };
-
-    const stackedData = data.groupBy(stack || []).map(grouped => {
-      const rawPathData = grouped.mapRows(row => row);
-
-      // Add missing data
-      const ticks = yScale.domain();
-      const dataWithMissing = ticks
-        .map(tick => {
-          const datum = rawPathData.find(d => y(d) === tick);
-          return datum || missingDatum(tick);
-        })
-        .sort(d => ticks.indexOf(y(d)));
-
-      // Stack
-      return {
-        data: dataWithMissing.map(row => {
-          const metricValue = x(row);
-          const accumulatedValue = accumulatedCache[y(row)] || 0;
-          accumulatedCache[y(row)] = accumulatedValue + (metricValue || 0);
-          return {
-            c: y(row),
-            m0: accumulatedValue,
-            m1: isDefined(metricValue) ? accumulatedValue + metricValue : undefined,
-          };
-        }),
-        firstRow: grouped.row(0),
-      };
-    });
+    const stackedData = dataWithMissing.map(row => ({
+      data: row.data.map(row => {
+        const metricValue = x(row);
+        const accumulatedValue = accumulatedCache[y(row)] || 0;
+        accumulatedCache[y(row)] = accumulatedValue + (metricValue || 0);
+        return {
+          c: y(row),
+          m0: accumulatedValue,
+          m1: isDefined(metricValue) ? accumulatedValue + metricValue : undefined,
+        };
+      }),
+      firstRow: row.firstRow,
+    }));
 
     return (
       <g transform={transform || defaultTransform}>
