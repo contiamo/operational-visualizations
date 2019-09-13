@@ -11,7 +11,7 @@ describe("isScaleBand()", () => {
 });
 
 describe("isScaleContinuous()", () => {
-  it("detects ScaleContinious", () => {
+  it("detects ScaleContinuous", () => {
     const scaleB = scaleBand().domain(["0", "1"]);
     const scaleL = scaleLinear().domain([0, 1]);
     expect(isScaleContinuous(scaleB)).toEqual(false);
