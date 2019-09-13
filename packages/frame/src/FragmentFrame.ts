@@ -42,10 +42,6 @@ export class FragmentFrame<Name extends string = string> implements IterableFram
     return this.index.map((i, j) => callback(this.data[i], j));
   }
 
-  public map<A>(callback: (row: RowCursor, index: number) => A) {
-    return this.index.map((i, j) => callback(this.data[i], j));
-  }
-
   public row(rowIndex: number) {
     return this.data[this.index[rowIndex]];
   }
