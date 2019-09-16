@@ -105,7 +105,7 @@ type Props<Name extends string = string> = (TextOnlyPivotGridProps<Name> | Gener
 
 ## Decision
 
-We want to refuse from static check and instead rely on dynamic type check for charts:
+We want to avoid a static check and instead rely on dynamic type checking for charts:
 
 ```tsx
 export const Bars: DiscreteAxialChart<string> = ({ xScale, yScale }) => {
