@@ -8,7 +8,7 @@ Date: 2019-07-11
 
 ## Context
 
-We planned to use so called [render prop](https://reactjs.org/docs/render-props.html) patter to be abled to swap out content of cells (or headers, or axes) in `PivotGrid`.
+We planned to use so called [render prop](https://reactjs.org/docs/render-props.html) pattern to be able to swap out content of cells (or headers, or axes) in `PivotGrid`.
 
 Then we discovered that we need code like this:
 
@@ -35,7 +35,7 @@ const axes = {
 };
 ```
 
-but we can't use hooks inside render prop, so we [decided to switch from hooks to components](https://github.com/contiamo/operational-visualizations/pull/87).
+but we can't use hooks inside the render prop, so we [decided to switch from hooks to components](https://github.com/contiamo/operational-visualizations/pull/87).
 
 Then we discovered that we need code like this:
 

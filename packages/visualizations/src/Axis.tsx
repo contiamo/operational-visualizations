@@ -6,7 +6,7 @@ import { useAxisTransform } from "./Chart";
 
 export interface AxisProps {
   /** see  https://github.com/d3/d3-scale */
-  scale: ScaleBand<any> | ScaleLinear<any, any>; // AxisScale<Domain>;
+  scale: ScaleBand<any> | ScaleLinear<number, number>; // AxisScale<Domain>;
   // left | right | bottom | top
   position: "left" | "right" | "bottom" | "top";
   /** see https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform */

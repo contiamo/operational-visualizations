@@ -3,7 +3,6 @@ import { storiesOf } from "@storybook/react";
 import { DataFrame } from "@operational/frame";
 import {
   Area,
-  AxialChartProps,
   Axis,
   Chart,
   ChartProps,
@@ -11,39 +10,39 @@ import {
   useScaleBand,
   useScaleLinear,
   Bars,
-  Labels
+  Labels,
 } from "@operational/visualizations";
 
 const rawData = {
   columns: [
     {
       name: "Customer.Continent" as "Customer.Continent",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.Country" as "Customer.Country",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.City" as "Customer.City",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.AgeGroup" as "Customer.AgeGroup",
-      type: "string"
+      type: "string",
     },
     {
       name: "Customer.Gender" as "Customer.Gender",
-      type: "string"
+      type: "string",
     },
     {
       name: "sales" as "sales",
-      type: "number"
+      type: "number",
     },
     {
       name: "revenue" as "revenue",
-      type: "number"
-    }
+      type: "number",
+    },
   ],
   rows: [
     ["Europe", "Germany", "Berlin", "<50", "Female", 101, 10.2],
@@ -52,8 +51,8 @@ const rawData = {
     ["Europe", "UK", "London", "<50", "Female", 401, 40.2],
     ["Europe", "UK", "Edinburgh", "<50", "Female", 501, 50.2],
     ["North America", "USA", "New York", "<50", "Female", 801, 80.2],
-    ["North America", "Canada", "Toronto", "<50", "Female", 801, 80.2]
-  ]
+    ["North America", "Canada", "Toronto", "<50", "Female", 801, 80.2],
+  ],
 };
 
 const frame = new DataFrame(rawData.columns, rawData.rows);
@@ -65,7 +64,7 @@ interface MixedChartProps<Name extends string> {
   data: DataFrame<Name>;
   categorical: Name;
   metric: Name;
-  metricDirection: AxialChartProps<string>["metricDirection"];
+  metricDirection: "horizontal" | "vertical";
 }
 
 /**
@@ -78,74 +77,60 @@ const MixedChart = <Name extends string>({
   data,
   categorical,
   metric,
-  metricDirection
+  metricDirection,
 }: MixedChartProps<Name>) => {
+  const isVertical = metricDirection === "vertical";
   const categoricalScale = useScaleBand({
     frame: data,
     column: data.getCursor(categorical),
-    range: metricDirection === "vertical" ? [0, width] : [0, height]
+    range: isVertical ? [0, width] : [0, height],
   });
   const metricScale = useScaleLinear({
     frame: data,
     column: data.getCursor(metric),
-    range: metricDirection === "vertical" ? [height, 0] : [0, width]
+    range: isVertical ? [height, 0] : [0, width],
   });
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
 
   return (
-    <Chart
-      width={width}
-      height={height}
-      margin={margin}
-      style={{ background: "#fff" }}
-    >
+    <Chart width={width} height={height} margin={margin} style={{ background: "#fff" }}>
       <Area
-        metricDirection={metricDirection}
         data={data}
-        categorical={categoricalCursor}
-        metric={metricCursor}
-        categoricalScale={categoricalScale}
-        metricScale={metricScale}
+        x={isVertical ? categoricalCursor : metricCursor}
+        y={isVertical ? metricCursor : categoricalCursor}
+        xScale={isVertical ? categoricalScale : metricScale}
+        yScale={isVertical ? metricScale : categoricalScale}
         style={{ fill: "#ddd" }}
       />
       {data.groupBy([categoricalCursor]).map((grouped, i) => (
         <Bars
           key={i}
-          metricDirection={metricDirection}
           data={grouped}
-          categorical={categoricalCursor}
-          metric={metricCursor}
-          categoricalScale={categoricalScale}
-          metricScale={metricScale}
+          x={isVertical ? categoricalCursor : metricCursor}
+          y={isVertical ? metricCursor : categoricalCursor}
+          xScale={isVertical ? categoricalScale : metricScale}
+          yScale={isVertical ? metricScale : categoricalScale}
           style={{ fill: "#1499CE" }}
         />
       ))}
       <Line
-        metricDirection={metricDirection}
         data={data}
-        categorical={categoricalCursor}
-        metric={metricCursor}
-        categoricalScale={categoricalScale}
-        metricScale={metricScale}
+        x={isVertical ? categoricalCursor : metricCursor}
+        y={isVertical ? metricCursor : categoricalCursor}
+        xScale={isVertical ? categoricalScale : metricScale}
+        yScale={isVertical ? metricScale : categoricalScale}
         style={{ stroke: "#7C246F" }}
       />
       <Labels
-        metricDirection={metricDirection}
         data={data}
-        categorical={categoricalCursor}
-        metric={metricCursor}
-        categoricalScale={categoricalScale}
-        metricScale={metricScale}
+        x={isVertical ? categoricalCursor : metricCursor}
+        y={isVertical ? metricCursor : categoricalCursor}
+        xScale={isVertical ? categoricalScale : metricScale}
+        yScale={isVertical ? metricScale : categoricalScale}
       />
-      <Axis
-        scale={categoricalScale}
-        position={metricDirection === "vertical" ? "bottom" : "left"}
-      />
-      <Axis
-        scale={metricScale}
-        position={metricDirection === "vertical" ? "left" : "bottom"}
-      />
+      <Axis scale={categoricalScale} position={isVertical ? "bottom" : "left"} />
+      <Axis scale={metricScale} position={isVertical ? "left" : "bottom"} />
     </Chart>
   );
 };

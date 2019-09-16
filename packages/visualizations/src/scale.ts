@@ -51,14 +51,14 @@ export const useScale = <Name extends string>({
     [frame, column, range, padding, type],
   );
 
-type ScaleAny = ScaleBand<any> | ScaleTime<any, any> | ScaleLinear<any, any>;
+type ScaleAny = ScaleBand<string> | ScaleTime<any, any> | ScaleLinear<number, number>;
 
-export const isScaleBand = (unknownScale: ScaleAny): unknownScale is ScaleBand<any> => {
+export const isScaleBand = (unknownScale: ScaleAny): unknownScale is ScaleBand<string> => {
   return "paddingInner" in unknownScale;
 };
 
-export const isScaleContinious = (
+export const isScaleContinuous = (
   unknownScale: ScaleAny,
-): unknownScale is ScaleLinear<any, any> | ScaleTime<any, any> => {
+): unknownScale is ScaleLinear<number, number> | ScaleTime<any, any> => {
   return "invert" in unknownScale;
 };

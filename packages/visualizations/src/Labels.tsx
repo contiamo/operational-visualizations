@@ -3,6 +3,7 @@ import { useChartTransform } from "./Chart";
 import { DiscreteAxialChart } from "./types";
 import { isFunction } from "./utils";
 import theme from "./theme";
+import { isScaleBand, isScaleContinuous } from "./scale";
 
 export const baseStyle: React.CSSProperties = {
   fontSize: theme.font.size.small,
@@ -11,61 +12,54 @@ export const baseStyle: React.CSSProperties = {
 
 export const verticalStyle: React.CSSProperties = {
   ...baseStyle,
-  textAnchor: "middle"
+  textAnchor: "middle",
 };
 
-export const Labels: DiscreteAxialChart<string> = props => {
+export const Labels: DiscreteAxialChart<string> = ({ data, transform, x, y, xScale, yScale, style }) => {
   const defaultTransform = useChartTransform();
-  const {
-    data,
-    transform,
-    metric,
-    categorical,
-    metricScale,
-    categoricalScale,
-    metricDirection,
-    style
-  } = props;
-  const bandWidth = categoricalScale.bandwidth();
 
-  if (metricDirection === "vertical") {
+  if (isScaleBand(xScale) && isScaleContinuous(yScale)) {
+    const bandWidth = xScale.bandwidth();
     return (
       <g transform={transform || defaultTransform}>
         {data.mapRows((row, i) => (
           <text
-            x={categoricalScale(categorical(row))! + bandWidth / 2}
-            y={metricScale(metric(row))}
+            x={(xScale(x(row)) || 0) + bandWidth / 2}
+            y={yScale(y(row))}
             dy="-0.35em"
             style={{
               ...verticalStyle,
-              ...(isFunction(style) ? style(row, i) : style)
+              ...(isFunction(style) ? style(row, i) : style),
             }}
             key={i}
           >
-            {metric(row)}
+            {y(row)}
+          </text>
+        ))}
+      </g>
+    );
+  } else if (isScaleBand(yScale) && isScaleContinuous(xScale)) {
+    const bandWidth = yScale.bandwidth();
+    return (
+      <g transform={transform || defaultTransform}>
+        {data.mapRows((row, i) => (
+          <text
+            x={xScale(x(row))}
+            y={(yScale(y(row)) || 0) + bandWidth / 2}
+            dx="0.35em"
+            dy="0.35em"
+            style={{
+              ...baseStyle,
+              ...(isFunction(style) ? style(row, i) : style),
+            }}
+            key={i}
+          >
+            {x(row)}
           </text>
         ))}
       </g>
     );
   } else {
-    return (
-      <g transform={transform || defaultTransform}>
-        {data.mapRows((row, i) => (
-          <text
-            x={metricScale(metric(row))}
-            y={categoricalScale(categorical(row))! + bandWidth / 2}
-            dx="0.35em"
-            dy="0.35em"
-            style={{
-              ...baseStyle,
-              ...(isFunction(style) ? style(row, i) : style)
-            }}
-            key={i}
-          >
-            {metric(row)}
-          </text>
-        ))}
-      </g>
-    );
+    throw new Error("Unsupported case of scales");
   }
 };

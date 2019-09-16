@@ -3,7 +3,6 @@ import { storiesOf } from "@storybook/react";
 import { DataFrame, RowCursor } from "@operational/frame";
 import {
   Area,
-  AxialChartProps,
   Axis,
   Chart,
   ChartProps,
@@ -207,7 +206,7 @@ interface AreaChartProps<Name extends string> {
   data: DataFrame<Name>;
   categorical: Name;
   metric: Name;
-  metricDirection: AxialChartProps<string>["metricDirection"];
+  metricDirection: "horizontal" | "vertical";
   colorBy?: Name[];
   stackBy?: Name[];
 }
@@ -226,6 +225,7 @@ const AreaChart = <Name extends string>({
   colorBy,
   stackBy,
 }: AreaChartProps<Name>) => {
+  const isVertical = metricDirection === "vertical";
   const categoricalCursor = data.getCursor(categorical);
   const metricCursor = data.getCursor(metric);
   const stackByCursors = (stackBy || []).map(x => data.getCursor(x));
@@ -236,12 +236,12 @@ const AreaChart = <Name extends string>({
   const categoricalScale = useScaleBand({
     frame: data,
     column: categoricalCursor,
-    range: metricDirection === "horizontal" ? [0, height] : [0, width],
+    range: !isVertical ? [0, height] : [0, width],
   });
   const metricScale = useScaleLinear({
     frame: data.groupBy([categoricalCursor]),
     column: metricCursor,
-    range: metricDirection === "horizontal" ? [0, width] : [height, 0],
+    range: !isVertical ? [0, width] : [height, 0],
   });
 
   const colorScale = useColorScale(data, colorByCursors);
@@ -253,21 +253,21 @@ const AreaChart = <Name extends string>({
         {frame.map((grouped, i) => (
           <Area
             key={i}
-            metricDirection={metricDirection}
             data={grouped}
-            categorical={categoricalCursor}
-            metric={metricCursor}
             stack={stackByCursors}
-            categoricalScale={categoricalScale}
-            metricScale={metricScale}
+            x={isVertical ? categoricalCursor : metricCursor}
+            y={isVertical ? metricCursor : categoricalCursor}
+            xScale={isVertical ? categoricalScale : metricScale}
+            yScale={isVertical ? metricScale : categoricalScale}
             showLabels={true}
-            style={(row: RowCursor) => ({ fill: colorScale(row), stroke: colorScale(row) })}
+            style={(row: RowCursor) => ({
+              fill: colorScale(row),
+              stroke: colorScale(row),
+            })}
           />
         ))}
-        <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
-        ))}
-        <Axis scale={categoricalScale} position={metricDirection === "vertical" ? "bottom" : "left"} />
-        <Axis scale={metricScale} position={metricDirection === "vertical" ? "left" : "bottom"} />
+        <Axis scale={categoricalScale} position={isVertical ? "bottom" : "left"} />
+        <Axis scale={metricScale} position={isVertical ? "left" : "bottom"} />
       </Chart>
     </div>
   );

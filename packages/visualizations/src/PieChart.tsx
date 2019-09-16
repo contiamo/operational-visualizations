@@ -10,7 +10,7 @@ interface PieChartProps<Name extends string> {
   height: number;
   data: IterableFrame<Name>;
   metric: ColumnCursor<Name>;
-  showLabels: boolean;
+  showLabels?: boolean;
   transform?: React.SVGAttributes<SVGRectElement>["transform"];
   style?:
     | React.SVGAttributes<SVGGElement>["style"]
@@ -23,8 +23,12 @@ export const PieChart = (props: PieChartProps<string>) => {
   const { data, width, height, metric, showLabels, transform, style } = props;
   const pieData = pie<RowCursor>().value(metric)(data.mapRows(row => row));
   const radius = Math.min(width, height) / 2;
-  const segmentArc = arc<PieArcDatum<RowCursor>>().innerRadius(0).outerRadius(radius);
-  const segmentArcForLabel = arc<PieArcDatum<RowCursor>>().innerRadius(0.7 * radius).outerRadius(radius);
+  const segmentArc = arc<PieArcDatum<RowCursor>>()
+    .innerRadius(0)
+    .outerRadius(radius);
+  const segmentArcForLabel = arc<PieArcDatum<RowCursor>>()
+    .innerRadius(0.7 * radius)
+    .outerRadius(radius);
 
   return (
     <g transform={transform || defaultTransform}>
@@ -38,19 +42,21 @@ export const PieChart = (props: PieChartProps<string>) => {
                 d={segmentArc(datum) || ""}
                 style={isFunction(style) ? style(datum.data, i) : style}
               />
-              {showLabels && <text
-                x={labelPosition[0]}
-                y={labelPosition[1]}
-                style={{
-                  ...verticalLabelStyle,
-                  fill: "white",
-                }}
-                key={`label-${i}`}
-              >
-                {datum.value}
-              </text>}
+              {showLabels && (
+                <text
+                  x={labelPosition[0]}
+                  y={labelPosition[1]}
+                  style={{
+                    ...verticalLabelStyle,
+                    fill: "white",
+                  }}
+                  key={`label-${i}`}
+                >
+                  {datum.value}
+                </text>
+              )}
             </>
-          )
+          );
         })}
       </g>
     </g>
