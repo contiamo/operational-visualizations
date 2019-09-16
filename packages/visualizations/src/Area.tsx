@@ -6,7 +6,7 @@ import { isFunction } from "./utils";
 import { baseStyle as baseLabelStyle, verticalStyle as verticalLabelStyle } from "./Labels";
 import { ColumnCursor } from "@operational/frame";
 import { isScaleBand, isScaleContinuous } from "./scale";
-import { ScaleBand } from "d3-scale";
+import { ScaleBand, ScaleLinear } from "d3-scale";
 
 const isDefined = (value: number | undefined) => value !== undefined;
 
@@ -16,14 +16,17 @@ export const Area: LinearAxialChart<string> = ({ data, transform, x, y, xScale, 
   let categorical: ColumnCursor<string>;
   let metric: ColumnCursor<string>;
   let categoricalScale: ScaleBand<string>;
+  let metricScale: ScaleLinear<number, number>;
   if (isScaleBand(xScale) && isScaleContinuous(yScale)) {
     categorical = x;
     metric = y;
     categoricalScale = xScale;
+    metricScale = yScale;
   } else if (isScaleBand(yScale) && isScaleContinuous(xScale)) {
     categorical = y;
     metric = x;
     categoricalScale = yScale;
+    metricScale = xScale;
   } else {
     throw new Error("Unsupported case of scales");
   }
@@ -49,21 +52,21 @@ export const Area: LinearAxialChart<string> = ({ data, transform, x, y, xScale, 
   // `m0` and `m1` are the lower and upper metric values
   const path = isScaleBand(xScale)
     ? area<{ c: string; m0: number; m1: number }>()
-        .x(d => categoricalTickWidth / 2 + (xScale(d.c) || 0))
-        .y0(d => yScale(d.m0 as any) as number)
-        .y1(d => yScale(d.m1 as any) as number)
+        .x(d => categoricalTickWidth / 2 + (categoricalScale(d.c) || 0))
+        .y0(d => metricScale(d.m0))
+        .y1(d => metricScale(d.m1))
     : area<{ c: string; m0: number; m1: number }>()
-        .x0(d => xScale(d.m0))
-        .x1(d => xScale(d.m1))
-        .y(d => categoricalTickWidth / 2 + (yScale(d.c as any) || 0));
+        .x0(d => metricScale(d.m0))
+        .x1(d => metricScale(d.m1))
+        .y(d => categoricalTickWidth / 2 + (categoricalScale(d.c) || 0));
 
   const strokePath = isScaleBand(xScale)
     ? line<{ c: string; m0: number; m1: number }>()
-        .x(d => categoricalTickWidth / 2 + (xScale(d.c) || 0))
-        .y(d => yScale(d.m1 as any) as number)
+        .x(d => categoricalTickWidth / 2 + (categoricalScale(d.c) || 0))
+        .y(d => metricScale(d.m1))
     : line<{ c: string; m0: number; m1: number }>()
-        .x(d => xScale(d.m1))
-        .y(d => categoricalTickWidth / 2 + (yScale(d.c as any) || 0));
+        .x(d => metricScale(d.m1))
+        .y(d => categoricalTickWidth / 2 + (categoricalScale(d.c) || 0));
 
   const stackedData = data.groupBy(stack || []).map(grouped => {
     const rawPathData = grouped.mapRows(row => row);

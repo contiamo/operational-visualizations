@@ -119,7 +119,7 @@ export const Bars: DiscreteAxialChart<string> = ({ xScale, yScale }) => {
 };
 ```
 
-There is a chance that visualusation can crash at runtime in user's face. We can be more graceful about this and replace `throw` with `return "Error"` in production mode.
+There is a chance that the visualisation can crash at runtime in the user's face. We can be more graceful about this and replace `throw` with `return "Error"` in production mode.
 
 Maybe later we will do the same change for `PivotGrid`.
 
