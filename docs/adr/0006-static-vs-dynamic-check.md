@@ -22,7 +22,7 @@ export type BaseAxialChartProps<Name extends string> =
     };
 ```
 
-But this won't work, because TS can't work with disjoint union without actual tag, so we need to add tag (`metricDirection`):
+But this won't work, because TS can't work with disjoint union without actual discriminant, so we need to add tag (`metricDirection`):
 
 ```ts
 export type BaseAxialChartProps<Name extends string> =
@@ -57,7 +57,7 @@ export interface DotsProps<Name extends string> {
 }
 ```
 
-And now we want to refactor all chart to have consistent interface, so it would be easy to interchnage them.
+And now we want to refactor all chart to have consistent interface, so it would be easy to interchange them.
 
 Pretty similar thing happens in `PivotGrid`:
 
@@ -119,7 +119,7 @@ export const Bars: DiscreteAxialChart<string> = ({ xScale, yScale }) => {
 };
 ```
 
-There is a chance that visualusation can crash at runtime in user's face. We can be more gracefull about this and replace `throw` with `return "Error"` in production mode.
+There is a chance that visualusation can crash at runtime in user's face. We can be more graceful about this and replace `throw` with `return "Error"` in production mode.
 
 Maybe later we will do the same change for `PivotGrid`.
 

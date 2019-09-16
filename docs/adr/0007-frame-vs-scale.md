@@ -61,7 +61,7 @@ This is wrong, instead it should look like:
 
 ### uniqueValues solution
 
-The only solution I see is to sort Frame by the same values we use for groupuing and for graphing (e.g. in this case we would sor by age and city). This way we can sort unique values as well:
+The only solution I see is to sort Frame by the same values we use for grouping and for graphing (e.g. in this case we would sort by age and city). This way we can sort unique values as well:
 
 ```js
 cacheItem.unique = [...unique].sort();
