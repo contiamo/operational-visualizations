@@ -11,7 +11,7 @@ Date: 2019-09-13
 When we draw charts we iterate over the frame, as the result there are some issues with continuous charts (Line, Area):
 
 - it will draw lines in case of missing data (to prevent this we added special code)
-- there is a chance it will draw a "knot", because **there is no guarantee that points in Scale and in Frame are in the same order**
+- there is a chance it will draw a "twist" (or tangle, or knot), because **there is no guarantee that points in Scale and in Frame are in the same order**
 
 This is the same issue as reported in [#94](https://github.com/contiamo/operational-visualizations/issues/94).
 
@@ -21,17 +21,17 @@ BandScale is built from unqiue values of the frame (`uniqueValues(frame, column)
 
 | age  | city    |
 | ---- | ------- |
-| < 50 | Berlin  |
+| < 50 | Dresden |
 | < 50 | London  |
-| > 50 | Dresden |
 | > 50 | Berlin  |
+| > 50 | Dresden |
 
-Unqiue values of the frame: `Berlin, London, Dresden`. But if we would group frame by `age` and take each fragment separately
+Unqiue values of the frame: `Dresden, London, Berlin`. But if we would group frame by `age` and take each fragment separately
 
-- `< 50`: `Berlin, London`
-- `> 50`: `Dresden, Berlin` (vs scale's `Berlin, London, Dresden`)
+- `< 50`: `Dresden, London`
+- `> 50`: `Berlin, Dresden` (vs scale's `Dresden, London, Berlin`)
 
-If we would iterate over the Frame and oreder of points in Scale and Frame is different (as example above), we would get "knot":
+If we would iterate over the Frame and oreder of points in Scale and Frame is different (as example above), we would get "twist":
 
 ```
 ^              3        4
