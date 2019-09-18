@@ -16,7 +16,7 @@ export interface AxisProps {
   maxNumberOfTicks?: number;
 }
 
-export const Axis: React.FC<AxisProps> = React.memo(({ scale, transform, position, maxNumberOfTicks = 10 }) => {
+export const Axis: React.FC<AxisProps> = React.memo(({ scale, transform, position, maxNumberOfTicks }) => {
   const defaultTransform = useAxisTransform(position!);
   const ref = useRef<SVGGElement>(null);
   useEffect(() => {
@@ -24,7 +24,7 @@ export const Axis: React.FC<AxisProps> = React.memo(({ scale, transform, positio
       const nTicks = (isScaleContinuous(scale) ? scale.ticks() : scale.domain()).length;
       const formatter = isScaleContinuous(scale) ? d3Format("~s") : (d: any) => d;
       const tickFormat =
-        nTicks > maxNumberOfTicks
+        maxNumberOfTicks !== undefined && nTicks > maxNumberOfTicks
           ? (d: any, i: number) => (i % maxNumberOfTicks === 0 ? formatter(d) : null)
           : formatter;
 
