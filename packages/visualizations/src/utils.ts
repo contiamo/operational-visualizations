@@ -4,15 +4,19 @@ export const isFunction = (x: any): x is Function => x instanceof Function;
 
 export const joinArrayAsString = (array: any[]) => (array || []).join(" / ");
 
+const removeTrailingZeros = (val: string) => {
+  return val.replace(/0*$/g, "").replace(/\.$/, "");
+};
+
 export const numberFormatter = (val: number) => {
   if (Math.abs(val) > 100) {
-    return d3Format(",.0f");
+    return removeTrailingZeros(d3Format(",.0f")(val));
   }
   if (Math.abs(val) > 10) {
-    return d3Format(",.1f");
+    return removeTrailingZeros(d3Format(",.1f")(val));
   }
-  if (Math.abs(val) > 0) {
-    return d3Format(",.2f");
+  if (Math.abs(val) > 1) {
+    return removeTrailingZeros(d3Format(",.2f")(val));
   }
-  return d3Format(".,3f");
+  return removeTrailingZeros(d3Format(",.3f")(val));
 };
