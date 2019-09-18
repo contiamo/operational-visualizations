@@ -1,7 +1,7 @@
 import React from "react";
 import { useChartTransform } from "./Chart";
 import { DiscreteAxialChart } from "./types";
-import { isFunction } from "./utils";
+import { isFunction, numberFormatter } from "./utils";
 import theme from "./theme";
 import { isScaleBand, isScaleContinuous } from "./scale";
 
@@ -17,7 +17,6 @@ export const verticalStyle: React.CSSProperties = {
 
 export const Labels: DiscreteAxialChart<string> = ({ data, transform, x, y, xScale, yScale, style }) => {
   const defaultTransform = useChartTransform();
-
   if (isScaleBand(xScale) && isScaleContinuous(yScale)) {
     const bandWidth = xScale.bandwidth();
     return (
@@ -33,7 +32,7 @@ export const Labels: DiscreteAxialChart<string> = ({ data, transform, x, y, xSca
             }}
             key={i}
           >
-            {y(row)}
+            {numberFormatter(y(row))}
           </text>
         ))}
       </g>
@@ -54,7 +53,7 @@ export const Labels: DiscreteAxialChart<string> = ({ data, transform, x, y, xSca
             }}
             key={i}
           >
-            {x(row)}
+            {numberFormatter(x(row))}
           </text>
         ))}
       </g>

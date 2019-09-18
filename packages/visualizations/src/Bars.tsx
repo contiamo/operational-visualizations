@@ -1,7 +1,7 @@
 import React from "react";
 import { useChartTransform } from "./Chart";
 import { DiscreteAxialChart } from "./types";
-import { isFunction } from "./utils";
+import { isFunction, numberFormatter } from "./utils";
 import { baseStyle as baseLabelStyle, verticalStyle as verticalLabelStyle } from "./Labels";
 import { isScaleBand, isScaleContinuous } from "./scale";
 
@@ -37,7 +37,7 @@ export const Bars: DiscreteAxialChart<string> = ({ data, transform, x, y, xScale
               style={verticalLabelStyle}
               key={`label-${i}`}
             >
-              {y(row)}
+              {numberFormatter(y(row))}
             </text>
           );
           labels.push(label);
@@ -75,7 +75,7 @@ export const Bars: DiscreteAxialChart<string> = ({ data, transform, x, y, xScale
               style={baseLabelStyle}
               key={`label-${i}`}
             >
-              {x(row)}
+              {numberFormatter(x(row))}
             </text>
           );
           labels.push(label);

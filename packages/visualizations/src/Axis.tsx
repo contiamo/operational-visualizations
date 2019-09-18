@@ -1,4 +1,5 @@
 import { axisBottom, axisLeft, axisTop, axisRight } from "d3-axis";
+import { format as d3Format } from "d3-format";
 import { ScaleBand, ScaleLinear } from "d3-scale";
 import { select } from "d3-selection";
 import React, { useEffect, useRef } from "react";
@@ -20,9 +21,13 @@ export const Axis: React.FC<AxisProps> = React.memo(({ scale, transform, positio
   const ref = useRef<SVGGElement>(null);
   useEffect(() => {
     if (ref.current) {
-      const ticks = (isScaleContinuous(scale) ? scale.ticks() : scale.domain()).length;
+      const nTicks = (isScaleContinuous(scale) ? scale.ticks() : scale.domain()).length;
+      const formatter = isScaleContinuous(scale) ? d3Format("~s") : (d: any) => d;
       const tickFormat =
-        ticks > maxNumberOfTicks ? (d: any, i: number) => (i % maxNumberOfTicks === 0 ? d : null) : (d: any) => d;
+        nTicks > maxNumberOfTicks
+          ? (d: any, i: number) => (i % maxNumberOfTicks === 0 ? formatter(d) : null)
+          : formatter;
+
       switch (position) {
         case "bottom":
           select(ref.current).call(axisBottom(scale).tickFormat(tickFormat));
