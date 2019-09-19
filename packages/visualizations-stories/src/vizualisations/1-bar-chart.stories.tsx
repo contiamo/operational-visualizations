@@ -46,13 +46,13 @@ const rawData = {
     },
   ],
   rows: [
-    ["Europe", "Germany", "Berlin", "<50", "Female", 1001, 10.2],
-    ["Europe", "Germany", "Dresden", "<50", "Female", 2001, 20.2],
-    ["Europe", "Germany", "Hamburg", "<50", "Female", 3001, 30.2],
-    ["Europe", "UK", "London", "<50", "Female", 4001, 40.2],
-    ["Europe", "UK", "Edinburgh", "<50", "Female", 5001, 50.2],
-    ["North America", "USA", "New York", "<50", "Female", 8001, 80.2],
-    ["North America", "Canada", "Toronto", "<50", "Female", 8001, 80.2],
+    ["Europe", "Germany", "Berlin", "<50", "Female", 10000001, 10.2],
+    ["Europe", "Germany", "Dresden", "<50", "Female", 20000001, 20.2],
+    ["Europe", "Germany", "Hamburg", "<50", "Female", 30000001, 30.2],
+    ["Europe", "UK", "London", "<50", "Female", 40000001, 40.2],
+    ["Europe", "UK", "Edinburgh", "<50", "Female", 50000001, 50.2],
+    ["North America", "USA", "New York", "<50", "Female", 80000001, 80.2],
+    ["North America", "Canada", "Toronto", "<50", "Female", 80000001, 80.2],
   ],
 };
 
@@ -150,7 +150,7 @@ const BarChart = <Name extends string>({
 storiesOf("@operational/visualizations/1. Bar chart", module)
   .add("horizontal", () => {
     // number of pixels picked manually to make sure that YAxis fits on the screen
-    const magicMargin = [5, 30, 20, 60] as ChartProps["margin"];
+    const magicMargin = [5, 60, 20, 60] as ChartProps["margin"];
 
     return (
       <BarChart
