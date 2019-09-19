@@ -42,6 +42,7 @@ const getTickSpacing = (scale: AxisProps["scale"]) => {
   return (range[1] - range[0]) / nTicks;
 };
 
+// Truncate axis tick labels where necessary and append ellipsis to denote truncation.
 const wrap = (ctx: BaseType, maxWidth: number) => {
   const textEl = select(ctx);
   let text = textEl.text();
