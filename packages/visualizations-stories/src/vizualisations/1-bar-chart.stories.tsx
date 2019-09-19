@@ -136,7 +136,11 @@ const BarChart = <Name extends string>({
             style={(row: RowCursor) => ({ fill: colorScale(row) })}
           />
         ))}
-        <Axis scale={categoricalScale} position={!isVertical ? "left" : "bottom"} />
+        <Axis
+          scale={categoricalScale}
+          position={!isVertical ? "left" : "bottom"}
+          maxNumberOfTicks={isVertical ? 4 : undefined}
+        />
         <Axis scale={metricScale} position={!isVertical ? "bottom" : "left"} />
       </Chart>
     </div>

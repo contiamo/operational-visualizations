@@ -23,17 +23,22 @@ const applyStyles = (axis: D3Selection<SVGGElement, unknown, null, undefined>) =
   axis.selectAll("line").style("color", theme.colors.axis.border);
 };
 
+const getTickFormatter = (scale: AxisProps["scale"], maxNumberOfTicks?: number) => {
+  const formatter = isScaleContinuous(scale) ? d3Format("~s") : (d: any) => d;
+  if (maxNumberOfTicks === undefined) {
+    return formatter;
+  }
+  const ticks = isScaleContinuous(scale) ? scale.ticks() : scale.domain();
+  const tickInterval = Math.ceil(ticks.length / maxNumberOfTicks);
+  return (d: any, i: number) => (i % tickInterval === 0 ? formatter(d) : null);
+};
+
 export const Axis: React.FC<AxisProps> = React.memo(({ scale, transform, position, maxNumberOfTicks }) => {
   const defaultTransform = useAxisTransform(position!);
   const ref = useRef<SVGGElement>(null);
   useEffect(() => {
     if (ref.current) {
-      const nTicks = (isScaleContinuous(scale) ? scale.ticks() : scale.domain()).length;
-      const formatter = isScaleContinuous(scale) ? d3Format("~s") : (d: any) => d;
-      const tickFormat =
-        maxNumberOfTicks !== undefined && nTicks > maxNumberOfTicks
-          ? (d: any, i: number) => (i % maxNumberOfTicks === 0 ? formatter(d) : null)
-          : formatter;
+      const tickFormat = getTickFormatter(scale, maxNumberOfTicks);
 
       let axis: D3Selection<SVGGElement, unknown, null, undefined>;
       switch (position) {
