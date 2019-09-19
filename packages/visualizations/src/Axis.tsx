@@ -75,6 +75,9 @@ export const Axis: React.FC<AxisProps> = React.memo(({ scale, transform, positio
         case "top":
           axis = select(ref.current).call(axisTop(scale).tickFormat(tickFormat));
           applyStyles(axis);
+          axis.selectAll("text").each(function() {
+            wrap(this, tickSpacing);
+          });
           break;
         case "left":
           axis = select(ref.current).call(axisLeft(scale).tickFormat(tickFormat));
