@@ -35,7 +35,7 @@ const palettes = {
 const axisColors = {
   border: "#adadad",
   rules: "#e8e8e8",
-  label: "#999999",
+  label: "#545454",
 };
 
 const focusColors = {

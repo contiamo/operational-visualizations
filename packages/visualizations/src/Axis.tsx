@@ -1,10 +1,11 @@
 import { axisBottom, axisLeft, axisTop, axisRight } from "d3-axis";
 import { format as d3Format } from "d3-format";
 import { ScaleBand, ScaleLinear } from "d3-scale";
-import { select } from "d3-selection";
+import { select, Selection as D3Selection } from "d3-selection";
 import React, { useEffect, useRef } from "react";
 import { useAxisTransform } from "./Chart";
 import { isScaleContinuous } from "./scale";
+import theme from "./theme";
 
 export interface AxisProps {
   /** see  https://github.com/d3/d3-scale */
@@ -15,6 +16,12 @@ export interface AxisProps {
   transform?: string;
   maxNumberOfTicks?: number;
 }
+
+const applyStyles = (axis: D3Selection<SVGGElement, unknown, null, undefined>) => {
+  axis.selectAll("text").style("color", theme.colors.axis.label);
+  axis.selectAll("path").style("color", theme.colors.axis.border);
+  axis.selectAll("line").style("color", theme.colors.axis.border);
+};
 
 export const Axis: React.FC<AxisProps> = React.memo(({ scale, transform, position, maxNumberOfTicks }) => {
   const defaultTransform = useAxisTransform(position!);
@@ -28,18 +35,23 @@ export const Axis: React.FC<AxisProps> = React.memo(({ scale, transform, positio
           ? (d: any, i: number) => (i % maxNumberOfTicks === 0 ? formatter(d) : null)
           : formatter;
 
+      let axis: D3Selection<SVGGElement, unknown, null, undefined>;
       switch (position) {
         case "bottom":
-          select(ref.current).call(axisBottom(scale).tickFormat(tickFormat));
+          axis = select(ref.current).call(axisBottom(scale).tickFormat(tickFormat));
+          applyStyles(axis);
           break;
         case "top":
-          select(ref.current).call(axisTop(scale).tickFormat(tickFormat));
+          axis = select(ref.current).call(axisTop(scale).tickFormat(tickFormat));
+          applyStyles(axis);
           break;
         case "left":
-          select(ref.current).call(axisLeft(scale).tickFormat(tickFormat));
+          axis = select(ref.current).call(axisLeft(scale).tickFormat(tickFormat));
+          applyStyles(axis);
           break;
         case "right":
-          select(ref.current).call(axisRight(scale).tickFormat(tickFormat));
+          axis = select(ref.current).call(axisRight(scale).tickFormat(tickFormat));
+          applyStyles(axis);
           break;
       }
     }
