@@ -1,7 +1,7 @@
 import React from "react";
 import { RowCursor, ColumnCursor, IterableFrame } from "@operational/frame";
 import { arc, pie, PieArcDatum } from "d3-shape";
-import { isFunction } from "./utils";
+import { isFunction, numberFormatter } from "./utils";
 import { useChartTransform } from "./Chart";
 import { verticalStyle as verticalLabelStyle } from "./Labels";
 
@@ -52,7 +52,7 @@ export const PieChart = (props: PieChartProps<string>) => {
                   }}
                   key={`label-${i}`}
                 >
-                  {datum.value}
+                  {numberFormatter(datum.value)}
                 </text>
               )}
             </>

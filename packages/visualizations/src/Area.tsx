@@ -2,7 +2,7 @@ import { area, line } from "d3-shape";
 import React from "react";
 import { useChartTransform } from "./Chart";
 import { LinearAxialChart } from "./types";
-import { isFunction } from "./utils";
+import { isFunction, numberFormatter } from "./utils";
 import { baseStyle as baseLabelStyle, verticalStyle as verticalLabelStyle } from "./Labels";
 import { ColumnCursor } from "@operational/frame";
 import { isScaleBand, isScaleContinuous } from "./scale";
@@ -139,7 +139,7 @@ export const Area: LinearAxialChart<string> = ({ data, transform, x, y, xScale, 
                 dy="0.35em"
                 style={baseLabelStyle}
               >
-                {isDefined(d.m1) && isDefined(d.m0) ? d.m1 - d.m0 : ""}
+                {isDefined(d.m1) && isDefined(d.m0) ? numberFormatter(d.m1 - d.m0) : ""}
               </text>
             ),
           ),

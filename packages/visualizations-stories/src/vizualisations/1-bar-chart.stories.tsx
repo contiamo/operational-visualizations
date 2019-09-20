@@ -46,13 +46,13 @@ const rawData = {
     },
   ],
   rows: [
-    ["Europe", "Germany", "Berlin", "<50", "Female", 101, 10.2],
-    ["Europe", "Germany", "Dresden", "<50", "Female", 201, 20.2],
-    ["Europe", "Germany", "Hamburg", "<50", "Female", 301, 30.2],
-    ["Europe", "UK", "London", "<50", "Female", 401, 40.2],
-    ["Europe", "UK", "Edinburgh", "<50", "Female", 501, 50.2],
-    ["North America", "USA", "New York", "<50", "Female", 801, 80.2],
-    ["North America", "Canada", "Toronto", "<50", "Female", 801, 80.2],
+    ["Europe", "Germany", "Berlin", "<50", "Female", 1001, 10.2],
+    ["Europe", "Germany", "Dresden", "<50", "Female", 2001, 20.2],
+    ["Europe", "Germany", "Hamburg", "<50", "Female", 3001, 30.2],
+    ["Europe", "UK", "London", "<50", "Female", 4001, 40.2],
+    ["Europe", "UK", "Edinburgh", "<50", "Female", 5001, 50.2],
+    ["North America", "USA", "New York", "<50", "Female", 8001, 80.2],
+    ["North America", "Canada", "Toronto", "<50", "Female", 8001, 80.2],
   ],
 };
 

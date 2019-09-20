@@ -59,7 +59,7 @@ const font = {
     /** 12 */
     default: 12,
     /** 11 */
-    small: 11,
+    small: 10,
   },
   weight: {
     /** 400 */
