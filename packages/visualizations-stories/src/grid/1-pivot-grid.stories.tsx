@@ -459,7 +459,12 @@ storiesOf("@operational/grid/1. Pivot table", module)
           viewBox={`0 0 ${widthWithoutPadding} ${height}`}
           style={{ margin: `${padding} 0` }}
         >
-          <Axis scale={xScale} transform={`translate(${padding}, ${35 - padding - 1})`} position="top" />
+          <Axis
+            scale={xScale}
+            transform={`translate(${padding}, ${35 - padding - 1})`}
+            position="top"
+            maxNumberOfTicks={5}
+          />
         </svg>
       );
     };
